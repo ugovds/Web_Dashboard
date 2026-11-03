@@ -330,7 +330,7 @@
                 </div>
               </div>
 
-              <!-- VUE 6 : MONITEUR SYSTÈME & CRYPTO -->
+              <!-- VUE 6 : MONITEUR SYSTÈME & MARCHÉS BOURSIERS -->
               <div id="deck-view-system" class="deck-slide-view" hidden>
                 <div class="deck-widget-panel system-panel">
                   <div class="system-telemetry-grid">
@@ -343,13 +343,13 @@
                       <span id="sys-ping-state" class="telemetry-sub">Mesure...</span>
                     </div>
 
-                    <div class="telemetry-card">
-                      <div class="telemetry-label"><i class="fa-solid fa-battery-half"></i> Batterie</div>
+                    <div class="telemetry-card" id="sys-power-card">
+                      <div class="telemetry-label" id="sys-power-label"><i class="fa-solid fa-plug"></i> Alimentation</div>
                       <div class="telemetry-val-row">
-                        <i id="sys-bat-icon" class="fa-solid fa-battery-full telemetry-bat-icon"></i>
-                        <span id="sys-bat-val" class="telemetry-number">--%</span>
+                        <i id="sys-bat-icon" class="fa-solid fa-plug telemetry-bat-icon ac-power"></i>
+                        <span id="sys-bat-val" class="telemetry-number">Secteur AC</span>
                       </div>
-                      <span id="sys-bat-state" class="telemetry-sub">Détection...</span>
+                      <span id="sys-bat-state" class="telemetry-sub">PC Station • Stable</span>
                     </div>
 
                     <div class="telemetry-card">
@@ -361,39 +361,59 @@
                     </div>
 
                     <div class="telemetry-card">
-                      <div class="telemetry-label"><i class="fa-solid fa-circle-check"></i> Progression Tâches</div>
+                      <div class="telemetry-label"><i class="fa-solid fa-microchip"></i> Matériel & CPU</div>
                       <div class="telemetry-val-row">
-                        <span id="sys-tasks-ratio" class="telemetry-number">0 / 0</span>
+                        <span id="sys-hardware-val" class="telemetry-number">-- Cores</span>
                       </div>
-                      <span id="sys-tasks-pct" class="telemetry-sub">0% terminées</span>
+                      <span id="sys-hardware-sub" class="telemetry-sub">Système 64-bit</span>
                     </div>
                   </div>
 
-                  <!-- Mini Ticker Crypto -->
-                  <div class="crypto-ticker-section">
-                    <div class="crypto-ticker-header">
-                      <span><i class="fa-solid fa-chart-line"></i> Marché & Crypto</span>
-                      <button type="button" id="crypto-refresh-btn" class="deck-mini-refresh" title="Actualiser les cours">
-                        <i class="fa-solid fa-rotate-right"></i>
-                      </button>
+                  <!-- Ticker Marchés Boursiers & Indices avec Personnalisation -->
+                  <div class="crypto-ticker-section market-ticker-section">
+                    <div class="crypto-ticker-header market-ticker-header">
+                      <span><i class="fa-solid fa-chart-line"></i> Marchés & Indices</span>
+                      <div class="market-header-actions">
+                        <button type="button" id="market-config-toggle-btn" class="deck-mini-refresh" title="Personnaliser les indices et actions">
+                          <i class="fa-solid fa-sliders"></i>
+                        </button>
+                        <button type="button" id="crypto-refresh-btn" class="deck-mini-refresh" title="Actualiser les cours">
+                          <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                      </div>
                     </div>
 
+                    <!-- Tiroir de personnalisation des marchés -->
+                    <div id="market-config-drawer" class="market-config-drawer" hidden>
+                      <div class="market-drawer-top">
+                        <span class="market-drawer-title"><i class="fa-solid fa-sliders"></i> Personnaliser les Marchés</span>
+                        <button type="button" id="market-config-close-btn" class="deck-icon-action" title="Fermer"><i class="fa-solid fa-xmark"></i></button>
+                      </div>
+
+                      <div class="market-presets-row">
+                        <button type="button" class="market-preset-btn" data-preset="indices">Indices Globaux</button>
+                        <button type="button" class="market-preset-btn" data-preset="tech">Tech & Titans</button>
+                        <button type="button" class="market-preset-btn" data-preset="all">Tout</button>
+                      </div>
+
+                      <div class="market-assets-checklist" id="market-assets-checklist">
+                        <!-- Cases à cocher générées par js/widgets.js -->
+                      </div>
+
+                      <!-- Ajout d'actif personnalisé -->
+                      <div class="market-add-custom-box">
+                        <div class="market-custom-inputs">
+                          <input type="text" id="market-new-name" placeholder="Nom (ex: Tesla)" maxlength="16" />
+                          <input type="text" id="market-new-sym" placeholder="Symbole (TSLA)" maxlength="8" />
+                          <input type="number" id="market-new-price" placeholder="Prix (ex: 215)" step="any" />
+                        </div>
+                        <button type="button" id="market-add-custom-btn" class="modal-btn primary"><i class="fa-solid fa-plus"></i> Ajouter</button>
+                      </div>
+                    </div>
+
+                    <!-- Cartes des marchés affichées -->
                     <div class="crypto-ticker-cards" id="crypto-ticker-cards">
-                      <div class="crypto-card">
-                        <span class="crypto-coin"><i class="fa-brands fa-bitcoin"></i> BTC</span>
-                        <span class="crypto-price" id="crypto-btc-price">-- $</span>
-                        <span class="crypto-change" id="crypto-btc-change">--%</span>
-                      </div>
-                      <div class="crypto-card">
-                        <span class="crypto-coin"><i class="fa-brands fa-ethereum"></i> ETH</span>
-                        <span class="crypto-price" id="crypto-eth-price">-- $</span>
-                        <span class="crypto-change" id="crypto-eth-change">--%</span>
-                      </div>
-                      <div class="crypto-card">
-                        <span class="crypto-coin"><i class="fa-solid fa-euro-sign"></i> EUR/USD</span>
-                        <span class="crypto-price" id="crypto-eur-price">-- $</span>
-                        <span class="crypto-change" id="crypto-eur-change">--%</span>
-                      </div>
+                      <!-- Rendu dynamique par js/widgets.js -->
                     </div>
                   </div>
                 </div>
@@ -828,13 +848,13 @@
                   </div>
                 </div>
 
-                <!-- Widget 4: Moniteur Système -->
+                <!-- Widget 4: Moniteur Système & Marchés -->
                 <div class="widget-config-card" data-widget-key="system">
                   <div class="widget-card-top">
                     <div class="widget-icon-box"><i class="fa-solid fa-microchip"></i></div>
                     <div class="widget-meta">
-                      <h5>Moniteur Système & Cyber Stats</h5>
-                      <p>Latence ping en direct, statut de batterie, temps de session (uptime) et cours crypto.</p>
+                      <h5>Moniteur Système & Marchés Boursiers</h5>
+                      <p>Latence ping en direct, statut d'alimentation/matériel, temps de session et indices boursiers (S&P 500, Europe Stoxx 600, Emerging Markets, NVIDIA).</p>
                     </div>
                     <label class="fx-toggle-label switch-only">
                       <input type="checkbox" id="widget-toggle-system" checked />
@@ -842,7 +862,7 @@
                     </label>
                   </div>
                   <div class="widget-config-body">
-                    <div class="widget-pill-badge"><i class="fa-solid fa-bolt"></i> Surveillance télémétrique live</div>
+                    <div class="widget-pill-badge"><i class="fa-solid fa-bolt"></i> Télémétrie PC & Indices Bourse</div>
                   </div>
                 </div>
 

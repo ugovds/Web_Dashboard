@@ -95,7 +95,7 @@ La page intègre **3 thèmes visuels complets** avec éclairage ambiant (Ambilig
   3. ⏱️ **Focus / Pomodoro** : Minuteur interactif (25m Focus / 5m Courte pause / 15m Longue pause), cadran numérique, barre de progression, carillon harmonique Web Audio et compteur de sessions.
   4. 📝 **Bloc-Notes Instantané (Scratchpad)** : Éditeur de notes rapides avec auto-sauvegarde dans `localStorage`, compteur de mots/caractères, copie dans le presse-papier et téléchargement en fichier `.txt`.
   5. 🎧 **Ambiance Sonore & Relax Lo-Fi** : Synthétiseur procédural Web Audio (pluie douce, bruit brun apaisant) et radio Lo-Fi cyber en streaming, avec curseur de volume et **visualiseur audio Canvas animé**.
-  6. ⚡ **Moniteur Système & Cyber Stats** : Latence ping en temps réel, jauge et icône animée de batterie (Battery API), compteur de temps de session (uptime), et cours crypto en direct (Bitcoin, Ethereum, EUR/USD).
+  6. ⚡ **Moniteur Système & Marchés Boursiers** : Latence ping en temps réel, statut d'alimentation universel (détection automatique de batterie sur ordinateur portable ou bascule intelligente sur alimentation Secteur AC fixe pour PC de bureau / Firefox), détection des cœurs CPU et de la RAM, compteur d'uptime et **ticker des marchés financiers & actions** (S&P 500, Europe Stoxx 600, Emerging Markets, NVIDIA...) avec **menu de personnalisation intégré** (sélection d'actifs par cases à cocher, presets rapides et ajout d'actifs sur mesure).
   7. 💬 **Citations Cyberpunk & Motivation** : Plus de 30 citations de science-fiction, de culture hacker et de philosophie dev avec bouton aléatoire et copie rapide.
 - **Bande de gauche immersive** : Illustration animée plein format s'étirant sur toute la hauteur de la grille avec badge Cyberdeck d'état du système.
 

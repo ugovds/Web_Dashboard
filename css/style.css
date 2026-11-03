@@ -2121,6 +2121,225 @@ body.edit-mode-active .link-item:hover {
 .crypto-change.up { color: #50fa7b; background: rgba(80, 250, 123, 0.12); }
 .crypto-change.down { color: #ff5555; background: rgba(255, 85, 85, 0.12); }
 
+.telemetry-bat-icon.ac-power {
+  color: #50fa7b;
+}
+
+.market-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.market-asset-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+
+/* Tiroir de personnalisation des marchés */
+.market-config-drawer {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-highlight);
+  border-radius: 9px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  animation: marketDrawerIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 0.4rem;
+}
+
+.market-config-drawer[hidden] {
+  display: none !important;
+}
+
+@keyframes marketDrawerIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.market-drawer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.market-drawer-title {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.market-presets-row {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.market-preset-btn {
+  flex: 1;
+  padding: 0.25rem 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.66rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.market-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--accent-white);
+  border-color: var(--border-highlight);
+}
+
+.market-assets-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-height: 155px;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.market-assets-checklist::-webkit-scrollbar {
+  width: 4px;
+}
+
+.market-assets-checklist::-webkit-scrollbar-thumb {
+  background: var(--border-highlight);
+  border-radius: 4px;
+}
+
+.market-check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.32rem 0.5rem;
+  background: rgba(255, 255, 255, 0.025);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  color: var(--text-main);
+  transition: background 0.15s ease;
+  user-select: none;
+}
+
+.market-check-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.market-check-item input[type="checkbox"] {
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
+
+.market-check-item i {
+  color: var(--accent-primary);
+  font-size: 0.75rem;
+  width: 14px;
+  text-align: center;
+}
+
+.market-check-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+}
+
+.market-check-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.market-check-sym {
+  font-size: 0.64rem;
+  color: var(--text-muted);
+  font-family: "JetBrains Mono", monospace;
+}
+
+.market-del-custom {
+  background: transparent;
+  border: none;
+  color: #ff6b6b;
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0 0.2rem;
+  opacity: 0.8;
+}
+
+.market-del-custom:hover {
+  opacity: 1;
+}
+
+.market-add-custom-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.market-custom-inputs {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.market-custom-inputs input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.28rem 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.68rem;
+}
+
+.market-custom-inputs input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.market-add-custom-box .modal-btn {
+  padding: 0.32rem 0.6rem;
+  font-size: 0.7rem;
+}
+
+.market-card.flash-update {
+  animation: cardFlash 0.6s ease;
+}
+
+@keyframes cardFlash {
+  0% { background: rgba(255, 255, 255, 0.12); }
+  100% { background: rgba(255, 255, 255, 0.03); }
+}
+
+.market-empty-hint {
+  text-align: center;
+  padding: 0.85rem;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* 5. Quotes */
 .quotes-panel {
   justify-content: space-between;
