@@ -1,5 +1,6 @@
 /**
- * bookmarks.js - Gestion des catégories de signets, mode personnalisation, glisser-déposer et sauvegarde/restauration JSON
+ * bookmarks.js - Gestion des catégories de signets, ajustement adaptatif de la taille,
+ * ajout/suppression de liens et catégories, glisser-déposer et sauvegarde/restauration JSON complète
  */
 const defaultCategories = [
   {
@@ -59,7 +60,8 @@ const defaultCategories = [
 let categories = [];
 let quickShortcuts = [];
 let isEditMode = false;
-let currentEditingTarget = { catIdx: null, linkIdx: null };
+let currentEditingTarget = { catIdx: null, linkIdx: null }; // linkIdx === null signifie ajout d'un nouveau lien
+let currentEditingCategoryIdx = null; // null = ajout de catégorie
 
 // Variables pour le Glisser-Déposer
 let draggedData = null; // { catIdx, linkIdx }
@@ -69,49 +71,115 @@ function getQuickShortcuts() {
   return quickShortcuts;
 }
 
+/**
+ * Calcule automatiquement la classe de densité pour que la carte reste belle
+ * peu importe le nombre de liens (> 6 liens supportés sans déformation).
+ */
+function getCategoryDensityClass(count) {
+  if (count <= 6) return 'density-normal';
+  if (count <= 8) return 'density-compact';
+  if (count <= 12) return 'density-dense';
+  return 'density-scroll';
+}
+
 function renderCategories() {
   const categoriesContainer = document.getElementById('categories-container');
   if (!categoriesContainer) return;
 
+  // Ajustement automatique des colonnes du conteneur si > 4 catégories
+  if (categories.length > 4) {
+    categoriesContainer.classList.add('multi-categories');
+  } else {
+    categoriesContainer.classList.remove('multi-categories');
+  }
+
   categoriesContainer.innerHTML = categories
-    .map(
-      (cat, catIdx) => `
-    <div class="category-card" data-cat="${catIdx}">
-      <div class="category-header">
-        <i class="${cat.icon}"></i>
-        <h3>${cat.title}</h3>
+    .map((cat, catIdx) => {
+      const densityClass = getCategoryDensityClass(cat.links.length);
+      return `
+      <div class="category-card ${densityClass}" data-cat="${catIdx}">
+        <div class="category-header">
+          <div class="category-title-wrap">
+            <i class="${cat.icon}"></i>
+            <h3>${cat.title}</h3>
+            <span class="category-count-badge" title="${cat.links.length} raccourci(s)">${cat.links.length}</span>
+          </div>
+
+          ${
+            isEditMode
+              ? `
+            <div class="category-tools-group">
+              <button type="button" class="cat-tool-btn cat-add-link-btn" data-cat="${catIdx}" title="Ajouter un lien à cette catégorie">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              <button type="button" class="cat-tool-btn cat-edit-btn" data-cat="${catIdx}" title="Modifier le nom ou l'icône de la catégorie">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              ${
+                categories.length > 1
+                  ? `
+                <button type="button" class="cat-tool-btn danger cat-del-btn" data-cat="${catIdx}" title="Supprimer cette catégorie">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              `
+                  : ''
+              }
+            </div>
+          `
+              : ''
+          }
+        </div>
+
+        <div class="link-list ${densityClass}" data-cat="${catIdx}">
+          ${cat.links
+            .map(
+              (link, linkIdx) => `
+            <a
+              href="${link.url}"
+              class="link-item"
+              data-cat="${catIdx}"
+              data-link="${linkIdx}"
+              ${isEditMode ? 'draggable="true"' : ''}
+            >
+              ${
+                isEditMode
+                  ? `<span class="link-drag-handle" title="Glisser pour réorganiser"><i class="fa-solid fa-grip-vertical"></i></span>`
+                  : ''
+              }
+              <i class="${link.icon}"></i>
+              <span class="link-name-text">${link.name}</span>
+              ${
+                isEditMode
+                  ? `
+                <div class="link-edit-actions">
+                  <span class="link-edit-badge" title="Modifier ce raccourci"><i class="fa-solid fa-pen"></i></span>
+                  <span class="link-delete-badge" data-del-link="${linkIdx}" data-del-cat="${catIdx}" title="Supprimer ce raccourci"><i class="fa-solid fa-xmark"></i></span>
+                </div>
+              `
+                  : ''
+              }
+            </a>
+          `
+            )
+            .join('')}
+
+          ${
+            isEditMode
+              ? `
+            <button type="button" class="link-item-add-quick" data-cat="${catIdx}" title="Ajouter un raccourci">
+              <i class="fa-solid fa-plus"></i>
+              <span>+ Nouveau lien</span>
+            </button>
+          `
+              : ''
+          }
+        </div>
       </div>
-      <div class="link-list" data-cat="${catIdx}">
-        ${cat.links
-          .map(
-            (link, linkIdx) => `
-          <a
-            href="${link.url}"
-            class="link-item"
-            data-cat="${catIdx}"
-            data-link="${linkIdx}"
-            ${isEditMode ? 'draggable="true"' : ''}
-          >
-            ${
-              isEditMode
-                ? `<span class="link-drag-handle" title="Glisser pour réorganiser"><i class="fa-solid fa-grip-vertical"></i></span>`
-                : ''
-            }
-            <i class="${link.icon}"></i>
-            <span>${link.name}</span>
-            <span class="link-edit-badge" title="Modifier ce raccourci">
-              <i class="fa-solid fa-pen"></i>
-            </span>
-          </a>
-        `
-          )
-          .join('')}
-      </div>
-    </div>
-  `
-    )
+    `;
+    })
     .join('');
 
+  // Reconstituer la liste plate pour la recherche Omnibox
   quickShortcuts = [];
   categories.forEach((cat) => {
     cat.links.forEach((l) => {
@@ -125,6 +193,7 @@ function renderCategories() {
 
   if (isEditMode) {
     attachDragAndDropEvents();
+    attachCategoryActionEvents();
   }
 }
 
@@ -143,6 +212,68 @@ function setEditMode(active) {
   }
 
   renderCategories();
+}
+
+// ----------------------------------------------------
+// Événements d'édition sur les catégories et raccourcis
+// ----------------------------------------------------
+function attachCategoryActionEvents() {
+  // Bouton Ajouter un lien dans le header ou à la fin de la liste
+  document.querySelectorAll('.cat-add-link-btn, .link-item-add-quick').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const catIdx = Number(btn.dataset.cat);
+      openEditModal(catIdx, null); // null = nouveau lien
+    });
+  });
+
+  // Bouton Éditer la catégorie
+  document.querySelectorAll('.cat-edit-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const catIdx = Number(btn.dataset.cat);
+      openCategoryModal(catIdx);
+    });
+  });
+
+  // Bouton Supprimer la catégorie
+  document.querySelectorAll('.cat-del-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const catIdx = Number(btn.dataset.cat);
+      const catName = categories[catIdx]?.title || 'cette catégorie';
+      if (confirm(`Voulez-vous vraiment supprimer la catégorie "${catName}" et tous ses raccourcis ?`)) {
+        categories.splice(catIdx, 1);
+        localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
+        renderCategories();
+        if (typeof showToast === 'function') {
+          showToast(`Catégorie "${catName}" supprimée`, 'info');
+        }
+      }
+    });
+  });
+
+  // Bouton suppression rapide d'un lien (croix rouge)
+  document.querySelectorAll('.link-delete-badge').forEach((badge) => {
+    badge.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const catIdx = Number(badge.dataset.delCat);
+      const linkIdx = Number(badge.dataset.delLink);
+      deleteBookmark(catIdx, linkIdx);
+    });
+  });
+}
+
+function deleteBookmark(catIdx, linkIdx) {
+  if (catIdx === null || linkIdx === null) return;
+  const linkName = categories[catIdx]?.links[linkIdx]?.name || 'le raccourci';
+  categories[catIdx].links.splice(linkIdx, 1);
+  localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
+  renderCategories();
+  if (typeof showToast === 'function') {
+    showToast(`Raccourci "${linkName}" supprimé`, 'info');
+  }
 }
 
 // ----------------------------------------------------
@@ -175,7 +306,7 @@ function attachDragAndDropEvents() {
       setTimeout(() => {
         didDragOccur = false;
         draggedData = null;
-      }, 50);
+      }, 60);
     });
 
     item.addEventListener('dragover', (e) => {
@@ -229,8 +360,7 @@ function attachDragAndDropEvents() {
     list.addEventListener('drop', (e) => {
       list.closest('.category-card')?.classList.remove('drag-over-cat');
       if (!draggedData) return;
-      // Si dropped directement sur la liste (fin de la liste)
-      if (e.target === list) {
+      if (e.target === list || e.target.closest('.link-item-add-quick')) {
         e.preventDefault();
         const targetCatIdx = Number(list.dataset.cat);
         moveBookmark(draggedData.catIdx, draggedData.linkIdx, targetCatIdx, categories[targetCatIdx].links.length, false);
@@ -265,20 +395,40 @@ function moveBookmark(srcCat, srcLink, dstCat, dstLink, insertBefore) {
 }
 
 // ----------------------------------------------------
-// Modale d'édition d'un raccourci individuel
+// Modale d'édition d'un raccourci (Ajout ou Modification)
 // ----------------------------------------------------
 function openEditModal(catIdx, linkIdx) {
   const editModal = document.getElementById('edit-modal');
+  const modalTitle = document.getElementById('edit-modal-title');
   const editNameInput = document.getElementById('edit-name');
   const editUrlInput = document.getElementById('edit-url');
   const editIconInput = document.getElementById('edit-icon');
+  const deleteBtn = document.getElementById('modal-delete-shortcut-btn');
+  const submitBtn = document.getElementById('modal-submit-btn');
 
   currentEditingTarget = { catIdx, linkIdx };
-  const data = categories[catIdx].links[linkIdx];
-  editNameInput.value = data.name;
-  editUrlInput.value = data.url;
-  editIconInput.value = data.icon;
-  updateIconPreview(data.icon);
+
+  if (linkIdx !== null) {
+    // Mode Modification
+    const data = categories[catIdx].links[linkIdx];
+    if (modalTitle) modalTitle.textContent = 'Modifier le raccourci';
+    editNameInput.value = data.name;
+    editUrlInput.value = data.url;
+    editIconInput.value = data.icon;
+    updateIconPreview(data.icon);
+    if (deleteBtn) deleteBtn.hidden = false;
+    if (submitBtn) submitBtn.textContent = 'Enregistrer';
+  } else {
+    // Mode Ajout
+    if (modalTitle) modalTitle.textContent = `Nouveau lien (${categories[catIdx]?.title || 'Catégorie'})`;
+    editNameInput.value = '';
+    editUrlInput.value = 'https://';
+    editIconInput.value = 'fa-solid fa-link';
+    updateIconPreview('fa-solid fa-link');
+    if (deleteBtn) deleteBtn.hidden = true;
+    if (submitBtn) submitBtn.textContent = 'Ajouter';
+  }
+
   editModal.hidden = false;
   editNameInput.focus();
 }
@@ -297,26 +447,67 @@ function updateIconPreview(cls) {
 }
 
 // ----------------------------------------------------
-// Sauvegarde & Restauration (Export / Import JSON)
+// Modale d'édition / création de catégorie
+// ----------------------------------------------------
+function openCategoryModal(catIdx = null) {
+  const modal = document.getElementById('category-modal');
+  const titleEl = document.getElementById('cat-modal-title');
+  const nameInput = document.getElementById('cat-modal-name');
+  const iconInput = document.getElementById('cat-modal-icon');
+  const preview = document.getElementById('cat-modal-icon-preview');
+
+  currentEditingCategoryIdx = catIdx;
+
+  if (catIdx !== null) {
+    const cat = categories[catIdx];
+    if (titleEl) titleEl.textContent = 'Modifier la catégorie';
+    if (nameInput) nameInput.value = cat.title;
+    if (iconInput) iconInput.value = cat.icon;
+    if (preview) preview.className = cat.icon;
+  } else {
+    if (titleEl) titleEl.textContent = 'Nouvelle catégorie';
+    if (nameInput) nameInput.value = '';
+    if (iconInput) iconInput.value = 'fa-solid fa-folder';
+    if (preview) preview.className = 'fa-solid fa-folder';
+  }
+
+  if (modal) modal.hidden = false;
+  if (nameInput) nameInput.focus();
+}
+
+function closeCategoryModal() {
+  const modal = document.getElementById('category-modal');
+  if (modal) modal.hidden = true;
+  currentEditingCategoryIdx = null;
+}
+
+// ----------------------------------------------------
+// Sauvegarde & Restauration (Export / Import JSON Complet)
 // ----------------------------------------------------
 function exportFullConfig() {
   let customFeeds = [];
-  try {
-    customFeeds = JSON.parse(localStorage.getItem('startpage_custom_feeds') || '[]');
-  } catch {}
+  try { customFeeds = JSON.parse(localStorage.getItem('startpage_custom_feeds') || '[]'); } catch {}
 
   let todos = [];
-  try {
-    todos = JSON.parse(localStorage.getItem('startpage_todos_v2') || '[]');
-  } catch {}
+  try { todos = JSON.parse(localStorage.getItem('startpage_todos_v2') || '[]'); } catch {}
+
+  let topbarWidgetsData = null;
+  try { topbarWidgetsData = JSON.parse(localStorage.getItem('startpage_topbar_widgets') || 'null'); } catch {}
+
+  let appearanceData = null;
+  try { appearanceData = JSON.parse(localStorage.getItem('startpage_appearance') || 'null'); } catch {}
 
   const config = {
     app: 'violet-startpage',
-    version: '2.0',
+    version: '2.1',
     exportDate: new Date().toISOString(),
     theme: localStorage.getItem('startpage_theme') || '1',
+    promptPath: localStorage.getItem('startpage_prompt_path') || '~/startpage',
     weatherCity: localStorage.getItem('startpage_weather_city') || '',
     weatherFx: localStorage.getItem('startpage_weather_fx') !== 'false',
+    scratchpad: localStorage.getItem('startpage_scratchpad') || '',
+    topbarWidgets: topbarWidgetsData,
+    appearance: appearanceData,
     categories: categories,
     todos: todos,
     customFeeds: customFeeds
@@ -332,7 +523,7 @@ function exportFullConfig() {
   downloadAnchor.remove();
 
   if (typeof showToast === 'function') {
-    showToast('Sauvegarde JSON téléchargée avec succès !', 'success');
+    showToast('Sauvegarde JSON complète téléchargée !', 'success');
   }
 }
 
@@ -364,6 +555,29 @@ function importFullConfig(file) {
         if (typeof initFeeds === 'function') initFeeds();
       }
 
+      if (data.promptPath) {
+        localStorage.setItem('startpage_prompt_path', data.promptPath);
+        if (typeof setPromptPath === 'function') setPromptPath(data.promptPath);
+      }
+
+      if (data.scratchpad !== undefined) {
+        localStorage.setItem('startpage_scratchpad', data.scratchpad);
+        const scratchpadTextarea = document.getElementById('scratchpad-textarea');
+        if (scratchpadTextarea) scratchpadTextarea.value = data.scratchpad;
+      }
+
+      if (data.topbarWidgets) {
+        localStorage.setItem('startpage_topbar_widgets', JSON.stringify(data.topbarWidgets));
+        if (typeof loadTopbarWidgetsSettings === 'function') loadTopbarWidgetsSettings();
+        if (typeof applyTopbarWidgetsVisibility === 'function') applyTopbarWidgetsVisibility();
+      }
+
+      if (data.appearance) {
+        localStorage.setItem('startpage_appearance', JSON.stringify(data.appearance));
+        if (typeof loadAppearanceSettings === 'function') loadAppearanceSettings();
+        if (typeof applyAppearance === 'function') applyAppearance();
+      }
+
       if (data.weatherCity !== undefined) {
         localStorage.setItem('startpage_weather_city', data.weatherCity);
         if (typeof fetchWeather === 'function') fetchWeather();
@@ -379,7 +593,7 @@ function importFullConfig(file) {
       }
 
       if (typeof showToast === 'function') {
-        showToast('Configuration restaurée avec succès !', 'success');
+        showToast('Configuration complète restaurée avec succès !', 'success');
       }
     } catch (err) {
       if (typeof showToast === 'function') {
@@ -406,15 +620,26 @@ function initBookmarks() {
 
   const editToggleBtn = document.getElementById('edit-mode-toggle');
   const closeEditBtn = document.getElementById('btn-close-edit');
+  const addCategoryBtn = document.getElementById('btn-add-category');
   const editModal = document.getElementById('edit-modal');
   const modalCloseBtn = document.getElementById('modal-close-btn');
   const modalCancelBtn = document.getElementById('modal-cancel-btn');
+  const deleteShortcutBtn = document.getElementById('modal-delete-shortcut-btn');
   const editForm = document.getElementById('edit-shortcut-form');
   const editNameInput = document.getElementById('edit-name');
   const editUrlInput = document.getElementById('edit-url');
   const editIconInput = document.getElementById('edit-icon');
   const resetAllBtn = document.getElementById('reset-all-shortcuts-btn');
   const categoriesContainer = document.getElementById('categories-container');
+
+  // Modale de catégorie
+  const catModal = document.getElementById('category-modal');
+  const catModalCloseBtn = document.getElementById('cat-modal-close');
+  const catModalCancelBtn = document.getElementById('cat-modal-cancel');
+  const catModalForm = document.getElementById('category-form');
+  const catNameInput = document.getElementById('cat-modal-name');
+  const catIconInput = document.getElementById('cat-modal-icon');
+  const catIconPreview = document.getElementById('cat-modal-icon-preview');
 
   // Boutons Export / Import JSON
   const btnExport = document.getElementById('btn-export-backup');
@@ -430,6 +655,12 @@ function initBookmarks() {
   if (closeEditBtn) {
     closeEditBtn.addEventListener('click', () => {
       setEditMode(false);
+    });
+  }
+
+  if (addCategoryBtn) {
+    addCategoryBtn.addEventListener('click', () => {
+      openCategoryModal(null);
     });
   }
 
@@ -449,12 +680,16 @@ function initBookmarks() {
     });
   }
 
+  // Clic sur un lien en mode édition = ouvrir la modale de modification
   if (categoriesContainer) {
     categoriesContainer.addEventListener('click', (e) => {
       if (!isEditMode) return;
-
-      // Si un drag vient de s'achever, ne pas ouvrir la modale
       if (didDragOccur) return;
+
+      // Si le clic provient d'un bouton d'action ou de suppression rapide, ne rien faire ici
+      if (e.target.closest('.link-delete-badge') || e.target.closest('.cat-tool-btn') || e.target.closest('.link-item-add-quick')) {
+        return;
+      }
 
       const linkEl = e.target.closest('.link-item');
       if (!linkEl) return;
@@ -468,6 +703,16 @@ function initBookmarks() {
 
   if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeEditModal);
   if (modalCancelBtn) modalCancelBtn.addEventListener('click', closeEditModal);
+
+  if (deleteShortcutBtn) {
+    deleteShortcutBtn.addEventListener('click', () => {
+      const { catIdx, linkIdx } = currentEditingTarget;
+      if (catIdx !== null && linkIdx !== null) {
+        deleteBookmark(catIdx, linkIdx);
+        closeEditModal();
+      }
+    });
+  }
 
   if (editModal) {
     editModal.addEventListener('click', (e) => {
@@ -491,24 +736,92 @@ function initBookmarks() {
     });
   });
 
+  // Soumission du formulaire de raccourci (Ajout ou Modification)
   if (editForm) {
     editForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const { catIdx, linkIdx } = currentEditingTarget;
-      if (catIdx === null || linkIdx === null) return;
+      if (catIdx === null) return;
 
-      categories[catIdx].links[linkIdx] = {
+      const newBookmark = {
         name: editNameInput.value.trim(),
         url: editUrlInput.value.trim(),
-        icon: editIconInput.value.trim()
+        icon: editIconInput.value.trim() || 'fa-solid fa-link'
       };
+
+      if (linkIdx === null) {
+        // Ajout
+        categories[catIdx].links.push(newBookmark);
+        if (typeof showToast === 'function') {
+          showToast(`Nouveau raccourci "${newBookmark.name}" ajouté !`, 'success');
+        }
+      } else {
+        // Modification
+        categories[catIdx].links[linkIdx] = newBookmark;
+        if (typeof showToast === 'function') {
+          showToast(`Raccourci "${newBookmark.name}" mis à jour`, 'success');
+        }
+      }
 
       localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
       renderCategories();
       closeEditModal();
-      if (typeof showToast === 'function') {
-        showToast('Raccourci mis à jour', 'success');
+    });
+  }
+
+  // Gestion du formulaire de catégorie
+  if (catModalCloseBtn) catModalCloseBtn.addEventListener('click', closeCategoryModal);
+  if (catModalCancelBtn) catModalCancelBtn.addEventListener('click', closeCategoryModal);
+  if (catModal) {
+    catModal.addEventListener('click', (e) => {
+      if (e.target === catModal) closeCategoryModal();
+    });
+  }
+
+  if (catIconInput) {
+    catIconInput.addEventListener('input', () => {
+      if (catIconPreview) catIconPreview.className = catIconInput.value.trim() || 'fa-solid fa-folder';
+    });
+  }
+
+  document.querySelectorAll('.q-cat-icon-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const iconCls = btn.dataset.icon;
+      if (catIconInput) catIconInput.value = iconCls;
+      if (catIconPreview) catIconPreview.className = iconCls;
+    });
+  });
+
+  if (catModalForm) {
+    catModalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = (catNameInput?.value || '').trim();
+      const icon = (catIconInput?.value || '').trim() || 'fa-solid fa-folder';
+      if (!title) return;
+
+      if (currentEditingCategoryIdx !== null) {
+        // Mise à jour
+        categories[currentEditingCategoryIdx].title = title;
+        categories[currentEditingCategoryIdx].icon = icon;
+        if (typeof showToast === 'function') {
+          showToast(`Catégorie "${title}" mise à jour`, 'success');
+        }
+      } else {
+        // Nouvelle catégorie
+        categories.push({
+          id: `cat_${Date.now()}`,
+          title,
+          icon,
+          links: []
+        });
+        if (typeof showToast === 'function') {
+          showToast(`Catégorie "${title}" créée avec succès !`, 'success');
+        }
       }
+
+      localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
+      renderCategories();
+      closeCategoryModal();
     });
   }
 

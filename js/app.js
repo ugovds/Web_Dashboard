@@ -43,8 +43,10 @@ function showToast(message, type = 'info') {
 document.addEventListener('DOMContentLoaded', () => {
   // Initialisation des différents modules
   if (typeof initThemes === 'function') initThemes();
+  if (typeof initAppearance === 'function') initAppearance();
   if (typeof initWeatherFx === 'function') initWeatherFx();
   if (typeof initBookmarks === 'function') initBookmarks();
+  if (typeof initWidgets === 'function') initWidgets();
   if (typeof initClock === 'function') initClock();
   if (typeof initWeather === 'function') initWeather();
   if (typeof initTasks === 'function') initTasks();
