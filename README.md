@@ -58,24 +58,46 @@ La page intègre **3 thèmes visuels complets** avec éclairage ambiant (Ambilig
 - **Sauvegarde & Restauration Totale (Export / Import JSON)** : Téléchargez un fichier de configuration `.json` ou restaurez-le en 1 clic (inclut signets, catégories, notes, tâches, flux RSS, widgets de topbar et réglages d'apparence).
 - **Persistance locale** : Toutes vos modifications sont enregistrées dans le `localStorage` de votre navigateur.
 
-### ⏱️ 3. Barre Supérieure & Horloge Stylisée — `js/clock.js`
-- **Barre supérieure épurée & équilibrée** :
-  - **À gauche** : Switcher de thèmes instantané (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>) et invite de terminal interactive et personnalisable (`~/startpage`).
-  - **Au centre** : Horloge numérique stylisée grand format avec police monospace néon (`HH:MM:SS • jour mois`) pour une lisibilité parfaite.
-  - **À droite** : Pilule météo compacte avec icône dynamique et température, plus le bouton d'accès direct au Grand Cadre **Personnaliser**.
+### ⏱️ 3. Horloge Avancée & Typographie Cyberpunk — `js/clock.js`
+- **Typographie au choix** : 5 polices intégrées sélectionnables d'un clic :
+  - `JetBrains Mono` : Monospace technique cyberdeck.
+  - `Orbitron` : HUD futuriste de science-fiction.
+  - `Share Tech Mono` : Style terminal hacker / console.
+  - `VT323` : Rétro-cathodique arcade des années 90.
+  - `Inter` : Sans-serif moderne, épurée et géométrique.
+- **Styles visuels de cadre** :
+  - **Pilule Verre Néon** : Translucidité biseautée moderne.
+  - **Crochets Cyber `[ ]`** : Style console hacker / dev.
+  - **Lueur Intense Néon** : Aura lumineuse pulsante synchronisée.
+  - **Digital Box LCD** : Cadran numérique rétro encadré.
+  - **Minimaliste** : Zéro bordure, texte brut néon.
+- **Options d'affichage & Formats** :
+  - Bascule 24 heures vs 12 heures AM/PM.
+  - Affichage ou masquage des secondes (`:SS`).
+  - Affichage ou masquage de la date.
+  - 3 formats de date : Texte français (`mar. 3 nov.`), Numérique (`03/11/2026`), ISO standard (`2026-11-03`).
+  - 3 tailles au choix : Compacte, Moyenne, Imposante.
+- **Aperçu en temps réel** : Cadre de prévisualisation live dans le Hub pour tester les polices et styles avant de valider.
 
 ### 🎛️ 4. Grand Cadre de Personnalisation (Control Hub) — `js/custom-hub.js`
 - **Interface élégante en grand cadre** remplaçant les barres d'outils étriquées :
   - **Onglet Raccourcis & Liens** : Gestion complète de vos catégories et liens avec aperçu direct du niveau de densité adaptatif, création de catégories avec sélection d'icônes, modification et suppression.
-  - **Onglet Thèmes & Apparence** : Sélection visuelle des thèmes, palettes d'accentuation cyberpunk, sélecteurs de couleur personnalisée, réglages fins du flou et de l'intensité de l'Ambilight, et activation/désactivation des scanlines.
+  - **Onglet Thèmes & Apparence** : Sélection visuelle des 3 thèmes, 10 palettes rapides cyberpunk instantanées, sélecteurs RGB personnalisés qui écrasent immédiatement les couleurs de base, réglages fins du flou et de l'intensité de l'Ambilight, scanlines rétro et **Aperçu en Direct** (mockup complet du tableau de bord affichant instantanément le résultat des modifications).
+  - **Onglet Horloge & Date** : Configuration détaillée de la police, du cadre visuel, du format d'heure et de date avec aperçu en temps réel.
+  - **Onglet Widgets & Outils** : Activation et désactivation individuelle de chaque widget de la startpage. Chaque widget activé s'intègre automatiquement au slider unifié de la colonne de droite.
   - **Onglet Flux d'Actualités** : Ajout et suppression de flux RSS personnalisés avec validation d'URL et rafraîchissement dynamique.
   - **Onglet Sauvegarde & Restauration** : Export en un clic de l'intégralité de la configuration au format `.json`, import instantané et réinitialisation d'usine propre.
 
-### 🖼️ 5. Bande Gauche Immersive & Panneau Droit Unifié — `js/custom-hub.js`
-- **Bande de gauche** : Illustration plein format s'étirant sur toute la hauteur de la grille avec badge Cyberdeck d'état du système.
-- **Panneau de droite unifié avec menu glissant** :
-  - **Vue Agenda & Tasks** : Mini-calendrier mensuel interactif synchronisé avec les échéances des tâches et liste de to-do avec ajout rapide, calcul d'urgence (`Auj.`, `J-X`, `J+X`) et filtre par jour.
-  - **Vue Actualités (Menu Glissant)** : Navigation fluide d'un clic vers les flux d'informations en direct (F1, Football, Tech et vos flux RSS sur mesure).
+### 🧩 5. Centre des Widgets Interactifs & Panneau Droit Unifié — `js/widgets.js` & `js/custom-hub.js`
+- **Slider dynamique à 7 vues dans la colonne de droite** :
+  1. 📅 **Agenda & Calendrier** : Vue mensuelle interactive avec badges des tâches du jour.
+  2. 📰 **Actualités & Flux RSS** : Fil d'actualité en direct (Tech, Sport, flux personnalisés).
+  3. ⏱️ **Focus / Pomodoro** : Minuteur interactif (25m Focus / 5m Courte pause / 15m Longue pause), cadran numérique, barre de progression, carillon harmonique Web Audio et compteur de sessions.
+  4. 📝 **Bloc-Notes Instantané (Scratchpad)** : Éditeur de notes rapides avec auto-sauvegarde dans `localStorage`, compteur de mots/caractères, copie dans le presse-papier et téléchargement en fichier `.txt`.
+  5. 🎧 **Ambiance Sonore & Relax Lo-Fi** : Synthétiseur procédural Web Audio (pluie douce, bruit brun apaisant) et radio Lo-Fi cyber en streaming, avec curseur de volume et **visualiseur audio Canvas animé**.
+  6. ⚡ **Moniteur Système & Cyber Stats** : Latence ping en temps réel, jauge et icône animée de batterie (Battery API), compteur de temps de session (uptime), et cours crypto en direct (Bitcoin, Ethereum, EUR/USD).
+  7. 💬 **Citations Cyberpunk & Motivation** : Plus de 30 citations de science-fiction, de culture hacker et de philosophie dev avec bouton aléatoire et copie rapide.
+- **Bande de gauche immersive** : Illustration animée plein format s'étirant sur toute la hauteur de la grille avec badge Cyberdeck d'état du système.
 
 ### 🌤️ 7. Météo Détaillée & Effets d'Arrière-Plan Dynamiques — `js/weather.js` & `js/weather-fx.js`
 - **Widget Météo en direct & Modale complète** : Cliquez sur la pilule météo pour ouvrir les détails météo (température ressentie, humidité, vitesse du vent, indice UV) et les **prévisions complètes sur 3 jours**.
@@ -118,6 +140,7 @@ violet-startpage/
 │   ├── tasks.js                # To-Do list, calcul des échéances & filtrage
 │   ├── clock.js                # Horloge numérique et calendrier français
 │   ├── weather.js              # Widget météo, géolocalisation & modale détaillée
+│   ├── widgets.js              # Widgets interactifs (Pomodoro, Notes, Ambiance, Système, Quotes)
 │   ├── feeds.js                # Flux d'actualités en direct & flux RSS personnalisés
 │   └── shortcuts.js            # Raccourcis clavier globaux
 │

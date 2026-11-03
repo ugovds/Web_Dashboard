@@ -11,8 +11,10 @@
     <link rel="stylesheet" href="css/themes/sakura.css" />
     <link rel="stylesheet" href="css/themes/cyberdeck.css" />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Share+Tech+Mono&family=VT323&display=swap"
       rel="stylesheet"
     />
     <link
@@ -122,14 +124,34 @@
           <div class="unified-deck-card">
             <!-- Sélecteur d'onglets glissant -->
             <div class="deck-view-header">
-              <div class="deck-view-nav">
-                <button type="button" class="deck-nav-btn active" data-deck-view="agenda">
+              <div class="deck-view-nav" id="deck-view-nav">
+                <button type="button" class="deck-nav-btn active" data-deck-view="agenda" title="Agenda & Tâches">
                   <i class="fa-regular fa-calendar-check"></i>
-                  <span>Agenda & Tasks</span>
+                  <span>Agenda</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="feeds">
+                <button type="button" class="deck-nav-btn" data-deck-view="feeds" title="Actualités en direct">
                   <i class="fa-solid fa-newspaper"></i>
-                  <span>Actualités</span>
+                  <span>Actus</span>
+                </button>
+                <button type="button" class="deck-nav-btn" data-deck-view="pomodoro" data-widget-nav="pomodoro" title="Minuteur Focus / Pomodoro">
+                  <i class="fa-solid fa-stopwatch"></i>
+                  <span>Focus</span>
+                </button>
+                <button type="button" class="deck-nav-btn" data-deck-view="notes" data-widget-nav="notes" title="Bloc-Notes Rapide">
+                  <i class="fa-solid fa-note-sticky"></i>
+                  <span>Notes</span>
+                </button>
+                <button type="button" class="deck-nav-btn" data-deck-view="ambient" data-widget-nav="ambient" title="Ambiance Sonore">
+                  <i class="fa-solid fa-headphones"></i>
+                  <span>Ambiance</span>
+                </button>
+                <button type="button" class="deck-nav-btn" data-deck-view="system" data-widget-nav="system" title="Moniteur Système & Crypto">
+                  <i class="fa-solid fa-microchip"></i>
+                  <span>Système</span>
+                </button>
+                <button type="button" class="deck-nav-btn" data-deck-view="quotes" data-widget-nav="quotes" title="Citations & Motivation Dev">
+                  <i class="fa-solid fa-quote-left"></i>
+                  <span>Quotes</span>
                 </button>
                 <div class="deck-nav-indicator"></div>
               </div>
@@ -198,6 +220,210 @@
                   <li class="feed-skeleton">Connexion au flux en direct...</li>
                 </ul>
               </div>
+
+              <!-- VUE 3 : MINUTEUR FOCUS / POMODORO -->
+              <div id="deck-view-pomodoro" class="deck-slide-view" hidden>
+                <div class="deck-widget-panel pomo-panel">
+                  <div class="pomo-modes-bar">
+                    <button type="button" class="pomo-mode-chip active" data-pomo-mode="focus">25m Focus</button>
+                    <button type="button" class="pomo-mode-chip" data-pomo-mode="short">5m Pause</button>
+                    <button type="button" class="pomo-mode-chip" data-pomo-mode="long">15m Longue</button>
+                  </div>
+
+                  <div class="pomo-dial-wrap">
+                    <div class="pomo-dial-ring">
+                      <span id="pomo-timer-display" class="pomo-digits">25:00</span>
+                      <span id="pomo-status-label" class="pomo-status">Prêt pour le focus</span>
+                    </div>
+                  </div>
+
+                  <div class="pomo-progress-bar-wrap">
+                    <div id="pomo-progress-bar" class="pomo-progress-fill" style="width: 0%;"></div>
+                  </div>
+
+                  <div class="pomo-controls-row">
+                    <button type="button" id="pomo-btn-toggle" class="modal-btn primary pomo-btn-main">
+                      <i id="pomo-btn-icon" class="fa-solid fa-play"></i>
+                      <span id="pomo-btn-text">Démarrer</span>
+                    </button>
+                    <button type="button" id="pomo-btn-reset" class="modal-btn secondary" title="Réinitialiser">
+                      <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                  </div>
+
+                  <div class="pomo-stats-footer">
+                    <span id="pomo-sessions-badge" class="stats-badge">
+                      <i class="fa-solid fa-fire"></i> <span id="pomo-sessions-count">0</span> cycle(s) aujourd'hui
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VUE 4 : BLOC-NOTES RAPIDE (SCRATCHPAD) -->
+              <div id="deck-view-notes" class="deck-slide-view" hidden>
+                <div class="deck-widget-panel notes-panel">
+                  <div class="notes-panel-header">
+                    <div class="notes-stats-info">
+                      <span id="notes-word-count">0</span> mots • <span id="notes-char-count">0</span> caractères
+                    </div>
+                    <div class="notes-actions-group">
+                      <button type="button" id="notes-btn-copy" class="deck-icon-action" title="Copier la note">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                      <button type="button" id="notes-btn-download" class="deck-icon-action" title="Télécharger (.txt)">
+                        <i class="fa-solid fa-download"></i>
+                      </button>
+                      <button type="button" id="notes-btn-clear" class="deck-icon-action danger" title="Effacer la note">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <textarea
+                    id="notes-textarea"
+                    class="notes-editor"
+                    placeholder="Écrivez ici... Vos notes sont sauvegardées en temps réel."
+                    spellcheck="false"
+                  ></textarea>
+
+                  <div class="notes-panel-footer">
+                    <span class="notes-save-status"><i class="fa-solid fa-cloud"></i> Enregistrement local automatique</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VUE 5 : AMBIANCE SONORE & RELAX LO-FI -->
+              <div id="deck-view-ambient" class="deck-slide-view" hidden>
+                <div class="deck-widget-panel ambient-panel">
+                  <div class="ambient-modes-grid">
+                    <button type="button" class="ambient-mode-card active" data-ambient-mode="rain">
+                      <i class="fa-solid fa-cloud-rain"></i>
+                      <span>Pluie</span>
+                    </button>
+                    <button type="button" class="ambient-mode-card" data-ambient-mode="brown">
+                      <i class="fa-solid fa-water"></i>
+                      <span>Bruit Brun</span>
+                    </button>
+                    <button type="button" class="ambient-mode-card" data-ambient-mode="lofi">
+                      <i class="fa-solid fa-radio"></i>
+                      <span>Radio Lo-Fi</span>
+                    </button>
+                  </div>
+
+                  <div class="ambient-visualizer-box">
+                    <canvas id="ambient-waves-canvas" width="280" height="60"></canvas>
+                    <span id="ambient-now-playing" class="ambient-now-playing">Générateur Procédural Audio</span>
+                  </div>
+
+                  <div class="ambient-controls-box">
+                    <button type="button" id="ambient-master-toggle" class="modal-btn primary ambient-master-btn">
+                      <i id="ambient-master-icon" class="fa-solid fa-play"></i>
+                      <span id="ambient-master-label">Écouter</span>
+                    </button>
+
+                    <div class="ambient-vol-control">
+                      <i class="fa-solid fa-volume-low"></i>
+                      <input type="range" id="ambient-vol-slider" min="0" max="1" step="0.05" value="0.5" />
+                      <i class="fa-solid fa-volume-high"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VUE 6 : MONITEUR SYSTÈME & CRYPTO -->
+              <div id="deck-view-system" class="deck-slide-view" hidden>
+                <div class="deck-widget-panel system-panel">
+                  <div class="system-telemetry-grid">
+                    <div class="telemetry-card">
+                      <div class="telemetry-label"><i class="fa-solid fa-tower-broadcast"></i> Latence Ping</div>
+                      <div class="telemetry-val-row">
+                        <span id="sys-ping-dot" class="telemetry-indicator"></span>
+                        <span id="sys-ping-val" class="telemetry-number">-- ms</span>
+                      </div>
+                      <span id="sys-ping-state" class="telemetry-sub">Mesure...</span>
+                    </div>
+
+                    <div class="telemetry-card">
+                      <div class="telemetry-label"><i class="fa-solid fa-battery-half"></i> Batterie</div>
+                      <div class="telemetry-val-row">
+                        <i id="sys-bat-icon" class="fa-solid fa-battery-full telemetry-bat-icon"></i>
+                        <span id="sys-bat-val" class="telemetry-number">--%</span>
+                      </div>
+                      <span id="sys-bat-state" class="telemetry-sub">Détection...</span>
+                    </div>
+
+                    <div class="telemetry-card">
+                      <div class="telemetry-label"><i class="fa-solid fa-stopwatch-20"></i> Session Uptime</div>
+                      <div class="telemetry-val-row">
+                        <span id="sys-uptime-val" class="telemetry-number">00:00</span>
+                      </div>
+                      <span class="telemetry-sub">Depuis ouverture</span>
+                    </div>
+
+                    <div class="telemetry-card">
+                      <div class="telemetry-label"><i class="fa-solid fa-circle-check"></i> Progression Tâches</div>
+                      <div class="telemetry-val-row">
+                        <span id="sys-tasks-ratio" class="telemetry-number">0 / 0</span>
+                      </div>
+                      <span id="sys-tasks-pct" class="telemetry-sub">0% terminées</span>
+                    </div>
+                  </div>
+
+                  <!-- Mini Ticker Crypto -->
+                  <div class="crypto-ticker-section">
+                    <div class="crypto-ticker-header">
+                      <span><i class="fa-solid fa-chart-line"></i> Marché & Crypto</span>
+                      <button type="button" id="crypto-refresh-btn" class="deck-mini-refresh" title="Actualiser les cours">
+                        <i class="fa-solid fa-rotate-right"></i>
+                      </button>
+                    </div>
+
+                    <div class="crypto-ticker-cards" id="crypto-ticker-cards">
+                      <div class="crypto-card">
+                        <span class="crypto-coin"><i class="fa-brands fa-bitcoin"></i> BTC</span>
+                        <span class="crypto-price" id="crypto-btc-price">-- $</span>
+                        <span class="crypto-change" id="crypto-btc-change">--%</span>
+                      </div>
+                      <div class="crypto-card">
+                        <span class="crypto-coin"><i class="fa-brands fa-ethereum"></i> ETH</span>
+                        <span class="crypto-price" id="crypto-eth-price">-- $</span>
+                        <span class="crypto-change" id="crypto-eth-change">--%</span>
+                      </div>
+                      <div class="crypto-card">
+                        <span class="crypto-coin"><i class="fa-solid fa-euro-sign"></i> EUR/USD</span>
+                        <span class="crypto-price" id="crypto-eur-price">-- $</span>
+                        <span class="crypto-change" id="crypto-eur-change">--%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VUE 7 : CITATIONS CYBERPUNK & MOTIVATION -->
+              <div id="deck-view-quotes" class="deck-slide-view" hidden>
+                <div class="deck-widget-panel quotes-panel">
+                  <div class="quote-card-box">
+                    <div class="quote-watermark-icon"><i class="fa-solid fa-quote-left"></i></div>
+                    <blockquote id="quote-text" class="quote-content">
+                      "The sky above the port was the color of television, tuned to a dead channel."
+                    </blockquote>
+                    <div class="quote-author-row">
+                      <span class="quote-dash">—</span>
+                      <span id="quote-author" class="quote-author">William Gibson</span>
+                      <span id="quote-source" class="quote-source-badge">Neuromancer</span>
+                    </div>
+                  </div>
+
+                  <div class="quote-actions-row">
+                    <button type="button" id="quote-btn-next" class="modal-btn primary">
+                      <i class="fa-solid fa-shuffle"></i> Autre Citation
+                    </button>
+                    <button type="button" id="quote-btn-copy" class="modal-btn secondary" title="Copier la citation">
+                      <i class="fa-regular fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </aside>
@@ -226,19 +452,27 @@
           <nav class="hub-sidebar">
             <button type="button" class="hub-tab-btn active" data-hub-tab="shortcuts">
               <i class="fa-solid fa-link"></i>
-              <span>Raccourcis & Liens</span>
+              <span>Raccourcis</span>
             </button>
             <button type="button" class="hub-tab-btn" data-hub-tab="appearance">
               <i class="fa-solid fa-palette"></i>
-              <span>Thèmes & Apparence</span>
+              <span>Thèmes & Couleurs</span>
+            </button>
+            <button type="button" class="hub-tab-btn" data-hub-tab="clock">
+              <i class="fa-solid fa-clock"></i>
+              <span>Horloge & Date</span>
+            </button>
+            <button type="button" class="hub-tab-btn" data-hub-tab="widgets">
+              <i class="fa-solid fa-shapes"></i>
+              <span>Widgets & Outils</span>
             </button>
             <button type="button" class="hub-tab-btn" data-hub-tab="feeds">
               <i class="fa-solid fa-rss"></i>
-              <span>Flux d'Actualités</span>
+              <span>Actualités RSS</span>
             </button>
             <button type="button" class="hub-tab-btn" data-hub-tab="backup">
               <i class="fa-solid fa-cloud-arrow-down"></i>
-              <span>Sauvegarde & Export</span>
+              <span>Sauvegarde</span>
             </button>
           </nav>
 
@@ -266,7 +500,48 @@
               <div class="hub-panel-header">
                 <div>
                   <h4>Thèmes & Personnalisation Visuelle</h4>
-                  <p class="panel-hint">Choisissez un thème ou personnalisez vos propres couleurs néon et effets d'ambiance.</p>
+                  <p class="panel-hint">Choisissez un thème ou personnalisez vos propres couleurs néon et effets d'ambiance avec aperçu en temps réel.</p>
+                </div>
+              </div>
+
+              <!-- APERÇU EN DIRECT DU THÈME ET COULEURS -->
+              <div class="live-preview-card" id="appearance-live-preview">
+                <div class="preview-card-header">
+                  <div class="preview-card-title"><i class="fa-solid fa-eye"></i> Aperçu en Direct (Temps Réel)</div>
+                  <span id="preview-active-theme-tag" class="preview-active-tag">Thème 1 • Kanagawa</span>
+                </div>
+                <div class="preview-mini-stage" id="preview-mini-stage">
+                  <div class="preview-banner-art" id="preview-banner-art">
+                    <div class="preview-badge-pill" id="preview-badge-pill">
+                      <span class="pulse-dot"></span> <span id="preview-badge-name">修理 // ONLINE</span>
+                    </div>
+                  </div>
+                  <div class="preview-components-row">
+                    <div class="preview-mock-clock" id="preview-mock-clock">
+                      <span class="mock-time" id="preview-mock-time">14:05:32</span>
+                      <span class="mock-sep">•</span>
+                      <span class="mock-date" id="preview-mock-date">mar. 3 nov.</span>
+                    </div>
+                    <div class="preview-mock-search">
+                      <span class="mock-prompt">&gt;</span>
+                      <span class="mock-search-txt">rechercher ou taper !help...</span>
+                    </div>
+                  </div>
+                  <div class="preview-cards-sample">
+                    <div class="preview-sample-cat">
+                      <div class="preview-sample-header"><i class="fa-solid fa-bookmark"></i> Favoris</div>
+                      <div class="preview-sample-links">
+                        <div class="preview-sample-link"><i class="fa-brands fa-github"></i> GitHub</div>
+                        <div class="preview-sample-link"><i class="fa-brands fa-youtube"></i> YouTube</div>
+                      </div>
+                    </div>
+                    <div class="preview-sample-cat">
+                      <div class="preview-sample-header"><i class="fa-solid fa-list-check"></i> Tasks</div>
+                      <div class="preview-sample-tasks">
+                        <div class="preview-sample-task"><i class="fa-regular fa-square-check"></i> Cyber startpage</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -294,26 +569,26 @@
 
               <!-- Palettes cyberpunk -->
               <div class="appearance-section">
-                <label class="section-label">Palettes Cyberpunk Rapides :</label>
+                <label class="section-label">Palettes Cyberpunk Rapides (Cliquez pour appliquer instantanément) :</label>
                 <div id="appearance-palettes-list" class="palettes-list"></div>
               </div>
 
               <!-- Couleurs d'accent personnalisées -->
               <div class="appearance-section">
-                <label class="section-label">Couleurs Personnalisées :</label>
+                <label class="section-label">Couleurs Personnalisées (Sélecteurs RGB) :</label>
                 <div class="appearance-colors-grid">
                   <div class="color-picker-item">
                     <label for="appearance-primary-color">Accent Principal :</label>
                     <div class="color-picker-wrap">
-                      <input type="color" id="appearance-primary-color" value="#31e1f7" />
-                      <span class="color-hint">Néons & bordures</span>
+                      <input type="color" id="appearance-primary-color" value="#a8e6f0" />
+                      <span class="color-hint">Néons, bordures & icônes</span>
                     </div>
                   </div>
                   <div class="color-picker-item">
                     <label for="appearance-secondary-color">Accent Secondaire :</label>
                     <div class="color-picker-wrap">
-                      <input type="color" id="appearance-secondary-color" value="#b55fe6" />
-                      <span class="color-hint">Orbes & reflets</span>
+                      <input type="color" id="appearance-secondary-color" value="#7aa89f" />
+                      <span class="color-hint">Orbes d'ambiance & reflets</span>
                     </div>
                   </div>
                 </div>
@@ -350,6 +625,244 @@
                 <button type="button" id="appearance-reset-btn" class="modal-btn danger">
                   Réinitialiser l'apparence par défaut
                 </button>
+              </div>
+            </div>
+
+            <!-- ONGLET 3 : HORLOGE & DATE (NOUVEAU) -->
+            <div id="hub-tab-clock" class="hub-tab-panel" hidden>
+              <div class="hub-panel-header">
+                <div>
+                  <h4>Personnalisation de l'Horloge & de la Date</h4>
+                  <p class="panel-hint">Choisissez la police, le style d'encadré, les formats et la taille de l'horloge avec aperçu en direct.</p>
+                </div>
+              </div>
+
+              <!-- Aperçu en direct de l'horloge -->
+              <div class="clock-live-preview-box">
+                <div class="clock-preview-title"><i class="fa-solid fa-eye"></i> Rendu en temps réel</div>
+                <div class="clock-preview-stage" id="clock-preview-stage">
+                  <div id="clock-preview-wrap" class="clock-display-wrap font-jetbrains clock-style-pill">
+                    <span id="clock-preview-time" class="time-main">14:05:32</span>
+                    <span class="clock-sep">•</span>
+                    <span id="clock-preview-date" class="date-sub">mar. 3 nov.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 1. Choix de la police -->
+              <div class="clock-section">
+                <label class="section-label">Police de Caractères (Typography) :</label>
+                <div class="clock-fonts-grid">
+                  <button type="button" class="clock-font-btn active" data-clock-font="jetbrains">
+                    <span class="font-sample font-jetbrains">12:34:56</span>
+                    <span class="font-name">JetBrains Mono</span>
+                    <span class="font-desc">Monospace Cyberpunk</span>
+                  </button>
+                  <button type="button" class="clock-font-btn" data-clock-font="orbitron">
+                    <span class="font-sample font-orbitron">12:34:56</span>
+                    <span class="font-name">Orbitron</span>
+                    <span class="font-desc">Futuriste HUD Sci-Fi</span>
+                  </button>
+                  <button type="button" class="clock-font-btn" data-clock-font="share-tech">
+                    <span class="font-sample font-share-tech">12:34:56</span>
+                    <span class="font-name">Share Tech Mono</span>
+                    <span class="font-desc">Terminal Hacker / Matrix</span>
+                  </button>
+                  <button type="button" class="clock-font-btn" data-clock-font="vt323">
+                    <span class="font-sample font-vt323">12:34:56</span>
+                    <span class="font-name">VT323</span>
+                    <span class="font-desc">Cathodique Rétro 90s</span>
+                  </button>
+                  <button type="button" class="clock-font-btn" data-clock-font="inter">
+                    <span class="font-sample font-inter">12:34:56</span>
+                    <span class="font-name">Inter Clean</span>
+                    <span class="font-desc">Moderne Sans-Serif</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2. Style visuel du cadre -->
+              <div class="clock-section">
+                <label class="section-label">Style du Cadre & Effet Visuel :</label>
+                <div class="clock-styles-grid">
+                  <button type="button" class="clock-style-card-btn active" data-clock-style="pill">
+                    <div class="style-icon-preview"><i class="fa-solid fa-capsules"></i></div>
+                    <span class="style-title">Pilule Verre Néon</span>
+                    <span class="style-desc">Arrondie avec translucidité</span>
+                  </button>
+                  <button type="button" class="clock-style-card-btn" data-clock-style="brackets">
+                    <div class="style-icon-preview"><i class="fa-solid fa-code"></i></div>
+                    <span class="style-title">Crochets Cyber [ ]</span>
+                    <span class="style-desc">Style console hacker</span>
+                  </button>
+                  <button type="button" class="clock-style-card-btn" data-clock-style="glow">
+                    <div class="style-icon-preview"><i class="fa-solid fa-sun"></i></div>
+                    <span class="style-title">Lueur Intense Néon</span>
+                    <span class="style-desc">Pulsation & aura lumineuse</span>
+                  </button>
+                  <button type="button" class="clock-style-card-btn" data-clock-style="digital">
+                    <div class="style-icon-preview"><i class="fa-solid fa-square"></i></div>
+                    <span class="style-title">Digital Box LCD</span>
+                    <span class="style-desc">Cadran rétro encadré</span>
+                  </button>
+                  <button type="button" class="clock-style-card-btn" data-clock-style="minimal">
+                    <div class="style-icon-preview"><i class="fa-solid fa-minus"></i></div>
+                    <span class="style-title">Minimaliste</span>
+                    <span class="style-desc">Sans bordure, texte pur</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 3. Formats & Options -->
+              <div class="clock-section clock-options-grid">
+                <div class="clock-option-col">
+                  <label class="section-label">Options d'Affichage :</label>
+                  <div class="clock-toggles-list">
+                    <label class="fx-toggle-label">
+                      <span>Format 24 Heures (vs 12h AM/PM)</span>
+                      <input type="checkbox" id="clock-opt-24h" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                    <label class="fx-toggle-label">
+                      <span>Afficher les secondes (:SS)</span>
+                      <input type="checkbox" id="clock-opt-seconds" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                    <label class="fx-toggle-label">
+                      <span>Afficher la date</span>
+                      <input type="checkbox" id="clock-opt-date" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="clock-option-col">
+                  <label class="section-label">Format de la Date & Taille :</label>
+                  <div class="form-row">
+                    <label for="clock-date-format-select">Format de date :</label>
+                    <select id="clock-date-format-select" class="hub-select">
+                      <option value="text" selected>Texte français (ex: mar. 3 nov.)</option>
+                      <option value="numeric">Numérique (ex: 03/11/2026)</option>
+                      <option value="iso">Format ISO / Dev (ex: 2026-11-03)</option>
+                    </select>
+                  </div>
+                  <div class="form-row">
+                    <label for="clock-size-select">Taille de l'horloge :</label>
+                    <select id="clock-size-select" class="hub-select">
+                      <option value="small">Compacte</option>
+                      <option value="medium" selected>Moyenne (Défaut)</option>
+                      <option value="large">Grande & Imposante</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hub-panel-footer">
+                <button type="button" id="clock-reset-btn" class="modal-btn secondary">
+                  Réinitialiser l'horloge par défaut
+                </button>
+              </div>
+            </div>
+
+            <!-- ONGLET 4 : WIDGETS & OUTILS (NOUVEAU) -->
+            <div id="hub-tab-widgets" class="hub-tab-panel" hidden>
+              <div class="hub-panel-header">
+                <div>
+                  <h4>Centre des Widgets & Outils</h4>
+                  <p class="panel-hint">Activez et configurez vos widgets interactifs. Chaque widget activé s'ajoute immédiatement à la barre de navigation de la colonne de droite.</p>
+                </div>
+              </div>
+
+              <div class="hub-widgets-grid">
+                <!-- Widget 1: Focus / Pomodoro -->
+                <div class="widget-config-card" data-widget-key="pomodoro">
+                  <div class="widget-card-top">
+                    <div class="widget-icon-box"><i class="fa-solid fa-stopwatch"></i></div>
+                    <div class="widget-meta">
+                      <h5>Minuteur Focus / Pomodoro</h5>
+                      <p>Cycles 25m Focus / 5m Pause avec barre de progression, carillon sonore et compteur de sessions.</p>
+                    </div>
+                    <label class="fx-toggle-label switch-only">
+                      <input type="checkbox" id="widget-toggle-pomodoro" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                  <div class="widget-config-body">
+                    <div class="widget-pill-badge"><i class="fa-solid fa-bell"></i> Carillon Web Audio inclus</div>
+                  </div>
+                </div>
+
+                <!-- Widget 2: Bloc-notes Rapide -->
+                <div class="widget-config-card" data-widget-key="notes">
+                  <div class="widget-card-top">
+                    <div class="widget-icon-box"><i class="fa-solid fa-note-sticky"></i></div>
+                    <div class="widget-meta">
+                      <h5>Bloc-Notes Rapide (Scratchpad)</h5>
+                      <p>Éditeur de notes instantané avec sauvegarde automatique en continu, compteurs et export .txt.</p>
+                    </div>
+                    <label class="fx-toggle-label switch-only">
+                      <input type="checkbox" id="widget-toggle-notes" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                  <div class="widget-config-body">
+                    <div class="widget-pill-badge"><i class="fa-solid fa-floppy-disk"></i> Sauvegarde locale temps réel</div>
+                  </div>
+                </div>
+
+                <!-- Widget 3: Ambiance Sonore -->
+                <div class="widget-config-card" data-widget-key="ambient">
+                  <div class="widget-card-top">
+                    <div class="widget-icon-box"><i class="fa-solid fa-headphones"></i></div>
+                    <div class="widget-meta">
+                      <h5>Ambiance Sonore & Relax Lo-Fi</h5>
+                      <p>Générateur procédural (pluie, bruit brun apaisant) et radio Lo-Fi avec visualiseur Canvas.</p>
+                    </div>
+                    <label class="fx-toggle-label switch-only">
+                      <input type="checkbox" id="widget-toggle-ambient" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                  <div class="widget-config-body">
+                    <div class="widget-pill-badge"><i class="fa-solid fa-wave-square"></i> Synthèse sonore procédurale</div>
+                  </div>
+                </div>
+
+                <!-- Widget 4: Moniteur Système -->
+                <div class="widget-config-card" data-widget-key="system">
+                  <div class="widget-card-top">
+                    <div class="widget-icon-box"><i class="fa-solid fa-microchip"></i></div>
+                    <div class="widget-meta">
+                      <h5>Moniteur Système & Cyber Stats</h5>
+                      <p>Latence ping en direct, statut de batterie, temps de session (uptime) et cours crypto.</p>
+                    </div>
+                    <label class="fx-toggle-label switch-only">
+                      <input type="checkbox" id="widget-toggle-system" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                  <div class="widget-config-body">
+                    <div class="widget-pill-badge"><i class="fa-solid fa-bolt"></i> Surveillance télémétrique live</div>
+                  </div>
+                </div>
+
+                <!-- Widget 5: Citations & Dev Quotes -->
+                <div class="widget-config-card" data-widget-key="quotes">
+                  <div class="widget-card-top">
+                    <div class="widget-icon-box"><i class="fa-solid fa-quote-left"></i></div>
+                    <div class="widget-meta">
+                      <h5>Citations Cyberpunk & Motivation</h5>
+                      <p>Pensées inspirantes, culture hacker, science-fiction et philosophie dev avec bouton aléatoire.</p>
+                    </div>
+                    <label class="fx-toggle-label switch-only">
+                      <input type="checkbox" id="widget-toggle-quotes" checked />
+                      <span class="switch-slider"></span>
+                    </label>
+                  </div>
+                  <div class="widget-config-body">
+                    <div class="widget-pill-badge"><i class="fa-solid fa-book-open"></i> 30+ citations intégrées</div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -651,6 +1164,7 @@
     <script src="js/calendar.js"></script>
     <script src="js/search.js"></script>
     <script src="js/feeds.js"></script>
+    <script src="js/widgets.js"></script>
     <script src="js/custom-hub.js"></script>
     <script src="js/shortcuts.js"></script>
     <script src="js/app.js"></script>

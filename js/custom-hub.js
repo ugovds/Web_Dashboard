@@ -4,40 +4,38 @@
 
 function initDeckViewSlider() {
   const navBtns = document.querySelectorAll('.deck-nav-btn');
-  const viewAgenda = document.getElementById('deck-view-agenda');
-  const viewFeeds = document.getElementById('deck-view-feeds');
+  const allViews = document.querySelectorAll('.deck-slide-view');
   const indicator = document.querySelector('.deck-nav-indicator');
 
-  navBtns.forEach((btn, idx) => {
+  function updateIndicator(activeBtn) {
+    if (!indicator || !activeBtn) return;
+    indicator.style.width = `${activeBtn.offsetWidth}px`;
+    indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+  }
+
+  navBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       navBtns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
 
       const target = btn.dataset.deckView;
-      if (target === 'agenda') {
-        if (viewAgenda) {
-          viewAgenda.hidden = false;
-          viewAgenda.classList.add('active');
-        }
-        if (viewFeeds) {
-          viewFeeds.hidden = true;
-          viewFeeds.classList.remove('active');
-        }
-      } else {
-        if (viewAgenda) {
-          viewAgenda.hidden = true;
-          viewAgenda.classList.remove('active');
-        }
-        if (viewFeeds) {
-          viewFeeds.hidden = false;
-          viewFeeds.classList.add('active');
-        }
-      }
+      allViews.forEach((view) => {
+        const isTarget = view.id === `deck-view-${target}`;
+        view.hidden = !isTarget;
+        view.classList.toggle('active', isTarget);
+      });
 
-      if (indicator) {
-        indicator.style.transform = `translateX(${idx * 100}%)`;
-      }
+      updateIndicator(btn);
     });
+  });
+
+  const initialActive = document.querySelector('.deck-nav-btn.active');
+  if (initialActive) {
+    setTimeout(() => updateIndicator(initialActive), 60);
+  }
+  window.addEventListener('resize', () => {
+    const curr = document.querySelector('.deck-nav-btn.active');
+    if (curr) updateIndicator(curr);
   });
 }
 
@@ -46,7 +44,6 @@ function openCustomHub(tabName = 'shortcuts') {
   if (!modal) return;
 
   switchHubTab(tabName);
-  renderHubShortcuts();
   modal.hidden = false;
 }
 
@@ -71,6 +68,14 @@ function switchHubTab(tabName) {
 
   if (tabName === 'shortcuts') {
     renderHubShortcuts();
+  } else if (tabName === 'appearance') {
+    if (typeof updateAppearanceInputs === 'function') updateAppearanceInputs();
+    if (typeof updateAppearanceLivePreview === 'function') updateAppearanceLivePreview();
+  } else if (tabName === 'clock') {
+    if (typeof updateClockControlsUI === 'function') updateClockControlsUI();
+    if (typeof updateClock === 'function') updateClock();
+  } else if (tabName === 'widgets') {
+    if (typeof applyWidgetVisibility === 'function') applyWidgetVisibility();
   } else if (tabName === 'feeds') {
     if (typeof renderCustomFeedsModalList === 'function') renderCustomFeedsModalList();
   }

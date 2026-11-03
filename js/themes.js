@@ -45,6 +45,10 @@ function applyTheme(themeId) {
   });
 
   localStorage.setItem('startpage_theme', themeId);
+
+  if (typeof applyAppearance === 'function') {
+    applyAppearance();
+  }
 }
 
 function initThemes() {
