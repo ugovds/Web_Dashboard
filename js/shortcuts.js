@@ -11,20 +11,16 @@ function initShortcuts() {
     const editModal = document.getElementById('edit-modal');
     const weatherModal = document.getElementById('weather-modal');
     const feedsModal = document.getElementById('feeds-modal');
-    const widgetsModal = document.getElementById('widgets-modal');
-    const appearanceModal = document.getElementById('appearance-modal');
+    const hubModal = document.getElementById('custom-hub-modal');
     const categoryModal = document.getElementById('category-modal');
-    const scratchpadPanel = document.getElementById('scratchpad-panel');
 
     const isEditModalOpen = editModal && !editModal.hidden;
     const isWeatherModalOpen = weatherModal && !weatherModal.hidden;
     const isFeedsModalOpen = feedsModal && !feedsModal.hidden;
-    const isWidgetsModalOpen = widgetsModal && !widgetsModal.hidden;
-    const isAppearanceModalOpen = appearanceModal && !appearanceModal.hidden;
+    const isHubModalOpen = hubModal && !hubModal.hidden;
     const isCategoryModalOpen = categoryModal && !categoryModal.hidden;
-    const isScratchpadOpen = scratchpadPanel && !scratchpadPanel.hidden;
 
-    // Fermeture des modales et tiroirs avec Échap
+    // Fermeture des modales avec Échap
     if (e.key === 'Escape') {
       if (isEditModalOpen && typeof closeEditModal === 'function') {
         closeEditModal();
@@ -34,12 +30,8 @@ function initShortcuts() {
         closeCategoryModal();
         return;
       }
-      if (isWidgetsModalOpen && typeof closeWidgetsModal === 'function') {
-        closeWidgetsModal();
-        return;
-      }
-      if (isAppearanceModalOpen && typeof closeAppearanceModal === 'function') {
-        closeAppearanceModal();
+      if (isHubModalOpen && typeof closeCustomHub === 'function') {
+        closeCustomHub();
         return;
       }
       if (isWeatherModalOpen && typeof closeWeatherModal === 'function') {
@@ -50,20 +42,13 @@ function initShortcuts() {
         closeFeedsModal();
         return;
       }
-      if (isScratchpadOpen) {
-        scratchpadPanel.hidden = true;
-        const notesBtn = document.getElementById('topbar-notes-btn');
-        if (notesBtn) notesBtn.classList.remove('active');
-        return;
-      }
     }
 
     const isAnyModalOpen =
       isEditModalOpen ||
       isWeatherModalOpen ||
       isFeedsModalOpen ||
-      isWidgetsModalOpen ||
-      isAppearanceModalOpen ||
+      isHubModalOpen ||
       isCategoryModalOpen;
     if (isAnyModalOpen) return;
 

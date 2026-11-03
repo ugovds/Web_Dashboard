@@ -58,42 +58,24 @@ La page intègre **3 thèmes visuels complets** avec éclairage ambiant (Ambilig
 - **Sauvegarde & Restauration Totale (Export / Import JSON)** : Téléchargez un fichier de configuration `.json` ou restaurez-le en 1 clic (inclut signets, catégories, notes, tâches, flux RSS, widgets de topbar et réglages d'apparence).
 - **Persistance locale** : Toutes vos modifications sont enregistrées dans le `localStorage` de votre navigateur.
 
-### ⏱️ 3. Widgets de la Barre Supérieure (Topbar) — `js/widgets.js`
-- **Minuteur Focus / Pomodoro** :
-  - Décompte 25 min (Focus), 5 min (Pause courte) et 15 min (Pause longue) commutable en 1 clic.
-  - Carillon doux mélodique généré via la Web Audio API (aucun fichier MP3 externe à charger, fonctionne 100% hors-ligne).
-  - Affichage dynamique du temps restant dans le titre de l'onglet du navigateur (`(24:45) Startpage`).
-- **Bloc-Notes Rapide (Scratchpad)** :
-  - Tiroir de notes instantané pour noter idées, liens ou extraits de code.
-  - Sauvegarde automatique en direct, compteur de mots et caractères, boutons de copie rapide et téléchargement `.txt`.
-- **Ambiance Sonore & Lofi (Relaxation)** :
-  - Générateur procédural audio (Pluie relaxante, Bruit brun apaisant pour concentration profonde) et flux Radio Lofi en direct avec curseur de volume.
-- **Statut Système & Réseau** :
-  - Latence réseau en direct (ping vers Cloudflare) avec indicateur vert/rouge.
-  - Indicateur de niveau de batterie et statut de charge en temps réel.
-- **Invite Terminal Personnalisable** :
-  - Personnalisez le prompt `~/startpage` (ex: `user@deck:~`, `neo@matrix:~$`).
-- **Gestionnaire d'affichage des Widgets** :
-  - Activez ou désactivez n'importe quel widget de la topbar depuis le menu Personnaliser > <kbd>Widgets</kbd>.
+### ⏱️ 3. Barre Supérieure & Horloge Stylisée — `js/clock.js`
+- **Barre supérieure épurée & équilibrée** :
+  - **À gauche** : Switcher de thèmes instantané (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>) et invite de terminal interactive et personnalisable (`~/startpage`).
+  - **Au centre** : Horloge numérique stylisée grand format avec police monospace néon (`HH:MM:SS • jour mois`) pour une lisibilité parfaite.
+  - **À droite** : Pilule météo compacte avec icône dynamique et température, plus le bouton d'accès direct au Grand Cadre **Personnaliser**.
 
-### 🎨 4. Personnalisation de l'Apparence & Couleurs — `js/appearance.js`
-- **Sélecteur de Couleurs d'Accentuation** :
-  - Définissez vos propres couleurs néon pour l'accentuation principale et secondaire.
-  - 6 palettes cyberpunk préréglées (*Kanagawa Cyan*, *Sakura Rose*, *Cyberdeck Violet*, *Matrix Emerald*, *Synthwave Amber*, *Neon Glace*).
-- **Contrôle de l'Ambilight & Éclairage** :
-  - Curseurs pour ajuster le rayon de flou (10px à 100px) et l'opacité (10% à 90%) de l'arrière-plan.
-  - Interrupteur pour activer ou désactiver les scanlines rétro.
+### 🎛️ 4. Grand Cadre de Personnalisation (Control Hub) — `js/custom-hub.js`
+- **Interface élégante en grand cadre** remplaçant les barres d'outils étriquées :
+  - **Onglet Raccourcis & Liens** : Gestion complète de vos catégories et liens avec aperçu direct du niveau de densité adaptatif, création de catégories avec sélection d'icônes, modification et suppression.
+  - **Onglet Thèmes & Apparence** : Sélection visuelle des thèmes, palettes d'accentuation cyberpunk, sélecteurs de couleur personnalisée, réglages fins du flou et de l'intensité de l'Ambilight, et activation/désactivation des scanlines.
+  - **Onglet Flux d'Actualités** : Ajout et suppression de flux RSS personnalisés avec validation d'URL et rafraîchissement dynamique.
+  - **Onglet Sauvegarde & Restauration** : Export en un clic de l'intégralité de la configuration au format `.json`, import instantané et réinitialisation d'usine propre.
 
-### 📅 5. Mini-Calendrier & Filtre d'échéances — `js/calendar.js`
-- Vue calendaire complète du mois en cours avec mise en évidence du jour actuel.
-- Navigation d'un mois à l'autre et bouton retour rapide à aujourd'hui (<kbd>auj</kbd>).
-- **Filtre synchronisé** : Cliquez sur une date du calendrier pour afficher uniquement les tâches associées à ce jour.
-
-### ✅ 6. Gestionnaire de Tâches (Tasks / To-Do List) — `js/tasks.js`
-- Ajout de tâches avec date d'échéance optionnelle.
-- Badges d'urgence dynamiques : `Auj.`, `J-X` (à venir) et `J+X` (en retard).
-- Validation d'un clic pour rayer une tâche terminée, suppression rapide.
-- Synchronisation complète avec le calendrier et persistance `localStorage`.
+### 🖼️ 5. Bande Gauche Immersive & Panneau Droit Unifié — `js/custom-hub.js`
+- **Bande de gauche** : Illustration plein format s'étirant sur toute la hauteur de la grille avec badge Cyberdeck d'état du système.
+- **Panneau de droite unifié avec menu glissant** :
+  - **Vue Agenda & Tasks** : Mini-calendrier mensuel interactif synchronisé avec les échéances des tâches et liste de to-do avec ajout rapide, calcul d'urgence (`Auj.`, `J-X`, `J+X`) et filtre par jour.
+  - **Vue Actualités (Menu Glissant)** : Navigation fluide d'un clic vers les flux d'informations en direct (F1, Football, Tech et vos flux RSS sur mesure).
 
 ### 🌤️ 7. Météo Détaillée & Effets d'Arrière-Plan Dynamiques — `js/weather.js` & `js/weather-fx.js`
 - **Widget Météo en direct & Modale complète** : Cliquez sur la pilule météo pour ouvrir les détails météo (température ressentie, humidité, vitesse du vent, indice UV) et les **prévisions complètes sur 3 jours**.
@@ -129,7 +111,7 @@ violet-startpage/
 │   ├── themes.js               # Gestionnaire de thèmes visuels
 │   ├── appearance.js           # Personnalisation des couleurs, ambilight et scanlines
 │   ├── weather-fx.js           # Effets météo d'arrière-plan dynamiques sur Canvas
-│   ├── widgets.js              # Widgets topbar (Pomodoro, Notes, Ambiance, Ping/Batterie)
+│   ├── custom-hub.js           # Grand Cadre de personnalisation & slider colonne droite
 │   ├── bookmarks.js            # Signets adaptatifs, Drag & Drop & Export/Import JSON
 │   ├── search.js               # Omnibox : moteur, calculatrice, bangs & autocomplétion
 │   ├── calendar.js             # Mini-calendrier mensuel interactif

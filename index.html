@@ -32,97 +32,28 @@
     </div>
 
     <div class="dashboard">
-      <!-- BARRE SUPÉRIEURE -->
+      <!-- BARRE SUPÉRIEURE : ÉPURÉE, HEURE AU CENTRE, PERSONNALISER À DROITE -->
       <header class="topbar">
         <div class="topbar-left">
-          <!-- Switcher de thèmes (Pavé 1, 2, 3) -->
           <div class="theme-switcher" title="Basculer de thème (Pavé numérique 1, 2, 3)">
             <button type="button" class="theme-btn active" data-theme-btn="1">1</button>
             <button type="button" class="theme-btn" data-theme-btn="2">2</button>
             <button type="button" class="theme-btn" data-theme-btn="3">3</button>
           </div>
+          <span id="prompt-path" class="prompt-path">~/startpage</span>
+        </div>
 
-          <!-- Invite de terminal personnalisable -->
-          <span id="prompt-path" class="prompt-path" title="Cliquez en mode personnalisation pour modifier">~/startpage</span>
-
-          <!-- Widget Minuteur Pomodoro / Focus -->
-          <div id="topbar-pomodoro" class="pomodoro-widget" title="Minuteur Focus / Pomodoro">
-            <button type="button" id="pomo-toggle-btn" class="pill-btn pomo-pill">
-              <i id="pomo-play-icon" class="fa-solid fa-play"></i>
-              <span id="pomo-display">25:00</span>
-              <span id="pomo-gear-btn" class="pomo-menu-dot" title="Options du minuteur"><i class="fa-solid fa-caret-down"></i></span>
-            </button>
-            <div id="pomo-popover" class="widget-popover pomo-popover" hidden>
-              <div class="popover-title"><i class="fa-solid fa-stopwatch"></i> Minuteur Focus</div>
-              <div class="pomo-modes-row">
-                <button type="button" class="pomo-mode-btn active" data-pomo-mode="focus">25m Focus</button>
-                <button type="button" class="pomo-mode-btn" data-pomo-mode="short">5m Pause</button>
-                <button type="button" class="pomo-mode-btn" data-pomo-mode="long">15m Longue</button>
-              </div>
-              <button type="button" id="pomo-reset-btn" class="popover-action-btn"><i class="fa-solid fa-rotate-left"></i> Réinitialiser</button>
-            </div>
-          </div>
-
-          <!-- Widget Ambiance Sonore & Lofi -->
-          <div id="topbar-ambient" class="ambient-widget">
-            <button type="button" id="ambient-toggle-btn" class="pill-btn ambient-pill" title="Ambiance sonore & Lofi (Relaxation / Concentration)">
-              <i id="ambient-icon" class="fa-solid fa-headphones"></i>
-              <span id="ambient-btn-label">Ambiance</span>
-            </button>
-            <div id="ambient-popover" class="widget-popover ambient-popover" hidden>
-              <div class="popover-title"><i class="fa-solid fa-headphones"></i> Ambiance Sonore</div>
-              <div class="ambient-modes-row">
-                <button type="button" class="ambient-type-btn active" data-sound-type="rain"><i class="fa-solid fa-cloud-rain"></i> Pluie</button>
-                <button type="button" class="ambient-type-btn" data-sound-type="brown"><i class="fa-solid fa-water"></i> Bruit Brun</button>
-                <button type="button" class="ambient-type-btn" data-sound-type="lofi"><i class="fa-solid fa-radio"></i> Radio Lofi</button>
-              </div>
-              <div class="ambient-slider-row">
-                <i class="fa-solid fa-volume-low"></i>
-                <input type="range" id="ambient-volume" min="0" max="1" step="0.05" value="0.5" />
-                <i class="fa-solid fa-volume-high"></i>
-              </div>
-              <button type="button" id="ambient-pop-play" class="popover-action-btn primary"><i class="fa-solid fa-play"></i> Écouter</button>
-            </div>
+        <!-- CENTRE : HEURE MIEUX STYLISÉE ET CENTRÉE -->
+        <div class="topbar-center">
+          <div class="clock-display-wrap">
+            <span id="time" class="time-main">00:00:00</span>
+            <span class="clock-sep">•</span>
+            <span id="date" class="date-sub">Loading...</span>
           </div>
         </div>
 
+        <!-- DROITE : MÉTÉO COMPACTE & BOUTON PERSONNALISER -->
         <div class="topbar-right">
-          <!-- Widget Bloc-Notes Rapide (Scratchpad) -->
-          <button
-            type="button"
-            id="topbar-notes-btn"
-            class="pill-btn notes-pill-btn"
-            title="Ouvrir le bloc-notes rapide"
-          >
-            <i class="fa-regular fa-note-sticky"></i>
-            <span class="notes-btn-text">Notes</span>
-          </button>
-
-          <!-- Widget Statut Système (Ping de latence réseau & Batterie) -->
-          <div id="topbar-sysinfo" class="sysinfo-widget" title="Statut Réseau & Batterie">
-            <div class="sys-pill">
-              <span id="sys-ping-dot" class="sys-ping-dot ping-good"></span>
-              <span id="sys-ping-val">-- ms</span>
-              <span id="sys-battery-wrap" class="sys-battery-wrap" hidden>
-                <i id="sys-battery-icon" class="fa-solid fa-battery-half"></i>
-                <span id="sys-battery-val">--%</span>
-              </span>
-            </div>
-          </div>
-
-          <!-- Bouton bascule de l'effet météo d'arrière-plan -->
-          <button
-            type="button"
-            id="weather-fx-toggle"
-            class="pill-btn weather-fx-btn active"
-            title="Effets météo d'arrière-plan (Cliquer pour désactiver)"
-            aria-label="Effet météo animé"
-          >
-            <i class="fa-solid fa-cloud-rain"></i>
-            <span class="fx-indicator-dot"></span>
-          </button>
-
-          <!-- Widget Météo cliquable pour ouvrir la modale détaillée -->
           <div
             class="weather-pill clickable-pill"
             id="weather"
@@ -134,83 +65,32 @@
             <span id="weather-temp">--°C</span>
           </div>
 
-          <!-- Date & Heure dynamique -->
-          <div class="datetime">
-            <span id="time" class="time">00:00:00</span>
-            <span id="date" class="date">Loading...</span>
-          </div>
-
-          <!-- Bouton pour basculer en mode personnalisation -->
           <button
             type="button"
-            id="edit-mode-toggle"
-            class="pill-btn edit-toggle-btn"
-            title="Activer/Désactiver le mode personnalisation"
+            id="open-custom-hub-btn"
+            class="pill-btn customize-hub-btn"
+            title="Ouvrir le menu de personnalisation"
           >
-            <i class="fa-solid fa-paintbrush"></i>
-            <span class="edit-btn-text">Personnaliser</span>
+            <i class="fa-solid fa-sliders"></i>
+            <span class="hub-btn-text">Personnaliser</span>
           </button>
         </div>
       </header>
 
-      <!-- TIROIR BLOC-NOTES RAPIDE (SCRATCHPAD) -->
-      <div id="scratchpad-panel" class="scratchpad-panel" hidden>
-        <div class="scratchpad-header">
-          <div class="scratchpad-title">
-            <i class="fa-regular fa-note-sticky"></i>
-            <span>Bloc-Notes Rapide</span>
-            <span class="scratchpad-stats">
-              <span id="scratchpad-words">0 mots</span> • <span id="scratchpad-chars">0 car.</span>
-            </span>
-          </div>
-          <div class="scratchpad-actions">
-            <button type="button" id="scratchpad-copy-btn" class="scratch-btn" title="Copier tout"><i class="fa-regular fa-copy"></i> Copier</button>
-            <button type="button" id="scratchpad-download-btn" class="scratch-btn" title="Télécharger (.txt)"><i class="fa-solid fa-download"></i></button>
-            <button type="button" id="scratchpad-clear-btn" class="scratch-btn danger" title="Effacer"><i class="fa-solid fa-trash-can"></i></button>
-            <button type="button" id="scratchpad-close-btn" class="scratch-btn close-btn" title="Fermer"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-        </div>
-        <textarea
-          id="scratchpad-textarea"
-          placeholder="Notez une idée, un rappel, un lien ou du code temporaire... (sauvegarde automatique en direct)"
-        ></textarea>
-      </div>
-
       <!-- GRILLE PRINCIPALE À 3 COLONNES -->
       <main class="deck-grid">
-        <!-- COLONNE GAUCHE : Illustration + Mini-Calendrier -->
+        <!-- COLONNE GAUCHE : IMAGE SUR TOUTE LA HAUTEUR -->
         <aside class="col-left">
-          <div class="art-card">
+          <div class="art-card full-height-art">
             <img id="main-art" src="images/gif.gif" alt="Theme Artwork" />
             <div class="art-badge">
-              <span class="pulse-dot"></span> <span id="art-badge-text">修理 // ONLINE</span>
+              <span class="pulse-dot"></span>
+              <span id="art-badge-text">修理 // ONLINE</span>
             </div>
-          </div>
-
-          <div class="cal-card">
-            <div class="card-header cal-header-only">
-              <div class="cal-controls">
-                <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <span id="cal-title" class="cal-title">Oct 2026</span>
-                <button id="cal-next" class="cal-nav-btn" title="Mois suivant">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-              </div>
-              <button id="cal-today" class="cal-today-btn" title="Revenir à aujourd'hui">
-                auj
-              </button>
-            </div>
-
-            <div class="cal-weekdays">
-              <span>Lu</span><span>Ma</span><span>Me</span><span>Je</span><span>Ve</span><span>Sa</span><span>Di</span>
-            </div>
-            <div id="cal-days" class="cal-days"></div>
           </div>
         </aside>
 
-        <!-- COLONNE CENTRALE : Barre de recherche + Toolbar Personnalisation + Catégories -->
+        <!-- COLONNE CENTRALE : BARRE DE RECHERCHE + GRILLE DES CATÉGORIES -->
         <section class="col-center">
           <div class="search-wrapper">
             <form id="search-form" class="search-box">
@@ -233,94 +113,331 @@
             <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
           </div>
 
-          <!-- BARRE DE PERSONNALISATION (VISIBLE UNIQUEMENT EN MODE PERSONNALISER) -->
-          <div id="customize-toolbar" class="customize-toolbar" hidden>
-            <div class="custom-toolbar-left">
-              <span class="custom-badge">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Personnalisation
-              </span>
-              <span class="custom-hint">
-                <i class="fa-solid fa-up-down-left-right"></i> Glissez pour réorganiser • Cliquez pour modifier
-              </span>
-            </div>
-            <div class="custom-toolbar-actions">
-              <button type="button" id="btn-manage-widgets" class="custom-tool-btn" title="Activer ou masquer les widgets de la barre supérieure">
-                <i class="fa-solid fa-sliders"></i> Widgets
-              </button>
-              <button type="button" id="btn-manage-appearance" class="custom-tool-btn" title="Personnaliser les couleurs d'accent, le flou et les scanlines">
-                <i class="fa-solid fa-palette"></i> Apparence
-              </button>
-              <button type="button" id="btn-add-category" class="custom-tool-btn" title="Créer une nouvelle catégorie de raccourcis">
-                <i class="fa-solid fa-folder-plus"></i> + Catégorie
-              </button>
-              <button type="button" id="btn-manage-feeds" class="custom-tool-btn" title="Gérer vos flux d'actualités personnalisés">
-                <i class="fa-solid fa-rss"></i> Flux RSS
-              </button>
-              <button type="button" id="btn-export-backup" class="custom-tool-btn" title="Télécharger une sauvegarde JSON complète de votre startpage">
-                <i class="fa-solid fa-download"></i> Sauvegarder
-              </button>
-              <button type="button" id="btn-import-backup" class="custom-tool-btn" title="Restaurer votre configuration à partir d'un fichier JSON">
-                <i class="fa-solid fa-upload"></i> Restaurer
-              </button>
-              <button type="button" id="btn-close-edit" class="custom-tool-btn primary" title="Quitter le mode personnalisation">
-                <i class="fa-solid fa-check"></i> Terminer
-              </button>
-            </div>
-          </div>
-          <input type="file" id="import-file-input" accept=".json" hidden />
-
-          <!-- Conteneur des catégories (rendu dynamique avec ajustement automatique de taille) -->
+          <!-- Conteneur des catégories (ajustement automatique de la taille pour rester harmonieux > 6 liens) -->
           <div id="categories-container" class="categories-grid"></div>
         </section>
 
-        <!-- COLONNE DROITE : Actus + Tasks -->
+        <!-- COLONNE DROITE : PANNEAU FUSIONNÉ (CALENDRIER & TASKS) + MENU GLISSANT ACTUALITÉS -->
         <aside class="col-right">
-          <div class="feed-card">
-            <div class="card-header feed-header-only">
-              <div class="tab-group">
-                <button class="tab-btn active" data-feed="f1">F1</button>
-                <button class="tab-btn" data-feed="foot">Foot</button>
-                <button class="tab-btn" data-feed="tech">Tech</button>
+          <div class="unified-deck-card">
+            <!-- Sélecteur d'onglets glissant -->
+            <div class="deck-view-header">
+              <div class="deck-view-nav">
+                <button type="button" class="deck-nav-btn active" data-deck-view="agenda">
+                  <i class="fa-regular fa-calendar-check"></i>
+                  <span>Agenda & Tasks</span>
+                </button>
+                <button type="button" class="deck-nav-btn" data-deck-view="feeds">
+                  <i class="fa-solid fa-newspaper"></i>
+                  <span>Actualités</span>
+                </button>
+                <div class="deck-nav-indicator"></div>
               </div>
             </div>
-            <ul id="feed-list" class="feed-list">
-              <li class="feed-skeleton">Connexion au flux en direct...</li>
-            </ul>
-          </div>
 
-          <div class="workspace-card">
-            <div class="card-header">
-              <span class="tasks-title">
-                <i class="fa-solid fa-list-check"></i> tasks
-              </span>
-              <button id="clear-date-filter" class="filter-chip" hidden title="Afficher toutes les dates">
-                <span id="filter-date-label"></span> &times;
-              </button>
-            </div>
+            <!-- Conteneur des vues glissantes -->
+            <div class="deck-views-wrapper">
+              <!-- VUE 1 : CALENDRIER & TÂCHES FUSIONNÉS -->
+              <div id="deck-view-agenda" class="deck-slide-view active">
+                <!-- Section Calendrier compact -->
+                <div class="merged-calendar-section">
+                  <div class="cal-controls-row">
+                    <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
+                      <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <span id="cal-title" class="cal-title">Oct 2026</span>
+                    <button id="cal-next" class="cal-nav-btn" title="Mois suivant">
+                      <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                    <button id="cal-today" class="cal-today-btn" title="Revenir à aujourd'hui">auj</button>
+                  </div>
+                  <div class="cal-weekdays">
+                    <span>Lu</span><span>Ma</span><span>Me</span><span>Je</span><span>Ve</span><span>Sa</span><span>Di</span>
+                  </div>
+                  <div id="cal-days" class="cal-days"></div>
+                </div>
 
-            <div class="ws-panel active">
-              <form id="todo-form" class="todo-input-row">
-                <input
-                  id="todo-input"
-                  type="text"
-                  placeholder="+ Nouvelle tâche..."
-                  autocomplete="off"
-                />
-                <input
-                  id="todo-date"
-                  type="date"
-                  title="Assigner une date d'échéance (optionnel)"
-                />
-                <button type="submit" class="todo-add-btn" title="Ajouter">+</button>
-              </form>
-              <ul id="todo-list" class="todo-list"></ul>
+                <!-- Section Tâches fusionnées -->
+                <div class="merged-tasks-section">
+                  <div class="tasks-header-row">
+                    <span class="tasks-label"><i class="fa-solid fa-list-check"></i> Tasks</span>
+                    <button id="clear-date-filter" class="filter-chip" hidden title="Afficher toutes les dates">
+                      <span id="filter-date-label"></span> &times;
+                    </button>
+                  </div>
+
+                  <form id="todo-form" class="todo-input-row">
+                    <input
+                      id="todo-input"
+                      type="text"
+                      placeholder="+ Ajouter une tâche..."
+                      autocomplete="off"
+                    />
+                    <input
+                      id="todo-date"
+                      type="date"
+                      title="Assigner une date d'échéance (optionnel)"
+                    />
+                    <button type="submit" class="todo-add-btn" title="Ajouter">+</button>
+                  </form>
+
+                  <ul id="todo-list" class="todo-list merged-todo-list"></ul>
+                </div>
+              </div>
+
+              <!-- VUE 2 : INFOS / ACTUALITÉS (MENU GLISSANT) -->
+              <div id="deck-view-feeds" class="deck-slide-view" hidden>
+                <div class="feeds-tab-bar">
+                  <div class="tab-group">
+                    <button class="tab-btn active" data-feed="f1">F1</button>
+                    <button class="tab-btn" data-feed="foot">Foot</button>
+                    <button class="tab-btn" data-feed="tech">Tech</button>
+                  </div>
+                </div>
+                <ul id="feed-list" class="feed-list merged-feed-list">
+                  <li class="feed-skeleton">Connexion au flux en direct...</li>
+                </ul>
+              </div>
             </div>
           </div>
         </aside>
       </main>
     </div>
 
-    <!-- MODALE MÉTÉO DÉTAILLÉE & CHOIX DE LA VILLE -->
+    <!-- ========================================================
+         GRAND CADRE DE PERSONNALISATION ÉLÉGANT (CONTROL HUB)
+         ======================================================== -->
+    <div id="custom-hub-modal" class="modal-backdrop" hidden>
+      <div class="hub-modal-card">
+        <!-- En-tête du grand cadre -->
+        <div class="hub-modal-header">
+          <div class="hub-title-group">
+            <div class="hub-icon-badge"><i class="fa-solid fa-sliders"></i></div>
+            <div>
+              <h3>Centre de Personnalisation</h3>
+              <p class="hub-subtitle">Gérez vos raccourcis, votre apparence et vos préférences en toute simplicité</p>
+            </div>
+          </div>
+          <button type="button" id="hub-modal-close" class="modal-close">&times;</button>
+        </div>
+
+        <div class="hub-modal-body">
+          <!-- Sidebar des onglets -->
+          <nav class="hub-sidebar">
+            <button type="button" class="hub-tab-btn active" data-hub-tab="shortcuts">
+              <i class="fa-solid fa-link"></i>
+              <span>Raccourcis & Liens</span>
+            </button>
+            <button type="button" class="hub-tab-btn" data-hub-tab="appearance">
+              <i class="fa-solid fa-palette"></i>
+              <span>Thèmes & Apparence</span>
+            </button>
+            <button type="button" class="hub-tab-btn" data-hub-tab="feeds">
+              <i class="fa-solid fa-rss"></i>
+              <span>Flux d'Actualités</span>
+            </button>
+            <button type="button" class="hub-tab-btn" data-hub-tab="backup">
+              <i class="fa-solid fa-cloud-arrow-down"></i>
+              <span>Sauvegarde & Export</span>
+            </button>
+          </nav>
+
+          <!-- Zone de contenu des onglets -->
+          <div class="hub-content-area">
+            <!-- ONGLET 1 : RACCOURCIS & CATÉGORIES -->
+            <div id="hub-tab-shortcuts" class="hub-tab-panel active">
+              <div class="hub-panel-header">
+                <div>
+                  <h4>Gestion des Catégories & Raccourcis</h4>
+                  <p class="panel-hint">
+                    Ajoutez autant de liens que vous le souhaitez (> 6 liens par catégorie). La taille s'ajuste automatiquement sur la page d'accueil pour que tout reste élégant.
+                  </p>
+                </div>
+                <button type="button" id="hub-add-category-btn" class="modal-btn primary">
+                  <i class="fa-solid fa-folder-plus"></i> + Nouvelle Catégorie
+                </button>
+              </div>
+
+              <div id="hub-categories-list" class="hub-categories-list"></div>
+            </div>
+
+            <!-- ONGLET 2 : THÈMES & APPARENCE -->
+            <div id="hub-tab-appearance" class="hub-tab-panel" hidden>
+              <div class="hub-panel-header">
+                <div>
+                  <h4>Thèmes & Personnalisation Visuelle</h4>
+                  <p class="panel-hint">Choisissez un thème ou personnalisez vos propres couleurs néon et effets d'ambiance.</p>
+                </div>
+              </div>
+
+              <!-- Choix des thèmes -->
+              <div class="appearance-section">
+                <label class="section-label">Sélection du Thème :</label>
+                <div class="hub-themes-grid">
+                  <button type="button" class="hub-theme-card-btn active" data-hub-theme="1" title="Kanagawa (Cyan / Menthe)">
+                    <span class="theme-preview-color kanagawa-color"></span>
+                    <span class="theme-card-name">1. Kanagawa</span>
+                    <span class="theme-card-desc">Cyan & Menthe froide</span>
+                  </button>
+                  <button type="button" class="hub-theme-card-btn" data-hub-theme="2" title="Sakura (Rose)">
+                    <span class="theme-preview-color sakura-color"></span>
+                    <span class="theme-card-name">2. Sakura</span>
+                    <span class="theme-card-desc">Rose & Néo-pastel</span>
+                  </button>
+                  <button type="button" class="hub-theme-card-btn" data-hub-theme="3" title="Cyberdeck (Violet)">
+                    <span class="theme-preview-color cyberdeck-color"></span>
+                    <span class="theme-card-name">3. Cyberdeck</span>
+                    <span class="theme-card-desc">Néon Violet & Cyan</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Palettes cyberpunk -->
+              <div class="appearance-section">
+                <label class="section-label">Palettes Cyberpunk Rapides :</label>
+                <div id="appearance-palettes-list" class="palettes-list"></div>
+              </div>
+
+              <!-- Couleurs d'accent personnalisées -->
+              <div class="appearance-section">
+                <label class="section-label">Couleurs Personnalisées :</label>
+                <div class="appearance-colors-grid">
+                  <div class="color-picker-item">
+                    <label for="appearance-primary-color">Accent Principal :</label>
+                    <div class="color-picker-wrap">
+                      <input type="color" id="appearance-primary-color" value="#31e1f7" />
+                      <span class="color-hint">Néons & bordures</span>
+                    </div>
+                  </div>
+                  <div class="color-picker-item">
+                    <label for="appearance-secondary-color">Accent Secondaire :</label>
+                    <div class="color-picker-wrap">
+                      <input type="color" id="appearance-secondary-color" value="#b55fe6" />
+                      <span class="color-hint">Orbes & reflets</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ambilight & Effets -->
+              <div class="appearance-section sliders-section">
+                <div class="form-row">
+                  <label for="appearance-blur-slider">
+                    <span>Flou de l'Ambilight d'arrière-plan</span>
+                    <span id="appearance-blur-val" class="slider-badge">55px</span>
+                  </label>
+                  <input type="range" id="appearance-blur-slider" min="10" max="100" step="5" value="55" />
+                </div>
+
+                <div class="form-row">
+                  <label for="appearance-opacity-slider">
+                    <span>Intensité de l'éclairage ambiant</span>
+                    <span id="appearance-opacity-val" class="slider-badge">56%</span>
+                  </label>
+                  <input type="range" id="appearance-opacity-slider" min="10" max="90" step="2" value="56" />
+                </div>
+
+                <div class="toggles-row">
+                  <label class="fx-toggle-label">
+                    <span>Effet Scanlines rétro (lignes cathodiques)</span>
+                    <input type="checkbox" id="appearance-scanlines-check" checked />
+                    <span class="switch-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="hub-panel-footer">
+                <button type="button" id="appearance-reset-btn" class="modal-btn danger">
+                  Réinitialiser l'apparence par défaut
+                </button>
+              </div>
+            </div>
+
+            <!-- ONGLET 3 : FLUX D'ACTUALITÉS -->
+            <div id="hub-tab-feeds" class="hub-tab-panel" hidden>
+              <div class="hub-panel-header">
+                <div>
+                  <h4>Gestion des Flux RSS</h4>
+                  <p class="panel-hint">Ajoutez vos propres flux d'actualités (blogs, gaming, tech, reddit) pour les consulter dans le menu de droite.</p>
+                </div>
+              </div>
+
+              <form id="add-feed-form" class="add-feed-form">
+                <div class="form-row">
+                  <label for="new-feed-name">Nom de l'onglet</label>
+                  <input
+                    type="text"
+                    id="new-feed-name"
+                    placeholder="ex: Science, Gaming, Reddit..."
+                    required
+                    maxlength="15"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="form-row">
+                  <label for="new-feed-url">URL du flux RSS (XML / RSS)</label>
+                  <input
+                    type="url"
+                    id="new-feed-url"
+                    placeholder="https://exemple.com/rss.xml"
+                    required
+                    autocomplete="off"
+                  />
+                </div>
+                <button type="submit" class="modal-btn primary"><i class="fa-solid fa-plus"></i> Ajouter ce flux</button>
+              </form>
+
+              <div class="custom-feeds-list-section">
+                <h4>Vos flux personnalisés actifs</h4>
+                <div id="custom-feeds-list" class="custom-feeds-list"></div>
+              </div>
+            </div>
+
+            <!-- ONGLET 4 : SAUVEGARDE & RESTAURATION -->
+            <div id="hub-tab-backup" class="hub-tab-panel" hidden>
+              <div class="hub-panel-header">
+                <div>
+                  <h4>Sauvegarde & Restauration</h4>
+                  <p class="panel-hint">Exportez l'intégralité de votre configuration (signets, thèmes, flux RSS, tâches) dans un fichier JSON réutilisable sur n'importe quelle machine.</p>
+                </div>
+              </div>
+
+              <div class="backup-cards-grid">
+                <div class="backup-card">
+                  <div class="backup-card-icon"><i class="fa-solid fa-download"></i></div>
+                  <h5>Exporter la sauvegarde</h5>
+                  <p>Téléchargez un fichier .json contenant toutes vos personnalisations.</p>
+                  <button type="button" id="hub-export-btn" class="modal-btn primary">
+                    <i class="fa-solid fa-download"></i> Télécharger (.json)
+                  </button>
+                </div>
+
+                <div class="backup-card">
+                  <div class="backup-card-icon"><i class="fa-solid fa-upload"></i></div>
+                  <h5>Restaurer une sauvegarde</h5>
+                  <p>Importez un fichier .json sauvegardé précédemment.</p>
+                  <button type="button" id="hub-import-btn" class="modal-btn secondary">
+                    <i class="fa-solid fa-upload"></i> Choisir un fichier...
+                  </button>
+                  <input type="file" id="hub-file-input" accept=".json" hidden />
+                </div>
+
+                <div class="backup-card danger-card">
+                  <div class="backup-card-icon"><i class="fa-solid fa-rotate-left"></i></div>
+                  <h5>Réinitialisation d'usine</h5>
+                  <p>Restaurer l'ensemble des réglages et raccourcis par défaut.</p>
+                  <button type="button" id="hub-reset-btn" class="modal-btn danger">
+                    Réinitialiser tout
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODALE MÉTÉO DÉTAILLÉE -->
     <div id="weather-modal" class="modal-backdrop" hidden>
       <div class="modal-box weather-modal-box">
         <div class="modal-header">
@@ -388,7 +505,7 @@
 
           <div class="weather-modal-footer">
             <label class="fx-toggle-label">
-              <span>Effets météo d'arrière-plan animés</span>
+              <span>Effets météo d'arrière-plan animés (pluie, neige)</span>
               <input type="checkbox" id="weather-modal-fx-check" checked />
               <span class="switch-slider"></span>
             </label>
@@ -397,269 +514,75 @@
       </div>
     </div>
 
-    <!-- MODALE GESTION DES FLUX RSS PERSONNALISÉS -->
-    <div id="feeds-modal" class="modal-backdrop" hidden>
-      <div class="modal-box feeds-modal-box">
+    <!-- MODALE D'ÉDITION D'UN RACCOURCI -->
+    <div id="edit-modal" class="modal-backdrop" hidden>
+      <div class="modal-box">
         <div class="modal-header">
           <div class="modal-title-group">
-            <i class="fa-solid fa-rss"></i>
-            <h3>Gestion des flux d'actualités</h3>
+            <i class="fa-solid fa-pen-to-square"></i>
+            <h3 id="edit-modal-title">Modifier le raccourci</h3>
           </div>
-          <button type="button" id="feeds-modal-close" class="modal-close">&times;</button>
+          <button type="button" id="modal-close-btn" class="modal-close">&times;</button>
         </div>
 
-        <div class="feeds-modal-body">
-          <p class="feeds-modal-desc">
-            Ajoutez des flux RSS pour les afficher directement dans les onglets du widget d'actualités.
-          </p>
+        <form id="edit-shortcut-form" class="modal-form">
+          <div class="form-row">
+            <label for="edit-name">Nom affiché</label>
+            <input type="text" id="edit-name" required autocomplete="off" />
+          </div>
 
-          <form id="add-feed-form" class="add-feed-form">
-            <div class="form-row">
-              <label for="new-feed-name">Nom de l'onglet</label>
+          <div class="form-row">
+            <label for="edit-url">Adresse URL</label>
+            <input type="url" id="edit-url" required placeholder="https://..." autocomplete="off" />
+          </div>
+
+          <div class="form-row">
+            <label for="edit-icon">
+              <span>Classe d'icône (Font Awesome)</span>
+              <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" class="fa-link-hint">
+                catalogue <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              </a>
+            </label>
+            <div class="icon-input-wrapper">
+              <div class="icon-preview-box">
+                <i id="edit-icon-preview" class="fa-solid fa-link"></i>
+              </div>
               <input
                 type="text"
-                id="new-feed-name"
-                placeholder="ex: Science, Gaming, Reddit..."
-                required
-                maxlength="15"
-                autocomplete="off"
-              />
-            </div>
-            <div class="form-row">
-              <label for="new-feed-url">URL du flux RSS (XML / RSS)</label>
-              <input
-                type="url"
-                id="new-feed-url"
-                placeholder="https://exemple.com/rss.xml"
+                id="edit-icon"
+                placeholder="ex: fa-brands fa-youtube"
                 required
                 autocomplete="off"
               />
             </div>
-            <button type="submit" class="modal-btn primary"><i class="fa-solid fa-plus"></i> Ajouter ce flux</button>
-          </form>
-
-          <div class="custom-feeds-list-section">
-            <h4>Vos flux personnalisés</h4>
-            <div id="custom-feeds-list" class="custom-feeds-list"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODALE DE GESTION DES WIDGETS DE LA TOPBAR -->
-    <div id="widgets-modal" class="modal-backdrop" hidden>
-      <div class="modal-box widgets-modal-box">
-        <div class="modal-header">
-          <div class="modal-title-group">
-            <i class="fa-solid fa-sliders"></i>
-            <h3>Gestion des Widgets de la Topbar</h3>
-          </div>
-          <button type="button" id="widgets-modal-close" class="modal-close">&times;</button>
-        </div>
-
-        <div class="widgets-modal-body">
-          <p class="modal-intro-text">
-            Choisissez précisément quels modules afficher dans votre barre supérieure :
-          </p>
-
-          <div class="widgets-checklist">
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-solid fa-palette"></i>
-                <div>
-                  <span class="widget-name">Sélecteur de Thèmes (1, 2, 3)</span>
-                  <span class="widget-sub">Boutons rapides Kanagawa, Sakura, Cyberdeck</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-themes" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-solid fa-terminal"></i>
-                <div>
-                  <span class="widget-name">Invite de Terminal (Prompt)</span>
-                  <span class="widget-sub">Texte d'invite personnalisable (~/startpage)</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-prompt" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-solid fa-stopwatch"></i>
-                <div>
-                  <span class="widget-name">Minuteur Focus / Pomodoro</span>
-                  <span class="widget-sub">Décompte 25/5/15 min & alertes sonores douces</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-pomodoro" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-regular fa-note-sticky"></i>
-                <div>
-                  <span class="widget-name">Bloc-Notes Rapide (Scratchpad)</span>
-                  <span class="widget-sub">Tiroir de notes instantané avec auto-sauvegarde</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-notes" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-solid fa-headphones"></i>
-                <div>
-                  <span class="widget-name">Ambiance Sonore & Lofi</span>
-                  <span class="widget-sub">Générateur de pluie, bruit brun & radio chill</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-ambient" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-solid fa-signal"></i>
-                <div>
-                  <span class="widget-name">Statut Système (Ping & Batterie)</span>
-                  <span class="widget-sub">Latence réseau en direct et niveau de batterie</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-sysinfo" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-solid fa-cloud-sun"></i>
-                <div>
-                  <span class="widget-name">Widget Météo</span>
-                  <span class="widget-sub">Pilule de température & prévisions détaillées</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-weather" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-solid fa-cloud-rain"></i>
-                <div>
-                  <span class="widget-name">Bouton Effets Météo Canvas</span>
-                  <span class="widget-sub">Bouton ON/OFF pour la pluie/neige en arrière-plan</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-weatherfx" checked />
-              <span class="switch-slider"></span>
-            </label>
-
-            <label class="widget-toggle-row">
-              <div class="widget-info">
-                <i class="fa-regular fa-clock"></i>
-                <div>
-                  <span class="widget-name">Horloge & Date</span>
-                  <span class="widget-sub">Heure numérique et calendrier en français</span>
-                </div>
-              </div>
-              <input type="checkbox" id="widget-check-datetime" checked />
-              <span class="switch-slider"></span>
-            </label>
           </div>
 
-          <!-- Personnalisation de l'invite de commande -->
-          <div class="prompt-custom-section">
-            <label for="widget-prompt-input">Texte de l'invite de terminal :</label>
-            <div class="prompt-input-row">
-              <input type="text" id="widget-prompt-input" placeholder="~/startpage" autocomplete="off" />
-              <div class="quick-prompts">
-                <button type="button" class="q-prompt-btn" data-prompt="~/startpage">~/startpage</button>
-                <button type="button" class="q-prompt-btn" data-prompt="user@deck:~">user@deck:~</button>
-                <button type="button" class="q-prompt-btn" data-prompt="neo@matrix:~$">neo@matrix</button>
-                <button type="button" class="q-prompt-btn" data-prompt="~/workspace">~/workspace</button>
-              </div>
+          <div class="quick-icons-group">
+            <span class="quick-icons-label">Raccourcis rapides :</span>
+            <div class="quick-icons-list">
+              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-youtube" title="YouTube"><i class="fa-brands fa-youtube"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-twitch" title="Twitch"><i class="fa-brands fa-twitch"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-discord" title="Discord"><i class="fa-brands fa-discord"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-github" title="GitHub"><i class="fa-brands fa-github"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-gamepad" title="Jeux"><i class="fa-solid fa-gamepad"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-code" title="Code"><i class="fa-solid fa-code"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-music" title="Musique"><i class="fa-solid fa-music"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-film" title="Vidéo/Film"><i class="fa-solid fa-film"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-book" title="Lecture/Livre"><i class="fa-solid fa-book"></i></button>
+              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-brain" title="IA"><i class="fa-solid fa-brain"></i></button>
             </div>
-          </div>
-
-          <div class="modal-actions-right">
-            <button type="button" id="widgets-modal-save" class="modal-btn primary">Enregistrer les préférences</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODALE DE PERSONNALISATION DE L'APPARENCE -->
-    <div id="appearance-modal" class="modal-backdrop" hidden>
-      <div class="modal-box appearance-modal-box">
-        <div class="modal-header">
-          <div class="modal-title-group">
-            <i class="fa-solid fa-palette"></i>
-            <h3>Personnalisation de l'Apparence</h3>
-          </div>
-          <button type="button" id="appearance-modal-close" class="modal-close">&times;</button>
-        </div>
-
-        <div class="appearance-modal-body">
-          <div class="form-row">
-            <label>Palettes Cyberpunk Rapides :</label>
-            <div id="appearance-palettes-list" class="palettes-list"></div>
-          </div>
-
-          <div class="appearance-colors-grid">
-            <div class="form-row">
-              <label for="appearance-primary-color">Couleur d'accent principale :</label>
-              <div class="color-picker-wrap">
-                <input type="color" id="appearance-primary-color" value="#31e1f7" />
-                <span class="color-hint">Néons, bordures & icônes</span>
-              </div>
-            </div>
-            <div class="form-row">
-              <label for="appearance-secondary-color">Couleur d'accent secondaire :</label>
-              <div class="color-picker-wrap">
-                <input type="color" id="appearance-secondary-color" value="#b55fe6" />
-                <span class="color-hint">Orbes & reflets</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <label for="appearance-blur-slider">
-              <span>Flou de l'Ambilight d'arrière-plan</span>
-              <span id="appearance-blur-val" class="slider-badge">55px</span>
-            </label>
-            <input type="range" id="appearance-blur-slider" min="10" max="100" step="5" value="55" />
-          </div>
-
-          <div class="form-row">
-            <label for="appearance-opacity-slider">
-              <span>Intensité de l'éclairage ambiant</span>
-              <span id="appearance-opacity-val" class="slider-badge">56%</span>
-            </label>
-            <input type="range" id="appearance-opacity-slider" min="10" max="90" step="2" value="56" />
-          </div>
-
-          <div class="form-row">
-            <label class="fx-toggle-label">
-              <span>Effet Scanlines rétro (grille cathodique)</span>
-              <input type="checkbox" id="appearance-scanlines-check" checked />
-              <span class="switch-slider"></span>
-            </label>
           </div>
 
           <div class="modal-actions">
-            <button type="button" id="appearance-reset-btn" class="modal-btn danger">
-              Réinitialiser l'apparence par défaut
+            <button type="button" id="modal-delete-shortcut-btn" class="modal-btn danger">
+              <i class="fa-solid fa-trash-can"></i> Supprimer
             </button>
             <div class="modal-actions-right">
-              <button type="button" onclick="closeAppearanceModal()" class="modal-btn primary">Terminer</button>
+              <button type="button" id="modal-cancel-btn" class="modal-btn secondary">Annuler</button>
+              <button type="submit" id="modal-submit-btn" class="modal-btn primary">Enregistrer</button>
             </div>
           </div>
-        </div>
+        </form>
       </div>
     </div>
 
@@ -714,84 +637,6 @@
       </div>
     </div>
 
-    <!-- MODALE DE PERSONNALISATION DU RACCOURCI -->
-    <div id="edit-modal" class="modal-backdrop" hidden>
-      <div class="modal-box">
-        <div class="modal-header">
-          <div class="modal-title-group">
-            <i class="fa-solid fa-pen-to-square"></i>
-            <h3 id="edit-modal-title">Modifier le raccourci</h3>
-          </div>
-          <button type="button" id="modal-close-btn" class="modal-close">&times;</button>
-        </div>
-
-        <form id="edit-shortcut-form" class="modal-form">
-          <div class="form-row">
-            <label for="edit-name">Nom affiché</label>
-            <input type="text" id="edit-name" required autocomplete="off" />
-          </div>
-
-          <div class="form-row">
-            <label for="edit-url">Adresse URL</label>
-            <input type="url" id="edit-url" required placeholder="https://..." autocomplete="off" />
-          </div>
-
-          <div class="form-row">
-            <label for="edit-icon">
-              <span>Classe d'icône (Font Awesome)</span>
-              <a href="https://fontawesome.com/search?o=r&m=free" target="_blank" class="fa-link-hint">
-                catalogue <i class="fa-solid fa-arrow-up-right-from-square"></i>
-              </a>
-            </label>
-            <div class="icon-input-wrapper">
-              <div class="icon-preview-box">
-                <i id="edit-icon-preview" class="fa-solid fa-link"></i>
-              </div>
-              <input
-                type="text"
-                id="edit-icon"
-                placeholder="ex: fa-brands fa-youtube"
-                required
-                autocomplete="off"
-              />
-            </div>
-          </div>
-
-          <!-- Suggestions rapides d'icônes -->
-          <div class="quick-icons-group">
-            <span class="quick-icons-label">Raccourcis rapides :</span>
-            <div class="quick-icons-list">
-              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-youtube" title="YouTube"><i class="fa-brands fa-youtube"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-twitch" title="Twitch"><i class="fa-brands fa-twitch"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-discord" title="Discord"><i class="fa-brands fa-discord"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-brands fa-github" title="GitHub"><i class="fa-brands fa-github"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-gamepad" title="Jeux"><i class="fa-solid fa-gamepad"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-code" title="Code"><i class="fa-solid fa-code"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-music" title="Musique"><i class="fa-solid fa-music"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-film" title="Vidéo/Film"><i class="fa-solid fa-film"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-book" title="Lecture/Livre"><i class="fa-solid fa-book"></i></button>
-              <button type="button" class="q-icon-btn" data-icon="fa-solid fa-brain" title="IA"><i class="fa-solid fa-brain"></i></button>
-            </div>
-          </div>
-
-          <div class="modal-actions">
-            <div class="modal-actions-left">
-              <button type="button" id="modal-delete-shortcut-btn" class="modal-btn danger">
-                <i class="fa-solid fa-trash-can"></i> Supprimer
-              </button>
-              <button type="button" id="reset-all-shortcuts-btn" class="modal-btn text-danger">
-                Restaurer par défaut
-              </button>
-            </div>
-            <div class="modal-actions-right">
-              <button type="button" id="modal-cancel-btn" class="modal-btn secondary">Annuler</button>
-              <button type="submit" id="modal-submit-btn" class="modal-btn primary">Enregistrer</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <!-- Conteneur global de notifications toast -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
@@ -802,11 +647,11 @@
     <script src="js/clock.js"></script>
     <script src="js/weather.js"></script>
     <script src="js/bookmarks.js"></script>
-    <script src="js/widgets.js"></script>
     <script src="js/tasks.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/search.js"></script>
     <script src="js/feeds.js"></script>
+    <script src="js/custom-hub.js"></script>
     <script src="js/shortcuts.js"></script>
     <script src="js/app.js"></script>
   </body>

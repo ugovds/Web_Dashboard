@@ -137,7 +137,7 @@ async function loadFeed(feedId) {
 }
 
 function renderFeedTabs() {
-  const tabGroup = document.querySelector('.feed-header-only .tab-group');
+  const tabGroup = document.querySelector('.feeds-tab-bar .tab-group') || document.querySelector('.tab-group');
   if (!tabGroup) return;
 
   const defaultKeys = ['f1', 'foot', 'tech'];

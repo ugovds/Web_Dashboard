@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initAppearance === 'function') initAppearance();
   if (typeof initWeatherFx === 'function') initWeatherFx();
   if (typeof initBookmarks === 'function') initBookmarks();
-  if (typeof initWidgets === 'function') initWidgets();
+  if (typeof initCustomHub === 'function') initCustomHub();
   if (typeof initClock === 'function') initClock();
   if (typeof initWeather === 'function') initWeather();
   if (typeof initTasks === 'function') initTasks();
