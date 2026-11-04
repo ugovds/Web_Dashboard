@@ -12,7 +12,8 @@ const defaultAppearance = {
   customAccentSecondary: null,
   wallpaperBlur: 55, // px
   wallpaperOpacity: 56, // %
-  scanlines: true
+  scanlines: true,
+  dimMode: false
 };
 
 let currentAppearance = structuredClone(defaultAppearance);
@@ -92,6 +93,13 @@ function applyAppearance() {
     scanlinesEl.style.display = currentAppearance.scanlines !== false ? '' : 'none';
   }
 
+  // Mode Nuit / Atténuation HUD
+  if (currentAppearance.dimMode) {
+    body.classList.add('dim-mode');
+  } else {
+    body.classList.remove('dim-mode');
+  }
+
   // Fond d'écran Ambilight
   if (wallpaperEl) {
     const blurVal = currentAppearance.wallpaperBlur ?? 55;
@@ -131,6 +139,11 @@ function updateAppearanceInputs() {
 
   if (scanlinesCheck) {
     scanlinesCheck.checked = currentAppearance.scanlines !== false;
+  }
+
+  const dimCheck = document.getElementById('appearance-dim-check');
+  if (dimCheck) {
+    dimCheck.checked = currentAppearance.dimMode === true;
   }
 
   // Mettre à jour l'état actif sur les boutons de palettes
@@ -215,6 +228,14 @@ function renderPalettesList() {
   });
 }
 
+function toggleDimMode() {
+  currentAppearance.dimMode = !currentAppearance.dimMode;
+  saveAppearanceSettings();
+  if (typeof showToast === 'function') {
+    showToast(currentAppearance.dimMode ? 'Mode Nuit / Atténuation HUD activé' : 'Mode Nuit désactivé', 'info');
+  }
+}
+
 function initAppearance() {
   loadAppearanceSettings();
   renderPalettesList();
@@ -228,6 +249,17 @@ function initAppearance() {
   const opacitySlider = document.getElementById('appearance-opacity-slider');
   const opacityValDisplay = document.getElementById('appearance-opacity-val');
   const scanlinesCheck = document.getElementById('appearance-scanlines-check');
+  const dimCheck = document.getElementById('appearance-dim-check');
+
+  if (dimCheck) {
+    dimCheck.addEventListener('change', () => {
+      currentAppearance.dimMode = dimCheck.checked;
+      saveAppearanceSettings();
+      if (typeof showToast === 'function') {
+        showToast(currentAppearance.dimMode ? 'Mode Nuit activé' : 'Mode Nuit désactivé', 'info');
+      }
+    });
+  }
 
   if (colorPrimaryInput) {
     colorPrimaryInput.addEventListener('input', () => {

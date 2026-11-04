@@ -70,6 +70,61 @@ function setSavedCity(city) {
   } else {
     localStorage.removeItem('startpage_weather_city');
   }
+  updateFavButtonState();
+  renderWeatherFavorites();
+}
+
+function getWeatherFavorites() {
+  try {
+    const saved = localStorage.getItem('startpage_weather_favorites');
+    if (saved) return JSON.parse(saved);
+  } catch {}
+  return ['Paris', 'Tokyo', 'New York'];
+}
+
+function saveWeatherFavorites(favs) {
+  localStorage.setItem('startpage_weather_favorites', JSON.stringify(favs));
+  renderWeatherFavorites();
+  updateFavButtonState();
+}
+
+function renderWeatherFavorites() {
+  const container = document.getElementById('weather-favorites-bar');
+  if (!container) return;
+
+  const favs = getWeatherFavorites();
+  const currentCity = getSavedCity().toLowerCase();
+
+  if (favs.length === 0) {
+    container.innerHTML = `<span class="fav-empty-hint">Aucun favori enregistré (étoile ci-dessus).</span>`;
+    return;
+  }
+
+  container.innerHTML = favs
+    .map((city) => {
+      const isSelected = currentCity && city.toLowerCase() === currentCity;
+      return `
+        <div class="weather-fav-chip ${isSelected ? 'active' : ''}" data-fav-city="${escapeHtml(city)}">
+          <span class="fav-chip-name">${escapeHtml(city)}</span>
+          <button type="button" class="fav-chip-remove" data-remove-fav="${escapeHtml(city)}" title="Retirer ${escapeHtml(city)}">&times;</button>
+        </div>
+      `;
+    })
+    .join('');
+}
+
+function updateFavButtonState() {
+  const favBtn = document.getElementById('deck-city-fav-btn');
+  if (!favBtn) return;
+  const currentCity = getSavedCity().trim();
+  const favs = getWeatherFavorites();
+  const isFav = currentCity && favs.some((c) => c.toLowerCase() === currentCity.toLowerCase());
+
+  const icon = favBtn.querySelector('i');
+  if (icon) {
+    icon.className = isFav ? 'fa-solid fa-star fav-active' : 'fa-regular fa-star';
+  }
+  favBtn.title = isFav ? `Retirer "${currentCity}" des favoris` : `Ajouter "${currentCity || 'cette ville'}" aux favoris`;
 }
 
 async function fetchWeather() {
@@ -97,6 +152,8 @@ async function fetchWeather() {
 
     cachedWeatherData = data;
     renderWeatherDeckView(data);
+    updateFavButtonState();
+    renderWeatherFavorites();
 
     // Mettre à jour l'effet météo Canvas
     const rawDesc = data.current_condition[0].weatherDesc[0]?.value || '';
@@ -208,11 +265,16 @@ function initWeather() {
   const cityInput = document.getElementById('deck-city-input');
   const searchBtn = document.getElementById('deck-city-search-btn');
   const autoLocBtn = document.getElementById('deck-city-gps-btn');
+  const favBtn = document.getElementById('deck-city-fav-btn');
   const refreshBtn = document.getElementById('deck-weather-refresh-btn');
   const fxToggle = document.getElementById('deck-weather-fx-toggle');
+  const favoritesBar = document.getElementById('weather-favorites-bar');
 
-  const executeSearch = async () => {
-    const val = (cityInput ? cityInput.value : '').trim();
+  const executeSearch = async (overrideCity) => {
+    const val = typeof overrideCity === 'string' ? overrideCity.trim() : (cityInput ? cityInput.value : '').trim();
+    if (cityInput && typeof overrideCity === 'string') {
+      cityInput.value = overrideCity;
+    }
     if (!val) {
       setSavedCity('');
       await fetchWeather();
@@ -228,12 +290,58 @@ function initWeather() {
     }
   };
 
-  if (searchBtn) searchBtn.addEventListener('click', executeSearch);
+  if (searchBtn) searchBtn.addEventListener('click', () => executeSearch());
   if (cityInput) {
     cityInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         executeSearch();
+      }
+    });
+  }
+
+  // Toggle de ville favorite (Étoile)
+  if (favBtn) {
+    favBtn.addEventListener('click', () => {
+      const currentCity = getSavedCity().trim();
+      if (!currentCity) {
+        if (typeof showToast === 'function') showToast('Recherchez d\'abord une ville à ajouter aux favoris', 'info');
+        return;
+      }
+      let favs = getWeatherFavorites();
+      const existingIdx = favs.findIndex((c) => c.toLowerCase() === currentCity.toLowerCase());
+      if (existingIdx !== -1) {
+        favs.splice(existingIdx, 1);
+        saveWeatherFavorites(favs);
+        if (typeof showToast === 'function') showToast(`"${currentCity}" retirée des favoris`, 'info');
+      } else {
+        if (favs.length >= 6) {
+          favs.shift(); // Max 6 favoris
+        }
+        favs.push(currentCity);
+        saveWeatherFavorites(favs);
+        if (typeof showToast === 'function') showToast(`"${currentCity}" ajoutée aux favoris`, 'success');
+      }
+    });
+  }
+
+  // Clic sur un chip favori ou sur la croix de suppression
+  if (favoritesBar) {
+    favoritesBar.addEventListener('click', (e) => {
+      const removeBtn = e.target.closest('[data-remove-fav]');
+      if (removeBtn) {
+        e.stopPropagation();
+        const cityToRemove = removeBtn.dataset.removeFav;
+        let favs = getWeatherFavorites().filter((c) => c.toLowerCase() !== cityToRemove.toLowerCase());
+        saveWeatherFavorites(favs);
+        if (typeof showToast === 'function') showToast(`"${cityToRemove}" supprimée`, 'info');
+        return;
+      }
+
+      const chip = e.target.closest('[data-fav-city]');
+      if (chip) {
+        const city = chip.dataset.favCity;
+        executeSearch(city);
       }
     });
   }
@@ -264,6 +372,8 @@ function initWeather() {
     });
   }
 
+  renderWeatherFavorites();
+  updateFavButtonState();
   fetchWeather();
   setInterval(fetchWeather, 1800000); // 30 minutes
 }

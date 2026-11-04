@@ -278,8 +278,63 @@ function initPomodoroWidget() {
 }
 
 /* ========================================================
-   2. BLOC-NOTES RAPIDE (SCRATCHPAD)
+   2. BLOC-NOTES RAPIDE (SCRATCHPAD) & APERÇU MARKDOWN
    ======================================================== */
+function renderMarkdownToHtml(md) {
+  if (!md || !md.trim()) {
+    return '<p class="notes-preview-empty"><em>Aucune note à afficher. Désactivez l\'aperçu pour rédiger.</em></p>';
+  }
+
+  // 1. Échappement HTML initial pour prévenir tout XSS
+  let text = md
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // 2. Blocs de code ```lang ... ```
+  text = text.replace(/```([a-z0-9_-]*)\n([\s\S]*?)```/g, (match, lang, code) => {
+    return `<pre class="md-code-block"><div class="md-code-header">${lang || 'code'}</div><code>${code.trim()}</code></pre>`;
+  });
+
+  // 3. Titres (# h1, ## h2, ### h3, #### h4)
+  text = text.replace(/^#### (.*$)/gim, '<h4 class="md-h4">$1</h4>');
+  text = text.replace(/^### (.*$)/gim, '<h3 class="md-h3">$1</h3>');
+  text = text.replace(/^## (.*$)/gim, '<h2 class="md-h2">$1</h2>');
+  text = text.replace(/^# (.*$)/gim, '<h1 class="md-h1">$1</h1>');
+
+  // 4. Lignes horizontales
+  text = text.replace(/^---$/gim, '<hr class="md-hr" />');
+
+  // 5. Citations / Blockquotes
+  text = text.replace(/^\> (.*$)/gim, '<blockquote class="md-quote">$1</blockquote>');
+
+  // 6. Checkboxes: - [ ] et - [x]
+  text = text.replace(/^- \[x\] (.*$)/gim, '<div class="md-task-item done"><i class="fa-solid fa-square-check"></i> <span>$1</span></div>');
+  text = text.replace(/^- \[ \] (.*$)/gim, '<div class="md-task-item"><i class="fa-regular fa-square"></i> <span>$1</span></div>');
+
+  // 7. Listes à puces
+  text = text.replace(/^\- (.*$)/gim, '<li class="md-li">$1</li>');
+  text = text.replace(/^\* (.*$)/gim, '<li class="md-li">$1</li>');
+
+  // 8. Code en ligne `code`
+  text = text.replace(/`([^`]+)`/g, '<code class="md-inline-code">$1</code>');
+
+  // 9. Gras **text** et Italique *text*
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+  text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+  // 10. Liens [label](url) avec validation http/https
+  text = text.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="md-link">$1 <i class="fa-solid fa-arrow-up-right-from-square fa-2xs"></i></a>');
+
+  // 11. Sauts de ligne simples dans les paragraphes
+  text = text.replace(/\n\n+/g, '</p><p class="md-p">');
+  text = text.replace(/\n/g, '<br />');
+
+  return `<div class="md-content"><p class="md-p">${text}</p></div>`;
+}
+
 function updateNotesStats(text) {
   const statsInfoEl = document.getElementById('notes-stats-info');
   const wordCountEl = document.getElementById('notes-word-count');
@@ -298,12 +353,16 @@ function updateNotesStats(text) {
 
 function initNotesWidget() {
   const textarea = document.getElementById('notes-editor') || document.getElementById('notes-textarea');
+  const preview = document.getElementById('notes-preview');
+  const markdownToggleBtn = document.getElementById('notes-markdown-toggle');
   const copyBtn = document.getElementById('notes-copy-btn') || document.getElementById('notes-btn-copy');
   const downloadBtn = document.getElementById('notes-download-btn') || document.getElementById('notes-btn-download');
   const clearBtn = document.getElementById('notes-clear-btn') || document.getElementById('notes-btn-clear');
+  const statusText = document.getElementById('notes-status-text');
 
   if (!textarea) return;
 
+  let isPreviewMode = false;
   const saved = localStorage.getItem('startpage_scratchpad_v2') || localStorage.getItem('startpage_scratchpad') || '';
   textarea.value = saved;
   updateNotesStats(saved);
@@ -317,6 +376,28 @@ function initNotesWidget() {
       localStorage.setItem('startpage_scratchpad', textarea.value);
     }, 300);
   });
+
+  // Bascule du mode aperçu Markdown
+  if (markdownToggleBtn && preview) {
+    markdownToggleBtn.addEventListener('click', () => {
+      isPreviewMode = !isPreviewMode;
+      if (isPreviewMode) {
+        preview.innerHTML = renderMarkdownToHtml(textarea.value);
+        textarea.hidden = true;
+        preview.hidden = false;
+        markdownToggleBtn.classList.add('active');
+        markdownToggleBtn.title = 'Revenir au mode Édition';
+        if (statusText) statusText.textContent = 'Mode Aperçu Markdown';
+      } else {
+        textarea.hidden = false;
+        preview.hidden = true;
+        markdownToggleBtn.classList.remove('active');
+        markdownToggleBtn.title = 'Basculer aperçu Markdown';
+        if (statusText) statusText.textContent = 'Sauvegarde locale active';
+        textarea.focus();
+      }
+    });
+  }
 
   if (copyBtn) {
     copyBtn.addEventListener('click', async () => {
@@ -338,11 +419,11 @@ function initNotesWidget() {
         if (typeof showToast === 'function') showToast('Le bloc-notes est vide.', 'info');
         return;
       }
-      const blob = new Blob([textarea.value], { type: 'text/plain;charset=utf-8' });
+      const blob = new Blob([textarea.value], { type: 'text/markdown;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `notes_startpage_${new Date().toISOString().slice(0, 10)}.txt`;
+      a.download = `notes_startpage_${new Date().toISOString().slice(0, 10)}.md`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -355,6 +436,7 @@ function initNotesWidget() {
       if (!textarea.value.trim()) return;
       if (confirm('Voulez-vous vraiment effacer l\'ensemble de vos notes ?')) {
         textarea.value = '';
+        if (preview) preview.innerHTML = renderMarkdownToHtml('');
         localStorage.removeItem('startpage_scratchpad_v2');
         localStorage.removeItem('startpage_scratchpad');
         updateNotesStats('');
@@ -569,6 +651,20 @@ function initAmbientWidget() {
   const masterBtn = document.getElementById('ambient-master-toggle');
   const volSlider = document.getElementById('ambient-vol-slider');
 
+  // Restauration du mode et du volume sauvegardés
+  const savedMode = localStorage.getItem('startpage_ambient_mode');
+  if (savedMode) {
+    ambientCurrentMode = savedMode;
+    document.querySelectorAll('.ambient-mode-card').forEach((c) => {
+      c.classList.toggle('active', c.dataset.ambientMode === ambientCurrentMode);
+    });
+  }
+
+  const savedVol = localStorage.getItem('startpage_ambient_vol');
+  if (savedVol !== null && volSlider) {
+    volSlider.value = savedVol;
+  }
+
   if (masterBtn) {
     masterBtn.addEventListener('click', () => {
       if (ambientIsPlaying) stopAmbientSound();
@@ -579,6 +675,7 @@ function initAmbientWidget() {
   if (volSlider) {
     volSlider.addEventListener('input', () => {
       const vol = Number(volSlider.value);
+      localStorage.setItem('startpage_ambient_vol', volSlider.value);
       if (ambientGainNode && ambientAudioCtx) {
         ambientGainNode.gain.setValueAtTime(vol * 0.35, ambientAudioCtx.currentTime);
       }
@@ -591,6 +688,7 @@ function initAmbientWidget() {
   document.querySelectorAll('.ambient-mode-card').forEach((card) => {
     card.addEventListener('click', () => {
       ambientCurrentMode = card.dataset.ambientMode;
+      localStorage.setItem('startpage_ambient_mode', ambientCurrentMode);
       document.querySelectorAll('.ambient-mode-card').forEach((c) => {
         c.classList.toggle('active', c.dataset.ambientMode === ambientCurrentMode);
       });
@@ -606,6 +704,38 @@ function initAmbientWidget() {
    4. MONITEUR SYSTÈME & MARCHÉS BOURSIERS
    ======================================================== */
 const sessionStartTime = Date.now();
+const pingHistory = [];
+const MAX_PING_HISTORY = 12;
+
+function renderPingSparkline() {
+  const svg = document.getElementById('sys-ping-sparkline');
+  if (!svg || pingHistory.length < 2) return;
+
+  const w = 100;
+  const h = 24;
+  const pad = 2;
+
+  const min = Math.min(...pingHistory);
+  const max = Math.max(...pingHistory);
+  const range = max === min ? 1 : (max - min);
+
+  const points = pingHistory.map((val, idx) => {
+    const x = pad + (idx / (pingHistory.length - 1)) * (w - 2 * pad);
+    const y = h - pad - ((val - min) / range) * (h - 2 * pad);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+
+  const linePath = `M ${points.join(' L ')}`;
+  const firstX = pad;
+  const lastX = (w - pad);
+  const areaPath = `M ${points.join(' L ')} L ${lastX},${h} L ${firstX},${h} Z`;
+
+  const lineEl = svg.querySelector('.ping-spark-line');
+  const areaEl = svg.querySelector('.ping-spark-area');
+
+  if (lineEl) lineEl.setAttribute('d', linePath);
+  if (areaEl) areaEl.setAttribute('d', areaPath);
+}
 
 async function checkNetworkPing() {
   const valEl = document.getElementById('sys-ping-val');
@@ -635,6 +765,10 @@ async function checkNetworkPing() {
   }
 
   if (measurementSuccess) {
+    pingHistory.push(latency);
+    if (pingHistory.length > MAX_PING_HISTORY) pingHistory.shift();
+    renderPingSparkline();
+
     valEl.textContent = `${latency} ms`;
     if (dotEl) {
       dotEl.className = 'telemetry-indicator ' + (latency < 80 ? 'good' : latency < 160 ? 'fair' : 'poor');
@@ -643,6 +777,10 @@ async function checkNetworkPing() {
       stateEl.textContent = latency < 80 ? 'Connexion excellente' : latency < 160 ? 'Connexion fluide' : 'Latence moyenne';
     }
   } else if (isOnline) {
+    pingHistory.push(28);
+    if (pingHistory.length > MAX_PING_HISTORY) pingHistory.shift();
+    renderPingSparkline();
+
     valEl.textContent = 'En ligne';
     if (dotEl) dotEl.className = 'telemetry-indicator good';
     if (stateEl) stateEl.textContent = 'Connecté (Ping non mesurable)';
@@ -1051,41 +1189,148 @@ const CYBER_QUOTES = [
 ];
 
 let currentQuoteIndex = 0;
+let allQuotes = [];
+
+function loadAllQuotes() {
+  let custom = [];
+  try {
+    const saved = localStorage.getItem('startpage_custom_quotes');
+    if (saved) custom = JSON.parse(saved);
+  } catch {
+    custom = [];
+  }
+  allQuotes = [...CYBER_QUOTES, ...custom];
+}
 
 function renderQuote(index) {
-  const quote = CYBER_QUOTES[index % CYBER_QUOTES.length];
+  if (allQuotes.length === 0) loadAllQuotes();
+  const quote = allQuotes[index % allQuotes.length];
   const textEl = document.getElementById('quote-text');
   const authorEl = document.getElementById('quote-author');
   const sourceEl = document.getElementById('quote-source');
+  const deleteBtn = document.getElementById('quote-btn-delete');
 
   if (textEl) textEl.textContent = `"${quote.text}"`;
   if (authorEl) authorEl.textContent = quote.author;
-  if (sourceEl) sourceEl.textContent = quote.source;
+  if (sourceEl) sourceEl.textContent = quote.source || (quote.isCustom ? 'Personnel' : '');
+
+  if (deleteBtn) {
+    deleteBtn.hidden = !quote.isCustom;
+  }
 }
 
 function initQuotesWidget() {
-  currentQuoteIndex = Math.floor(Math.random() * CYBER_QUOTES.length);
+  loadAllQuotes();
+  currentQuoteIndex = Math.floor(Math.random() * allQuotes.length);
   renderQuote(currentQuoteIndex);
 
   const nextBtn = document.getElementById('quote-btn-next');
   const copyBtn = document.getElementById('quote-btn-copy');
+  const addBtn = document.getElementById('quote-btn-add');
+  const deleteBtn = document.getElementById('quote-btn-delete');
+  const addModal = document.getElementById('quote-add-modal');
+  const addForm = document.getElementById('quote-add-form');
+  const addCloseBtn = document.getElementById('quote-add-close');
+  const addCancelBtn = document.getElementById('quote-add-cancel');
 
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
-      currentQuoteIndex = (currentQuoteIndex + 1) % CYBER_QUOTES.length;
+      currentQuoteIndex = (currentQuoteIndex + 1) % allQuotes.length;
       renderQuote(currentQuoteIndex);
     });
   }
 
   if (copyBtn) {
     copyBtn.addEventListener('click', async () => {
-      const q = CYBER_QUOTES[currentQuoteIndex];
-      const str = `"${q.text}" — ${q.author} (${q.source})`;
+      const q = allQuotes[currentQuoteIndex];
+      const str = `"${q.text}" — ${q.author}${q.source ? ` (${q.source})` : ''}`;
       try {
         await navigator.clipboard.writeText(str);
         if (typeof showToast === 'function') showToast('Citation copiée !', 'success');
       } catch {
         if (typeof showToast === 'function') showToast('Copié !', 'info');
+      }
+    });
+  }
+
+  if (addBtn && addModal) {
+    addBtn.addEventListener('click', () => {
+      addModal.hidden = !addModal.hidden;
+      if (!addModal.hidden) {
+        document.getElementById('quote-new-text')?.focus();
+      }
+    });
+  }
+
+  if (addCloseBtn && addModal) {
+    addCloseBtn.addEventListener('click', () => { addModal.hidden = true; });
+  }
+
+  if (addCancelBtn && addModal) {
+    addCancelBtn.addEventListener('click', () => { addModal.hidden = true; });
+  }
+
+  if (addForm && addModal) {
+    addForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const textInput = document.getElementById('quote-new-text');
+      const authorInput = document.getElementById('quote-new-author');
+      const sourceInput = document.getElementById('quote-new-source');
+
+      const text = textInput ? textInput.value.trim() : '';
+      const author = authorInput ? authorInput.value.trim() : '';
+      const source = sourceInput ? sourceInput.value.trim() : '';
+
+      if (!text || !author) return;
+
+      let custom = [];
+      try {
+        custom = JSON.parse(localStorage.getItem('startpage_custom_quotes') || '[]');
+      } catch {
+        custom = [];
+      }
+
+      const newQuote = {
+        id: Date.now(),
+        text,
+        author,
+        source: source || 'Personnalisée',
+        isCustom: true
+      };
+
+      custom.push(newQuote);
+      localStorage.setItem('startpage_custom_quotes', JSON.stringify(custom));
+      loadAllQuotes();
+
+      currentQuoteIndex = allQuotes.length - 1;
+      renderQuote(currentQuoteIndex);
+
+      addForm.reset();
+      addModal.hidden = true;
+      if (typeof showToast === 'function') showToast('Citation personnalisée ajoutée !', 'success');
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', () => {
+      const q = allQuotes[currentQuoteIndex];
+      if (!q || !q.isCustom) return;
+
+      if (confirm('Supprimer cette citation personnalisée ?')) {
+        let custom = [];
+        try {
+          custom = JSON.parse(localStorage.getItem('startpage_custom_quotes') || '[]');
+        } catch {
+          custom = [];
+        }
+
+        custom = custom.filter((item) => item.id !== q.id && item.text !== q.text);
+        localStorage.setItem('startpage_custom_quotes', JSON.stringify(custom));
+        loadAllQuotes();
+
+        currentQuoteIndex = 0;
+        renderQuote(currentQuoteIndex);
+        if (typeof showToast === 'function') showToast('Citation supprimée', 'info');
       }
     });
   }

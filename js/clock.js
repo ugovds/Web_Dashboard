@@ -18,7 +18,10 @@ const defaultClockSettings = {
   showWeek: true,
   dateFormat: 'text', // 'text', 'numeric', 'iso'
   timezone: 'local', // 'local', 'tokyo', 'ny', 'london', 'utc'
-  size: 'medium' // 'small', 'medium', 'large'
+  size: 'medium', // 'small', 'medium', 'large'
+  countdownMode: false,
+  countdownTarget: '',
+  countdownLabel: 'Fin de journée'
 };
 
 let currentClockSettings = structuredClone(defaultClockSettings);
@@ -84,6 +87,9 @@ function updateClockControlsUI() {
   const optDate = document.getElementById('clock-opt-date');
   const optProgress = document.getElementById('clock-opt-progress');
   const optWeek = document.getElementById('clock-opt-week');
+  const optCountdown = document.getElementById('clock-opt-countdown');
+  const countdownTargetInput = document.getElementById('clock-countdown-target');
+  const countdownLabelInput = document.getElementById('clock-countdown-label');
   const selectDateFormat = document.getElementById('clock-date-format-select');
   const selectTimezone = document.getElementById('clock-timezone-select');
   const selectSize = document.getElementById('clock-size-select');
@@ -93,9 +99,22 @@ function updateClockControlsUI() {
   if (optDate) optDate.checked = currentClockSettings.showDate !== false;
   if (optProgress) optProgress.checked = currentClockSettings.showProgress !== false;
   if (optWeek) optWeek.checked = currentClockSettings.showWeek !== false;
+  if (optCountdown) optCountdown.checked = currentClockSettings.countdownMode === true;
+  if (countdownTargetInput) countdownTargetInput.value = currentClockSettings.countdownTarget || '';
+  if (countdownLabelInput) countdownLabelInput.value = currentClockSettings.countdownLabel || 'Fin de journée';
   if (selectDateFormat) selectDateFormat.value = currentClockSettings.dateFormat || 'text';
   if (selectTimezone) selectTimezone.value = currentClockSettings.timezone || 'local';
   if (selectSize) selectSize.value = currentClockSettings.size || 'medium';
+
+  // Badge du mode sur la carte de l'horloge
+  const modeBadgeText = document.getElementById('clock-mode-label');
+  const modeBadgeIcon = document.getElementById('clock-mode-icon');
+  if (modeBadgeText) {
+    modeBadgeText.textContent = currentClockSettings.countdownMode ? 'Rebours' : 'Horloge';
+  }
+  if (modeBadgeIcon) {
+    modeBadgeIcon.className = currentClockSettings.countdownMode ? 'fa-solid fa-hourglass-half' : 'fa-solid fa-clock';
+  }
 }
 
 function getZonedDate(settings) {
@@ -214,23 +233,68 @@ function updateClock() {
   const secArc = document.getElementById('clock-sec-arc');
   const msTickEl = document.getElementById('clock-ms-tick');
 
-  if (timeEl) timeEl.textContent = timeData.time;
-
-  if (ampmEl) {
-    if (!currentClockSettings.format24h && timeData.ampm) {
-      ampmEl.textContent = timeData.ampm;
-      ampmEl.hidden = false;
+  // Mode Compte à rebours vs Horloge standard
+  if (currentClockSettings.countdownMode) {
+    let targetTime = null;
+    const rawTarget = (currentClockSettings.countdownTarget || '').trim();
+    if (rawTarget) {
+      if (rawTarget.includes('T')) {
+        targetTime = new Date(rawTarget).getTime();
+      } else if (rawTarget.includes(':')) {
+        const [h, m] = rawTarget.split(':').map(Number);
+        const tDate = new Date(zonedDate);
+        tDate.setHours(h, m, 0, 0);
+        if (tDate.getTime() < zonedDate.getTime()) {
+          tDate.setDate(tDate.getDate() + 1);
+        }
+        targetTime = tDate.getTime();
+      }
     } else {
-      ampmEl.hidden = true;
+      const tDate = new Date(zonedDate);
+      tDate.setHours(18, 0, 0, 0);
+      if (tDate.getTime() < zonedDate.getTime()) {
+        tDate.setDate(tDate.getDate() + 1);
+      }
+      targetTime = tDate.getTime();
     }
-  }
 
-  if (dateEl) {
-    if (currentClockSettings.showDate !== false && dateStr) {
-      dateEl.textContent = dateStr;
-      dateEl.style.display = '';
+    const diffMs = (targetTime || 0) - zonedDate.getTime();
+    const lbl = currentClockSettings.countdownLabel || 'Objectif';
+
+    if (diffMs > 0) {
+      const totSec = Math.floor(diffMs / 1000);
+      const days = Math.floor(totSec / 86400);
+      const hours = Math.floor((totSec % 86400) / 3600);
+      const mins = Math.floor((totSec % 3600) / 60);
+      const secs = totSec % 60;
+      let displayStr = '';
+      if (days > 0) {
+        displayStr = `${days}j ${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      } else {
+        displayStr = `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+      }
+      if (timeEl) timeEl.textContent = `-${displayStr}`;
+      if (dateEl) {
+        dateEl.textContent = `🎯 ${lbl}`;
+        dateEl.style.display = '';
+      }
     } else {
-      dateEl.style.display = 'none';
+      if (timeEl) timeEl.textContent = '00:00:00';
+      if (dateEl) {
+        dateEl.textContent = `🎉 ${lbl} TERMINÉ !`;
+        dateEl.style.display = '';
+      }
+    }
+  } else {
+    if (timeEl) timeEl.textContent = timeData.time;
+
+    if (dateEl) {
+      if (currentClockSettings.showDate !== false && dateStr) {
+        dateEl.textContent = dateStr;
+        dateEl.style.display = '';
+      } else {
+        dateEl.style.display = 'none';
+      }
     }
   }
 
@@ -439,6 +503,46 @@ function initClock() {
     selectSize.addEventListener('change', () => {
       currentClockSettings.size = selectSize.value;
       saveClockSettings();
+    });
+  }
+
+  // Mode Compte à Rebours & Target
+  const optCountdown = document.getElementById('clock-opt-countdown');
+  const countdownTargetInput = document.getElementById('clock-countdown-target');
+  const countdownLabelInput = document.getElementById('clock-countdown-label');
+  const clockModeToggleBtn = document.getElementById('clock-mode-toggle');
+
+  if (optCountdown) {
+    optCountdown.addEventListener('change', () => {
+      currentClockSettings.countdownMode = optCountdown.checked;
+      saveClockSettings();
+      if (typeof showToast === 'function') {
+        showToast(currentClockSettings.countdownMode ? 'Mode Compte à rebours activé' : 'Mode Horloge activé', 'info');
+      }
+    });
+  }
+
+  if (countdownTargetInput) {
+    countdownTargetInput.addEventListener('change', () => {
+      currentClockSettings.countdownTarget = countdownTargetInput.value;
+      saveClockSettings();
+    });
+  }
+
+  if (countdownLabelInput) {
+    countdownLabelInput.addEventListener('input', () => {
+      currentClockSettings.countdownLabel = countdownLabelInput.value;
+      saveClockSettings();
+    });
+  }
+
+  if (clockModeToggleBtn) {
+    clockModeToggleBtn.addEventListener('click', () => {
+      currentClockSettings.countdownMode = !currentClockSettings.countdownMode;
+      saveClockSettings();
+      if (typeof showToast === 'function') {
+        showToast(currentClockSettings.countdownMode ? 'Affichage Compte à rebours' : 'Affichage Horloge', 'info');
+      }
     });
   }
 
