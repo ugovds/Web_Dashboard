@@ -8,6 +8,7 @@
  */
 
 const defaultWidgetSettings = {
+  weather: true,
   pomodoro: true,
   notes: true,
   ambient: true,
@@ -35,7 +36,7 @@ function saveWidgetSettings() {
 
 function applyWidgetVisibility() {
   // Synchroniser les boutons de navigation du deck
-  const keys = ['pomodoro', 'notes', 'ambient', 'system', 'quotes'];
+  const keys = ['weather', 'pomodoro', 'notes', 'ambient', 'system', 'quotes'];
   keys.forEach((key) => {
     const isEnabled = currentWidgetSettings[key] !== false;
     const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${key}"]`);
@@ -1012,7 +1013,7 @@ function initWidgets() {
   initQuotesWidget();
 
   // Écouteurs dans le centre de personnalisation (onglet Widgets)
-  ['pomodoro', 'notes', 'ambient', 'system', 'quotes'].forEach((key) => {
+  ['weather', 'pomodoro', 'notes', 'ambient', 'system', 'quotes'].forEach((key) => {
     const toggle = document.getElementById(`widget-toggle-${key}`);
     if (toggle) {
       toggle.addEventListener('change', () => {

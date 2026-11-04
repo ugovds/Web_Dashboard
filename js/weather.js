@@ -1,5 +1,9 @@
 /**
- * weather.js - Widget météo via wttr.in & Modale météo détaillée
+ * weather.js - Widget météo complet intégré dans le Deck (wttr.in)
+ * - Météo en direct, conditions, ressenti, vent, humidité, UV, pression, visibilité
+ * - Prévisions complètes sur 3 jours
+ * - Recherche de ville et géolocalisation automatique
+ * - Contrôle direct des effets météo d'arrière-plan (Canvas)
  */
 
 let cachedWeatherData = null;
@@ -69,60 +73,59 @@ function setSavedCity(city) {
 }
 
 async function fetchWeather() {
-  const tempEl = document.getElementById('weather-temp');
-  const iconEl = document.getElementById('weather-icon');
   const city = getSavedCity();
-
-  if (tempEl) tempEl.textContent = 'Chargement...';
-
   const queryUrl = city
     ? `https://wttr.in/${encodeURIComponent(city)}?format=j1`
     : 'https://wttr.in/?format=j1';
 
+  const locEl = document.getElementById('deck-weather-loc');
+  const tempEl = document.getElementById('deck-weather-temp');
+  const descEl = document.getElementById('deck-weather-desc');
+  const iconEl = document.getElementById('deck-weather-icon');
+  const refreshBtn = document.getElementById('deck-weather-refresh-btn');
+
+  if (refreshBtn) refreshBtn.querySelector('i')?.classList.add('fa-spin');
+  if (descEl) descEl.textContent = 'Actualisation en cours...';
+
   try {
     const res = await fetch(queryUrl);
-    if (!res.ok) throw new Error('Erreur de requête météo');
+    if (!res.ok) throw new Error('Erreur météo');
     const data = await res.json();
     if (!data.current_condition || !data.current_condition[0]) {
-      throw new Error('Données météo invalides');
+      throw new Error('Données invalides');
     }
 
     cachedWeatherData = data;
-    const current = data.current_condition[0];
-    const temp = current.temp_C;
-    const rawDesc = current.weatherDesc[0]?.value || 'Météo';
-    const frDesc = translateWeatherDesc(rawDesc);
-    const iconClass = getWeatherIconClass(rawDesc);
+    renderWeatherDeckView(data);
 
-    // Mettre à jour le widget dans la topbar
-    if (tempEl) {
-      tempEl.textContent = `${temp}°C ~ ${frDesc}`;
-    }
-    if (iconEl) {
-      iconEl.className = iconClass;
-    }
-
-    // Mettre à jour l'effet météo d'arrière-plan
+    // Mettre à jour l'effet météo Canvas
+    const rawDesc = data.current_condition[0].weatherDesc[0]?.value || '';
     if (typeof setWeatherFxCondition === 'function') {
       setWeatherFxCondition(rawDesc);
     }
 
-    // Rafraîchir les informations de la modale si elle est ouverte
-    renderWeatherModalDetails(data);
+    if (refreshBtn) {
+      setTimeout(() => refreshBtn.querySelector('i')?.classList.remove('fa-spin'), 600);
+    }
     return true;
   } catch (err) {
-    if (tempEl) tempEl.textContent = city ? `offline (${city})` : 'offline';
+    if (descEl) descEl.textContent = 'Météo indisponible (hors-ligne)';
+    if (tempEl) tempEl.textContent = '--°C';
+    if (locEl) locEl.textContent = city || 'Position inconnue';
     if (iconEl) iconEl.className = 'fa-solid fa-triangle-exclamation';
+    if (refreshBtn) {
+      setTimeout(() => refreshBtn.querySelector('i')?.classList.remove('fa-spin'), 600);
+    }
     return false;
   }
 }
 
-function renderWeatherModalDetails(data) {
+function renderWeatherDeckView(data) {
   if (!data || !data.current_condition || !data.current_condition[0]) return;
 
   const current = data.current_condition[0];
   const area = data.nearest_area && data.nearest_area[0];
-  const areaName = area?.areaName?.[0]?.value || getSavedCity() || 'Position locale';
+  const areaName = area?.areaName?.[0]?.value || getSavedCity() || 'Position Locale';
   const country = area?.country?.[0]?.value || '';
   const fullLoc = country ? `${areaName}, ${country}` : areaName;
 
@@ -130,30 +133,42 @@ function renderWeatherModalDetails(data) {
   const frDesc = translateWeatherDesc(rawDesc);
   const iconCls = getWeatherIconClass(rawDesc);
 
-  // Mettre à jour les champs principaux de la modale
-  const modalTemp = document.getElementById('weather-detail-temp');
-  const modalDesc = document.getElementById('weather-detail-desc');
-  const modalLoc = document.getElementById('weather-detail-loc');
-  const modalIcon = document.getElementById('weather-detail-icon');
+  // Éléments du hero
+  const tempEl = document.getElementById('deck-weather-temp');
+  const descEl = document.getElementById('deck-weather-desc');
+  const locEl = document.getElementById('deck-weather-loc');
+  const iconEl = document.getElementById('deck-weather-icon');
+  const updatedEl = document.getElementById('deck-weather-updated');
+  const inputEl = document.getElementById('deck-city-input');
 
-  if (modalTemp) modalTemp.textContent = `${current.temp_C}°C`;
-  if (modalDesc) modalDesc.textContent = frDesc;
-  if (modalLoc) modalLoc.textContent = fullLoc;
-  if (modalIcon) modalIcon.className = `${iconCls} weather-hero-icon`;
+  if (tempEl) tempEl.textContent = `${current.temp_C}°C`;
+  if (descEl) descEl.textContent = frDesc;
+  if (locEl) locEl.textContent = fullLoc;
+  if (iconEl) iconEl.className = iconCls;
+  if (inputEl && !inputEl.value) inputEl.value = getSavedCity();
 
-  // Métriques détaillées
-  const metricFeels = document.getElementById('weather-metric-feels');
-  const metricHumidity = document.getElementById('weather-metric-humidity');
-  const metricWind = document.getElementById('weather-metric-wind');
-  const metricUv = document.getElementById('weather-metric-uv');
+  if (updatedEl) {
+    const timeStr = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    updatedEl.textContent = `Mis à jour à ${timeStr}`;
+  }
 
-  if (metricFeels) metricFeels.textContent = `${current.FeelsLikeC}°C`;
-  if (metricHumidity) metricHumidity.textContent = `${current.humidity}%`;
-  if (metricWind) metricWind.textContent = `${current.windspeedKmph} km/h (${current.winddir16Point || ''})`;
-  if (metricUv) metricUv.textContent = `${current.uvIndex || '0'} / 10`;
+  // Métriques
+  const feelsEl = document.getElementById('deck-weather-feels');
+  const humidityEl = document.getElementById('deck-weather-humidity');
+  const windEl = document.getElementById('deck-weather-wind');
+  const uvEl = document.getElementById('deck-weather-uv');
+  const pressureEl = document.getElementById('deck-weather-pressure');
+  const visibilityEl = document.getElementById('deck-weather-visibility');
+
+  if (feelsEl) feelsEl.textContent = `${current.FeelsLikeC}°C`;
+  if (humidityEl) humidityEl.textContent = `${current.humidity}%`;
+  if (windEl) windEl.textContent = `${current.windspeedKmph} km/h (${current.winddir16Point || ''})`;
+  if (uvEl) uvEl.textContent = `${current.uvIndex || '0'} / 10`;
+  if (pressureEl) pressureEl.textContent = `${current.pressure || '1015'} hPa`;
+  if (visibilityEl) visibilityEl.textContent = `${current.visibility || '10'} km`;
 
   // Prévisions 3 jours
-  const forecastList = document.getElementById('weather-forecast-list');
+  const forecastList = document.getElementById('deck-weather-forecast-list');
   if (forecastList && data.weather && Array.isArray(data.weather)) {
     const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -164,11 +179,8 @@ function renderWeatherModalDetails(data) {
         const parts = w.date.split('-').map(Number);
         const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
         let dayLabel = days[dateObj.getDay()];
-        if (w.date === todayStr || idx === 0) {
-          dayLabel = "Aujourd'hui";
-        } else if (idx === 1) {
-          dayLabel = 'Demain';
-        }
+        if (w.date === todayStr || idx === 0) dayLabel = 'Aujourd\'hui';
+        else if (idx === 1) dayLabel = 'Demain';
 
         const hourlyMid = w.hourly && (w.hourly[4] || w.hourly[0]);
         const dayDescRaw = hourlyMid?.weatherDesc?.[0]?.value || '';
@@ -192,73 +204,36 @@ function renderWeatherModalDetails(data) {
   }
 }
 
-function openWeatherModal() {
-  const modal = document.getElementById('weather-modal');
-  const cityInput = document.getElementById('weather-city-input');
-  const cityStatus = document.getElementById('weather-city-status');
-
-  if (cityStatus) cityStatus.textContent = '';
-  if (cityInput) cityInput.value = getSavedCity();
-
-  if (modal) modal.hidden = false;
-
-  if (cachedWeatherData) {
-    renderWeatherModalDetails(cachedWeatherData);
-  } else {
-    fetchWeather();
-  }
-}
-
-function closeWeatherModal() {
-  const modal = document.getElementById('weather-modal');
-  if (modal) modal.hidden = true;
-}
-
 function initWeather() {
-  // Clic sur le widget topbar pour ouvrir la modale détaillée
-  const weatherPill = document.getElementById('weather');
-  if (weatherPill) {
-    weatherPill.addEventListener('click', openWeatherModal);
-  }
+  const cityInput = document.getElementById('deck-city-input');
+  const searchBtn = document.getElementById('deck-city-search-btn');
+  const autoLocBtn = document.getElementById('deck-city-gps-btn');
+  const refreshBtn = document.getElementById('deck-weather-refresh-btn');
+  const fxToggle = document.getElementById('deck-weather-fx-toggle');
 
-  // Fermeture de la modale
-  const closeBtn = document.getElementById('weather-modal-close');
-  if (closeBtn) closeBtn.addEventListener('click', closeWeatherModal);
+  const executeSearch = async () => {
+    const val = (cityInput ? cityInput.value : '').trim();
+    if (!val) {
+      setSavedCity('');
+      await fetchWeather();
+      if (typeof showToast === 'function') showToast('Météo : Détection automatique', 'info');
+      return;
+    }
+    setSavedCity(val);
+    const ok = await fetchWeather();
+    if (ok) {
+      if (typeof showToast === 'function') showToast(`Météo mise à jour pour ${val}`, 'success');
+    } else {
+      if (typeof showToast === 'function') showToast(`Impossible de trouver la ville "${val}"`, 'error');
+    }
+  };
 
-  const modal = document.getElementById('weather-modal');
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeWeatherModal();
-    });
-  }
-
-  // Formulaire de ville
-  const cityForm = document.getElementById('weather-city-form');
-  const cityInput = document.getElementById('weather-city-input');
-  const cityStatus = document.getElementById('weather-city-status');
-  const autoLocBtn = document.getElementById('weather-auto-loc-btn');
-
-  if (cityForm) {
-    cityForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const newCity = (cityInput ? cityInput.value : '').trim();
-      if (!newCity) {
-        setSavedCity('');
-        if (cityStatus) cityStatus.innerHTML = '<span class="status-info">Retour à la détection automatique par IP.</span>';
-        await fetchWeather();
-        return;
-      }
-
-      if (cityStatus) cityStatus.innerHTML = '<span class="status-info">Recherche en cours...</span>';
-      setSavedCity(newCity);
-      const success = await fetchWeather();
-      if (success) {
-        if (cityStatus) cityStatus.innerHTML = `<span class="status-success"><i class="fa-solid fa-check"></i> Ville définie : ${newCity}</span>`;
-        if (typeof showToast === 'function') {
-          showToast(`Météo mise à jour pour : ${newCity}`, 'success');
-        }
-      } else {
-        if (cityStatus) cityStatus.innerHTML = '<span class="status-error"><i class="fa-solid fa-triangle-exclamation"></i> Impossible de trouver cette ville.</span>';
+  if (searchBtn) searchBtn.addEventListener('click', executeSearch);
+  if (cityInput) {
+    cityInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        executeSearch();
       }
     });
   }
@@ -267,10 +242,24 @@ function initWeather() {
     autoLocBtn.addEventListener('click', async () => {
       setSavedCity('');
       if (cityInput) cityInput.value = '';
-      if (cityStatus) cityStatus.innerHTML = '<span class="status-info">Détection automatique activée.</span>';
       await fetchWeather();
-      if (typeof showToast === 'function') {
-        showToast('Météo réinitialisée sur la géolocalisation automatique', 'info');
+      if (typeof showToast === 'function') showToast('Météo : Détection automatique par IP', 'info');
+    });
+  }
+
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      await fetchWeather();
+      if (typeof showToast === 'function') showToast('Données météo actualisées', 'info');
+    });
+  }
+
+  if (fxToggle) {
+    const savedFx = localStorage.getItem('startpage_weather_fx');
+    fxToggle.checked = savedFx !== 'false';
+    fxToggle.addEventListener('change', () => {
+      if (typeof toggleWeatherFx === 'function') {
+        toggleWeatherFx(fxToggle.checked);
       }
     });
   }
