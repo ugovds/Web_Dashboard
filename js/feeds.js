@@ -23,6 +23,29 @@ const builtinFeeds = {
 let customFeeds = [];
 let currentActiveFeedId = 'f1';
 
+function escapeFeedHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, (m) => {
+    switch (m) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#039;';
+      default: return m;
+    }
+  });
+}
+
+function sanitizeFeedUrl(url) {
+  if (!url) return '#';
+  const clean = String(url).trim();
+  if (/^(https?:\/\/|\/)/i.test(clean)) {
+    return clean.replace(/"/g, '&quot;');
+  }
+  return '#';
+}
+
 function loadCustomFeedsFromStorage() {
   try {
     const saved = localStorage.getItem('startpage_custom_feeds');
@@ -91,23 +114,23 @@ async function loadFeed(feedId) {
         .map(
           (item) => `
           <li>
-            <a href="${item.url || `https://news.ycombinator.com/item?id=${item.id}`}" target="_blank" rel="noopener">
+            <a href="${sanitizeFeedUrl(item.url || `https://news.ycombinator.com/item?id=${item.id}`)}" target="_blank" rel="noopener">
               <span class="feed-score">TECH</span>
-              <span class="feed-title">${item.title}</span>
+              <span class="feed-title">${escapeFeedHtml(item.title)}</span>
             </a>
           </li>`
         )
         .join('');
     } else if (builtinFeeds[feedId]) {
       const articles = await fetchRssWithFallback(builtinFeeds[feedId].url);
-      const tag = feedId.toUpperCase();
+      const tag = escapeFeedHtml(feedId.toUpperCase());
       feedList.innerHTML = articles
         .map(
           (item) => `
           <li>
-            <a href="${item.link}" target="_blank" rel="noopener">
+            <a href="${sanitizeFeedUrl(item.link)}" target="_blank" rel="noopener">
               <span class="feed-score">${tag}</span>
-              <span class="feed-title">${item.title}</span>
+              <span class="feed-title">${escapeFeedHtml(item.title)}</span>
             </a>
           </li>`
         )
@@ -118,14 +141,14 @@ async function loadFeed(feedId) {
       if (!customFeed) throw new Error('Flux introuvable');
 
       const articles = await fetchRssWithFallback(customFeed.url);
-      const tag = (customFeed.name || 'RSS').toUpperCase().slice(0, 5);
+      const tag = escapeFeedHtml((customFeed.name || 'RSS').toUpperCase().slice(0, 5));
       feedList.innerHTML = articles
         .map(
           (item) => `
           <li>
-            <a href="${item.link}" target="_blank" rel="noopener">
+            <a href="${sanitizeFeedUrl(item.link)}" target="_blank" rel="noopener">
               <span class="feed-score">${tag}</span>
-              <span class="feed-title">${item.title}</span>
+              <span class="feed-title">${escapeFeedHtml(item.title)}</span>
             </a>
           </li>`
         )
@@ -182,8 +205,8 @@ function renderCustomFeedsModalList() {
       (f, index) => `
       <div class="custom-feed-item">
         <div class="custom-feed-info">
-          <span class="custom-feed-name"><i class="fa-solid fa-satellite-dish"></i> ${f.name}</span>
-          <span class="custom-feed-url" title="${f.url}">${f.url}</span>
+          <span class="custom-feed-name"><i class="fa-solid fa-satellite-dish"></i> ${escapeFeedHtml(f.name)}</span>
+          <span class="custom-feed-url" title="${escapeFeedHtml(f.url)}">${escapeFeedHtml(f.url)}</span>
         </div>
         <button type="button" class="custom-feed-del-btn" data-del-feed="${index}" title="Supprimer ce flux">
           <i class="fa-solid fa-trash-can"></i>
@@ -247,8 +270,8 @@ function initFeeds() {
 
   // Formulaire d'ajout de flux
   const addFeedForm = document.getElementById('add-feed-form');
-  const feedNameInput = document.getElementById('new-feed-name');
-  const feedUrlInput = document.getElementById('new-feed-url');
+  const feedNameInput = document.getElementById('feed-name-input') || document.getElementById('new-feed-name');
+  const feedUrlInput = document.getElementById('feed-url-input') || document.getElementById('new-feed-url');
 
   if (addFeedForm) {
     addFeedForm.addEventListener('submit', (e) => {

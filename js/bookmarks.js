@@ -397,14 +397,18 @@ function moveBookmark(srcCat, srcLink, dstCat, dstLink, insertBefore) {
 // ----------------------------------------------------
 // Modale d'édition d'un raccourci (Ajout ou Modification)
 // ----------------------------------------------------
+function openAddModal(catIdx) {
+  openEditModal(catIdx, null);
+}
+
 function openEditModal(catIdx, linkIdx) {
   const editModal = document.getElementById('edit-modal');
   const modalTitle = document.getElementById('edit-modal-title');
-  const editNameInput = document.getElementById('edit-name');
+  const editNameInput = document.getElementById('edit-name') || document.getElementById('edit-title');
   const editUrlInput = document.getElementById('edit-url');
   const editIconInput = document.getElementById('edit-icon');
-  const deleteBtn = document.getElementById('modal-delete-shortcut-btn');
-  const submitBtn = document.getElementById('modal-submit-btn');
+  const deleteBtn = document.getElementById('modal-delete-shortcut-btn') || document.getElementById('modal-delete-btn');
+  const submitBtn = document.getElementById('modal-submit-btn') || document.querySelector('#edit-shortcut-form button[type="submit"]') || document.querySelector('#edit-form button[type="submit"]');
 
   currentEditingTarget = { catIdx, linkIdx };
 
@@ -412,25 +416,25 @@ function openEditModal(catIdx, linkIdx) {
     // Mode Modification
     const data = categories[catIdx].links[linkIdx];
     if (modalTitle) modalTitle.textContent = 'Modifier le raccourci';
-    editNameInput.value = data.name;
-    editUrlInput.value = data.url;
-    editIconInput.value = data.icon;
+    if (editNameInput) editNameInput.value = data.name;
+    if (editUrlInput) editUrlInput.value = data.url;
+    if (editIconInput) editIconInput.value = data.icon;
     updateIconPreview(data.icon);
     if (deleteBtn) deleteBtn.hidden = false;
     if (submitBtn) submitBtn.textContent = 'Enregistrer';
   } else {
     // Mode Ajout
     if (modalTitle) modalTitle.textContent = `Nouveau lien (${categories[catIdx]?.title || 'Catégorie'})`;
-    editNameInput.value = '';
-    editUrlInput.value = 'https://';
-    editIconInput.value = 'fa-solid fa-link';
+    if (editNameInput) editNameInput.value = '';
+    if (editUrlInput) editUrlInput.value = 'https://';
+    if (editIconInput) editIconInput.value = 'fa-solid fa-link';
     updateIconPreview('fa-solid fa-link');
     if (deleteBtn) deleteBtn.hidden = true;
     if (submitBtn) submitBtn.textContent = 'Ajouter';
   }
 
-  editModal.hidden = false;
-  editNameInput.focus();
+  if (editModal) editModal.hidden = false;
+  if (editNameInput) editNameInput.focus();
 }
 
 function closeEditModal() {
@@ -440,7 +444,7 @@ function closeEditModal() {
 }
 
 function updateIconPreview(cls) {
-  const editIconPreview = document.getElementById('edit-icon-preview');
+  const editIconPreview = document.getElementById('edit-icon-preview') || document.getElementById('icon-preview');
   if (editIconPreview) {
     editIconPreview.className = cls || 'fa-solid fa-link';
   }
@@ -451,10 +455,10 @@ function updateIconPreview(cls) {
 // ----------------------------------------------------
 function openCategoryModal(catIdx = null) {
   const modal = document.getElementById('category-modal');
-  const titleEl = document.getElementById('cat-modal-title');
-  const nameInput = document.getElementById('cat-modal-name');
-  const iconInput = document.getElementById('cat-modal-icon');
-  const preview = document.getElementById('cat-modal-icon-preview');
+  const titleEl = document.getElementById('cat-modal-title') || document.getElementById('category-modal-title');
+  const nameInput = document.getElementById('cat-modal-name') || document.getElementById('category-title-input');
+  const iconInput = document.getElementById('cat-modal-icon') || document.getElementById('category-icon-input');
+  const preview = document.getElementById('cat-modal-icon-preview') || document.getElementById('category-icon-preview');
 
   currentEditingCategoryIdx = catIdx;
 
@@ -505,7 +509,7 @@ function exportFullConfig() {
     promptPath: localStorage.getItem('startpage_prompt_path') || '~/startpage',
     weatherCity: localStorage.getItem('startpage_weather_city') || '',
     weatherFx: localStorage.getItem('startpage_weather_fx') !== 'false',
-    scratchpad: localStorage.getItem('startpage_scratchpad') || '',
+    scratchpad: localStorage.getItem('startpage_scratchpad_v2') || localStorage.getItem('startpage_scratchpad') || '',
     topbarWidgets: topbarWidgetsData,
     appearance: appearanceData,
     categories: categories,
@@ -561,9 +565,13 @@ function importFullConfig(file) {
       }
 
       if (data.scratchpad !== undefined) {
+        localStorage.setItem('startpage_scratchpad_v2', data.scratchpad);
         localStorage.setItem('startpage_scratchpad', data.scratchpad);
-        const scratchpadTextarea = document.getElementById('scratchpad-textarea');
-        if (scratchpadTextarea) scratchpadTextarea.value = data.scratchpad;
+        const scratchpadTextarea = document.getElementById('notes-editor') || document.getElementById('notes-textarea') || document.getElementById('scratchpad-textarea');
+        if (scratchpadTextarea) {
+          scratchpadTextarea.value = data.scratchpad;
+          if (typeof updateNotesStats === 'function') updateNotesStats(data.scratchpad);
+        }
       }
 
       if (data.topbarWidgets) {
@@ -624,9 +632,9 @@ function initBookmarks() {
   const editModal = document.getElementById('edit-modal');
   const modalCloseBtn = document.getElementById('modal-close-btn');
   const modalCancelBtn = document.getElementById('modal-cancel-btn');
-  const deleteShortcutBtn = document.getElementById('modal-delete-shortcut-btn');
-  const editForm = document.getElementById('edit-shortcut-form');
-  const editNameInput = document.getElementById('edit-name');
+  const deleteShortcutBtn = document.getElementById('modal-delete-shortcut-btn') || document.getElementById('modal-delete-btn');
+  const editForm = document.getElementById('edit-shortcut-form') || document.getElementById('edit-form');
+  const editNameInput = document.getElementById('edit-name') || document.getElementById('edit-title');
   const editUrlInput = document.getElementById('edit-url');
   const editIconInput = document.getElementById('edit-icon');
   const resetAllBtn = document.getElementById('reset-all-shortcuts-btn');
@@ -634,12 +642,12 @@ function initBookmarks() {
 
   // Modale de catégorie
   const catModal = document.getElementById('category-modal');
-  const catModalCloseBtn = document.getElementById('cat-modal-close');
-  const catModalCancelBtn = document.getElementById('cat-modal-cancel');
+  const catModalCloseBtn = document.getElementById('cat-modal-close') || document.getElementById('category-modal-close');
+  const catModalCancelBtn = document.getElementById('cat-modal-cancel') || document.getElementById('category-cancel-btn');
   const catModalForm = document.getElementById('category-form');
-  const catNameInput = document.getElementById('cat-modal-name');
-  const catIconInput = document.getElementById('cat-modal-icon');
-  const catIconPreview = document.getElementById('cat-modal-icon-preview');
+  const catNameInput = document.getElementById('cat-modal-name') || document.getElementById('category-title-input');
+  const catIconInput = document.getElementById('cat-modal-icon') || document.getElementById('category-icon-input');
+  const catIconPreview = document.getElementById('cat-modal-icon-preview') || document.getElementById('category-icon-preview');
 
   // Boutons Export / Import JSON
   const btnExport = document.getElementById('btn-export-backup');

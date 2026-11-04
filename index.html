@@ -421,7 +421,7 @@
                   <!-- Ticker Marchés Boursiers & Indices avec Personnalisation -->
                   <div class="crypto-ticker-section market-ticker-section">
                     <div class="crypto-ticker-header market-ticker-header">
-                      <span><i class="fa-solid fa-chart-line"></i> Marchés & Indices</span>
+                      <span title="Cours réels pour EUR/USD et BTC • Cotations indicatives pour les autres actifs"><i class="fa-solid fa-chart-line"></i> Marchés & Indices</span>
                       <div class="market-header-actions">
                         <button type="button" id="market-config-toggle-btn" class="deck-mini-refresh" title="Personnaliser les indices et actions">
                           <i class="fa-solid fa-sliders"></i>
@@ -1106,10 +1106,10 @@
           <button type="button" id="modal-close-btn" class="modal-close">&times;</button>
         </div>
 
-        <form id="edit-form" class="modal-form">
+        <form id="edit-shortcut-form" class="modal-form">
           <div class="form-row">
-            <label for="edit-title">Nom du raccourci :</label>
-            <input type="text" id="edit-title" required autocomplete="off" />
+            <label for="edit-name">Nom du raccourci :</label>
+            <input type="text" id="edit-name" required autocomplete="off" />
           </div>
 
           <div class="form-row">
@@ -1126,7 +1126,7 @@
             </label>
             <div class="icon-input-wrapper">
               <input type="text" id="edit-icon" placeholder="fa-solid fa-bookmark" autocomplete="off" />
-              <div id="icon-preview" class="icon-preview-box"><i class="fa-solid fa-bookmark"></i></div>
+              <div id="edit-icon-preview" class="icon-preview-box"><i class="fa-solid fa-bookmark"></i></div>
             </div>
           </div>
 
@@ -1149,10 +1149,10 @@
           </div>
 
           <div class="modal-actions">
-            <button type="button" id="modal-delete-btn" class="modal-btn danger">Supprimer ce lien</button>
+            <button type="button" id="modal-delete-shortcut-btn" class="modal-btn danger">Supprimer ce lien</button>
             <div class="modal-actions-right">
               <button type="button" id="modal-cancel-btn" class="modal-btn secondary">Annuler</button>
-              <button type="submit" class="modal-btn primary">Enregistrer</button>
+              <button type="submit" id="modal-submit-btn" class="modal-btn primary">Enregistrer</button>
             </div>
           </div>
         </form>
@@ -1165,33 +1165,33 @@
         <div class="modal-header">
           <div class="modal-title-group">
             <i class="fa-solid fa-folder-gear"></i>
-            <h3 id="category-modal-title">Gérer la catégorie</h3>
+            <h3 id="cat-modal-title">Gérer la catégorie</h3>
           </div>
-          <button type="button" id="category-modal-close" class="modal-close">&times;</button>
+          <button type="button" id="cat-modal-close" class="modal-close">&times;</button>
         </div>
 
         <form id="category-form" class="modal-form">
           <div class="form-row">
-            <label for="category-title-input">Titre de la catégorie :</label>
-            <input type="text" id="category-title-input" placeholder="Ex: Travail, Veille, Dev..." required autocomplete="off" />
+            <label for="cat-modal-name">Titre de la catégorie :</label>
+            <input type="text" id="cat-modal-name" placeholder="Ex: Travail, Veille, Dev..." required autocomplete="off" />
           </div>
 
           <div class="form-row">
-            <label for="category-icon-input">
+            <label for="cat-modal-icon">
               <span>Icône Font Awesome :</span>
               <a href="https://fontawesome.com/icons" target="_blank" rel="noopener" class="fa-link-hint">
                 Chercher une icône <i class="fa-solid fa-arrow-up-right-from-square"></i>
               </a>
             </label>
             <div class="icon-input-wrapper">
-              <input type="text" id="category-icon-input" placeholder="fa-solid fa-folder" autocomplete="off" />
-              <div id="category-icon-preview" class="icon-preview-box"><i class="fa-solid fa-folder"></i></div>
+              <input type="text" id="cat-modal-icon" placeholder="fa-solid fa-folder" autocomplete="off" />
+              <div id="cat-modal-icon-preview" class="icon-preview-box"><i class="fa-solid fa-folder"></i></div>
             </div>
           </div>
 
           <div class="modal-actions">
-            <button type="button" id="category-cancel-btn" class="modal-btn secondary">Annuler</button>
-            <button type="submit" class="modal-btn primary">Enregistrer</button>
+            <button type="button" id="cat-modal-cancel" class="modal-btn secondary">Annuler</button>
+            <button type="submit" id="cat-modal-submit" class="modal-btn primary">Enregistrer</button>
           </div>
         </form>
       </div>

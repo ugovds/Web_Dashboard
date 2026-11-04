@@ -47,7 +47,7 @@ body {
 .bg-wallpaper {
   position: absolute;
   inset: -60px;
-  background-image: url("images/gif.gif");
+  background-image: url("../images/gif.gif");
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;

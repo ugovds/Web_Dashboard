@@ -145,8 +145,8 @@ function renderHubShortcuts() {
                   <div class="hub-link-info">
                     <span class="hub-link-icon-box"><i class="${link.icon || 'fa-solid fa-bookmark'}"></i></span>
                     <div class="hub-link-texts">
-                      <span class="hub-link-name">${link.title}</span>
-                      <span class="hub-link-url">${link.url}</span>
+                      <span class="hub-link-name">${link.name || link.title || ''}</span>
+                      <span class="hub-link-url">${link.url || ''}</span>
                     </div>
                   </div>
                   <div class="hub-link-row-actions">
@@ -172,7 +172,11 @@ function renderHubShortcuts() {
   container.querySelectorAll('.hub-add-link-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const catIdx = parseInt(btn.dataset.cat, 10);
-      if (typeof openAddModal === 'function') openAddModal(catIdx);
+      if (typeof openEditModal === 'function') {
+        openEditModal(catIdx, null);
+      } else if (typeof openAddModal === 'function') {
+        openAddModal(catIdx);
+      }
     });
   });
 
@@ -213,7 +217,7 @@ function renderHubShortcuts() {
     btn.addEventListener('click', () => {
       const catIdx = parseInt(btn.dataset.cat, 10);
       const linkIdx = parseInt(btn.dataset.link, 10);
-      const linkName = categories[catIdx].links[linkIdx]?.title || 'Lien';
+      const linkName = categories[catIdx]?.links[linkIdx]?.name || categories[catIdx]?.links[linkIdx]?.title || 'Lien';
       categories[catIdx].links.splice(linkIdx, 1);
       localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
       if (typeof renderCategories === 'function') renderCategories();

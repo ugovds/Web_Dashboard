@@ -61,7 +61,7 @@ function applyWidgetVisibility() {
 /* ========================================================
    1. MINUTEUR FOCUS / POMODORO
    ======================================================== */
-const POMO_DURATIONS = {
+let POMO_DURATIONS = {
   focus: 25 * 60,
   short: 5 * 60,
   long: 15 * 60
@@ -202,9 +202,10 @@ function resetPomoTimer() {
 }
 
 function setPomoMode(mode) {
-  pomoMode = mode;
+  pomoMode = (mode === 'work') ? 'focus' : mode;
   document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
-    chip.classList.toggle('active', chip.dataset.pomoMode === mode);
+    const chipMode = chip.dataset.pomoMode === 'work' ? 'focus' : chip.dataset.pomoMode;
+    chip.classList.toggle('active', chipMode === pomoMode);
   });
   resetPomoTimer();
 }
@@ -239,13 +240,36 @@ function initPomodoroWidget() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.pomo-preset-btn').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
-      const mins = Number(btn.dataset.pomoPreset) || 25;
-      POMO_DURATIONS.focus = mins * 60;
-      if (pomoMode === 'focus') {
-        resetPomoTimer();
+      const preset = Number(btn.dataset.pomoPreset) || 25;
+      if (preset === 50) {
+        POMO_DURATIONS.focus = 50 * 60;
+        POMO_DURATIONS.short = 10 * 60;
+        POMO_DURATIONS.long = 20 * 60;
+      } else if (preset === 15) {
+        POMO_DURATIONS.focus = 15 * 60;
+        POMO_DURATIONS.short = 3 * 60;
+        POMO_DURATIONS.long = 10 * 60;
+      } else {
+        POMO_DURATIONS.focus = 25 * 60;
+        POMO_DURATIONS.short = 5 * 60;
+        POMO_DURATIONS.long = 15 * 60;
       }
+
+      // Mettre à jour les labels des modes
+      document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+        const m = chip.dataset.pomoMode;
+        if (m === 'work' || m === 'focus') {
+          chip.textContent = `Focus (${Math.round(POMO_DURATIONS.focus / 60)}m)`;
+        } else if (m === 'short') {
+          chip.textContent = `Pause (${Math.round(POMO_DURATIONS.short / 60)}m)`;
+        } else if (m === 'long') {
+          chip.textContent = `Longue (${Math.round(POMO_DURATIONS.long / 60)}m)`;
+        }
+      });
+
+      resetPomoTimer();
       if (typeof showToast === 'function') {
-        showToast(`Durée Focus définie à ${mins} minutes`, 'info');
+        showToast(`Intervalles Pomodoro : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
       }
     });
   });
@@ -257,25 +281,30 @@ function initPomodoroWidget() {
    2. BLOC-NOTES RAPIDE (SCRATCHPAD)
    ======================================================== */
 function updateNotesStats(text) {
+  const statsInfoEl = document.getElementById('notes-stats-info');
   const wordCountEl = document.getElementById('notes-word-count');
   const charCountEl = document.getElementById('notes-char-count');
 
-  const chars = text.length;
-  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  const safeText = typeof text === 'string' ? text : '';
+  const chars = safeText.length;
+  const words = safeText.trim() ? safeText.trim().split(/\s+/).length : 0;
 
+  if (statsInfoEl) {
+    statsInfoEl.textContent = `${words} ${words > 1 ? 'mots' : 'mot'} • ${chars} car.`;
+  }
   if (wordCountEl) wordCountEl.textContent = words;
   if (charCountEl) charCountEl.textContent = chars;
 }
 
 function initNotesWidget() {
-  const textarea = document.getElementById('notes-textarea');
-  const copyBtn = document.getElementById('notes-btn-copy');
-  const downloadBtn = document.getElementById('notes-btn-download');
-  const clearBtn = document.getElementById('notes-btn-clear');
+  const textarea = document.getElementById('notes-editor') || document.getElementById('notes-textarea');
+  const copyBtn = document.getElementById('notes-copy-btn') || document.getElementById('notes-btn-copy');
+  const downloadBtn = document.getElementById('notes-download-btn') || document.getElementById('notes-btn-download');
+  const clearBtn = document.getElementById('notes-clear-btn') || document.getElementById('notes-btn-clear');
 
   if (!textarea) return;
 
-  const saved = localStorage.getItem('startpage_scratchpad_v2') || '';
+  const saved = localStorage.getItem('startpage_scratchpad_v2') || localStorage.getItem('startpage_scratchpad') || '';
   textarea.value = saved;
   updateNotesStats(saved);
 
@@ -285,6 +314,7 @@ function initNotesWidget() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
       localStorage.setItem('startpage_scratchpad_v2', textarea.value);
+      localStorage.setItem('startpage_scratchpad', textarea.value);
     }, 300);
   });
 
@@ -326,6 +356,7 @@ function initNotesWidget() {
       if (confirm('Voulez-vous vraiment effacer l\'ensemble de vos notes ?')) {
         textarea.value = '';
         localStorage.removeItem('startpage_scratchpad_v2');
+        localStorage.removeItem('startpage_scratchpad');
         updateNotesStats('');
         if (typeof showToast === 'function') showToast('Notes effacées', 'info');
       }
@@ -585,6 +616,7 @@ async function checkNetworkPing() {
   const start = performance.now();
   let latency = 0;
   let isOnline = navigator.onLine !== false;
+  let measurementSuccess = false;
 
   try {
     const controller = new AbortController();
@@ -597,16 +629,12 @@ async function checkNetworkPing() {
     });
     clearTimeout(timeoutId);
     latency = Math.max(8, Math.round(performance.now() - start));
+    measurementSuccess = true;
   } catch {
-    // Si 1.1.1.1 est bloqué par tracking protection ou adblocker mais que le navigateur est en ligne :
-    if (isOnline) {
-      latency = Math.floor(Math.random() * 22) + 14; // Latence typique optimale
-    } else {
-      isOnline = false;
-    }
+    measurementSuccess = false;
   }
 
-  if (isOnline) {
+  if (measurementSuccess) {
     valEl.textContent = `${latency} ms`;
     if (dotEl) {
       dotEl.className = 'telemetry-indicator ' + (latency < 80 ? 'good' : latency < 160 ? 'fair' : 'poor');
@@ -614,6 +642,10 @@ async function checkNetworkPing() {
     if (stateEl) {
       stateEl.textContent = latency < 80 ? 'Connexion excellente' : latency < 160 ? 'Connexion fluide' : 'Latence moyenne';
     }
+  } else if (isOnline) {
+    valEl.textContent = 'En ligne';
+    if (dotEl) dotEl.className = 'telemetry-indicator good';
+    if (stateEl) stateEl.textContent = 'Connecté (Ping non mesurable)';
   } else {
     valEl.textContent = 'Hors-ligne';
     if (dotEl) dotEl.className = 'telemetry-indicator poor';
@@ -693,7 +725,7 @@ function updateSessionUptime() {
   const m = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
   const s = String(diffSec % 60).padStart(2, '0');
 
-  uptimeEl.textContent = h > 0 ? `${h}h ${m}m` : `${m}m ${s}s`;
+  uptimeEl.textContent = diffSec >= 3600 ? `${h}h ${m}m` : `${m}m ${s}s`;
 }
 
 /* ========================================================
@@ -747,6 +779,7 @@ function renderMarketCards() {
   }
 
   container.innerHTML = enabledAssets.map((asset) => {
+    const isLive = asset.id === 'eurusd' || asset.id === 'btc';
     const isPositive = asset.baseChange >= 0;
     const sign = isPositive ? '+' : '';
     let formattedPrice = '';
@@ -758,8 +791,10 @@ function renderMarketCards() {
       formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${asset.unit}`;
     }
 
+    const cardTitle = isLive ? `${asset.name} • Cours en direct via API` : `${asset.name} • Cotation indicative de référence`;
+
     return `
-      <div class="crypto-card market-card" data-asset-id="${asset.id}">
+      <div class="crypto-card market-card" data-asset-id="${asset.id}" title="${cardTitle}">
         <span class="crypto-coin">
           <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
           <span class="market-asset-name">${asset.name}</span>

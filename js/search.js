@@ -19,13 +19,125 @@ let selectedSuggestionIndex = -1;
 let activePrefix = null;
 let debounceTimer = null;
 
+function escapeSearchHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/[&<>"']/g, (m) => {
+    switch (m) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#039;';
+      default: return m;
+    }
+  });
+}
+
 function tryEvaluateMath(expr) {
   const clean = expr.replace(/\s+/g, '');
   if (!/^[0-9+\-*/().%^]+$/.test(clean) || !/[+\-*/%^]/.test(clean)) return null;
+
+  const tokens = [];
+  let i = 0;
+  while (i < clean.length) {
+    const ch = clean[i];
+    if (/[0-9.]/.test(ch)) {
+      let numStr = '';
+      while (i < clean.length && /[0-9.]/.test(clean[i])) {
+        numStr += clean[i];
+        i++;
+      }
+      const num = parseFloat(numStr);
+      if (isNaN(num)) return null;
+      tokens.push({ type: 'num', value: num });
+    } else if (['+', '-', '*', '/', '%', '^', '(', ')'].includes(ch)) {
+      tokens.push({ type: 'op', value: ch });
+      i++;
+    } else {
+      return null;
+    }
+  }
+
+  let pos = 0;
+  function peek() {
+    return tokens[pos];
+  }
+  function consume(val) {
+    const tok = tokens[pos];
+    if (tok && (!val || tok.value === val)) {
+      pos++;
+      return tok;
+    }
+    return null;
+  }
+
+  function parseExpression() {
+    let left = parseTerm();
+    if (left === null) return null;
+    while (peek() && (peek().value === '+' || peek().value === '-')) {
+      const op = consume().value;
+      const right = parseTerm();
+      if (right === null) return null;
+      left = (op === '+') ? left + right : left - right;
+    }
+    return left;
+  }
+
+  function parseTerm() {
+    let left = parsePower();
+    if (left === null) return null;
+    while (peek() && (peek().value === '*' || peek().value === '/' || peek().value === '%')) {
+      const op = consume().value;
+      const right = parsePower();
+      if (right === null) return null;
+      if (op === '*') left = left * right;
+      else if (op === '/') {
+        if (right === 0) return null;
+        left = left / right;
+      } else if (op === '%') {
+        if (right === 0) return null;
+        left = left % right;
+      }
+    }
+    return left;
+  }
+
+  function parsePower() {
+    let base = parsePrimary();
+    if (base === null) return null;
+    if (peek() && peek().value === '^') {
+      consume('^');
+      const exponent = parsePower();
+      if (exponent === null) return null;
+      return Math.pow(base, exponent);
+    }
+    return base;
+  }
+
+  function parsePrimary() {
+    if (peek() && (peek().value === '+' || peek().value === '-')) {
+      const sign = consume().value === '-' ? -1 : 1;
+      const val = parsePrimary();
+      return val === null ? null : sign * val;
+    }
+    const tok = peek();
+    if (!tok) return null;
+    if (tok.type === 'num') {
+      consume();
+      return tok.value;
+    }
+    if (tok.value === '(') {
+      consume('(');
+      const val = parseExpression();
+      if (val === null || !consume(')')) return null;
+      return val;
+    }
+    return null;
+  }
+
   try {
-    const normalized = clean.replace(/\^/g, '**');
-    const result = Function(`"use strict"; return (${normalized})`)();
-    if (typeof result === 'number' && isFinite(result)) {
+    const result = parseExpression();
+    if (pos === tokens.length && typeof result === 'number' && isFinite(result)) {
       return Number.isInteger(result) ? result : Number(result.toFixed(4));
     }
   } catch {
@@ -87,10 +199,10 @@ function renderHelpMenu() {
         (item, index) => `
         <li class="suggestion-item" data-index="${index}">
           <div class="sug-left">
-            <i class="${item.icon}"></i>
-            <span class="sug-text"><strong>${item.prefix}</strong> <span class="sug-match">${searchEngines[item.prefix].desc}</span></span>
+            <i class="${escapeSearchHtml(item.icon)}"></i>
+            <span class="sug-text"><strong>${escapeSearchHtml(item.prefix)}</strong> <span class="sug-match">${escapeSearchHtml(searchEngines[item.prefix].desc)}</span></span>
           </div>
-          <span class="sug-badge shortcut">${searchEngines[item.prefix].name}</span>
+          <span class="sug-badge shortcut">${escapeSearchHtml(searchEngines[item.prefix].name)}</span>
         </li>`
       )
       .join('');
@@ -116,10 +228,10 @@ function renderSuggestions(items, rawQuery) {
   suggestionsBox.innerHTML = items
     .map((item, index) => {
       const textLower = item.text.toLowerCase();
-      let displayHtml = item.text;
+      let displayHtml = escapeSearchHtml(item.text);
       if (cleanQuery && textLower.startsWith(cleanQuery)) {
-        const matched = item.text.slice(0, cleanQuery.length);
-        const rest = item.text.slice(cleanQuery.length);
+        const matched = escapeSearchHtml(item.text.slice(0, cleanQuery.length));
+        const rest = escapeSearchHtml(item.text.slice(cleanQuery.length));
         displayHtml = `<span class="sug-match">${matched}</span><strong>${rest}</strong>`;
       }
 
@@ -131,7 +243,7 @@ function renderSuggestions(items, rawQuery) {
       return `
         <li class="suggestion-item" data-index="${index}">
           <div class="sug-left">
-            <i class="${item.icon}"></i>
+            <i class="${escapeSearchHtml(item.icon)}"></i>
             <span class="sug-text">${displayHtml}</span>
           </div>
           ${badgeHtml}
