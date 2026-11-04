@@ -1,0 +1,102 @@
+/**
+ * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache PWA)
+ */
+
+const CACHE_NAME = 'violet-startpage-v1';
+
+const STATIC_ASSETS = [
+  './',
+  './index.html',
+  './css/style.css',
+  './css/themes/kanagawa.css',
+  './css/themes/sakura.css',
+  './css/themes/cyberdeck.css',
+  './js/themes.js',
+  './js/appearance.js',
+  './js/clock.js',
+  './js/weather-fx.js',
+  './js/weather.js',
+  './js/calendar.js',
+  './js/tasks.js',
+  './js/search.js',
+  './js/feeds.js',
+  './js/bookmarks.js',
+  './js/widgets.js',
+  './js/custom-hub.js',
+  './js/command-palette.js',
+  './js/shortcuts.js',
+  './js/app.js',
+  './images/gif.gif',
+  './images/gif2.gif',
+  './images/gif3.gif'
+];
+
+// Installation : mise en cache des fichiers statiques
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS).catch((err) => {
+        console.warn('[SW] Cache partiel lors de l\'installation:', err);
+      });
+    }).then(() => self.skipWaiting())
+  );
+});
+
+// Activation : nettoyage des anciens caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Interception des requêtes réseau : Stratégie Cache-First pour les assets locaux, Network-First pour les APIs
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // Requêtes non-GET ignorées
+  if (event.request.method !== 'GET') return;
+
+  // Assets locaux : Cache-First avec mise à jour en arrière-plan
+  if (url.origin === self.location.origin) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          // Mise à jour en arrière-plan (Stale-While-Revalidate)
+          fetch(event.request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+            }
+          }).catch(() => {});
+          return cachedResponse;
+        }
+        return fetch(event.request);
+      })
+    );
+    return;
+  }
+
+  // APIs externes (wttr.in, feeds, coingecko) : Network-First avec repli sur cache
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
+  );
+});

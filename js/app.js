@@ -56,4 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initFeeds === 'function') initFeeds();
   if (typeof initCommandPalette === 'function') initCommandPalette();
   if (typeof initShortcuts === 'function') initShortcuts();
+
+  // Enregistrement du Service Worker pour le mode hors-ligne PWA
+  if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
 });

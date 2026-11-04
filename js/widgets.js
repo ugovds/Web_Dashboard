@@ -160,6 +160,11 @@ function updatePomoUI() {
 
 function startPomoTimer() {
   if (pomoIsRunning) return;
+
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission().catch(() => {});
+  }
+
   pomoIsRunning = true;
   updatePomoUI();
 
@@ -171,6 +176,15 @@ function startPomoTimer() {
       clearInterval(pomoInterval);
       pomoIsRunning = false;
       playPomoChime();
+
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification(pomoMode === 'focus' ? '🎉 Focus Terminé !' : '⚡ Pause Terminée !', {
+            body: pomoMode === 'focus' ? 'Prenez une pause bien méritée.' : 'Prêt à reprendre une session de focus !',
+            icon: 'images/gif.gif'
+          });
+        } catch {}
+      }
 
       if (pomoMode === 'focus') {
         pomoCompletedCount++;
@@ -936,6 +950,7 @@ function renderMarketCards() {
         <span class="crypto-coin">
           <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
           <span class="market-asset-name">${asset.name}</span>
+          <span class="market-type-pill ${isLive ? 'live' : 'sim'}">${isLive ? 'Live' : 'Indicatif'}</span>
         </span>
         <span class="crypto-price" id="price-${asset.id}">${formattedPrice}</span>
         <span class="crypto-change ${isPositive ? 'up' : 'down'}" id="change-${asset.id}">${sign}${asset.baseChange.toFixed(2)}%</span>

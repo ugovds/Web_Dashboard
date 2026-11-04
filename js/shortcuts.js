@@ -133,6 +133,18 @@ function initShortcuts() {
       return;
     }
 
+    // Annuler la suppression (Ctrl+Z / Cmd+Z) quand on ne tape pas dans un champ
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && isNotTyping) {
+      if (typeof undoDeleteTask === 'function' && undoDeleteTask()) {
+        e.preventDefault();
+        return;
+      }
+      if (typeof undoDeleteBookmark === 'function' && undoDeleteBookmark()) {
+        e.preventDefault();
+        return;
+      }
+    }
+
     // Raccourci T : Ajout rapide de tâche (active la vue Agenda et focus le champ)
     if ((e.key === 't' || e.key === 'T') && isNotTyping) {
       e.preventDefault();

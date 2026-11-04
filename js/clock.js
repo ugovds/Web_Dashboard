@@ -397,6 +397,21 @@ function initClock() {
   applyClockSettings();
   updateClock();
 
+  // Économie d'énergie : pause de l'animation 60 FPS quand l'onglet est en arrière-plan
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (clockRafId) {
+        cancelAnimationFrame(clockRafId);
+        clockRafId = null;
+      }
+    } else {
+      updateClock();
+      if (!clockRafId) {
+        clockRafId = requestAnimationFrame(runClockAnimationLoop);
+      }
+    }
+  });
+
   // Actualisation continue de l'horloge
   setInterval(updateClock, 1000);
   if (!clockRafId) {
