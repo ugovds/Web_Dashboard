@@ -1,0 +1,332 @@
+/* ========================================================
+   css/clock.css - Horloge Moderne, Design & Personnalisable
+   ======================================================== */
+
+.left-clock-card {
+  flex: 1;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  backdrop-filter: blur(24px);
+  padding: 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- BARRE SUPÉRIEURE DE L'HORLOGE --- */
+.clock-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.clock-tz-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 99px;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  font-family: inherit;
+}
+
+.clock-tz-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-highlight);
+  color: var(--accent-white);
+  transform: translateY(-1px);
+}
+
+.clock-mode-pill {
+  color: var(--accent-primary);
+  border-color: var(--border-highlight);
+}
+
+.clock-mode-pill:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--accent-white);
+}
+
+/* --- AFFICHAGE CENTRAL DU TEMPS --- */
+.left-clock-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0;
+  z-index: 2;
+}
+
+.time-digits-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  line-height: 1;
+}
+
+.left-time-main {
+  font-size: 3.1rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--accent-white);
+  text-shadow: 0 0 25px rgba(255, 255, 255, 0.12);
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  transition: font-size 0.25s ease;
+}
+
+.clock-ms-tick {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--accent-primary);
+  opacity: 0.85;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.ampm-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--accent-primary);
+  align-self: flex-start;
+  margin-top: 0.35rem;
+}
+
+/* --- DATE & TÉLÉMÉTRIE CALENDAIRE --- */
+.left-clock-telemetry {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  z-index: 2;
+}
+
+.left-date-main {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-main);
+  text-transform: capitalize;
+  letter-spacing: -0.01em;
+}
+
+.clock-telemetry-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.chrono-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.26rem 0.65rem;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.chrono-chip i {
+  color: var(--accent-primary);
+  font-size: 0.72rem;
+}
+
+.chrono-chip.solar-chip.day i {
+  color: #ffb86c;
+}
+
+.chrono-chip.solar-chip.night i {
+  color: #bd93f9;
+}
+
+/* --- PROGRESSION DE LA JOURNÉE (%) --- */
+.day-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-subtle);
+  z-index: 2;
+}
+
+.day-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.day-progress-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+.day-progress-title i {
+  color: var(--accent-primary);
+  font-size: 0.68rem;
+}
+
+.day-progress-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.progress-pct-bold {
+  font-weight: 700;
+  color: var(--accent-white);
+}
+
+.progress-remaining-sub {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.day-progress-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+}
+
+.day-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-secondary, #bd93f9), var(--accent-primary, #a78bfa));
+  border-radius: 99px;
+  position: relative;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+.progress-glow-head {
+  position: absolute;
+  right: 0;
+  top: -2px;
+  bottom: -2px;
+  width: 6px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #fff;
+}
+
+/* ========================================================
+   STYLES DESIGN & PERSONNALISATION DE L'HORLOGE
+   ======================================================== */
+
+/* 1. Glass / Verre Dépoli Moderne (Défaut) */
+.clock-style-glass,
+.clock-style-pill {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* 2. Minimaliste Pur */
+.clock-style-minimal {
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  padding: 0.9rem 0.5rem;
+}
+
+.clock-style-minimal .day-progress-wrap {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+/* 3. Carte Élégante */
+.clock-style-card,
+.clock-style-digital {
+  background: var(--surface-strong);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* 4. Bordure Accent Néon */
+.clock-style-accent,
+.clock-style-brackets {
+  border-left: 3px solid var(--accent-primary);
+  border-radius: 0 16px 16px 0;
+  background: var(--surface);
+}
+
+/* 5. HUD Épuré */
+.clock-style-hud,
+.clock-style-glow {
+  background: var(--surface);
+  border: 1px solid var(--border-highlight);
+  box-shadow: 0 0 25px rgba(167, 139, 250, 0.1);
+}
+
+/* --- POLICES TYPOGRAPHIQUES MODERNES --- */
+.font-inter .left-time-main,
+.font-inter .left-date-main {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: -0.04em;
+}
+
+.font-jetbrains .left-time-main,
+.font-jetbrains .left-date-main {
+  font-family: "JetBrains Mono", monospace;
+  letter-spacing: -0.02em;
+}
+
+.font-orbitron .left-time-main {
+  font-family: "Orbitron", sans-serif;
+  letter-spacing: 0.03em;
+  font-weight: 800;
+}
+
+.font-share-tech .left-time-main {
+  font-family: "Share Tech Mono", monospace;
+  letter-spacing: 0.01em;
+}
+
+.font-vt323 .left-time-main {
+  font-family: "VT323", monospace;
+  font-size: 3.8rem;
+  letter-spacing: 0.05em;
+}
+
+/* --- TAILLES D'AFFICHAGE --- */
+.clock-size-small .left-time-main {
+  font-size: 2.35rem;
+}
+
+.clock-size-medium .left-time-main {
+  font-size: 3.1rem;
+}
+
+.clock-size-large .left-time-main {
+  font-size: 3.8rem;
+}

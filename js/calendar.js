@@ -1,10 +1,23 @@
 /**
- * calendar.js - Mini-calendrier synchronisé avec les échéances des tâches
+ * calendar.js - Calendrier mensuel étendu avec tâches intégrées
  * - Affichage dynamique du mois et navigation rapide
- * - Badges du nombre de tâches directement sur les jours du calendrier
- * - Filtrage instantané au clic sur un jour pour voir les tâches associées
+ * - Affichage direct des puces de tâches avec code couleur de priorité
+ * - Liste défilante interne si une journée contient plusieurs tâches
+ * - Filtrage instantané au clic sur un jour pour voir les détails et éditer
  */
 let calDate = new Date();
+
+function safeEscape(str) {
+  if (typeof escapeHtml === 'function') return escapeHtml(str);
+  if (!str) return '';
+  return str.replace(/[&<>"']/g, (m) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  })[m]);
+}
 
 function renderCalendar() {
   const calTitle = document.getElementById('cal-title');
@@ -13,7 +26,7 @@ function renderCalendar() {
 
   const year = calDate.getFullYear();
   const month = calDate.getMonth();
-  const todayStr = toISODate(new Date());
+  const todayStr = typeof toISODate === 'function' ? toISODate(new Date()) : '';
   const selectedDate = typeof getSelectedDateFilter === 'function' ? getSelectedDateFilter() : null;
 
   const monthName = calDate.toLocaleDateString('fr-FR', {
@@ -30,7 +43,7 @@ function renderCalendar() {
 
   let html = '';
   for (let i = 0; i < startOffset; i++) {
-    html += `<span class="cal-day empty"></span>`;
+    html += `<div class="cal-day empty"></div>`;
   }
 
   for (let d = 1; d <= daysInMonth; d++) {
@@ -47,15 +60,32 @@ function renderCalendar() {
     }
 
     const totalTasks = stats ? (stats.pending + stats.done) : 0;
-    const badgeHtml = totalTasks > 0
-      ? `<span class="cal-badge ${stats.pending > 0 ? 'pending' : 'done'}" title="${totalTasks} tâche(s)">${totalTasks}</span>`
-      : '';
+
+    // Mini-puces des tâches directement dans la case du jour
+    let tasksHtml = '';
+    if (stats && stats.tasks && stats.tasks.length > 0) {
+      const chips = stats.tasks.map((t) => {
+        const priorityCls = `priority-${t.priority || 'normal'}`;
+        const doneCls = t.done ? 'done' : '';
+        const titleText = safeEscape(t.text);
+        return `
+          <div class="cal-task-chip ${priorityCls} ${doneCls}" title="${titleText}">
+            <span class="cal-chip-dot"></span>
+            <span class="cal-chip-text">${titleText}</span>
+          </div>
+        `;
+      }).join('');
+      tasksHtml = `<div class="cal-day-tasks">${chips}</div>`;
+    }
 
     html += `
-      <button type="button" class="${classes}" data-date="${iso}" title="${iso}${totalTasks > 0 ? ` • ${totalTasks} tâche(s)` : ''}">
-        <span class="cal-day-num">${d}</span>
-        ${badgeHtml}
-      </button>
+      <div class="${classes}" data-date="${iso}" title="${iso}${totalTasks > 0 ? ` • ${totalTasks} tâche(s)` : ''}" role="button" tabindex="0">
+        <div class="cal-day-top">
+          <span class="cal-day-num">${d}</span>
+          ${isToday ? '<span class="cal-day-dot" title="Aujourd\'hui"></span>' : ''}
+        </div>
+        ${tasksHtml}
+      </div>
     `;
   }
 
@@ -101,10 +131,9 @@ function initCalendar() {
   }
 
   if (calDaysContainer) {
-    calDaysContainer.addEventListener('click', (e) => {
-      const dayBtn = e.target.closest('.cal-day:not(.empty)');
-      if (!dayBtn) return;
-      const clickedDate = dayBtn.dataset.date;
+    const handleSelectDay = (dayEl) => {
+      if (!dayEl) return;
+      const clickedDate = dayEl.dataset.date;
       const currentFilter = typeof getSelectedDateFilter === 'function' ? getSelectedDateFilter() : null;
 
       if (typeof setDateFilter === 'function') {
@@ -112,6 +141,21 @@ function initCalendar() {
           setDateFilter(null);
         } else {
           setDateFilter(clickedDate);
+        }
+      }
+    };
+
+    calDaysContainer.addEventListener('click', (e) => {
+      const dayEl = e.target.closest('.cal-day:not(.empty)');
+      handleSelectDay(dayEl);
+    });
+
+    calDaysContainer.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        const dayEl = e.target.closest('.cal-day:not(.empty)');
+        if (dayEl) {
+          e.preventDefault();
+          handleSelectDay(dayEl);
         }
       }
     });

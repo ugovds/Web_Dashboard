@@ -1,0 +1,129 @@
+/* ========================================================
+   css/responsive.css - Breakpoints Responsive & Mode Nuit
+   ======================================================== */
+
+/* --- MODE NUIT / ATTÉNUATION HUD (Ctrl+Shift+D) --- */
+body.dim-mode {
+  filter: brightness(0.8) contrast(1.08);
+}
+
+body.dim-mode .unified-deck-card,
+body.dim-mode .left-clock-card,
+body.dim-mode .category-card,
+body.dim-mode .search-box {
+  background: rgba(8, 9, 14, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8) !important;
+}
+
+body.dim-mode .bg-wallpaper {
+  opacity: 0.28 !important;
+  filter: blur(65px) saturate(1.4) brightness(0.7) !important;
+}
+
+/* ========================================================
+   MEDIA QUERIES
+   ======================================================== */
+
+@media (max-width: 1150px) {
+  html,
+  body {
+    overflow-y: auto;
+    height: auto;
+    padding: 1rem 0;
+  }
+  .dashboard {
+    height: auto;
+  }
+  .deck-grid {
+    grid-template-columns: 1fr;
+  }
+  .col-left {
+    height: auto;
+  }
+  .col-left-art {
+    height: 220px;
+  }
+  .categories-grid.multi-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .categories-grid.multi-categories {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .deck-nav-btn {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.68rem;
+  }
+
+  .hub-modal-card {
+    width: 96vw;
+    height: 94vh;
+    border-radius: 14px;
+  }
+
+  .hub-modal-body {
+    grid-template-columns: 1fr;
+  }
+
+  .hub-sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.6rem 0.8rem;
+  }
+
+  .hub-tab-btn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.76rem;
+    white-space: nowrap;
+  }
+
+  .hub-themes-grid,
+  .backup-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .clock-fonts-grid,
+  .clock-styles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .clock-options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-components-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .preview-cards-sample {
+    grid-template-columns: 1fr;
+  }
+
+  .widget-config-body {
+    padding-left: 0;
+  }
+
+  .weather-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .forecast-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toast-container {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    align-items: center;
+  }
+}
