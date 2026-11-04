@@ -186,6 +186,174 @@
   color: var(--accent-white);
 }
 
+/* Onglets de vue météo (Aperçu vs Radar en direct) */
+.weather-view-tabs {
+  display: flex;
+  gap: 0.35rem;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--border-subtle);
+}
+
+.weather-view-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.weather-view-tab-btn:hover {
+  color: var(--accent-white);
+}
+
+.weather-view-tab-btn.active {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--accent-primary);
+  border: 1px solid var(--border-highlight);
+}
+
+/* Section Graphique Températures & Pluie (24h) */
+.weather-chart-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+}
+
+.weather-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+}
+
+.weather-chart-title {
+  font-weight: 700;
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.weather-chart-summary {
+  color: var(--text-muted);
+  font-size: 0.64rem;
+}
+
+.weather-hourly-graph-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.weather-hourly-svg {
+  width: 100%;
+  height: 60px;
+  overflow: visible;
+}
+
+.weather-hourly-chips-row {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.hourly-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.hourly-chip-time {
+  font-weight: 600;
+}
+
+.hourly-chip-icon {
+  font-size: 0.72rem;
+  color: var(--accent-primary);
+}
+
+.hourly-chip-temp {
+  font-weight: 700;
+  color: var(--accent-white);
+}
+
+.hourly-chip-rain {
+  font-size: 0.55rem;
+  color: #8be9fd;
+  font-weight: 600;
+}
+
+/* Panneau Radar Satellite en direct */
+.weather-radar-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 380px;
+}
+
+.weather-radar-panel[hidden] {
+  display: none !important;
+}
+
+.weather-radar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.radar-mini-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: 5px;
+  padding: 0.15rem 0.35rem;
+  cursor: pointer;
+  font-size: 0.68rem;
+}
+
+.weather-radar-iframe-wrap {
+  flex: 1;
+  min-height: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  background: #000;
+}
+
+.weather-radar-iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  border: none;
+}
+
 .weather-deck-forecast-section {
   display: flex;
   flex-direction: column;
@@ -296,7 +464,10 @@
   flex-direction: column;
   gap: 0.45rem;
   overflow-y: auto;
+  overflow-x: hidden;
   flex: 1;
+  min-height: 0;
+  padding-right: 3px;
 }
 
 .feed-item {
@@ -963,6 +1134,54 @@
   letter-spacing: 0.5px;
 }
 
+.market-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.market-filter-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.64rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.market-filter-btn:hover {
+  color: var(--accent-white);
+  border-color: var(--border-highlight);
+}
+
+.market-filter-btn.active {
+  background: rgba(255, 184, 108, 0.15);
+  border-color: #ffb86c;
+  color: #ffb86c;
+  box-shadow: 0 0 8px rgba(255, 184, 108, 0.3);
+}
+
+.volatile-tag {
+  font-size: 0.54rem;
+  font-weight: 700;
+  color: #ffb86c;
+  background: rgba(255, 184, 108, 0.12);
+  border: 1px solid rgba(255, 184, 108, 0.35);
+  padding: 0.06rem 0.3rem;
+  border-radius: 4px;
+  margin-left: 0.3rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
 .deck-mini-refresh {
   background: transparent;
   border: none;
@@ -977,10 +1196,25 @@
   transform: rotate(180deg);
 }
 
+.system-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  gap: 0.85rem;
+  padding-right: 0.25rem;
+}
+
 .crypto-ticker-cards {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 380px;
+  min-height: 0;
+  padding-right: 0.25rem;
 }
 
 .crypto-card {
@@ -1288,5 +1522,61 @@
 .quote-new-input:focus {
   outline: none;
   border-color: var(--accent-primary);
+}
+
+/* ========================================================
+   8. PANNEAU CONFIGURATION DANS LE DECK
+   ======================================================== */
+.customize-deck-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.35rem;
+}
+
+.config-subtabs-nav {
+  display: flex;
+  gap: 0.3rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.config-subtabs-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.config-subtab-btn {
+  padding: 0.35rem 0.65rem;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.config-subtab-btn:hover {
+  color: var(--accent-white);
+  border-color: var(--border-highlight);
+}
+
+.config-subtab-btn.active {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  font-weight: 700;
 }
 

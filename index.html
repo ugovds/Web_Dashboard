@@ -60,7 +60,7 @@
           </div>
 
           <!-- Grand Cadre Horloge & Date Moderne -->
-          <div class="left-clock-card font-inter clock-style-glass clock-size-medium" id="left-clock-card">
+          <div class="left-clock-card font-inter clock-style-editorial clock-size-medium" id="left-clock-card">
             <div class="clock-card-top">
               <button type="button" id="clock-tz-badge" class="clock-tz-pill" title="Cliquer pour changer de fuseau horaire">
                 <i class="fa-solid fa-globe"></i> LOCAL • PARIS
@@ -70,13 +70,50 @@
               </button>
             </div>
 
+            <!-- Salutation chaleureuse & moderne -->
+            <span id="clock-greeting" class="clock-greeting">Bonjour</span>
+
             <!-- Affichage moderne et épuré de l'heure -->
             <div class="left-clock-display" id="left-clock-display">
               <div class="time-digits-box">
-                <span id="time" class="left-time-main">00:00:00</span>
+                <span id="time" class="left-time-main">00:00</span>
                 <span id="clock-ms-tick" class="clock-ms-tick" style="display: none;">.00</span>
               </div>
               <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
+            </div>
+
+            <!-- Affichage Flip Clock Rétro (style Fliqlo) -->
+            <div id="clock-flip-wrap" class="clock-flip-wrap" style="display: none;">
+              <div class="flip-unit"><span class="flip-digit" id="flip-h">12</span></div>
+              <span class="flip-sep">:</span>
+              <div class="flip-unit"><span class="flip-digit" id="flip-m">30</span></div>
+              <span class="flip-sep" id="flip-sec-sep" style="display:none;">:</span>
+              <div class="flip-unit" id="flip-sec-unit" style="display:none;"><span class="flip-digit" id="flip-s">00</span></div>
+            </div>
+
+            <!-- Affichage Horloge Analogique Suisse (style Braun) -->
+            <div id="clock-analog-wrap" class="clock-analog-wrap" style="display: none;">
+              <svg class="clock-analog-svg" viewBox="0 0 200 200">
+                <circle class="analog-face" cx="100" cy="100" r="92" />
+                <!-- 12 graduations -->
+                <line class="analog-tick major" x1="100" y1="14" x2="100" y2="26" />
+                <line class="analog-tick major" x1="100" y1="186" x2="100" y2="174" />
+                <line class="analog-tick major" x1="14" y1="100" x2="26" y2="100" />
+                <line class="analog-tick major" x1="186" y1="100" x2="174" y2="100" />
+                <line class="analog-tick" x1="143" y1="25" x2="137" y2="35" />
+                <line class="analog-tick" x1="175" y1="57" x2="165" y2="63" />
+                <line class="analog-tick" x1="175" y1="143" x2="165" y2="137" />
+                <line class="analog-tick" x1="143" y1="175" x2="137" y2="165" />
+                <line class="analog-tick" x1="57" y1="175" x2="63" y2="165" />
+                <line class="analog-tick" x1="25" y1="143" x2="35" y2="137" />
+                <line class="analog-tick" x1="25" y1="57" x2="35" y2="63" />
+                <line class="analog-tick" x1="57" y1="25" x2="63" y2="35" />
+                <!-- Aiguilles -->
+                <line id="analog-hour-hand" class="analog-hand-hour" x1="100" y1="100" x2="100" y2="52" />
+                <line id="analog-min-hand" class="analog-hand-min" x1="100" y1="100" x2="100" y2="34" />
+                <line id="analog-sec-hand" class="analog-hand-sec" x1="100" y1="114" x2="100" y2="24" />
+                <circle class="analog-center-dot" cx="100" cy="100" r="4.5" />
+              </svg>
             </div>
 
             <!-- Télémétrie Calendaire & Cycle Solaire -->
@@ -215,7 +252,7 @@
                 <div class="merged-tasks-section">
                   <div class="tasks-header-row">
                     <div class="tasks-title-group">
-                      <span class="tasks-label"><i class="fa-solid fa-list-check"></i> Agenda & Tâches</span>
+                      <span class="tasks-label"><i class="fa-solid fa-list-check"></i> Tâches</span>
                       <span id="tasks-stats-badge" class="tasks-stats-badge">0 / 0</span>
                     </div>
                     <div class="tasks-filters-group">
@@ -280,61 +317,105 @@
                   <!-- Barre des villes favorites -->
                   <div id="weather-favorites-bar" class="weather-favorites-bar"></div>
 
-                  <div class="weather-deck-hero">
-                    <div class="weather-hero-left">
-                      <div class="weather-hero-loc">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <span id="deck-weather-loc">Chargement...</span>
+                  <!-- Onglets de vue météo : Prévisions/Graphique vs Radar direct -->
+                  <div class="weather-view-tabs">
+                    <button type="button" class="weather-view-tab-btn active" id="weather-tab-overview" data-weather-view="overview">
+                      <i class="fa-solid fa-chart-line"></i> Prévisions & Graphique
+                    </button>
+                    <button type="button" class="weather-view-tab-btn" id="weather-tab-radar" data-weather-view="radar">
+                      <i class="fa-solid fa-satellite-dish"></i> Radar Direct
+                    </button>
+                  </div>
+
+                  <!-- 1. VUE PRINCIPALE : HERO, GRAPHIQUE 24H, MÉTRIQUES & PRÉVISIONS -->
+                  <div id="weather-overview-panel" class="weather-overview-panel">
+                    <div class="weather-deck-hero">
+                      <div class="weather-hero-left">
+                        <div class="weather-hero-loc">
+                          <i class="fa-solid fa-location-dot"></i>
+                          <span id="deck-weather-loc">Chargement...</span>
+                        </div>
+                        <span id="deck-weather-temp" class="weather-hero-temp">--°C</span>
+                        <span id="deck-weather-desc" class="weather-hero-desc">Météo en direct</span>
+                        <span id="deck-weather-updated" class="telemetry-sub">Actualisation en cours</span>
                       </div>
-                      <span id="deck-weather-temp" class="weather-hero-temp">--°C</span>
-                      <span id="deck-weather-desc" class="weather-hero-desc">Météo en direct</span>
-                      <span id="deck-weather-updated" class="telemetry-sub">Actualisation en cours</span>
+                      <div class="weather-hero-right">
+                        <i id="deck-weather-icon" class="fa-solid fa-cloud"></i>
+                      </div>
                     </div>
-                    <div class="weather-hero-right">
-                      <i id="deck-weather-icon" class="fa-solid fa-cloud"></i>
+
+                    <!-- Graphique interactif des températures et pluie (24h) -->
+                    <div class="weather-chart-section">
+                      <div class="weather-chart-header">
+                        <span class="weather-chart-title"><i class="fa-solid fa-chart-area"></i> Températures & Pluie (24h)</span>
+                        <span id="weather-chart-summary" class="weather-chart-summary">Aujourd'hui</span>
+                      </div>
+                      <div class="weather-hourly-graph-wrap">
+                        <svg id="weather-hourly-svg" class="weather-hourly-svg" viewBox="0 0 340 60" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="weatherTempGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stop-color="var(--accent-primary, #a78bfa)" stop-opacity="0.45" />
+                              <stop offset="100%" stop-color="var(--accent-primary, #a78bfa)" stop-opacity="0.0" />
+                            </linearGradient>
+                          </defs>
+                          <path id="weather-graph-area" fill="url(#weatherTempGrad)" d=""></path>
+                          <path id="weather-graph-line" fill="none" stroke="var(--accent-primary, #a78bfa)" stroke-width="2.5" d=""></path>
+                        </svg>
+                        <div id="weather-hourly-chips-row" class="weather-hourly-chips-row"></div>
+                      </div>
+                    </div>
+
+                    <div class="weather-deck-metrics">
+                      <div class="weather-deck-metric-card">
+                        <span class="metric-label"><i class="fa-solid fa-temperature-half"></i> Ressenti</span>
+                        <span id="deck-weather-feels" class="metric-val">--°C</span>
+                      </div>
+                      <div class="weather-deck-metric-card">
+                        <span class="metric-label"><i class="fa-solid fa-droplet"></i> Humidité</span>
+                        <span id="deck-weather-humidity" class="metric-val">--%</span>
+                      </div>
+                      <div class="weather-deck-metric-card">
+                        <span class="metric-label"><i class="fa-solid fa-wind"></i> Vent</span>
+                        <span id="deck-weather-wind" class="metric-val">-- km/h</span>
+                      </div>
+                      <div class="weather-deck-metric-card">
+                        <span class="metric-label"><i class="fa-solid fa-sun"></i> Indice UV</span>
+                        <span id="deck-weather-uv" class="metric-val">-- / 10</span>
+                      </div>
+                      <div class="weather-deck-metric-card">
+                        <span class="metric-label"><i class="fa-solid fa-gauge-high"></i> Pression</span>
+                        <span id="deck-weather-pressure" class="metric-val">1015 hPa</span>
+                      </div>
+                      <div class="weather-deck-metric-card">
+                        <span class="metric-label"><i class="fa-solid fa-eye"></i> Visibilité</span>
+                        <span id="deck-weather-visibility" class="metric-val">10 km</span>
+                      </div>
+                    </div>
+
+                    <div class="weather-deck-forecast-section">
+                      <div class="forecast-section-title"><i class="fa-solid fa-calendar-days"></i> Prévisions sur 3 Jours</div>
+                      <div id="deck-weather-forecast-list" class="forecast-cards-row">
+                        <div class="forecast-loading">Chargement des prévisions...</div>
+                      </div>
+                    </div>
+
+                    <div class="weather-fx-box">
+                      <label class="fx-toggle-label">
+                        <span>Effets météo animés d'arrière-plan (Canvas)</span>
+                        <input type="checkbox" id="deck-weather-fx-toggle" checked />
+                        <span class="switch-slider"></span>
+                      </label>
                     </div>
                   </div>
 
-                  <div class="weather-deck-metrics">
-                    <div class="weather-deck-metric-card">
-                      <span class="metric-label"><i class="fa-solid fa-temperature-half"></i> Ressenti</span>
-                      <span id="deck-weather-feels" class="metric-val">--°C</span>
+                  <!-- 2. VUE RADAR SATELLITE EN DIRECT (RAINVIEWER) -->
+                  <div id="weather-radar-panel" class="weather-radar-panel" hidden>
+                    <div class="weather-radar-header">
+                      <span><i class="fa-solid fa-satellite-dish"></i> Radar précipitations satellite en direct</span>
                     </div>
-                    <div class="weather-deck-metric-card">
-                      <span class="metric-label"><i class="fa-solid fa-droplet"></i> Humidité</span>
-                      <span id="deck-weather-humidity" class="metric-val">--%</span>
+                    <div class="weather-radar-iframe-wrap">
+                      <iframe id="weather-radar-iframe" class="weather-radar-iframe" title="Radar des précipitations en direct" src="" loading="lazy"></iframe>
                     </div>
-                    <div class="weather-deck-metric-card">
-                      <span class="metric-label"><i class="fa-solid fa-wind"></i> Vent</span>
-                      <span id="deck-weather-wind" class="metric-val">-- km/h</span>
-                    </div>
-                    <div class="weather-deck-metric-card">
-                      <span class="metric-label"><i class="fa-solid fa-sun"></i> Indice UV</span>
-                      <span id="deck-weather-uv" class="metric-val">-- / 10</span>
-                    </div>
-                    <div class="weather-deck-metric-card">
-                      <span class="metric-label"><i class="fa-solid fa-gauge-high"></i> Pression</span>
-                      <span id="deck-weather-pressure" class="metric-val">1015 hPa</span>
-                    </div>
-                    <div class="weather-deck-metric-card">
-                      <span class="metric-label"><i class="fa-solid fa-eye"></i> Visibilité</span>
-                      <span id="deck-weather-visibility" class="metric-val">10 km</span>
-                    </div>
-                  </div>
-
-                  <div class="weather-deck-forecast-section">
-                    <div class="forecast-section-title"><i class="fa-solid fa-calendar-days"></i> Prévisions sur 3 Jours</div>
-                    <div id="deck-weather-forecast-list" class="forecast-cards-row">
-                      <div class="forecast-loading">Chargement des prévisions...</div>
-                    </div>
-                  </div>
-
-                  <div class="weather-fx-box">
-                    <label class="fx-toggle-label">
-                      <span>Effets météo animés d'arrière-plan (Canvas)</span>
-                      <input type="checkbox" id="deck-weather-fx-toggle" checked />
-                      <span class="switch-slider"></span>
-                    </label>
                   </div>
                 </div>
               </div>
@@ -407,8 +488,11 @@
                   <!-- Ticker Marchés Boursiers & Indices avec Personnalisation -->
                   <div class="crypto-ticker-section market-ticker-section">
                     <div class="crypto-ticker-header market-ticker-header">
-                      <span title="Cours réels pour EUR/USD et BTC • Cotations indicatives pour les autres actifs"><i class="fa-solid fa-chart-line"></i> Marchés & Indices</span>
+                      <span title="Cours réels pour EUR/USD, 10AP, LYP6, XMME, NVIDIA et BTC"><i class="fa-solid fa-chart-line"></i> Marchés & Indices</span>
                       <div class="market-header-actions">
+                        <button type="button" id="market-filter-volatile-btn" class="market-filter-btn" title="Filtrer les actifs les plus volatiles du jour">
+                          <i class="fa-solid fa-fire"></i> Volatiles
+                        </button>
                         <button type="button" id="market-config-toggle-btn" class="deck-mini-refresh" title="Personnaliser les indices et actions">
                           <i class="fa-solid fa-sliders"></i>
                         </button>
@@ -425,8 +509,8 @@
                       </div>
 
                       <div class="market-presets-row">
-                        <button type="button" class="market-preset-btn" data-preset="indices">Indices Globaux</button>
-                        <button type="button" class="market-preset-btn" data-preset="tech">Tech & Titans</button>
+                        <button type="button" class="market-preset-btn" data-preset="portfolio">Sélection (10AP, LYP6, XMME, NVDA)</button>
+                        <button type="button" class="market-preset-btn" data-preset="volatile">Top Volatilité</button>
                         <button type="button" class="market-preset-btn" data-preset="all">Tout</button>
                       </div>
 
@@ -820,7 +904,22 @@
                     <div class="clock-section">
                       <label class="section-label">Style du Cadre & Design :</label>
                       <div class="clock-styles-grid">
-                        <button type="button" class="clock-style-card-btn active" data-clock-style="glass">
+                        <button type="button" class="clock-style-card-btn active" data-clock-style="editorial">
+                          <div class="style-icon-preview"><i class="fa-solid fa-feather"></i></div>
+                          <span class="style-title">Éditorial Pro</span>
+                          <span class="style-desc">Design épuré & salutation</span>
+                        </button>
+                        <button type="button" class="clock-style-card-btn" data-clock-style="flip">
+                          <div class="style-icon-preview"><i class="fa-solid fa-stopwatch"></i></div>
+                          <span class="style-title">Flip Clock</span>
+                          <span class="style-desc">Clapets rétro animés</span>
+                        </button>
+                        <button type="button" class="clock-style-card-btn" data-clock-style="analog">
+                          <div class="style-icon-preview"><i class="fa-regular fa-clock"></i></div>
+                          <span class="style-title">Analogique Suisse</span>
+                          <span class="style-desc">Cadran & trotteuse fluide</span>
+                        </button>
+                        <button type="button" class="clock-style-card-btn" data-clock-style="glass">
                           <div class="style-icon-preview"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
                           <span class="style-title">Verre Dépoli</span>
                           <span class="style-desc">Design moderne & flou</span>
@@ -834,16 +933,6 @@
                           <div class="style-icon-preview"><i class="fa-solid fa-square"></i></div>
                           <span class="style-title">Carte Élégante</span>
                           <span class="style-desc">Surface contrastée</span>
-                        </button>
-                        <button type="button" class="clock-style-card-btn" data-clock-style="accent">
-                          <div class="style-icon-preview"><i class="fa-solid fa-border-left"></i></div>
-                          <span class="style-title">Bordure Accent</span>
-                          <span class="style-desc">Liseré coloré moderne</span>
-                        </button>
-                        <button type="button" class="clock-style-card-btn" data-clock-style="hud">
-                          <div class="style-icon-preview"><i class="fa-solid fa-crosshairs"></i></div>
-                          <span class="style-title">Technique Épuré</span>
-                          <span class="style-desc">Instrument haute précision</span>
                         </button>
                       </div>
                     </div>

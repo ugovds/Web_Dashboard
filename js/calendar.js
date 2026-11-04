@@ -61,25 +61,29 @@ function renderCalendar() {
 
     const totalTasks = stats ? (stats.pending + stats.done) : 0;
 
-    // Mini-puces des tâches directement dans la case du jour
+    // Puces épurées et lisibles : pastilles de priorité sans texte tronqué
     let tasksHtml = '';
+    let tasksSummary = '';
     if (stats && stats.tasks && stats.tasks.length > 0) {
-      const chips = stats.tasks.map((t) => {
+      tasksSummary = stats.tasks.map((t) => `\n • [${t.priority || 'normal'}] ${t.text}`).join('');
+      const maxVisibleDots = 3;
+      const visibleTasks = stats.tasks.slice(0, maxVisibleDots);
+      const remainingCount = stats.tasks.length - maxVisibleDots;
+
+      const dots = visibleTasks.map((t) => {
         const priorityCls = `priority-${t.priority || 'normal'}`;
         const doneCls = t.done ? 'done' : '';
-        const titleText = safeEscape(t.text);
-        return `
-          <div class="cal-task-chip ${priorityCls} ${doneCls}" title="${titleText}">
-            <span class="cal-chip-dot"></span>
-            <span class="cal-chip-text">${titleText}</span>
-          </div>
-        `;
+        return `<span class="cal-dot ${priorityCls} ${doneCls}"></span>`;
       }).join('');
-      tasksHtml = `<div class="cal-day-tasks">${chips}</div>`;
+
+      const countBadge = remainingCount > 0 ? `<span class="cal-dot-count">+${remainingCount}</span>` : '';
+      tasksHtml = `<div class="cal-day-dots">${dots}${countBadge}</div>`;
     }
 
+    const dayTitle = `${d} ${monthName} • ${totalTasks} tâche(s)${tasksSummary}`;
+
     html += `
-      <div class="${classes}" data-date="${iso}" title="${iso}${totalTasks > 0 ? ` • ${totalTasks} tâche(s)` : ''}" role="button" tabindex="0">
+      <div class="${classes}" data-date="${iso}" title="${safeEscape(dayTitle)}" role="button" tabindex="0">
         <div class="cal-day-top">
           <span class="cal-day-num">${d}</span>
           ${isToday ? '<span class="cal-day-dot" title="Aujourd\'hui"></span>' : ''}

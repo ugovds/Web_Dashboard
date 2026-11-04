@@ -259,6 +259,96 @@ function renderWeatherDeckView(data) {
       })
       .join('');
   }
+
+  // Graphique interactif des températures et de pluie sur 24h
+  renderWeatherHourlyGraph(data);
+
+  // Mise à jour de l'URL du radar satellite RainViewer
+  updateWeatherRadar(area);
+}
+
+/**
+ * Construit un graphique SVG fluide (courbe de Bézier) de la météo 24h
+ */
+function renderWeatherHourlyGraph(data) {
+  const lineEl = document.getElementById('weather-graph-line');
+  const areaEl = document.getElementById('weather-graph-area');
+  const chipsRow = document.getElementById('weather-hourly-chips-row');
+  const chartSummary = document.getElementById('weather-chart-summary');
+
+  if (!data?.weather?.[0]?.hourly) return;
+  const hourly = data.weather[0].hourly;
+
+  const temps = hourly.map((h) => parseInt(h.tempC, 10));
+  const minTemp = Math.min(...temps) - 1;
+  const maxTemp = Math.max(...temps) + 1;
+  const tempRange = Math.max(1, maxTemp - minTemp);
+
+  const points = hourly.map((h, i) => {
+    const x = 16 + i * (308 / (hourly.length - 1));
+    const t = parseInt(h.tempC, 10);
+    const y = 50 - ((t - minTemp) / tempRange) * 38;
+    return { x, y, temp: t, hour: h.time, rain: h.chanceofrain, desc: h.weatherDesc?.[0]?.value || '' };
+  });
+
+  // Construction de la courbe SVG lissée
+  let linePath = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const cX = (prev.x + curr.x) / 2;
+    linePath += ` C ${cX.toFixed(1)} ${prev.y.toFixed(1)}, ${cX.toFixed(1)} ${curr.y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
+  }
+
+  const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(1)} 58 L ${points[0].x.toFixed(1)} 58 Z`;
+
+  if (lineEl) lineEl.setAttribute('d', linePath);
+  if (areaEl) areaEl.setAttribute('d', areaPath);
+
+  if (chartSummary) {
+    const minT = Math.min(...temps);
+    const maxT = Math.max(...temps);
+    chartSummary.textContent = `Min ${minT}°C • Max ${maxT}°C`;
+  }
+
+  // Mini-colonnes horaires avec icône, température et probabilité de pluie
+  if (chipsRow) {
+    const formatHour = (rawTime) => {
+      const h = Math.floor(parseInt(rawTime, 10) / 100);
+      return `${String(h).padStart(2, '0')}h`;
+    };
+
+    chipsRow.innerHTML = points.map((p) => {
+      const iconCls = getWeatherIconClass(p.desc);
+      const rainInt = parseInt(p.rain, 10) || 0;
+      const rainHtml = rainInt > 10 ? `<span class="hourly-chip-rain"><i class="fa-solid fa-droplet"></i> ${rainInt}%</span>` : '<span class="hourly-chip-rain" style="opacity:0;">--</span>';
+      return `
+        <div class="hourly-chip" title="${formatHour(p.hour)} : ${p.temp}°C, Risque pluie ${rainInt}%, ${p.desc}">
+          <span class="hourly-chip-time">${formatHour(p.hour)}</span>
+          <i class="${iconCls} hourly-chip-icon"></i>
+          <span class="hourly-chip-temp">${p.temp}°</span>
+          ${rainHtml}
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+/**
+ * Configure le radar précipitations satellite en direct (RainViewer)
+ */
+function updateWeatherRadar(area) {
+  const radarIframe = document.getElementById('weather-radar-iframe');
+  if (!radarIframe) return;
+
+  const lat = area?.latitude || '48.8566';
+  const lon = area?.longitude || '2.3522';
+  // RainViewer Map Embed libre et sans clé API
+  const radarUrl = `https://www.rainviewer.com/map.html?loc=${lat},${lon},8&oFa=0&oC=1&oU=0&oRev=0&oA=1&oD=0&oF=0&oAP=1&rmt=4&layer=radar&sm=1&sn=1`;
+  if (radarIframe.getAttribute('data-loaded-src') !== radarUrl) {
+    radarIframe.setAttribute('data-loaded-src', radarUrl);
+    radarIframe.src = radarUrl;
+  }
 }
 
 function initWeather() {
@@ -369,6 +459,28 @@ function initWeather() {
       if (typeof toggleWeatherFx === 'function') {
         toggleWeatherFx(fxToggle.checked);
       }
+    });
+  }
+
+  // Bascule entre vue Prévisions/Graphique et vue Radar Satellite direct
+  const tabOverview = document.getElementById('weather-tab-overview');
+  const tabRadar = document.getElementById('weather-tab-radar');
+  const overviewPanel = document.getElementById('weather-overview-panel');
+  const radarPanel = document.getElementById('weather-radar-panel');
+
+  if (tabOverview && tabRadar && overviewPanel && radarPanel) {
+    tabOverview.addEventListener('click', () => {
+      tabOverview.classList.add('active');
+      tabRadar.classList.remove('active');
+      overviewPanel.hidden = false;
+      radarPanel.hidden = true;
+    });
+
+    tabRadar.addEventListener('click', () => {
+      tabRadar.classList.add('active');
+      tabOverview.classList.remove('active');
+      overviewPanel.hidden = true;
+      radarPanel.hidden = false;
     });
   }
 

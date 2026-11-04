@@ -8,6 +8,32 @@
   margin: 0;
 }
 
+/* --- BARRES DE DÉFILEMENT UNIVERSELLES ÉLÉGANTES ET VISIBLES --- */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(167, 139, 250, 0.45) rgba(255, 255, 255, 0.04);
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 99px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(167, 139, 250, 0.42);
+  border-radius: 99px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary, #a78bfa);
+}
+
 html,
 body {
   width: 100vw;

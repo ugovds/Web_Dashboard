@@ -10,12 +10,12 @@
 
 const defaultClockSettings = {
   font: 'inter', // 'inter', 'jetbrains', 'orbitron', 'share-tech', 'vt323'
-  style: 'glass', // 'glass', 'minimal', 'card', 'accent', 'hud'
+  style: 'editorial', // 'editorial', 'flip', 'analog', 'glass', 'minimal', 'card', 'accent', 'hud'
   format24h: true,
-  showSeconds: true,
+  showSeconds: false,
   showDate: true,
-  showProgress: true,
-  showWeek: true,
+  showProgress: false,
+  showWeek: false,
   dateFormat: 'text', // 'text', 'numeric', 'iso'
   timezone: 'local', // 'local', 'tokyo', 'ny', 'london', 'utc'
   size: 'medium', // 'small', 'medium', 'large'
@@ -54,21 +54,45 @@ function applyClockSettings() {
     document.getElementById('clock-preview-wrap')
   ];
 
+  const currentStyle = currentClockSettings.style || 'editorial';
+
   clockWraps.forEach((wrap) => {
     if (!wrap) return;
 
     // Réinitialiser les classes dynamiques
     wrap.classList.remove(
       'font-inter', 'font-jetbrains', 'font-orbitron', 'font-share-tech', 'font-vt323',
+      'clock-style-editorial', 'clock-style-flip', 'clock-style-analog',
       'clock-style-glass', 'clock-style-minimal', 'clock-style-card', 'clock-style-accent', 'clock-style-hud',
       'clock-style-glow', 'clock-style-digital', 'clock-style-pill', 'clock-style-brackets',
       'clock-size-small', 'clock-size-medium', 'clock-size-large'
     );
 
     wrap.classList.add(`font-${currentClockSettings.font || 'inter'}`);
-    wrap.classList.add(`clock-style-${currentClockSettings.style || 'glass'}`);
+    wrap.classList.add(`clock-style-${currentStyle}`);
     wrap.classList.add(`clock-size-${currentClockSettings.size || 'medium'}`);
   });
+
+  // Affichage dynamique des modules d'horloge (Normal, Flip Clock ou Analogique Suisse)
+  const displayStandard = document.getElementById('left-clock-display');
+  const displayFlip = document.getElementById('clock-flip-wrap');
+  const displayAnalog = document.getElementById('clock-analog-wrap');
+
+  if (displayStandard && displayFlip && displayAnalog) {
+    if (currentStyle === 'flip') {
+      displayStandard.style.display = 'none';
+      displayFlip.style.display = 'flex';
+      displayAnalog.style.display = 'none';
+    } else if (currentStyle === 'analog') {
+      displayStandard.style.display = 'none';
+      displayFlip.style.display = 'none';
+      displayAnalog.style.display = 'flex';
+    } else {
+      displayStandard.style.display = 'flex';
+      displayFlip.style.display = 'none';
+      displayAnalog.style.display = 'none';
+    }
+  }
 
   // Mettre à jour l'interface des réglages
   updateClockControlsUI();
@@ -221,6 +245,7 @@ function updateClock() {
   // 1. Horloge Principale de la Colonne Gauche
   const timeEl = document.getElementById('time');
   const dateEl = document.getElementById('date');
+  const greetingEl = document.getElementById('clock-greeting');
   const ampmEl = document.getElementById('clock-ampm-pill');
   const tzBadgeEl = document.getElementById('clock-tz-badge');
   const weekChipEl = document.getElementById('clock-week-chip');
@@ -236,6 +261,46 @@ function updateClock() {
   const progressFill = document.getElementById('day-progress-fill');
   const secArc = document.getElementById('clock-sec-arc');
   const msTickEl = document.getElementById('clock-ms-tick');
+
+  // Mise à jour de la salutation moderne
+  if (greetingEl) {
+    const hours = zonedDate.getHours();
+    let greet = 'Bonjour';
+    if (hours >= 5 && hours < 12) greet = 'Bonjour';
+    else if (hours >= 12 && hours < 18) greet = 'Bon après-midi';
+    else if (hours >= 18 && hours < 23) greet = 'Bonne soirée';
+    else greet = 'Bonne nuit';
+    greetingEl.textContent = greet;
+  }
+
+  // Mise à jour des modules alternatifs (Flip Clock)
+  const flipH = document.getElementById('flip-h');
+  const flipM = document.getElementById('flip-m');
+  const flipS = document.getElementById('flip-s');
+  const flipSecSep = document.getElementById('flip-sec-sep');
+  const flipSecUnit = document.getElementById('flip-sec-unit');
+  if (flipH) flipH.textContent = timeData.h;
+  if (flipM) flipM.textContent = timeData.m;
+  if (flipS) flipS.textContent = timeData.s;
+  if (flipSecSep && flipSecUnit) {
+    const showSec = currentClockSettings.showSeconds !== false;
+    flipSecSep.style.display = showSec ? '' : 'none';
+    flipSecUnit.style.display = showSec ? '' : 'none';
+  }
+
+  // Mise à jour des aiguilles analogiques suisses
+  const hourHand = document.getElementById('analog-hour-hand');
+  const minHand = document.getElementById('analog-min-hand');
+  const secHand = document.getElementById('analog-sec-hand');
+  if (hourHand && minHand) {
+    const h12 = zonedDate.getHours() % 12;
+    const m = zonedDate.getMinutes();
+    const s = zonedDate.getSeconds();
+    const hourDeg = (h12 + m / 60) * 30;
+    const minDeg = (m + s / 60) * 6;
+    hourHand.setAttribute('transform', `rotate(${hourDeg} 100 100)`);
+    minHand.setAttribute('transform', `rotate(${minDeg} 100 100)`);
+  }
 
   // Mode Compte à rebours vs Horloge standard
   if (currentClockSettings.countdownMode) {
@@ -308,7 +373,7 @@ function updateClock() {
 
   // Numéro de semaine & jour annuel
   if (weekChipEl && weekTextEl && dayChipEl && dayTextEl) {
-    if (currentClockSettings.showWeek !== false) {
+    if (currentClockSettings.showWeek) {
       const week = getWeekNumber(zonedDate);
       const day = getDayOfYear(zonedDate);
       weekTextEl.textContent = `Sem. ${week}`;
@@ -323,16 +388,21 @@ function updateClock() {
 
   // Cycle Solaire (Diurne / Nocturne)
   if (solarChipEl && solarIconEl && solarTextEl) {
-    const hours = zonedDate.getHours();
-    const isDay = hours >= 7 && hours < 19;
-    solarChipEl.className = `chrono-chip solar-chip ${isDay ? 'day' : 'night'}`;
-    solarIconEl.className = isDay ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-    solarTextEl.textContent = isDay ? 'Diurne' : 'Nocturne';
+    if (currentClockSettings.showWeek) {
+      const hours = zonedDate.getHours();
+      const isDay = hours >= 7 && hours < 19;
+      solarChipEl.className = `chrono-chip solar-chip ${isDay ? 'day' : 'night'}`;
+      solarIconEl.className = isDay ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      solarTextEl.textContent = isDay ? 'Diurne' : 'Nocturne';
+      solarChipEl.style.display = '';
+    } else {
+      solarChipEl.style.display = 'none';
+    }
   }
 
   // Barre de progression du jour (%) & temps restant
   if (progressWrap) {
-    if (currentClockSettings.showProgress !== false) {
+    if (currentClockSettings.showProgress) {
       progressWrap.style.display = '';
       const totalSecs = zonedDate.getHours() * 3600 + zonedDate.getMinutes() * 60 + zonedDate.getSeconds();
       const pct = Math.min(100, Math.max(0, (totalSecs / 86400) * 100)).toFixed(1);
@@ -363,18 +433,25 @@ function updateClock() {
 }
 
 /**
- * Boucle d'animation fluide 60 FPS pour l'arc radial des secondes et les millisecondes
+ * Boucle d'animation fluide 60 FPS pour l'arc radial des secondes et trotteuse analogique
  */
 function runClockAnimationLoop() {
   const zonedDate = getZonedDate(currentClockSettings);
   const secArc = document.getElementById('clock-sec-arc');
   const msTickEl = document.getElementById('clock-ms-tick');
+  const secHand = document.getElementById('analog-sec-hand');
 
-  if (currentClockSettings.showSeconds !== false) {
-    const s = zonedDate.getSeconds();
-    const ms = zonedDate.getMilliseconds();
-    const frac = s + ms / 1000;
+  const s = zonedDate.getSeconds();
+  const ms = zonedDate.getMilliseconds();
+  const frac = s + ms / 1000;
 
+  // Trotteuse fluide 60 FPS pour l'horloge analogique suisse
+  if (secHand) {
+    const secDeg = frac * 6;
+    secHand.setAttribute('transform', `rotate(${secDeg} 100 100)`);
+  }
+
+  if (currentClockSettings.showSeconds) {
     // Arc des secondes SVG (circonférence = 2 * PI * 96 ≈ 603.18)
     if (secArc) {
       const circum = 603.18;

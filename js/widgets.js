@@ -884,22 +884,24 @@ function updateSessionUptime() {
    GESTIONNAIRE DES MARCHÉS & INDICES BOURSIERS
    ======================================================== */
 const DEFAULT_MARKET_ASSETS = [
-  { id: 'sp500', name: 'S&P 500', symbol: '^GSPC', icon: 'fa-solid fa-chart-line', basePrice: 5864.67, baseChange: 0.41, unit: 'pts', enabled: true },
-  { id: 'stoxx600', name: 'Europe Stoxx 600', symbol: '^STOXX', icon: 'fa-solid fa-landmark', basePrice: 514.80, baseChange: 0.28, unit: 'pts', enabled: true },
-  { id: 'emerging', name: 'Emerging Mkts', symbol: 'EEM', icon: 'fa-solid fa-earth-americas', basePrice: 44.60, baseChange: 0.55, unit: '$', enabled: true },
-  { id: 'nvda', name: 'NVIDIA Corp.', symbol: 'NVDA', icon: 'fa-solid fa-microchip', basePrice: 138.25, baseChange: 1.84, unit: '$', enabled: true },
-  { id: 'aapl', name: 'Apple Inc.', symbol: 'AAPL', icon: 'fa-brands fa-apple', basePrice: 228.40, baseChange: 0.32, unit: '$', enabled: false },
-  { id: 'msft', name: 'Microsoft', symbol: 'MSFT', icon: 'fa-brands fa-windows', basePrice: 415.20, baseChange: -0.15, unit: '$', enabled: false },
-  { id: 'btc', name: 'Bitcoin USD', symbol: 'BTC', icon: 'fa-brands fa-bitcoin', basePrice: 68420, baseChange: 2.1, unit: '$', enabled: false },
-  { id: 'eurusd', name: 'EUR / USD Forex', symbol: 'EUR/USD', icon: 'fa-solid fa-euro-sign', basePrice: 1.085, baseChange: 0.12, unit: '$', enabled: false },
-  { id: 'gold', name: 'Or (Gold / oz)', symbol: 'XAU', icon: 'fa-solid fa-coins', basePrice: 2735.50, baseChange: 0.45, unit: '$', enabled: false }
+  { id: '10ap', name: 'Amundi S&P 500 (10AP)', symbol: '10AP.DU', icon: 'fa-solid fa-chart-line', basePrice: 136.76, baseChange: 0.52, unit: '€', enabled: true },
+  { id: 'lyp6', name: 'Amundi Stoxx 600 (LYP6)', symbol: 'LYP6.DE', icon: 'fa-solid fa-landmark', basePrice: 324.95, baseChange: 0.38, unit: '€', enabled: true },
+  { id: 'xmme', name: 'Xtrackers MSCI EM (XMME)', symbol: 'XMME.DE', icon: 'fa-solid fa-earth-americas', basePrice: 76.65, baseChange: -0.42, unit: '€', enabled: true },
+  { id: 'nvda', name: 'NVIDIA Corp. (NVDA)', symbol: 'NVDA', icon: 'fa-solid fa-microchip', basePrice: 200.13, baseChange: 1.84, unit: '$', enabled: true },
+  { id: 'btc', name: 'Bitcoin USD (BTC)', symbol: 'BTC-USD', icon: 'fa-brands fa-bitcoin', basePrice: 80360, baseChange: 3.45, unit: '$', enabled: true, isVolatile: true },
+  { id: 'sol', name: 'Solana (SOL)', symbol: 'SOL-USD', icon: 'fa-solid fa-bolt', basePrice: 95.66, baseChange: -4.82, unit: '$', enabled: true, isVolatile: true },
+  { id: 'tsla', name: 'Tesla Inc. (TSLA)', symbol: 'TSLA', icon: 'fa-solid fa-car', basePrice: 248.50, baseChange: 3.12, unit: '$', enabled: true, isVolatile: true },
+  { id: 'mstr', name: 'MicroStrategy (MSTR)', symbol: 'MSTR', icon: 'fa-solid fa-fire', basePrice: 215.30, baseChange: 8.65, unit: '$', enabled: true, isVolatile: true },
+  { id: 'sp500', name: 'S&P 500 Index', symbol: '^GSPC', icon: 'fa-solid fa-chart-line', basePrice: 5864.67, baseChange: 0.41, unit: 'pts', enabled: false },
+  { id: 'eurusd', name: 'EUR / USD Forex', symbol: 'EUR/USD', icon: 'fa-solid fa-euro-sign', basePrice: 1.085, baseChange: 0.12, unit: '$', enabled: false }
 ];
 
+let isMarketVolatileFilterActive = false;
 let marketAssets = loadMarketAssets();
 
 function loadMarketAssets() {
   try {
-    const raw = localStorage.getItem('violet_market_assets_v2');
+    const raw = localStorage.getItem('violet_market_assets_v3');
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) return parsed;
@@ -910,7 +912,7 @@ function loadMarketAssets() {
 
 function saveMarketAssets() {
   try {
-    localStorage.setItem('violet_market_assets_v2', JSON.stringify(marketAssets));
+    localStorage.setItem('violet_market_assets_v3', JSON.stringify(marketAssets));
   } catch {}
 }
 
@@ -918,11 +920,19 @@ function renderMarketCards() {
   const container = document.getElementById('crypto-ticker-cards');
   if (!container) return;
 
-  const enabledAssets = marketAssets.filter((a) => a.enabled);
+  let enabledAssets = marketAssets.filter((a) => a.enabled);
+
+  if (isMarketVolatileFilterActive) {
+    // Filtrage et tri par forte volatilité du jour
+    enabledAssets = enabledAssets
+      .filter((a) => a.isVolatile || Math.abs(a.baseChange) >= 1.5)
+      .sort((a, b) => Math.abs(b.baseChange) - Math.abs(a.baseChange));
+  }
+
   if (enabledAssets.length === 0) {
     container.innerHTML = `
       <div class="market-empty-hint">
-        <span>Aucun actif sélectionné.</span>
+        <span>${isMarketVolatileFilterActive ? 'Aucun actif fortement volatile actif.' : 'Aucun actif sélectionné.'}</span>
         <button type="button" class="hub-action-btn primary" id="market-open-empty-btn"><i class="fa-solid fa-sliders"></i> Personnaliser</button>
       </div>
     `;
@@ -939,12 +949,16 @@ function renderMarketCards() {
       formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`;
     } else if (asset.unit === '$') {
       formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
+    } else if (asset.unit === '€') {
+      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
     } else {
       formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${asset.unit}`;
     }
 
     const cardTitle = isLive ? `${asset.name} • Cours en direct via API (${asset.isReal ? 'Yahoo Finance' : 'Live'})` : `${asset.name} • Cotation indicative de marché`;
     const pillText = asset.isReal ? 'Yahoo' : (isLive ? 'Live' : 'Marché');
+    const isHighVolatile = Math.abs(asset.baseChange) >= 2.5 || asset.isVolatile;
+    const volatileHtml = isHighVolatile ? `<span class="volatile-tag"><i class="fa-solid fa-fire"></i> Volatile</span>` : '';
 
     return `
       <div class="crypto-card market-card" data-asset-id="${asset.id}" title="${cardTitle}">
@@ -952,6 +966,7 @@ function renderMarketCards() {
           <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
           <span class="market-asset-name">${asset.name}</span>
           <span class="market-type-pill ${isLive ? 'live' : 'sim'}">${pillText}</span>
+          ${volatileHtml}
         </span>
         <span class="crypto-price" id="price-${asset.id}">${formattedPrice}</span>
         <span class="crypto-change ${isPositive ? 'up' : 'down'}" id="change-${asset.id}">${sign}${asset.baseChange.toFixed(2)}%</span>
@@ -1020,10 +1035,11 @@ function toggleMarketConfigDrawer() {
  */
 async function fetchYahooQuote(symbol) {
   if (!symbol) return null;
-  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
+  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
 
   const proxies = [
     `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
+    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(yahooUrl)}`,
     `https://corsproxy.io/?url=${encodeURIComponent(yahooUrl)}`,
     yahooUrl
   ];
@@ -1087,7 +1103,7 @@ async function fetchMarketRates() {
     } catch {}
   }
 
-  // 3. Récupération des vraies cotations boursières via Yahoo Finance API (S&P 500, Stoxx 600, Nvidia, Apple...)
+  // 3. Récupération des vraies cotations boursières via Yahoo Finance API (10AP, LYP6, XMME, Nvidia...)
   const yahooTasks = marketAssets
     .filter((a) => a.enabled && a.id !== 'eurusd' && a.id !== 'btc' && a.symbol)
     .map(async (asset) => {
@@ -1122,6 +1138,19 @@ function initMarketWidget() {
   renderMarketCards();
   renderMarketChecklist();
 
+  // Bouton de filtrage par forte volatilité du jour
+  const volatileFilterBtn = document.getElementById('market-filter-volatile-btn');
+  if (volatileFilterBtn) {
+    volatileFilterBtn.addEventListener('click', () => {
+      isMarketVolatileFilterActive = !isMarketVolatileFilterActive;
+      volatileFilterBtn.classList.toggle('active', isMarketVolatileFilterActive);
+      renderMarketCards();
+      if (typeof showToast === 'function') {
+        showToast(isMarketVolatileFilterActive ? 'Affichage des actifs les plus volatiles du jour' : 'Affichage de tous les actifs', 'info');
+      }
+    });
+  }
+
   // Boutons du tiroir
   const toggleBtn = document.getElementById('market-config-toggle-btn');
   const closeBtn = document.getElementById('market-config-close-btn');
@@ -1139,13 +1168,13 @@ function initMarketWidget() {
   document.querySelectorAll('.market-preset-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const preset = btn.dataset.preset;
-      if (preset === 'indices') {
+      if (preset === 'portfolio') {
         marketAssets.forEach((a) => {
-          a.enabled = ['sp500', 'stoxx600', 'emerging', 'nvda'].includes(a.id);
+          a.enabled = ['10ap', 'lyp6', 'xmme', 'nvda'].includes(a.id);
         });
-      } else if (preset === 'tech') {
+      } else if (preset === 'volatile') {
         marketAssets.forEach((a) => {
-          a.enabled = ['nvda', 'aapl', 'msft'].includes(a.id);
+          a.enabled = ['btc', 'sol', 'tsla', 'mstr', 'nvda'].includes(a.id);
         });
       } else if (preset === 'all') {
         marketAssets.forEach((a) => {

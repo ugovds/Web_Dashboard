@@ -237,11 +237,50 @@
   box-shadow: 0 0 8px #fff;
 }
 
+/* --- SALUTATION MODERNE --- */
+.clock-greeting {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.15rem;
+  display: block;
+}
+
 /* ========================================================
    STYLES DESIGN & PERSONNALISATION DE L'HORLOGE
    ======================================================== */
 
-/* 1. Glass / Verre Dépoli Moderne (Défaut) */
+/* 1. Éditorial Contemporain (Style Bonjourr / Apple) */
+.clock-style-editorial {
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+  align-items: center;
+  text-align: center;
+}
+
+.clock-style-editorial .left-clock-display {
+  align-items: center;
+}
+
+.clock-style-editorial .time-digits-box {
+  justify-content: center;
+}
+
+.clock-style-editorial .left-time-main {
+  font-size: 3.6rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+}
+
+.clock-style-editorial .left-clock-telemetry {
+  align-items: center;
+}
+
+/* 2. Glass / Verre Dépoli Moderne (Défaut) */
 .clock-style-glass,
 .clock-style-pill {
   background: rgba(255, 255, 255, 0.035);
@@ -250,7 +289,7 @@
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-/* 2. Minimaliste Pur */
+/* 3. Minimaliste Pur */
 .clock-style-minimal {
   background: transparent;
   border: 1px solid transparent;
@@ -263,7 +302,135 @@
   border-top-color: rgba(255, 255, 255, 0.06);
 }
 
-/* 3. Carte Élégante */
+/* 4. Flip Clock Rétro (Style Fliqlo) */
+.clock-style-flip {
+  background: rgba(12, 14, 22, 0.85);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+  align-items: center;
+}
+
+.clock-flip-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0;
+}
+
+.flip-unit {
+  position: relative;
+  width: 68px;
+  height: 82px;
+  background: #141721;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.flip-unit::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.85);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
+  z-index: 3;
+}
+
+.flip-digit {
+  font-size: 2.8rem;
+  font-weight: 800;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #f1f2f6;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  user-select: none;
+}
+
+.flip-sep {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  opacity: 0.75;
+  animation: flipBlink 1s step-end infinite;
+}
+
+@keyframes flipBlink {
+  50% { opacity: 0.2; }
+}
+
+/* 5. Horloge Analogique Suisse (Style Braun / Dieter Rams) */
+.clock-style-analog {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  align-items: center;
+}
+
+.clock-analog-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0;
+}
+
+.clock-analog-svg {
+  width: 155px;
+  height: 155px;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5));
+}
+
+.analog-face {
+  fill: rgba(14, 16, 24, 0.9);
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 2;
+}
+
+.analog-tick {
+  stroke: rgba(255, 255, 255, 0.25);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.analog-tick.major {
+  stroke: var(--accent-primary);
+  stroke-width: 2.5;
+}
+
+.analog-hand-hour {
+  stroke: #ffffff;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.analog-hand-min {
+  stroke: rgba(255, 255, 255, 0.9);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.analog-hand-sec {
+  stroke: #ff5555;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.analog-center-dot {
+  fill: #ff5555;
+}
+
+/* 6. Carte Élégante */
 .clock-style-card,
 .clock-style-digital {
   background: var(--surface-strong);
@@ -272,7 +439,7 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
-/* 4. Bordure Accent Néon */
+/* 7. Bordure Accent Néon */
 .clock-style-accent,
 .clock-style-brackets {
   border-left: 3px solid var(--accent-primary);
@@ -280,7 +447,7 @@
   background: var(--surface);
 }
 
-/* 5. HUD Épuré */
+/* 8. HUD Épuré */
 .clock-style-hud,
 .clock-style-glow {
   background: var(--surface);
