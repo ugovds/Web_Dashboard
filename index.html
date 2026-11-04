@@ -20,7 +20,16 @@
     />
 
     <!-- Stylesheets modulaires -->
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/clock.css" />
+    <link rel="stylesheet" href="css/search.css" />
+    <link rel="stylesheet" href="css/bookmarks.css" />
+    <link rel="stylesheet" href="css/calendar.css" />
+    <link rel="stylesheet" href="css/tasks.css" />
+    <link rel="stylesheet" href="css/deck.css" />
+    <link rel="stylesheet" href="css/widgets.css" />
+    <link rel="stylesheet" href="css/modals.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
     <link rel="stylesheet" href="css/themes/kanagawa.css" />
     <link rel="stylesheet" href="css/themes/sakura.css" />
     <link rel="stylesheet" href="css/themes/cyberdeck.css" />
@@ -50,67 +59,24 @@
             </div>
           </div>
 
-          <!-- Grand Cadre Horloge & Date Cyberdeck en bas -->
-          <div class="left-clock-card font-jetbrains clock-style-hud clock-size-medium" id="left-clock-card">
-            <!-- Reticules & Brackets de coin HUD Cyberdeck -->
-            <span class="hud-bracket top-left"></span>
-            <span class="hud-bracket top-right"></span>
-            <span class="hud-bracket bottom-left"></span>
-            <span class="hud-bracket bottom-right"></span>
-
+          <!-- Grand Cadre Horloge & Date Moderne -->
+          <div class="left-clock-card font-inter clock-style-glass clock-size-medium" id="left-clock-card">
             <div class="clock-card-top">
-              <span class="clock-deck-label">
-                <span class="pulse-dot"></span>
-                <span id="clock-sys-tag">CHRONO-HUD // V4</span>
-              </span>
-              <button type="button" id="clock-mode-toggle" class="clock-tz-pill clock-mode-pill" title="Basculer entre Horloge et Compte à rebours">
-                <i id="clock-mode-icon" class="fa-solid fa-clock"></i> <span id="clock-mode-label">Horloge</span>
-              </button>
               <button type="button" id="clock-tz-badge" class="clock-tz-pill" title="Cliquer pour changer de fuseau horaire">
                 <i class="fa-solid fa-globe"></i> LOCAL • PARIS
               </button>
+              <button type="button" id="clock-mode-toggle" class="clock-tz-pill clock-mode-pill" title="Basculer entre Horloge et Compte à rebours">
+                <i id="clock-mode-icon" class="fa-solid fa-clock"></i> <span id="clock-mode-label">Horloge</span>
+              </button>
             </div>
 
-            <!-- Stage Central HUD avec Gauge Radiale SVG & Digits Néon -->
-            <div class="clock-hud-stage" id="clock-hud-stage">
-              <svg class="clock-radial-svg" viewBox="0 0 220 220">
-                <defs>
-                  <linearGradient id="hudArcGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="var(--accent-secondary)" />
-                    <stop offset="100%" stop-color="var(--accent-primary)" />
-                  </linearGradient>
-                </defs>
-                <!-- Ticks et piste de fond -->
-                <circle class="hud-track-circle" cx="110" cy="110" r="96"></circle>
-                <!-- Arc dynamique des secondes (circonférence = 2 * PI * 96 ≈ 603.18) -->
-                <circle
-                  id="clock-sec-arc"
-                  class="hud-sec-arc"
-                  cx="110"
-                  cy="110"
-                  r="96"
-                  stroke-dasharray="603.18"
-                  stroke-dashoffset="0"
-                ></circle>
-                <!-- Reticules et repères cardinaux -->
-                <line class="hud-reticle r-top" x1="110" y1="6" x2="110" y2="16"></line>
-                <line class="hud-reticle r-right" x1="204" y1="110" x2="214" y2="110"></line>
-                <line class="hud-reticle r-bottom" x1="110" y1="204" x2="110" y2="214"></line>
-                <line class="hud-reticle r-left" x1="6" y1="110" x2="16" y2="110"></line>
-                <text x="110" y="24" class="hud-cardinal">60</text>
-                <text x="198" y="113" class="hud-cardinal">15</text>
-                <text x="110" y="202" class="hud-cardinal">30</text>
-                <text x="22" y="113" class="hud-cardinal">45</text>
-              </svg>
-
-              <!-- Affichage digital central de l'heure -->
-              <div class="left-clock-display" id="left-clock-display">
-                <div class="time-digits-box">
-                  <span id="time" class="left-time-main">00:00:00</span>
-                  <span id="clock-ms-tick" class="clock-ms-tick">.00</span>
-                </div>
-                <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
+            <!-- Affichage moderne et épuré de l'heure -->
+            <div class="left-clock-display" id="left-clock-display">
+              <div class="time-digits-box">
+                <span id="time" class="left-time-main">00:00:00</span>
+                <span id="clock-ms-tick" class="clock-ms-tick" style="display: none;">.00</span>
               </div>
+              <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
             </div>
 
             <!-- Télémétrie Calendaire & Cycle Solaire -->
@@ -148,19 +114,6 @@
                   <span class="progress-glow-head"></span>
                 </div>
               </div>
-            </div>
-
-            <!-- Pied de page télémétrique HUD -->
-            <div class="clock-status-footer">
-              <div class="hud-wave-box" title="Signal système actif">
-                <span class="hud-wave-bar bar-1"></span>
-                <span class="hud-wave-bar bar-2"></span>
-                <span class="hud-wave-bar bar-3"></span>
-                <span class="hud-wave-bar bar-4"></span>
-                <span class="hud-wave-bar bar-5"></span>
-              </div>
-              <span class="pulse-dot"></span>
-              <span id="clock-status-tag">SYSTEM SYNCED • 60 FPS</span>
             </div>
           </div>
         </aside>
@@ -287,6 +240,10 @@
                     <div id="tasks-progress-mini-fill" class="tasks-progress-mini-fill" style="width: 0%;"></div>
                   </div>
 
+                  <!-- Liste défilante des tâches -->
+                  <ul id="todo-list" class="todo-list merged-todo-list"></ul>
+
+                  <!-- Ajouteur de tâches positionné en bas -->
                   <form id="todo-form" class="todo-input-row">
                     <input
                       id="todo-input"
@@ -306,8 +263,6 @@
                     />
                     <button type="submit" class="todo-add-btn" title="Ajouter"><i class="fa-solid fa-plus"></i></button>
                   </form>
-
-                  <ul id="todo-list" class="todo-list merged-todo-list"></ul>
                 </div>
               </div>
 
@@ -863,37 +818,32 @@
 
                     <!-- 2. Style visuel du cadre -->
                     <div class="clock-section">
-                      <label class="section-label">Style du Cadre & Effet Visuel :</label>
+                      <label class="section-label">Style du Cadre & Design :</label>
                       <div class="clock-styles-grid">
-                        <button type="button" class="clock-style-card-btn active" data-clock-style="pill">
-                          <div class="style-icon-preview"><i class="fa-solid fa-capsules"></i></div>
-                          <span class="style-title">Pilule Verre Néon</span>
-                          <span class="style-desc">Arrondie translucide</span>
-                        </button>
-                        <button type="button" class="clock-style-card-btn" data-clock-style="brackets">
-                          <div class="style-icon-preview"><i class="fa-solid fa-code"></i></div>
-                          <span class="style-title">Crochets Cyber [ ]</span>
-                          <span class="style-desc">Style console dev</span>
-                        </button>
-                        <button type="button" class="clock-style-card-btn" data-clock-style="glow">
-                          <div class="style-icon-preview"><i class="fa-solid fa-sun"></i></div>
-                          <span class="style-title">Lueur Intense Néon</span>
-                          <span class="style-desc">Pulsation & aura</span>
-                        </button>
-                        <button type="button" class="clock-style-card-btn" data-clock-style="digital">
-                          <div class="style-icon-preview"><i class="fa-solid fa-square"></i></div>
-                          <span class="style-title">Digital Box LCD</span>
-                          <span class="style-desc">Cadran rétro encadré</span>
+                        <button type="button" class="clock-style-card-btn active" data-clock-style="glass">
+                          <div class="style-icon-preview"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                          <span class="style-title">Verre Dépoli</span>
+                          <span class="style-desc">Design moderne & flou</span>
                         </button>
                         <button type="button" class="clock-style-card-btn" data-clock-style="minimal">
                           <div class="style-icon-preview"><i class="fa-solid fa-minus"></i></div>
                           <span class="style-title">Minimaliste</span>
-                          <span class="style-desc">Texte pur néon</span>
+                          <span class="style-desc">Typographie pure</span>
+                        </button>
+                        <button type="button" class="clock-style-card-btn" data-clock-style="card">
+                          <div class="style-icon-preview"><i class="fa-solid fa-square"></i></div>
+                          <span class="style-title">Carte Élégante</span>
+                          <span class="style-desc">Surface contrastée</span>
+                        </button>
+                        <button type="button" class="clock-style-card-btn" data-clock-style="accent">
+                          <div class="style-icon-preview"><i class="fa-solid fa-border-left"></i></div>
+                          <span class="style-title">Bordure Accent</span>
+                          <span class="style-desc">Liseré coloré moderne</span>
                         </button>
                         <button type="button" class="clock-style-card-btn" data-clock-style="hud">
                           <div class="style-icon-preview"><i class="fa-solid fa-crosshairs"></i></div>
-                          <span class="style-title">HUD Cyberdeck</span>
-                          <span class="style-desc">Viseurs sci-fi</span>
+                          <span class="style-title">Technique Épuré</span>
+                          <span class="style-desc">Instrument haute précision</span>
                         </button>
                       </div>
                     </div>

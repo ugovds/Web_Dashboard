@@ -1,0 +1,128 @@
+/* ========================================================
+   css/deck.css - Colonne Droite, Navigation & Onglets Glissants
+   ======================================================== */
+
+.col-right {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.unified-deck-card {
+  flex: 1;
+  height: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+}
+
+.deck-view-header {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.deck-view-nav {
+  position: relative;
+  display: flex;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.deck-view-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.deck-nav-btn {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.38rem 0.55rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 7px;
+  z-index: 2;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.deck-nav-btn i {
+  font-size: 0.78rem;
+}
+
+.deck-nav-btn:hover {
+  color: var(--accent-white);
+}
+
+.deck-nav-btn.active {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.deck-nav-indicator {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: calc(100% - 6px);
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--border-highlight);
+  border-radius: 7px;
+  z-index: 1;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.deck-views-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.deck-slide-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 0.9rem 1rem;
+  animation: deckSlideFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.deck-slide-view[hidden] {
+  display: none !important;
+}
+
+@keyframes deckSlideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

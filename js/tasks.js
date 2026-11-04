@@ -59,9 +59,10 @@ function getTaskDatesMap() {
   const map = {};
   todos.forEach((t) => {
     if (t.date) {
-      if (!map[t.date]) map[t.date] = { pending: 0, done: 0 };
+      if (!map[t.date]) map[t.date] = { pending: 0, done: 0, tasks: [] };
       if (t.done) map[t.date].done++;
       else map[t.date].pending++;
+      map[t.date].tasks.push(t);
     }
   });
   return map;

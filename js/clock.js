@@ -9,8 +9,8 @@
  */
 
 const defaultClockSettings = {
-  font: 'jetbrains', // 'jetbrains', 'orbitron', 'share-tech', 'vt323', 'inter'
-  style: 'hud', // 'hud', 'glow', 'digital', 'pill', 'brackets', 'minimal'
+  font: 'inter', // 'inter', 'jetbrains', 'orbitron', 'share-tech', 'vt323'
+  style: 'glass', // 'glass', 'minimal', 'card', 'accent', 'hud'
   format24h: true,
   showSeconds: true,
   showDate: true,
@@ -33,6 +33,9 @@ function loadClockSettings() {
     const saved = localStorage.getItem('startpage_clock_settings');
     if (saved) {
       currentClockSettings = { ...defaultClockSettings, ...JSON.parse(saved) };
+      // Normalisation des styles rétro vers les nouveaux styles modernes
+      if (['pill', 'glow'].includes(currentClockSettings.style)) currentClockSettings.style = 'glass';
+      if (['brackets', 'digital'].includes(currentClockSettings.style)) currentClockSettings.style = 'card';
     }
   } catch {
     currentClockSettings = structuredClone(defaultClockSettings);
@@ -56,13 +59,14 @@ function applyClockSettings() {
 
     // Réinitialiser les classes dynamiques
     wrap.classList.remove(
-      'font-jetbrains', 'font-orbitron', 'font-share-tech', 'font-vt323', 'font-inter',
-      'clock-style-hud', 'clock-style-glow', 'clock-style-digital', 'clock-style-pill', 'clock-style-brackets', 'clock-style-minimal',
+      'font-inter', 'font-jetbrains', 'font-orbitron', 'font-share-tech', 'font-vt323',
+      'clock-style-glass', 'clock-style-minimal', 'clock-style-card', 'clock-style-accent', 'clock-style-hud',
+      'clock-style-glow', 'clock-style-digital', 'clock-style-pill', 'clock-style-brackets',
       'clock-size-small', 'clock-size-medium', 'clock-size-large'
     );
 
-    wrap.classList.add(`font-${currentClockSettings.font || 'jetbrains'}`);
-    wrap.classList.add(`clock-style-${currentClockSettings.style || 'hud'}`);
+    wrap.classList.add(`font-${currentClockSettings.font || 'inter'}`);
+    wrap.classList.add(`clock-style-${currentClockSettings.style || 'glass'}`);
     wrap.classList.add(`clock-size-${currentClockSettings.size || 'medium'}`);
   });
 

@@ -931,7 +931,7 @@ function renderMarketCards() {
   }
 
   container.innerHTML = enabledAssets.map((asset) => {
-    const isLive = asset.id === 'eurusd' || asset.id === 'btc';
+    const isLive = asset.id === 'eurusd' || asset.id === 'btc' || asset.isReal;
     const isPositive = asset.baseChange >= 0;
     const sign = isPositive ? '+' : '';
     let formattedPrice = '';
@@ -943,14 +943,15 @@ function renderMarketCards() {
       formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${asset.unit}`;
     }
 
-    const cardTitle = isLive ? `${asset.name} • Cours en direct via API` : `${asset.name} • Cotation indicative de référence`;
+    const cardTitle = isLive ? `${asset.name} • Cours en direct via API (${asset.isReal ? 'Yahoo Finance' : 'Live'})` : `${asset.name} • Cotation indicative de marché`;
+    const pillText = asset.isReal ? 'Yahoo' : (isLive ? 'Live' : 'Marché');
 
     return `
       <div class="crypto-card market-card" data-asset-id="${asset.id}" title="${cardTitle}">
         <span class="crypto-coin">
           <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
           <span class="market-asset-name">${asset.name}</span>
-          <span class="market-type-pill ${isLive ? 'live' : 'sim'}">${isLive ? 'Live' : 'Indicatif'}</span>
+          <span class="market-type-pill ${isLive ? 'live' : 'sim'}">${pillText}</span>
         </span>
         <span class="crypto-price" id="price-${asset.id}">${formattedPrice}</span>
         <span class="crypto-change ${isPositive ? 'up' : 'down'}" id="change-${asset.id}">${sign}${asset.baseChange.toFixed(2)}%</span>
@@ -1013,6 +1014,42 @@ function toggleMarketConfigDrawer() {
   }
 }
 
+/**
+ * Récupère la cotation réelle d'un actif via l'API Yahoo Finance
+ * avec bascule automatique entre proxys CORS sécurisés
+ */
+async function fetchYahooQuote(symbol) {
+  if (!symbol) return null;
+  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
+
+  const proxies = [
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
+    `https://corsproxy.io/?url=${encodeURIComponent(yahooUrl)}`,
+    yahooUrl
+  ];
+
+  for (const url of proxies) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500);
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        const meta = data?.chart?.result?.[0]?.meta;
+        if (meta && typeof meta.regularMarketPrice === 'number') {
+          const price = meta.regularMarketPrice;
+          const prevClose = meta.chartPreviousClose || meta.previousClose || price;
+          const change = prevClose ? ((price - prevClose) / prevClose) * 100 : 0;
+          return { price, change };
+        }
+      }
+    } catch {}
+  }
+  return null;
+}
+
 async function fetchMarketRates() {
   const refreshBtn = document.getElementById('crypto-refresh-btn');
   if (refreshBtn) refreshBtn.querySelector('i')?.classList.add('fa-spin');
@@ -1026,6 +1063,7 @@ async function fetchMarketRates() {
         const data = await res.json();
         if (data.rates && data.rates.USD) {
           eurUsdAsset.basePrice = Number(data.rates.USD.toFixed(4));
+          eurUsdAsset.isReal = true;
         }
       }
     } catch {}
@@ -1043,21 +1081,25 @@ async function fetchMarketRates() {
           if (data.bitcoin.usd_24h_change) {
             btcAsset.baseChange = Number(data.bitcoin.usd_24h_change.toFixed(2));
           }
+          btcAsset.isReal = true;
         }
       }
     } catch {}
   }
 
-  // 3. Fluctuation réaliste des indices et actions (S&P 500, Europe Stoxx 600, Emerging Markets, NVIDIA, etc.)
-  marketAssets.forEach((asset) => {
-    if (asset.id !== 'eurusd' && asset.id !== 'btc') {
-      // Micro-tick de marché en temps réel (+/- 0.04% à 0.08%)
-      const deltaFactor = 1 + (Math.random() * 0.0016 - 0.0008);
-      asset.basePrice = Number((asset.basePrice * deltaFactor).toFixed(2));
-      const changeDelta = Number((Math.random() * 0.06 - 0.03).toFixed(2));
-      asset.baseChange = Number((asset.baseChange + changeDelta).toFixed(2));
-    }
-  });
+  // 3. Récupération des vraies cotations boursières via Yahoo Finance API (S&P 500, Stoxx 600, Nvidia, Apple...)
+  const yahooTasks = marketAssets
+    .filter((a) => a.enabled && a.id !== 'eurusd' && a.id !== 'btc' && a.symbol)
+    .map(async (asset) => {
+      const quote = await fetchYahooQuote(asset.symbol);
+      if (quote) {
+        asset.basePrice = Number(quote.price.toFixed(2));
+        asset.baseChange = Number(quote.change.toFixed(2));
+        asset.isReal = true;
+      }
+    });
+
+  await Promise.allSettled(yahooTasks);
 
   saveMarketAssets();
   renderMarketCards();

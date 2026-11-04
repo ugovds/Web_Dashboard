@@ -1,0 +1,170 @@
+/* ========================================================
+   css/search.css - Barre de Recherche, Badge Moteur & Suggestions
+   ======================================================== */
+
+.search-wrapper {
+  position: relative;
+  z-index: 50;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.15rem;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  backdrop-filter: blur(20px);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.search-box:focus-within {
+  border-color: var(--border-highlight);
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.35);
+}
+
+.engine-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-highlight);
+  color: var(--accent-primary);
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.prompt-arrow {
+  color: var(--accent-secondary);
+  font-weight: 700;
+}
+
+.search-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--accent-white);
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+
+.search-box input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+.search-box input:focus {
+  outline: none;
+}
+
+.calc-preview {
+  padding: 0.2rem 0.6rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-highlight);
+  color: var(--accent-primary);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.shortcut-hint {
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+}
+
+/* Menu déroulant de suggestions */
+.suggestions-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: 340px;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-highlight);
+  border-radius: 14px;
+  padding: 0.45rem;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.suggestions-dropdown[hidden] {
+  display: none !important;
+}
+
+.help-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.68rem;
+  color: var(--accent-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0.2rem;
+}
+
+.suggestion-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  border-radius: 9px;
+  cursor: pointer;
+  color: var(--text-main);
+  font-size: 0.84rem;
+  transition: all 0.15s ease;
+}
+
+.suggestion-item:hover,
+.suggestion-item.active {
+  background: rgba(255, 255, 255, 0.09);
+  color: var(--accent-white);
+}
+
+.sug-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sug-left i {
+  width: 18px;
+  text-align: center;
+  color: var(--accent-primary);
+  font-size: 0.9rem;
+}
+
+.sug-match {
+  color: var(--text-muted);
+}
+
+.sug-text strong {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.sug-badge {
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+}
+
+.sug-badge.shortcut {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-highlight);
+  color: var(--accent-primary);
+}
+
