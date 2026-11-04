@@ -63,6 +63,9 @@
                 <span class="pulse-dot"></span>
                 <span id="clock-sys-tag">CHRONO-HUD // V4</span>
               </span>
+              <button type="button" id="clock-mode-toggle" class="clock-tz-pill clock-mode-pill" title="Basculer entre Horloge et Compte à rebours">
+                <i id="clock-mode-icon" class="fa-solid fa-clock"></i> <span id="clock-mode-label">Horloge</span>
+              </button>
               <button type="button" id="clock-tz-badge" class="clock-tz-pill" title="Cliquer pour changer de fuseau horaire">
                 <i class="fa-solid fa-globe"></i> LOCAL • PARIS
               </button>
@@ -195,39 +198,39 @@
             <!-- Sélecteur d'onglets glissant (scrollable horizontal) -->
             <div class="deck-view-header">
               <div class="deck-view-nav" id="deck-view-nav">
-                <button type="button" class="deck-nav-btn active" data-deck-view="agenda" title="Agenda & Tâches">
+                <button type="button" class="deck-nav-btn active" data-deck-view="agenda" title="Agenda & Tâches (Alt+1)">
                   <i class="fa-regular fa-calendar-check"></i>
                   <span>Agenda</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="weather" data-widget-nav="weather" title="Météo Détaillée">
+                <button type="button" class="deck-nav-btn" data-deck-view="weather" data-widget-nav="weather" title="Météo Détaillée (Alt+2)">
                   <i class="fa-solid fa-cloud-sun"></i>
                   <span>Météo</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="feeds" data-widget-nav="feeds" title="Actualités en direct">
+                <button type="button" class="deck-nav-btn" data-deck-view="feeds" data-widget-nav="feeds" title="Actualités en direct (Alt+3)">
                   <i class="fa-solid fa-newspaper"></i>
                   <span>Actus</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="system" data-widget-nav="system" title="Moniteur Système & Marchés">
+                <button type="button" class="deck-nav-btn" data-deck-view="system" data-widget-nav="system" title="Moniteur Système & Marchés (Alt+4)">
                   <i class="fa-solid fa-microchip"></i>
                   <span>Système</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="pomodoro" data-widget-nav="pomodoro" title="Minuteur Focus / Pomodoro">
+                <button type="button" class="deck-nav-btn" data-deck-view="pomodoro" data-widget-nav="pomodoro" title="Minuteur Focus / Pomodoro (Alt+5)">
                   <i class="fa-solid fa-stopwatch"></i>
                   <span>Focus</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="notes" data-widget-nav="notes" title="Bloc-Notes Rapide">
+                <button type="button" class="deck-nav-btn" data-deck-view="notes" data-widget-nav="notes" title="Bloc-Notes Rapide (Alt+6)">
                   <i class="fa-solid fa-note-sticky"></i>
                   <span>Notes</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="ambient" data-widget-nav="ambient" title="Ambiance Sonore">
+                <button type="button" class="deck-nav-btn" data-deck-view="ambient" data-widget-nav="ambient" title="Ambiance Sonore (Alt+7)">
                   <i class="fa-solid fa-headphones"></i>
                   <span>Ambiance</span>
                 </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="quotes" data-widget-nav="quotes" title="Citations & Motivation Dev">
+                <button type="button" class="deck-nav-btn" data-deck-view="quotes" data-widget-nav="quotes" title="Citations & Motivation Dev (Alt+8)">
                   <i class="fa-solid fa-quote-left"></i>
                   <span>Quotes</span>
                 </button>
-                <button type="button" class="deck-nav-btn deck-nav-config" data-deck-view="customize" title="Personnalisation de la Startpage">
+                <button type="button" class="deck-nav-btn deck-nav-config" data-deck-view="customize" title="Personnalisation de la Startpage (Alt+9)">
                   <i class="fa-solid fa-sliders"></i>
                   <span>Config</span>
                 </button>
@@ -266,6 +269,13 @@
                       <button type="button" class="task-filter-btn active" data-filter="all">Toutes</button>
                       <button type="button" class="task-filter-btn" data-filter="pending">À faire</button>
                       <button type="button" class="task-filter-btn" data-filter="done">Faites</button>
+                      <button type="button" class="task-filter-btn" data-filter="today" title="Afficher uniquement les tâches du jour">Auj.</button>
+                      <button type="button" id="task-sort-btn" class="task-filter-btn task-action-chip" title="Changer l'ordre de tri : Normal / Priorité / Échéance">
+                        <i class="fa-solid fa-arrow-down-short-wide"></i> <span id="task-sort-label">Tri</span>
+                      </button>
+                      <button type="button" id="task-export-ics-btn" class="task-filter-btn task-action-chip" title="Exporter l'agenda vers votre calendrier (.ics)">
+                        <i class="fa-solid fa-calendar-arrow-down"></i> .ics
+                      </button>
                       <button id="clear-date-filter" class="filter-chip" hidden title="Afficher toutes les dates">
                         <span id="filter-date-label"></span> &times;
                       </button>
@@ -281,9 +291,14 @@
                     <input
                       id="todo-input"
                       type="text"
-                      placeholder="+ Ajouter une tâche ou échéance..."
+                      placeholder="+ Ajouter une tâche... (Touche T pour cibler)"
                       autocomplete="off"
                     />
+                    <select id="todo-priority" class="todo-priority-select" title="Niveau de priorité">
+                      <option value="urgent">🔴 Urgent</option>
+                      <option value="normal" selected>🟡 Normal</option>
+                      <option value="low">🟢 Faible</option>
+                    </select>
                     <input
                       id="todo-date"
                       type="date"
@@ -302,9 +317,13 @@
                   <div class="weather-deck-search">
                     <input type="text" id="deck-city-input" placeholder="Changer de ville (Paris, Tokyo...)" />
                     <button type="button" id="deck-city-search-btn" class="deck-icon-action" title="Rechercher"><i class="fa-solid fa-magnifying-glass"></i></button>
+                    <button type="button" id="deck-city-fav-btn" class="deck-icon-action" title="Ajouter / Retirer des favoris"><i class="fa-regular fa-star"></i></button>
                     <button type="button" id="deck-city-gps-btn" class="deck-icon-action" title="Détection automatique"><i class="fa-solid fa-location-crosshairs"></i></button>
                     <button type="button" id="deck-weather-refresh-btn" class="deck-icon-action" title="Actualiser"><i class="fa-solid fa-rotate-right"></i></button>
                   </div>
+
+                  <!-- Barre des villes favorites -->
+                  <div id="weather-favorites-bar" class="weather-favorites-bar"></div>
 
                   <div class="weather-deck-hero">
                     <div class="weather-hero-left">
@@ -390,6 +409,18 @@
                         <span id="sys-ping-val" class="telemetry-number">-- ms</span>
                       </div>
                       <span id="sys-ping-state" class="telemetry-sub">Mesure...</span>
+                      <div class="ping-sparkline-wrap">
+                        <svg id="sys-ping-sparkline" class="ping-sparkline" viewBox="0 0 100 24" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="pingGrad" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stop-color="var(--accent-primary)" stop-opacity="0.45"/>
+                              <stop offset="100%" stop-color="var(--accent-primary)" stop-opacity="0.0"/>
+                            </linearGradient>
+                          </defs>
+                          <path class="ping-spark-area" fill="url(#pingGrad)" d=""></path>
+                          <path class="ping-spark-line" fill="none" stroke="var(--accent-primary)" stroke-width="1.8" d=""></path>
+                        </svg>
+                      </div>
                     </div>
 
                     <div class="telemetry-card" id="sys-power-card">
@@ -535,17 +566,19 @@
                   <div class="notes-panel-header">
                     <span class="notes-stats-info" id="notes-stats-info">0 mot • 0 car.</span>
                     <div class="notes-actions-group">
+                      <button type="button" id="notes-markdown-toggle" class="deck-icon-action" title="Basculer aperçu Markdown (Lecture / Édition)"><i class="fa-brands fa-markdown"></i></button>
                       <button type="button" id="notes-copy-btn" class="deck-icon-action" title="Copier le texte"><i class="fa-regular fa-copy"></i></button>
-                      <button type="button" id="notes-download-btn" class="deck-icon-action" title="Télécharger .txt"><i class="fa-solid fa-download"></i></button>
+                      <button type="button" id="notes-download-btn" class="deck-icon-action" title="Télécharger .md"><i class="fa-solid fa-download"></i></button>
                       <button type="button" id="notes-clear-btn" class="deck-icon-action danger" title="Effacer tout"><i class="fa-regular fa-trash-can"></i></button>
                     </div>
                   </div>
 
-                  <textarea id="notes-editor" class="notes-editor" placeholder="Bloc-notes rapide en temps réel... (sauvegarde automatique continue dans le navigateur)"></textarea>
+                  <textarea id="notes-editor" class="notes-editor" placeholder="Bloc-notes rapide en temps réel... (sauvegarde automatique continue, supporte le Markdown)"></textarea>
+                  <div id="notes-preview" class="notes-preview markdown-body" hidden></div>
 
                   <div class="notes-panel-footer">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span>Sauvegarde locale active</span>
+                    <span id="notes-status-text">Sauvegarde locale active</span>
                   </div>
                 </div>
               </div>
@@ -619,9 +652,36 @@
                     <button type="button" id="quote-btn-next" class="modal-btn primary">
                       <i class="fa-solid fa-shuffle"></i> Autre Citation
                     </button>
+                    <button type="button" id="quote-btn-add" class="modal-btn secondary" title="Ajouter votre propre citation">
+                      <i class="fa-solid fa-plus"></i> Citation
+                    </button>
+                    <button type="button" id="quote-btn-delete" class="modal-btn danger" title="Supprimer cette citation personnalisée" hidden>
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
                     <button type="button" id="quote-btn-copy" class="modal-btn secondary" title="Copier la citation">
                       <i class="fa-regular fa-copy"></i>
                     </button>
+                  </div>
+
+                  <!-- Formulaire d'ajout de citation -->
+                  <div id="quote-add-modal" class="quote-add-box" hidden>
+                    <div class="quote-add-header">
+                      <span><i class="fa-solid fa-quote-left"></i> Ajouter une citation</span>
+                      <button type="button" id="quote-add-close" class="modal-close">&times;</button>
+                    </div>
+                    <form id="quote-add-form" class="modal-form">
+                      <div class="form-row">
+                        <textarea id="quote-new-text" placeholder="Entrez la citation..." required rows="2" class="quote-new-input"></textarea>
+                      </div>
+                      <div class="form-row quote-double-inputs">
+                        <input type="text" id="quote-new-author" placeholder="Auteur (ex: Linus Torvalds)" required class="quote-new-input" />
+                        <input type="text" id="quote-new-source" placeholder="Source / Contexte (optionnel)" class="quote-new-input" />
+                      </div>
+                      <div class="modal-actions">
+                        <button type="button" id="quote-add-cancel" class="modal-btn secondary">Annuler</button>
+                        <button type="submit" class="modal-btn primary">Enregistrer</button>
+                      </div>
+                    </form>
                   </div>
                 </div>
               </div>
@@ -731,6 +791,11 @@
                         <label class="fx-toggle-label">
                           <span>Effet Scanlines rétro (lignes cathodiques)</span>
                           <input type="checkbox" id="appearance-scanlines-check" checked />
+                          <span class="switch-slider"></span>
+                        </label>
+                        <label class="fx-toggle-label">
+                          <span>Mode Nuit / Atténuation HUD (Ctrl+Shift+D)</span>
+                          <input type="checkbox" id="appearance-dim-check" />
                           <span class="switch-slider"></span>
                         </label>
                       </div>
@@ -881,6 +946,28 @@
                             <option value="medium" selected>Standard (Défaut)</option>
                             <option value="large">Grande & Imposante</option>
                           </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- 4. Mode Compte à Rebours (Countdown HUD) -->
+                    <div class="clock-section">
+                      <label class="section-label"><i class="fa-solid fa-hourglass-start"></i> Mode Compte à Rebours (Countdown HUD) :</label>
+                      <div class="clock-countdown-config-card">
+                        <label class="fx-toggle-label">
+                          <span>Activer l'affichage compte à rebours sur l'horloge</span>
+                          <input type="checkbox" id="clock-opt-countdown" />
+                          <span class="switch-slider"></span>
+                        </label>
+                        <div class="clock-countdown-inputs-grid">
+                          <div class="form-row">
+                            <label for="clock-countdown-target">Heure cible (HH:MM ou Date ISO) :</label>
+                            <input type="text" id="clock-countdown-target" placeholder="Ex: 18:00 ou 2026-12-31T23:59" class="config-input" />
+                          </div>
+                          <div class="form-row">
+                            <label for="clock-countdown-label">Libellé de l'objectif :</label>
+                            <input type="text" id="clock-countdown-label" placeholder="Ex: Fin de journée, Rendu projet..." class="config-input" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1197,6 +1284,34 @@
       </div>
     </div>
 
+    <!-- MODALE COMMAND PALETTE & RECHERCHE GLOBALE DE SIGNETS (Ctrl+K / B) -->
+    <div id="command-palette-modal" class="modal-backdrop command-palette-backdrop" hidden>
+      <div class="command-palette-box">
+        <div class="command-palette-header">
+          <i class="fa-solid fa-terminal command-palette-icon"></i>
+          <input
+            type="text"
+            id="command-palette-input"
+            class="command-palette-input"
+            placeholder="Rechercher un signet, une catégorie ou une commande... (Échap pour fermer)"
+            autocomplete="off"
+          />
+          <kbd class="palette-kbd">ESC</kbd>
+        </div>
+        <div class="command-palette-body">
+          <ul id="command-palette-list" class="command-palette-results"></ul>
+        </div>
+        <div class="command-palette-footer">
+          <div class="palette-shortcuts-hint">
+            <span><kbd>&uarr;</kbd><kbd>&darr;</kbd> Naviguer</span>
+            <span><kbd>Entrée</kbd> Ouvrir</span>
+            <span><kbd>Échap</kbd> Fermer</span>
+          </div>
+          <span id="palette-count-badge" class="palette-count-badge">0 résultat</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Scripts JavaScript modulaires -->
     <script src="js/themes.js"></script>
     <script src="js/appearance.js"></script>
@@ -1210,6 +1325,7 @@
     <script src="js/bookmarks.js"></script>
     <script src="js/widgets.js"></script>
     <script src="js/custom-hub.js"></script>
+    <script src="js/command-palette.js"></script>
     <script src="js/shortcuts.js"></script>
     <script src="js/app.js"></script>
   </body>

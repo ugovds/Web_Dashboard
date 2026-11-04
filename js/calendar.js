@@ -85,8 +85,15 @@ function initCalendar() {
   if (calTodayBtn) {
     calTodayBtn.addEventListener('click', () => {
       calDate = new Date();
+      const todayIso = typeof toISODate === 'function' ? toISODate(new Date()) : null;
+      const current = typeof getSelectedDateFilter === 'function' ? getSelectedDateFilter() : null;
       if (typeof setDateFilter === 'function') {
-        setDateFilter(null);
+        // Alterne entre le filtre du jour et toutes les tâches
+        if (current === todayIso) {
+          setDateFilter(null);
+        } else {
+          setDateFilter(todayIso);
+        }
       } else {
         renderCalendar();
       }

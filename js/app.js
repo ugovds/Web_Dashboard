@@ -54,5 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initCalendar === 'function') initCalendar();
   if (typeof initSearch === 'function') initSearch();
   if (typeof initFeeds === 'function') initFeeds();
+  if (typeof initCommandPalette === 'function') initCommandPalette();
   if (typeof initShortcuts === 'function') initShortcuts();
 });
