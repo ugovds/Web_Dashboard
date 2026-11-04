@@ -54,9 +54,20 @@ function loadAppearanceSettings() {
   }
 }
 
+let appearanceSaveDebounceTimer = null;
+
 function saveAppearanceSettings() {
+  clearTimeout(appearanceSaveDebounceTimer);
   localStorage.setItem('startpage_appearance', JSON.stringify(currentAppearance));
   applyAppearance();
+}
+
+function debouncedSaveAppearanceSettings() {
+  applyAppearance();
+  clearTimeout(appearanceSaveDebounceTimer);
+  appearanceSaveDebounceTimer = setTimeout(() => {
+    localStorage.setItem('startpage_appearance', JSON.stringify(currentAppearance));
+  }, 120);
 }
 
 function applyAppearance() {
@@ -236,9 +247,45 @@ function toggleDimMode() {
   }
 }
 
+function getUserCustomThemes() {
+  try {
+    const raw = localStorage.getItem('startpage_user_custom_themes');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [];
+}
+
+function saveUserCustomThemes(themes) {
+  localStorage.setItem('startpage_user_custom_themes', JSON.stringify(themes));
+  renderUserCustomThemes();
+}
+
+function renderUserCustomThemes() {
+  const container = document.getElementById('appearance-custom-themes-list');
+  if (!container) return;
+
+  const themes = getUserCustomThemes();
+  if (themes.length === 0) {
+    container.innerHTML = '<span class="fav-empty-hint">Aucun thème personnalisé créé pour le moment.</span>';
+    return;
+  }
+
+  container.innerHTML = themes
+    .map((t, idx) => `
+      <div class="custom-theme-chip" data-theme-idx="${idx}" title="Appliquer ${escapeHtml(t.name)}">
+        <span class="custom-theme-dot" style="background:${t.primary};"></span>
+        <span class="custom-theme-dot" style="background:${t.secondary};"></span>
+        <span>${escapeHtml(t.name)}</span>
+        <button type="button" class="custom-theme-chip-delete" data-del-theme="${idx}" title="Supprimer ce thème">&times;</button>
+      </div>
+    `)
+    .join('');
+}
+
 function initAppearance() {
   loadAppearanceSettings();
   renderPalettesList();
+  renderUserCustomThemes();
   applyAppearance();
 
   const resetBtn = document.getElementById('appearance-reset-btn');
@@ -250,6 +297,9 @@ function initAppearance() {
   const opacityValDisplay = document.getElementById('appearance-opacity-val');
   const scanlinesCheck = document.getElementById('appearance-scanlines-check');
   const dimCheck = document.getElementById('appearance-dim-check');
+  const customThemeForm = document.getElementById('custom-theme-create-form');
+  const customThemeNameInput = document.getElementById('custom-theme-name-input');
+  const customThemesContainer = document.getElementById('appearance-custom-themes-list');
 
   if (dimCheck) {
     dimCheck.addEventListener('change', () => {
@@ -261,17 +311,18 @@ function initAppearance() {
     });
   }
 
+  // Utilisation du debounce de sauvegarde pour optimiser les performances de saisie
   if (colorPrimaryInput) {
     colorPrimaryInput.addEventListener('input', () => {
       currentAppearance.customAccent = colorPrimaryInput.value;
-      saveAppearanceSettings();
+      debouncedSaveAppearanceSettings();
     });
   }
 
   if (colorSecondaryInput) {
     colorSecondaryInput.addEventListener('input', () => {
       currentAppearance.customAccentSecondary = colorSecondaryInput.value;
-      saveAppearanceSettings();
+      debouncedSaveAppearanceSettings();
     });
   }
 
@@ -279,7 +330,7 @@ function initAppearance() {
     blurSlider.addEventListener('input', () => {
       currentAppearance.wallpaperBlur = Number(blurSlider.value);
       if (blurValDisplay) blurValDisplay.textContent = `${blurSlider.value}px`;
-      saveAppearanceSettings();
+      debouncedSaveAppearanceSettings();
     });
   }
 
@@ -287,7 +338,7 @@ function initAppearance() {
     opacitySlider.addEventListener('input', () => {
       currentAppearance.wallpaperOpacity = Number(opacitySlider.value);
       if (opacityValDisplay) opacityValDisplay.textContent = `${opacitySlider.value}%`;
-      saveAppearanceSettings();
+      debouncedSaveAppearanceSettings();
     });
   }
 
@@ -295,6 +346,68 @@ function initAppearance() {
     scanlinesCheck.addEventListener('change', () => {
       currentAppearance.scanlines = scanlinesCheck.checked;
       saveAppearanceSettings();
+    });
+  }
+
+  // Enregistrement d'un thème utilisateur complet
+  if (customThemeForm && customThemeNameInput) {
+    customThemeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = customThemeNameInput.value.trim();
+      if (!name) return;
+
+      const computedPrimary = getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#31e1f7';
+      const computedSecondary = getComputedStyle(document.body).getPropertyValue('--accent-secondary').trim() || '#b55fe6';
+
+      const themes = getUserCustomThemes();
+      themes.push({
+        name,
+        primary: currentAppearance.customAccent || computedPrimary,
+        secondary: currentAppearance.customAccentSecondary || computedSecondary,
+        blur: currentAppearance.wallpaperBlur,
+        opacity: currentAppearance.wallpaperOpacity
+      });
+
+      saveUserCustomThemes(themes);
+      customThemeNameInput.value = '';
+      if (typeof showToast === 'function') {
+        showToast(`Thème personnalisé "${name}" enregistré !`, 'success');
+      }
+    });
+  }
+
+  // Application / suppression d'un thème personnalisé
+  if (customThemesContainer) {
+    customThemesContainer.addEventListener('click', (e) => {
+      const delBtn = e.target.closest('[data-del-theme]');
+      if (delBtn) {
+        e.stopPropagation();
+        const idx = Number(delBtn.dataset.delTheme);
+        const themes = getUserCustomThemes();
+        const removed = themes.splice(idx, 1)[0];
+        saveUserCustomThemes(themes);
+        if (typeof showToast === 'function') {
+          showToast(`Thème "${removed?.name}" supprimé`, 'info');
+        }
+        return;
+      }
+
+      const chip = e.target.closest('[data-theme-idx]');
+      if (chip) {
+        const idx = Number(chip.dataset.themeIdx);
+        const themes = getUserCustomThemes();
+        const t = themes[idx];
+        if (t) {
+          currentAppearance.customAccent = t.primary;
+          currentAppearance.customAccentSecondary = t.secondary;
+          if (typeof t.blur === 'number') currentAppearance.wallpaperBlur = t.blur;
+          if (typeof t.opacity === 'number') currentAppearance.wallpaperOpacity = t.opacity;
+          saveAppearanceSettings();
+          if (typeof showToast === 'function') {
+            showToast(`Thème personnalisé "${t.name}" appliqué !`, 'success');
+          }
+        }
+      }
     });
   }
 

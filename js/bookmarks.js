@@ -265,14 +265,31 @@ function attachCategoryActionEvents() {
   });
 }
 
+let lastDeletedBookmark = null;
+
+function undoDeleteBookmark() {
+  if (!lastDeletedBookmark || !categories[lastDeletedBookmark.catIdx]) return false;
+  const { catIdx, linkIdx, item } = lastDeletedBookmark;
+  categories[catIdx].links.splice(linkIdx, 0, item);
+  lastDeletedBookmark = null;
+  localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
+  renderCategories();
+  if (typeof showToast === 'function') {
+    showToast(`Raccourci "${item.name}" restauré !`, 'success');
+  }
+  return true;
+}
+
 function deleteBookmark(catIdx, linkIdx) {
   if (catIdx === null || linkIdx === null) return;
-  const linkName = categories[catIdx]?.links[linkIdx]?.name || 'le raccourci';
+  const item = categories[catIdx]?.links[linkIdx];
+  if (!item) return;
+  lastDeletedBookmark = { catIdx, linkIdx, item };
   categories[catIdx].links.splice(linkIdx, 1);
   localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
   renderCategories();
   if (typeof showToast === 'function') {
-    showToast(`Raccourci "${linkName}" supprimé`, 'info');
+    showToast(`Raccourci "${item.name}" supprimé • Ctrl+Z pour annuler`, 'info');
   }
 }
 

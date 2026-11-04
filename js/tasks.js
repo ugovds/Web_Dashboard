@@ -1,6 +1,8 @@
 /**
  * tasks.js - Gestionnaire de tâches (To-Do List) et persistance
  * - Système de priorité avec code couleur (🔴 Urgent, 🟡 Normal, 🟢 Faible)
+ * - Édition en ligne des tâches existantes (texte et échéance)
+ * - Annulation de suppression (Undo / Ctrl+Z)
  * - Tri dynamique : Par Priorité / Par Échéance / Normal
  * - Filtrage avancé : Toutes, À faire, Faites, Aujourd'hui, ou par date du calendrier
  * - Badges dynamiques des échéances (Auj, J-X, J+X retard)
@@ -11,6 +13,8 @@ let todos = [];
 let selectedDateFilter = null;
 let currentStatusFilter = 'all'; // 'all', 'pending', 'done', 'today'
 let taskSortMode = 'none'; // 'none', 'priority', 'date'
+let editingTaskIndex = null;
+let lastDeletedTask = null;
 
 function toISODate(d) {
   const y = d.getFullYear();
@@ -74,6 +78,18 @@ function setDateFilter(date) {
     todoDateInput.value = date || '';
   }
   saveAndRenderTodos();
+}
+
+function undoDeleteTask() {
+  if (!lastDeletedTask) return false;
+  todos.splice(lastDeletedTask.index, 0, lastDeletedTask.item);
+  const restoredText = lastDeletedTask.item.text;
+  lastDeletedTask = null;
+  saveAndRenderTodos();
+  if (typeof showToast === 'function') {
+    showToast(`Tâche restaurée : "${restoredText}"`, 'success');
+  }
+  return true;
 }
 
 function exportTodosToICS() {
@@ -248,6 +264,22 @@ function saveAndRenderTodos() {
 
   todoListEl.innerHTML = visibleTodos
     .map((t) => {
+      const isEditing = t.originalIndex === editingTaskIndex;
+      if (isEditing) {
+        return `
+          <li class="todo-item editing">
+            <div class="todo-edit-form">
+              <input type="text" class="todo-edit-text-input" id="todo-edit-text-${t.originalIndex}" value="${escapeHtml(t.text)}" autocomplete="off" />
+              <input type="date" class="todo-edit-date-input" id="todo-edit-date-${t.originalIndex}" value="${t.date || ''}" />
+              <div class="todo-edit-actions">
+                <button type="button" class="todo-edit-save-btn" data-save-edit="${t.originalIndex}" title="Valider les modifications"><i class="fa-solid fa-check"></i></button>
+                <button type="button" class="todo-edit-cancel-btn" data-cancel-edit="${t.originalIndex}" title="Annuler"><i class="fa-solid fa-xmark"></i></button>
+              </div>
+            </div>
+          </li>
+        `;
+      }
+
       const badge = computeDaysBadge(t.date);
       const prio = getPriorityConfig(t.priority);
       return `
@@ -266,12 +298,20 @@ function saveAndRenderTodos() {
               ${prio.label}
             </button>
             ${badge ? `<span class="deadline-badge ${badge.cls}">${badge.label}</span>` : ''}
+            <button type="button" class="todo-edit-btn" data-edit="${t.originalIndex}" title="Modifier cette tâche"><i class="fa-solid fa-pen"></i></button>
             <button class="todo-del" data-del="${t.originalIndex}" title="Supprimer">&times;</button>
           </div>
         </li>
       `;
     })
     .join('');
+
+  if (editingTaskIndex !== null) {
+    const inputToFocus = document.getElementById(`todo-edit-text-${editingTaskIndex}`);
+    if (inputToFocus) {
+      setTimeout(() => inputToFocus.focus(), 20);
+    }
+  }
 }
 
 function escapeHtml(str) {
@@ -371,12 +411,48 @@ function initTasks() {
           todos[idx].priority = cyclePriority(todos[idx].priority || 'normal');
           saveAndRenderTodos();
         }
+      } else if (e.target.closest('[data-edit]')) {
+        const btn = e.target.closest('[data-edit]');
+        editingTaskIndex = Number(btn.dataset.edit);
+        saveAndRenderTodos();
+      } else if (e.target.closest('[data-save-edit]')) {
+        const btn = e.target.closest('[data-save-edit]');
+        const idx = Number(btn.dataset.saveEdit);
+        const textIn = document.getElementById(`todo-edit-text-${idx}`);
+        const dateIn = document.getElementById(`todo-edit-date-${idx}`);
+        if (textIn && textIn.value.trim() && todos[idx]) {
+          todos[idx].text = textIn.value.trim();
+          todos[idx].date = dateIn ? dateIn.value : (todos[idx].date || '');
+          editingTaskIndex = null;
+          saveAndRenderTodos();
+          if (typeof showToast === 'function') showToast('Tâche modifiée !', 'success');
+        }
+      } else if (e.target.closest('[data-cancel-edit]')) {
+        editingTaskIndex = null;
+        saveAndRenderTodos();
       } else if (e.target.matches('.todo-del')) {
         const idx = Number(e.target.dataset.del);
         if (todos[idx]) {
+          lastDeletedTask = { item: todos[idx], index: idx };
+          const delText = todos[idx].text;
           todos.splice(idx, 1);
           saveAndRenderTodos();
+          if (typeof showToast === 'function') {
+            showToast(`Tâche supprimée • Appuyez sur Ctrl+Z pour annuler`, 'info');
+          }
         }
+      }
+    });
+
+    // Validation touche Entrée lors de l'édition en ligne
+    todoListEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.target.classList.contains('todo-edit-text-input')) {
+        e.preventDefault();
+        const saveBtn = e.target.closest('.todo-item')?.querySelector('[data-save-edit]');
+        if (saveBtn) saveBtn.click();
+      } else if (e.key === 'Escape' && editingTaskIndex !== null) {
+        editingTaskIndex = null;
+        saveAndRenderTodos();
       }
     });
   }

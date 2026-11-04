@@ -1,9 +1,6 @@
 /* ========================================================
    Startpage - Styles Principaux
    ======================================================== */
-@import url("themes/kanagawa.css");
-@import url("themes/sakura.css");
-@import url("themes/cyberdeck.css");
 
 
 * {
@@ -5537,3 +5534,183 @@ body.dim-mode .bg-wallpaper {
   opacity: 0.28 !important;
   filter: blur(65px) saturate(1.4) brightness(0.7) !important;
 }
+
+/* --- 9. BADGES DE MARCHÉ EN DIRECT VS SIMULÉ --- */
+.market-type-pill {
+  font-size: 0.56rem;
+  padding: 0.08rem 0.32rem;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
+.market-type-pill.live {
+  color: #52c41a;
+  background: rgba(82, 196, 26, 0.15);
+  border: 1px solid rgba(82, 196, 26, 0.4);
+  box-shadow: 0 0 6px rgba(82, 196, 26, 0.2);
+}
+
+.market-type-pill.sim {
+  color: #faad14;
+  background: rgba(250, 173, 20, 0.12);
+  border: 1px solid rgba(250, 173, 20, 0.35);
+}
+
+/* --- 10. ÉDITION EN LIGNE DES TÂCHES --- */
+.todo-edit-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 0.2rem;
+  font-size: 0.65rem;
+  transition: all 0.15s ease;
+}
+
+.todo-edit-btn:hover {
+  color: var(--accent-primary);
+}
+
+.todo-item.editing {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-highlight);
+  box-shadow: 0 0 10px rgba(49, 225, 247, 0.12);
+}
+
+.todo-edit-form {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.todo-edit-text-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.25rem 0.45rem;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-highlight);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.72rem;
+}
+
+.todo-edit-text-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.todo-edit-date-input {
+  width: 102px;
+  padding: 0.2rem 0.3rem;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.65rem;
+  color-scheme: dark;
+}
+
+.todo-edit-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.todo-edit-save-btn {
+  color: #52c41a;
+  background: rgba(82, 196, 26, 0.15);
+  border: 1px solid rgba(82, 196, 26, 0.4);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-family: inherit;
+}
+
+.todo-edit-cancel-btn {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.15);
+  border: 1px solid rgba(255, 77, 79, 0.4);
+  border-radius: 4px;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-family: inherit;
+}
+
+/* --- 11. GESTIONNAIRE DE THÈMES PERSONNALISÉS --- */
+.custom-theme-creator-box {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.custom-theme-input-row {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+
+.custom-theme-input-row input {
+  flex: 1;
+}
+
+.custom-themes-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.55rem;
+}
+
+.custom-theme-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: 99px;
+  font-size: 0.68rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.custom-theme-chip:hover {
+  border-color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.custom-theme-chip.active {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px var(--orb-1);
+}
+
+.custom-theme-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.custom-theme-chip-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 0 0.1rem;
+}
+
+.custom-theme-chip-delete:hover {
+  color: #ff4d4f;
+}
+
