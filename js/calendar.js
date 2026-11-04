@@ -1,5 +1,8 @@
 /**
  * calendar.js - Mini-calendrier synchronisé avec les échéances des tâches
+ * - Affichage dynamique du mois et navigation rapide
+ * - Badges du nombre de tâches directement sur les jours du calendrier
+ * - Filtrage instantané au clic sur un jour pour voir les tâches associées
  */
 let calDate = new Date();
 
@@ -43,10 +46,15 @@ function renderCalendar() {
       classes += stats.pending > 0 ? ' has-pending' : ' has-done';
     }
 
+    const totalTasks = stats ? (stats.pending + stats.done) : 0;
+    const badgeHtml = totalTasks > 0
+      ? `<span class="cal-badge ${stats.pending > 0 ? 'pending' : 'done'}" title="${totalTasks} tâche(s)">${totalTasks}</span>`
+      : '';
+
     html += `
-      <button type="button" class="${classes}" data-date="${iso}" title="${iso}">
-        <span>${d}</span>
-        ${stats ? '<i class="cal-dot"></i>' : ''}
+      <button type="button" class="${classes}" data-date="${iso}" title="${iso}${totalTasks > 0 ? ` • ${totalTasks} tâche(s)` : ''}">
+        <span class="cal-day-num">${d}</span>
+        ${badgeHtml}
       </button>
     `;
   }
@@ -79,6 +87,8 @@ function initCalendar() {
       calDate = new Date();
       if (typeof setDateFilter === 'function') {
         setDateFilter(null);
+      } else {
+        renderCalendar();
       }
     });
   }

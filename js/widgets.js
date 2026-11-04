@@ -104,12 +104,12 @@ function playPomoChime() {
 }
 
 function updatePomoUI() {
-  const display = document.getElementById('pomo-timer-display');
-  const status = document.getElementById('pomo-status-label');
-  const progressBar = document.getElementById('pomo-progress-bar');
-  const btnText = document.getElementById('pomo-btn-text');
-  const btnIcon = document.getElementById('pomo-btn-icon');
-  const countBadge = document.getElementById('pomo-sessions-count');
+  const display = document.getElementById('pomo-time') || document.getElementById('pomo-timer-display');
+  const status = document.getElementById('pomo-status') || document.getElementById('pomo-status-label');
+  const progressBar = document.getElementById('pomo-progress-fill') || document.getElementById('pomo-progress-bar');
+  const ringArc = document.getElementById('pomo-ring-arc');
+  const toggleBtn = document.getElementById('pomo-start-btn') || document.getElementById('pomo-btn-toggle');
+  const countBadge = document.getElementById('pomo-cycles-count') || document.getElementById('pomo-sessions-count');
 
   const m = String(Math.floor(pomoTimeLeft / 60)).padStart(2, '0');
   const s = String(pomoTimeLeft % 60).padStart(2, '0');
@@ -127,9 +127,17 @@ function updatePomoUI() {
   const pct = Math.min(100, Math.max(0, ((total - pomoTimeLeft) / total) * 100));
   if (progressBar) progressBar.style.width = `${pct}%`;
 
-  if (btnText) btnText.textContent = pomoIsRunning ? 'Pause' : 'Démarrer';
-  if (btnIcon) {
-    btnIcon.className = pomoIsRunning ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+  // Arc SVG circulaire (circonférence = 2 * PI * 88 ≈ 552.92)
+  if (ringArc) {
+    const circum = 552.92;
+    const offset = circum - (pct / 100) * circum;
+    ringArc.style.strokeDashoffset = offset.toFixed(1);
+  }
+
+  if (toggleBtn) {
+    toggleBtn.innerHTML = pomoIsRunning
+      ? '<i class="fa-solid fa-pause"></i> Pause'
+      : '<i class="fa-solid fa-play"></i> Démarrer';
   }
 
   if (status) {
@@ -141,6 +149,13 @@ function updatePomoUI() {
   }
 
   if (countBadge) countBadge.textContent = pomoCompletedCount;
+
+  // Mise à jour des points d'objectif journalier (sur 4)
+  const dots = document.querySelectorAll('#pomo-dots-wrap .pomo-dot');
+  const completedMod = pomoCompletedCount % 4;
+  dots.forEach((dot, idx) => {
+    dot.classList.toggle('done', idx < completedMod || pomoCompletedCount >= 4);
+  });
 }
 
 function startPomoTimer() {
@@ -201,8 +216,8 @@ function initPomodoroWidget() {
     pomoCompletedCount = 0;
   }
 
-  const toggleBtn = document.getElementById('pomo-btn-toggle');
-  const resetBtn = document.getElementById('pomo-btn-reset');
+  const toggleBtn = document.getElementById('pomo-start-btn') || document.getElementById('pomo-btn-toggle');
+  const resetBtn = document.getElementById('pomo-reset-btn') || document.getElementById('pomo-btn-reset');
 
   if (toggleBtn) {
     toggleBtn.addEventListener('click', () => {
@@ -217,6 +232,22 @@ function initPomodoroWidget() {
 
   document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
     chip.addEventListener('click', () => setPomoMode(chip.dataset.pomoMode));
+  });
+
+  // Presets d'intervalles rapides (25/5, 50/10, 15/3)
+  document.querySelectorAll('.pomo-preset-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pomo-preset-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const mins = Number(btn.dataset.pomoPreset) || 25;
+      POMO_DURATIONS.focus = mins * 60;
+      if (pomoMode === 'focus') {
+        resetPomoTimer();
+      }
+      if (typeof showToast === 'function') {
+        showToast(`Durée Focus définie à ${mins} minutes`, 'info');
+      }
+    });
   });
 
   updatePomoUI();
@@ -418,6 +449,29 @@ function startAmbientSound() {
     let generator = null;
     if (ambientCurrentMode === 'rain') {
       generator = createRainAudioNode(ambientAudioCtx);
+    } else if (ambientCurrentMode === 'storm') {
+      generator = createRainAudioNode(ambientAudioCtx);
+      const biquad = ambientAudioCtx.createBiquadFilter();
+      biquad.type = 'lowshelf';
+      biquad.frequency.value = 180;
+      biquad.gain.value = 12;
+      generator.output.connect(biquad);
+      generator.output = biquad;
+    } else if (ambientCurrentMode === 'space') {
+      generator = createBrownNoiseNode(ambientAudioCtx);
+      const biquad = ambientAudioCtx.createBiquadFilter();
+      biquad.type = 'lowpass';
+      biquad.frequency.value = 220;
+      generator.output.connect(biquad);
+      generator.output = biquad;
+    } else if (ambientCurrentMode === 'night') {
+      generator = createRainAudioNode(ambientAudioCtx);
+      const biquad = ambientAudioCtx.createBiquadFilter();
+      biquad.type = 'bandpass';
+      biquad.frequency.value = 1600;
+      biquad.Q.value = 2.5;
+      generator.output.connect(biquad);
+      generator.output = biquad;
     } else {
       generator = createBrownNoiseNode(ambientAudioCtx);
     }
@@ -470,10 +524,13 @@ function updateAmbientUI() {
   }
 
   if (nowPlaying) {
-    let modeLabel = 'Pluie Relaxante';
+    let modeLabel = 'Pluie Cyber';
     if (ambientCurrentMode === 'brown') modeLabel = 'Bruit Brun (Focus)';
     if (ambientCurrentMode === 'lofi') modeLabel = 'Radio Lo-Fi Chill';
-    nowPlaying.textContent = ambientIsPlaying ? `En lecture : ${modeLabel}` : 'En pause';
+    if (ambientCurrentMode === 'storm') modeLabel = 'Orage Néon';
+    if (ambientCurrentMode === 'space') modeLabel = 'Deep Space';
+    if (ambientCurrentMode === 'night') modeLabel = 'Nuit Synthé';
+    nowPlaying.textContent = ambientIsPlaying ? `En lecture : ${modeLabel}` : 'Générateur Procédural Audio';
   }
 }
 

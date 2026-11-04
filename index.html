@@ -51,33 +51,111 @@
           </div>
 
           <!-- Grand Cadre Horloge & Date Cyberdeck en bas -->
-          <div class="left-clock-card font-jetbrains clock-style-pill clock-size-medium" id="left-clock-card">
+          <div class="left-clock-card font-jetbrains clock-style-hud clock-size-medium" id="left-clock-card">
+            <!-- Reticules & Brackets de coin HUD Cyberdeck -->
+            <span class="hud-bracket top-left"></span>
+            <span class="hud-bracket top-right"></span>
+            <span class="hud-bracket bottom-left"></span>
+            <span class="hud-bracket bottom-right"></span>
+
             <div class="clock-card-top">
-              <span class="clock-deck-label"><i class="fa-solid fa-clock"></i> CYBER CLOCK</span>
-              <span id="clock-tz-badge" class="clock-tz-pill">LOCAL</span>
+              <span class="clock-deck-label">
+                <span class="pulse-dot"></span>
+                <span id="clock-sys-tag">CHRONO-HUD // V4</span>
+              </span>
+              <button type="button" id="clock-tz-badge" class="clock-tz-pill" title="Cliquer pour changer de fuseau horaire">
+                <i class="fa-solid fa-globe"></i> LOCAL • PARIS
+              </button>
             </div>
 
-            <div class="left-clock-display" id="left-clock-display">
-              <span id="time" class="left-time-main">00:00:00</span>
-              <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
+            <!-- Stage Central HUD avec Gauge Radiale SVG & Digits Néon -->
+            <div class="clock-hud-stage" id="clock-hud-stage">
+              <svg class="clock-radial-svg" viewBox="0 0 220 220">
+                <defs>
+                  <linearGradient id="hudArcGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="var(--accent-secondary)" />
+                    <stop offset="100%" stop-color="var(--accent-primary)" />
+                  </linearGradient>
+                </defs>
+                <!-- Ticks et piste de fond -->
+                <circle class="hud-track-circle" cx="110" cy="110" r="96"></circle>
+                <!-- Arc dynamique des secondes (circonférence = 2 * PI * 96 ≈ 603.18) -->
+                <circle
+                  id="clock-sec-arc"
+                  class="hud-sec-arc"
+                  cx="110"
+                  cy="110"
+                  r="96"
+                  stroke-dasharray="603.18"
+                  stroke-dashoffset="0"
+                ></circle>
+                <!-- Reticules et repères cardinaux -->
+                <line class="hud-reticle r-top" x1="110" y1="6" x2="110" y2="16"></line>
+                <line class="hud-reticle r-right" x1="204" y1="110" x2="214" y2="110"></line>
+                <line class="hud-reticle r-bottom" x1="110" y1="204" x2="110" y2="214"></line>
+                <line class="hud-reticle r-left" x1="6" y1="110" x2="16" y2="110"></line>
+                <text x="110" y="24" class="hud-cardinal">60</text>
+                <text x="198" y="113" class="hud-cardinal">15</text>
+                <text x="110" y="202" class="hud-cardinal">30</text>
+                <text x="22" y="113" class="hud-cardinal">45</text>
+              </svg>
+
+              <!-- Affichage digital central de l'heure -->
+              <div class="left-clock-display" id="left-clock-display">
+                <div class="time-digits-box">
+                  <span id="time" class="left-time-main">00:00:00</span>
+                  <span id="clock-ms-tick" class="clock-ms-tick">.00</span>
+                </div>
+                <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
+              </div>
             </div>
 
-            <div class="left-clock-date-group">
+            <!-- Télémétrie Calendaire & Cycle Solaire -->
+            <div class="left-clock-telemetry">
               <div id="date" class="left-date-main">Chargement...</div>
-              <div id="clock-extra-info" class="left-date-extra">Semaine -- • Jour --</div>
+              <div class="clock-telemetry-chips">
+                <span class="chrono-chip" id="clock-week-chip">
+                  <i class="fa-solid fa-calendar-week"></i>
+                  <span id="clock-week-text">Sem. --</span>
+                </span>
+                <span class="chrono-chip" id="clock-day-chip">
+                  <i class="fa-solid fa-hourglass-half"></i>
+                  <span id="clock-day-text">Jour --/365</span>
+                </span>
+                <span class="chrono-chip solar-chip" id="clock-solar-chip">
+                  <i id="clock-solar-icon" class="fa-solid fa-sun"></i>
+                  <span id="clock-solar-text">Diurne</span>
+                </span>
+              </div>
             </div>
 
+            <!-- Progression du cycle journalier (%) -->
             <div id="day-progress-wrap" class="day-progress-wrap">
               <div class="day-progress-header">
-                <span>Progression Journée</span>
-                <span id="day-progress-pct">0%</span>
+                <span class="day-progress-title">
+                  <i class="fa-solid fa-circle-notch"></i> Progression Journée
+                </span>
+                <div class="day-progress-stats">
+                  <span id="day-progress-pct" class="progress-pct-bold">0%</span>
+                  <span id="day-progress-remaining" class="progress-remaining-sub">(12h 00m restants)</span>
+                </div>
               </div>
               <div class="day-progress-track">
-                <div id="day-progress-fill" class="day-progress-fill" style="width: 0%;"></div>
+                <div id="day-progress-fill" class="day-progress-fill" style="width: 0%;">
+                  <span class="progress-glow-head"></span>
+                </div>
               </div>
             </div>
 
+            <!-- Pied de page télémétrique HUD -->
             <div class="clock-status-footer">
+              <div class="hud-wave-box" title="Signal système actif">
+                <span class="hud-wave-bar bar-1"></span>
+                <span class="hud-wave-bar bar-2"></span>
+                <span class="hud-wave-bar bar-3"></span>
+                <span class="hud-wave-bar bar-4"></span>
+                <span class="hud-wave-bar bar-5"></span>
+              </div>
               <span class="pulse-dot"></span>
               <span id="clock-status-tag">SYSTEM SYNCED • 60 FPS</span>
             </div>
@@ -180,17 +258,30 @@
 
                 <div class="merged-tasks-section">
                   <div class="tasks-header-row">
-                    <span class="tasks-label"><i class="fa-solid fa-list-check"></i> Tasks</span>
-                    <button id="clear-date-filter" class="filter-chip" hidden title="Afficher toutes les dates">
-                      <span id="filter-date-label"></span> &times;
-                    </button>
+                    <div class="tasks-title-group">
+                      <span class="tasks-label"><i class="fa-solid fa-list-check"></i> Agenda & Tâches</span>
+                      <span id="tasks-stats-badge" class="tasks-stats-badge">0 / 0</span>
+                    </div>
+                    <div class="tasks-filters-group">
+                      <button type="button" class="task-filter-btn active" data-filter="all">Toutes</button>
+                      <button type="button" class="task-filter-btn" data-filter="pending">À faire</button>
+                      <button type="button" class="task-filter-btn" data-filter="done">Faites</button>
+                      <button id="clear-date-filter" class="filter-chip" hidden title="Afficher toutes les dates">
+                        <span id="filter-date-label"></span> &times;
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Mini barre de progression d'accomplissement des tâches -->
+                  <div class="tasks-progress-mini-wrap">
+                    <div id="tasks-progress-mini-fill" class="tasks-progress-mini-fill" style="width: 0%;"></div>
                   </div>
 
                   <form id="todo-form" class="todo-input-row">
                     <input
                       id="todo-input"
                       type="text"
-                      placeholder="+ Ajouter une tâche..."
+                      placeholder="+ Ajouter une tâche ou échéance..."
                       autocomplete="off"
                     />
                     <input
@@ -198,7 +289,7 @@
                       type="date"
                       title="Assigner une date d'échéance (optionnel)"
                     />
-                    <button type="submit" class="todo-add-btn" title="Ajouter">+</button>
+                    <button type="submit" class="todo-add-btn" title="Ajouter"><i class="fa-solid fa-plus"></i></button>
                   </form>
 
                   <ul id="todo-list" class="todo-list merged-todo-list"></ul>
@@ -381,13 +472,34 @@
 
                   <div class="pomo-dial-wrap">
                     <div class="pomo-dial-ring">
-                      <span id="pomo-time" class="pomo-digits">25:00</span>
-                      <span id="pomo-status" class="pomo-status">Focus Time</span>
+                      <svg class="pomo-svg-ring" viewBox="0 0 200 200">
+                        <circle class="pomo-ring-track" cx="100" cy="100" r="88"></circle>
+                        <circle
+                          id="pomo-ring-arc"
+                          class="pomo-ring-arc"
+                          cx="100"
+                          cy="100"
+                          r="88"
+                          stroke-dasharray="552.92"
+                          stroke-dashoffset="0"
+                        ></circle>
+                      </svg>
+                      <div class="pomo-dial-content">
+                        <span id="pomo-time" class="pomo-digits">25:00</span>
+                        <span id="pomo-status" class="pomo-status">Focus Time</span>
+                      </div>
                     </div>
                   </div>
 
                   <div class="pomo-progress-bar-wrap">
                     <div id="pomo-progress-fill" class="pomo-progress-fill" style="width: 100%;"></div>
+                  </div>
+
+                  <!-- Presets d'intervalles rapides -->
+                  <div class="pomo-presets-row">
+                    <button type="button" class="pomo-preset-btn active" data-pomo-preset="25">25/5 Standard</button>
+                    <button type="button" class="pomo-preset-btn" data-pomo-preset="50">50/10 Deep Work</button>
+                    <button type="button" class="pomo-preset-btn" data-pomo-preset="15">15/3 Sprint</button>
                   </div>
 
                   <div class="pomo-controls-row">
@@ -400,10 +512,19 @@
                   </div>
 
                   <div class="pomo-stats-footer">
-                    <span class="stats-badge">
-                      <i class="fa-solid fa-circle-check"></i>
-                      <span id="pomo-cycles-count">0</span> sessions terminées
-                    </span>
+                    <div class="pomo-milestones-row">
+                      <span class="pomo-goal-text">Objectif :</span>
+                      <div class="pomo-dots-wrap" id="pomo-dots-wrap">
+                        <span class="pomo-dot"></span>
+                        <span class="pomo-dot"></span>
+                        <span class="pomo-dot"></span>
+                        <span class="pomo-dot"></span>
+                      </div>
+                      <span class="stats-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="pomo-cycles-count">0</span> / 4 complétées
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -432,23 +553,35 @@
               <!-- VUE 7 : AMBIANCE SONORE LO-FI & GÉNÉRATEUR -->
               <div id="deck-view-ambient" class="deck-slide-view" hidden>
                 <div class="deck-widget-panel ambient-panel">
-                  <div class="ambient-modes-grid">
+                  <div class="ambient-modes-grid ambient-grid-expanded">
                     <button type="button" class="ambient-mode-card active" data-ambient-mode="rain">
                       <i class="fa-solid fa-cloud-rain"></i>
-                      <span>Pluie douce</span>
+                      <span>Pluie cyber</span>
                     </button>
                     <button type="button" class="ambient-mode-card" data-ambient-mode="brown">
                       <i class="fa-solid fa-water"></i>
-                      <span>Bruit Brun</span>
+                      <span>Bruit brun</span>
                     </button>
                     <button type="button" class="ambient-mode-card" data-ambient-mode="lofi">
                       <i class="fa-solid fa-radio"></i>
                       <span>Radio Lo-Fi</span>
                     </button>
+                    <button type="button" class="ambient-mode-card" data-ambient-mode="storm">
+                      <i class="fa-solid fa-bolt"></i>
+                      <span>Orage néon</span>
+                    </button>
+                    <button type="button" class="ambient-mode-card" data-ambient-mode="space">
+                      <i class="fa-solid fa-atom"></i>
+                      <span>Deep space</span>
+                    </button>
+                    <button type="button" class="ambient-mode-card" data-ambient-mode="night">
+                      <i class="fa-solid fa-moon"></i>
+                      <span>Nuit synthé</span>
+                    </button>
                   </div>
 
                   <div class="ambient-visualizer-box">
-                    <canvas id="ambient-waves-canvas" width="280" height="60"></canvas>
+                    <canvas id="ambient-waves-canvas" width="320" height="90"></canvas>
                     <span id="ambient-now-playing" class="ambient-now-playing">Générateur Procédural Audio</span>
                   </div>
 

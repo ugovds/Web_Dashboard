@@ -18,9 +18,9 @@
 
 ---
 
-## 📸 Aperçu des Thèmes
+## 📸 Thèmes Visuels
 
-La page intègre **3 thèmes visuels complets** avec éclairage ambiant (Ambilight), orbes lumineux animés et scanlines rétro. Vous pouvez basculer d'un thème à l'autre en un clic dans la configuration ou via les raccourcis clavier (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>).
+La startpage intègre 3 thèmes visuels avec éclairage ambiant (Ambilight), orbes lumineux et scanlines rétro, sélectionnables via les raccourcis clavier (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>) ou dans le centre de configuration :
 
 | Thème 1 : Kanagawa 🌊 | Thème 2 : Sakura 🌸 | Thème 3 : Cyberdeck ⚡ |
 | :---: | :---: | :---: |
@@ -29,134 +29,150 @@ La page intègre **3 thèmes visuels complets** avec éclairage ambiant (Ambilig
 
 ---
 
-## 📐 Layout 100% Cyberdeck Bento (Zero Topbar)
+## 📐 Architecture de l'Interface (Bento 3 Colonnes)
 
-L'interface a été épurée pour maximiser l'espace utile et supprimer la barre supérieure superflue :
-- **Colonne Gauche (Visuel & Horloge)** :
-  - **Artwork thématique** animé en haut.
-  - **Station Horloge Cyberdeck** complète en bas (heure, date, semaine, barre de progression du jour %, fuseaux horaires).
-- **Colonne Centrale (Navigation & Productivité)** :
-  - **Omnibox de recherche intelligente** avec calculatrice et bangs.
-  - **Grille de signets Bento adaptative** avec Drag & Drop.
-- **Colonne Droite (Cyberdeck Multi-Vues à 9 Onglets)** :
-  - Navigateur d'onglets ergonomique à défilement fluide avec indicateur animé.
-  - Contient tous les outils, la météo complète et l'intégralité du centre de configuration en direct.
+Le tableau de bord est structuré en 3 colonnes immersives qui exploitent toute la hauteur de l'écran :
+
+1. **Colonne Gauche (Visuels & Station Horloge)** :
+   - Illustration animée du thème actif avec indicateur d'état système.
+   - Station Horloge Chrono-HUD (cadran radial SVG, micro-compteur millisecondes, cycle solaire, progression du jour et fuseaux horaires).
+2. **Colonne Centrale (Navigation & Productivité)** :
+   - Barre de recherche Omnibox (moteurs, raccourcis bangs, calculatrice en temps réel et autocomplétion).
+   - Grille Bento des catégories et signets avec densité adaptative et réorganisation par glisser-déposer.
+3. **Colonne Droite (Cyberdeck Multi-Vues à 9 Onglets)** :
+   - Slider interactif donnant accès aux différents outils : Agenda & Tâches, Météo complète, Actualités RSS, Moniteur Système & Marchés boursiers, Minuteur Focus Pomodoro, Bloc-Notes, Ambiance Sonore, Citations, et Centre de Configuration.
 
 ---
 
-## ✨ Fonctionnalités Clés
+## ✨ Fonctionnalités
 
-### 🔍 1. Barre de Recherche Intelligente (Omnibox) — `js/search.js`
-- **Raccourci instantané** : Appuyez sur la touche <kbd>/</kbd> n'importe où pour cibler immédiatement la recherche.
+### ⏱️ Station Horloge Cyberdeck (Chrono-HUD) — `js/clock.js`
+- **Cadran central interactif** :
+  - Arc circulaire des secondes SVG avec animation continue à 60 FPS.
+  - Micro-compteur de millisecondes (`.ms`) et repères cardinaux tachymétriques.
+  - Horloge au format 24h ou 12h avec pastille AM/PM.
+- **Télémétrie calendaire & solaire** :
+  - Affichage complet de la date en français.
+  - Puces télémétriques : numéro de semaine (`Sem. 45`), jour de l'année (`Jour 308/365`) et cycle solaire dynamique (☀️ Diurne / 🌙 Nocturne).
+- **Progression de la journée (%)** :
+  - Jauge visuelle animée avec pourcentage exact et calcul en temps réel du temps restant (`Xh Ym restants`).
+- **Sélecteur de fuseaux horaires** :
+  - Défilement au clic ou sélection par menu : Local (Paris), Tokyo (JST), New York (EST), Londres (GMT), UTC.
+- **Typographies & Styles au choix** :
+  - 5 polices : *JetBrains Mono*, *Orbitron*, *Share Tech Mono*, *VT323*, *Inter*.
+  - 6 styles de cadre : *HUD Cyberdeck*, *Lueur Intense Néon*, *Digital Box LCD*, *Pilule Verre*, *Crochets Cyber [ ]*, *Minimaliste*.
+
+### 📅 Agenda & Gestionnaire de Tâches — `js/calendar.js` & `js/tasks.js`
+- **Mini-calendrier mensuel interactif** :
+  - Navigation par mois avec bouton de retour à aujourd'hui.
+  - Badges du nombre de tâches incrustés directement sur chaque jour du calendrier.
+  - Clic sur un jour pour filtrer immédiatement la liste des tâches sur cette date précise.
+- **Gestionnaire de tâches (To-Do List)** :
+  - Ajout rapide avec libellé et date d'échéance optionnelle.
+  - Calcul dynamique des échéances : `Auj.`, `Demain`, `J-X` (à venir), `J+X` (en retard).
+  - Onglets de filtrage rapide : `Toutes`, `À faire`, `Faites`.
+  - Mini-jauge de progression globale indiquant le ratio de tâches complétées (`X / Y`).
+  - Vue d'état vide ergonomique lors de l'accomplissement de toutes les tâches.
+
+### 🔍 Barre de Recherche Intelligente (Omnibox) — `js/search.js`
+- **Raccourci clavier instantané** : Touche <kbd>/</kbd> pour cibler immédiatement le champ de recherche.
 - **Moteurs de recherche & Préfixes rapides (Bangs)** :
-  Tapez un préfixe pour changer instantanément de moteur de recherche :
-  - `!yt <requête>` : Rechercher sur **YouTube**
-  - `!gh <requête>` : Rechercher sur **GitHub**
-  - `!tr <texte>` : Traduire avec **DeepL**
-  - `!maps <lieu>` : Localiser sur **Google Maps**
-  - `!img <terme>` : Rechercher sur **Google Images**
-  - `!w <terme>` : Rechercher sur **Wikipédia**
-  - `!d <requête>` : Rechercher sur **DuckDuckGo**
-  - `!so <requête>` : Rechercher sur **StackOverflow**
-  - `!arch <sujet>` : Consulter le wiki **ArchLinux**
-  - `!r <terme>` : Rechercher sur **Reddit**
-  - `!help` : Afficher l'aide interactive des commandes
-- **Calculatrice en direct** : Saisissez une expression mathématique (ex: `15 * 4`, `(120/4) + 8`) et le résultat s'affiche en temps réel sans recharger la page.
-- **Suggestions automatiques** : Autocomplétion Google en temps réel navigable au clavier (flèches <kbd>↑</kbd> <kbd>↓</kbd>).
+  - `!yt <requête>` : YouTube
+  - `!gh <requête>` : GitHub
+  - `!tr <texte>` : Traduction DeepL
+  - `!maps <lieu>` : Google Maps
+  - `!img <terme>` : Google Images
+  - `!w <terme>` : Wikipédia
+  - `!d <requête>` : DuckDuckGo
+  - `!so <requête>` : StackOverflow
+  - `!arch <sujet>` : ArchWiki
+  - `!r <terme>` : Reddit
+  - `!help` : Afficher l'aide des commandes
+- **Calculatrice en direct** : Évalue les expressions mathématiques (`15 * 4`, `(120/4) + 8`) instantanément pendant la frappe.
+- **Suggestions de recherche** : Autocomplétion Google navigable au clavier avec les flèches <kbd>↑</kbd> et <kbd>↓</kbd>.
 
-### ⚡ 2. Signets & Personnalisation Complète (Nombre illimité de liens) — `js/bookmarks.js`
-- **Plus de 6 liens par catégorie avec ajustement adaptatif** :
-  - **Densité automatique** : La startpage adapte dynamiquement l'espacement et la taille de la police selon le nombre de liens (Normal <= 6, Compact 7-8, Dense 9-12, Défilement élégant > 12) pour que la grille Bento reste toujours impeccable sans déborder.
-  - **Ajout & Suppression de liens** : Bouton <kbd>+ Nouveau lien</kbd> direct dans chaque catégorie en mode personnalisation et bouton de suppression rapide.
-  - **Création & Édition de catégories** : Créez vos propres catégories (ex: Outils, Musique, Veille...) avec icônes Font Awesome ou modifiez/supprimez les catégories existantes.
-- **Réorganisation par Glisser-Déposer (Drag & Drop)** : Réordonnez vos favoris ou déplacez-les d'une catégorie à l'autre en un simple glissé.
-- **Sauvegarde & Restauration Totale (Export / Import JSON)** : Téléchargez un fichier de configuration `.json` ou restaurez-le en 1 clic (inclut signets, catégories, notes, tâches, flux RSS et réglages d'apparence).
-- **Persistance locale** : Toutes vos modifications sont enregistrées dans le `localStorage` de votre navigateur.
+### ⚡ Grille des Signets & Catégories — `js/bookmarks.js`
+- **Densité adaptative automatique** : Ajustement dynamique de la taille et de l'espacement pour afficher plus de 6 liens par catégorie sans déborder.
+- **Ajout & Gestion complète** : Création, modification et suppression de catégories et de liens avec sélection d'icônes Font Awesome.
+- **Glisser-Déposer (Drag & Drop)** : Réorganisation libre des liens au sein d'une même catégorie ou déplacement d'une catégorie à l'autre.
+- **Export & Import JSON** : Sauvegarde intégrale en 1 clic de votre configuration dans un fichier `.json` et restauration immédiate.
 
-### ⏱️ 3. Horloge Cyberdeck & Indicateurs Temporels — `js/clock.js`
-- **Positionnée dans la colonne gauche** sous l'artwork pour un équilibre parfait.
-- **Typographie au choix** : 5 polices intégrées sélectionnables d'un clic :
-  - `JetBrains Mono` : Monospace technique cyberdeck.
-  - `Orbitron` : HUD futuriste de science-fiction.
-  - `Share Tech Mono` : Style terminal hacker / console.
-  - `VT323` : Rétro-cathodique arcade des années 90.
-  - `Inter` : Sans-serif moderne, épurée et géométrique.
-- **Styles visuels de cadre** :
-  - **Pilule Verre Néon** : Translucidité biseautée moderne.
-  - **Crochets Cyber `[ ]`** : Style console hacker / dev.
-  - **Lueur Intense Néon** : Aura lumineuse pulsante synchronisée.
-  - **Digital Box LCD** : Cadran numérique rétro encadré.
-  - **Minimaliste** : Zéro bordure, texte brut néon.
-  - **Cadre Cyber HUD** : Coins biseautés et encadrement technique.
-- **Indicateurs avancés** :
-  - **Barre de progression de la journée (%)** : progression visuelle en temps réel de 0 à 100%.
-  - **Informations complémentaires** : Numéro de semaine (`Sem. 45`) et jour de l'année (`Jour 307/365`).
-  - **Sélecteur de Fuseaux Horaires** : Local, Tokyo (JST), New York (EST), Londres (GMT) et UTC.
-  - Bascule 24 heures vs 12 heures AM/PM, affichage ou masquage des secondes (`:SS`), et 3 formats de date (Texte français, Numérique, ISO).
-  - 3 tailles au choix : Compacte, Moyenne, Imposante.
+### 🌤️ Station Météo Complète & Effets Canvas — `js/weather.js` & `js/weather-fx.js`
+- **Données en direct** : Température actuelle, température ressentie, humidité, vitesse du vent, indice UV.
+- **Prévisions à 3 jours** avec températures minimales et maximales.
+- **Recherche de ville & Géolocalisation** : Recherche manuelle par nom de ville ou détection automatique de localisation par IP.
+- **Effets météo d'arrière-plan** : Particules Canvas réactives (pluie, neige, orage, brume, ciel étoilé) avec interrupteur ON/OFF.
 
-### 🎛️ 4. Centre de Configuration Intégré au Deck Droit — `js/custom-hub.js`
-- **Zéro pop-up bloquante** : Accessible directement via l'onglet **Config** de la colonne droite avec défilement fluide et sous-onglets horizontaux :
-  - **Apparence** : Choix des thèmes, 10 palettes rapides instantanées, sélecteurs de couleurs personnalisés, flou, intensité de l'Ambilight et scanlines rétro avec rendu en direct sur toute la page.
-  - **Horloge** : Réglages en temps réel de la police, du style de cadre, du fuseau horaire, du format et des options d'affichage.
-  - **Signets** : Gestion complète des catégories et favoris avec contrôle de densité adaptative.
+### ⏱️ Minuteur Focus / Pomodoro — `js/widgets.js`
+- Cadran circulaire avec anneau de progression SVG.
+- Modes de travail prédéfinis : Focus (25m), Pause courte (5m), Pause longue (15m).
+- Boutons de presets d'intervalles : `25/5 Standard`, `50/10 Deep Work`, `15/3 Sprint`.
+- Compteur de sessions et objectif journalier représenté par 4 jalons visuels.
+- Carillon harmonique Web Audio à l'achèvement de chaque session.
+
+### 📝 Bloc-Notes Instantané (Scratchpad) — `js/widgets.js`
+- Zone de saisie rapide plein format avec auto-sauvegarde continue dans `localStorage`.
+- Compteur en temps réel des mots et des caractères.
+- Actions directes : copier dans le presse-papier, exporter au format `.txt`, et effacer.
+
+### 🎧 Ambiance Sonore Procédurale & Lo-Fi — `js/widgets.js`
+- 6 ambiances audio au choix :
+  - 🌧️ Pluie Cyber (Pluie douce synthétisée)
+  - ☕ Lo-Fi Synth (Lounge relax)
+  - 🌌 Deep Space (Bruit brun spatial profond)
+  - ⚡ Orage Néon (Pluie et tonnerre)
+  - 📻 Radio Lo-Fi (Flux radio continu chillhop)
+  - 🍃 Nuit Synthé (Brise nocturne et résonance)
+- Visualiseur de spectre audio animé sur Canvas et réglage précis du volume.
+
+### ⚡ Moniteur Système & Marchés Financiers — `js/widgets.js`
+- Télémétrie système : Latence ping réseau (ms), statut d'alimentation (AC / Batterie), nombre de cœurs CPU, mémoire vive (RAM), et temps de session (uptime).
+- Ticker des marchés boursiers : Suivi des indices majeurs (S&P 500, Europe Stoxx 600, Marchés Émergents, NVIDIA...) avec menu de personnalisation pour activer, masquer ou ajouter des actifs.
+
+### 💬 Citations Cyberpunk & Motivation — `js/widgets.js`
+- Sélection de citations issues de la science-fiction, de la culture hacker et de la philosophie dev (Blade Runner, Ghost in the Shell, Matrix, Neuromancer).
+- Bouton de tirage aléatoire et copie rapide dans le presse-papier.
+
+### ⚙️ Centre de Configuration Intégré — `js/custom-hub.js`
+- Accès direct via l'onglet **Config** de la colonne droite :
+  - **Apparence** : Choix des 3 thèmes, 10 palettes rapides, sélecteurs de couleurs personnalisés, intensité de l'Ambilight, scanlines rétro, avec aperçu en temps réel sur la page.
+  - **Horloge** : Choix de la police, du style de cadre, des formats d'heure et de date, et des fuseaux horaires.
+  - **Signets** : Gestion complète des catégories et favoris.
   - **Widgets** : Activation et désactivation individuelle de chaque widget.
   - **Flux RSS** : Gestion et validation d'URL pour vos flux d'actualités sur mesure.
-  - **Sauvegarde** : Exportation et importation JSON en un clic, ou réinitialisation aux valeurs d'usine.
-
-### 🌤️ 5. Station Météo Complète & Effets d'Arrière-Plan — `js/weather.js` & `js/weather-fx.js`
-- **Intégrée dans l'onglet Météo du deck droit** :
-  - Carte Hero météo en temps réel (icône animée, température, description).
-  - Recherche manuelle de ville instantanée ou détection GPS/IP en 1 clic.
-  - **Grille de métriques avancées** : Température ressentie, humidité, vent, indice UV.
-  - **Prévisions complètes sur 3 jours** avec températures min/max.
-  - **Effets météo dynamiques sur Canvas** : pluie, neige, orages, brume ou étoiles scintillantes réagissant à la météo réelle, avec interrupteur ON/OFF direct.
-
-### 🧩 6. Centre des Widgets Multi-Vues (Colonne Droite) — `js/widgets.js`
-- **Slider dynamique à 9 vues dans la colonne droite** :
-  1. 📅 **Agenda** : Calendrier mensuel interactif avec badges et gestionnaire de tâches (To-Do list).
-  2. 🌤️ **Météo** : Station météo complète et prévisions à 3 jours.
-  3. 📰 **Actus** : Flux RSS réactifs (Tech, Sport, flux sur mesure).
-  4. ⚡ **Système & Marchés** : Ping en temps réel, alimentation universelle (AC / Batterie), uptime, CPU/RAM et cotations boursières (S&P 500, Stoxx 600, Emerging Markets, NVIDIA...) avec menu de personnalisation intégré.
-  5. ⏱️ **Focus** : Minuteur Pomodoro (25m / 5m / 15m), barre de progression et carillon Web Audio.
-  6. 📝 **Notes** : Bloc-notes instantané avec sauvegarde automatique, compteurs et export texte.
-  7. 🎧 **Ambiance** : Synthétiseur procédural (pluie, bruit brun), radio Lo-Fi cyber et visualiseur audio Canvas animé.
-  8. 💬 **Quotes** : Citations cyberpunk et pensées inspirantes.
-  9. ⚙️ **Config** : Centre de personnalisation complet en direct.
+  - **Sauvegarde** : Téléchargement du fichier de configuration JSON, restauration et remise à zéro.
 
 ---
 
-## 🏗️ Architecture Propre & Modulaire
-
-Le projet est entièrement modulaire, sans dépendance lourde :
+## 🏗️ Structure du Projet
 
 ```text
 violet-startpage/
-├── index.html                  # Structure HTML cyberdeck 3 colonnes épurée
+├── index.html                  # Structure HTML cyberdeck 3 colonnes
 ├── README.md                   # Documentation complète du projet
-├── .gitignore                  # Fichiers et dossiers exclus de Git
+├── .gitignore                  # Fichiers exclus de Git
 │
-├── css/                        # Feuilles de styles modulaires
-│   ├── style.css               # Styles de base, Bento Grid 3 colonnes, widgets & responsive
-│   └── themes/                 # Thèmes visuels autonomes
+├── css/                        # Feuilles de styles
+│   ├── style.css               # Styles de base, Bento Grid, widgets et responsive
+│   └── themes/                 # Thèmes visuels
 │       ├── kanagawa.css        # Thème 1 : Kanagawa (Cyan / Menthe froide)
 │       ├── sakura.css          # Thème 2 : Sakura (Rose / Néo-pastel)
 │       └── cyberdeck.css       # Thème 3 : Cyberdeck (Néon violet & cyan)
 │
-├── js/                         # Logique JavaScript modulaire
-│   ├── app.js                  # Point d'entrée & bootstrapping DOMContentLoaded
-│   ├── themes.js               # Gestionnaire de thèmes visuels
+├── js/                         # Modules JavaScript
+│   ├── app.js                  # Point d'entrée de l'application
+│   ├── themes.js               # Gestionnaire des thèmes
 │   ├── appearance.js           # Personnalisation des couleurs, ambilight et scanlines
-│   ├── weather-fx.js           # Effets météo d'arrière-plan dynamiques sur Canvas
-│   ├── custom-hub.js           # Centre de personnalisation in-deck & navigation à 9 vues
-│   ├── bookmarks.js            # Signets adaptatifs, Drag & Drop & Export/Import JSON
+│   ├── clock.js                # Station horloge HUD, arc radial, cycle solaire & fuseaux
+│   ├── calendar.js             # Mini-calendrier mensuel avec badges de tâches
+│   ├── tasks.js                # To-Do list, échéances et filtrage
 │   ├── search.js               # Omnibox : moteur, calculatrice, bangs & autocomplétion
-│   ├── calendar.js             # Mini-calendrier mensuel interactif
-│   ├── tasks.js                # To-Do list, calcul des échéances & filtrage
-│   ├── clock.js                # Horloge cyberdeck gauche, progress bar jour & fuseaux
-│   ├── weather.js              # Station météo in-deck, prévisions & géolocalisation
-│   ├── widgets.js              # Widgets interactifs (Pomodoro, Notes, Ambiance, Système, Quotes)
+│   ├── bookmarks.js            # Signets adaptatifs, Drag & Drop & Export/Import JSON
+│   ├── weather.js              # Station météo in-deck & géolocalisation
+│   ├── weather-fx.js           # Effets météo dynamiques sur Canvas
+│   ├── widgets.js              # Widgets (Pomodoro, Notes, Ambiance, Système, Quotes)
 │   ├── feeds.js                # Flux d'actualités en direct & flux RSS personnalisés
+│   ├── custom-hub.js           # Centre de configuration in-deck & navigation à 9 vues
 │   └── shortcuts.js            # Raccourcis clavier globaux
 │
 └── images/                     # Médias et animations des thèmes
@@ -172,11 +188,11 @@ violet-startpage/
 
 | Raccourci | Action |
 | :--- | :--- |
-| <kbd>/</kbd> | Activer immédiatement la barre de recherche |
-| <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd> | Basculer entre les thèmes (Kanagawa / Sakura / Cyberdeck) |
-| <kbd>Échap</kbd> | Fermer la modale d'édition ou masquer les suggestions |
+| <kbd>/</kbd> | Activer la barre de recherche |
+| <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd> | Basculer instantanément entre les 3 thèmes |
 | <kbd>Entrée</kbd> | Valider une recherche, ajouter une tâche ou enregistrer |
 | <kbd>↑</kbd> / <kbd>↓</kbd> | Naviguer dans les suggestions de recherche |
+| <kbd>Échap</kbd> | Fermer les modales ou masquer les suggestions |
 
 ---
 
@@ -187,33 +203,35 @@ violet-startpage/
    ```bash
    git clone https://github.com/ugovds/startup_page.git
    ```
-2. Ouvrez simplement `index.html` dans votre navigateur Web (Chrome, Firefox, Brave, Edge...).
-3. Pour définir comme nouvel onglet :
+2. Ouvrez le fichier `index.html` dans votre navigateur Web (Firefox, Chrome, Brave, Edge...).
+3. Pour l'assigner comme page d'accueil ou nouvel onglet :
    - Utilisez une extension telle que **New Tab Override** ou **Custom New Tab URL**.
-   - Indiquez le chemin vers votre fichier : `file:///chemin/vers/index.html`.
+   - Renseignez l'URL locale : `file:///chemin/vers/index.html`.
 
 ### Option B : Déploiement en ligne gratuit (GitHub Pages)
 1. Rendez-vous sur votre dépôt GitHub : [https://github.com/ugovds/startup_page](https://github.com/ugovds/startup_page).
-2. Rendez-vous dans **Settings** > **Pages**.
-3. Sous **Branch**, sélectionnez `main` et `/ (root)`, puis cliquez sur **Save**.
-4. Votre startpage sera instantanément accessible en ligne à l'adresse :
+2. Ouvrez **Settings** > **Pages**.
+3. Sous **Branch**, sélectionnez `main` et le dossier `/ (root)`, puis validez avec **Save**.
+4. Votre startpage sera accessible en ligne à l'adresse :
    ```text
    https://ugovds.github.io/startup_page/
    ```
 
 ---
 
-## 🎨 Créer un Nouveau Thème
+## 🎨 Création d'un Nouveau Thème
 
-Grâce à la nouvelle architecture modulaire, ajouter un thème est un jeu d'enfant :
+Pour ajouter un thème supplémentaire :
 1. Créez un fichier `css/themes/mon-theme.css` avec vos variables CSS :
    ```css
    body[data-theme="4"] {
      --bg-deep: #0a0e14;
      --accent-primary: #ffaa00;
      --accent-secondary: #00e5ff;
-     /* ... */
+     --surface: rgba(10, 14, 20, 0.75);
+     --border-subtle: rgba(255, 170, 0, 0.15);
+     --border-highlight: rgba(255, 170, 0, 0.45);
    }
    ```
-2. Liez-le dans `index.html` ou importez-le dans `css/style.css`.
-3. Déclarez l'artwork et le nom du thème dans `js/themes.js`.
+2. Liez le fichier dans `index.html`.
+3. Déclarez le nom du thème et son artwork dans `js/themes.js`.
