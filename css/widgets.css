@@ -1535,6 +1535,16 @@
   min-height: 0;
   overflow-y: auto;
   padding-right: 0.35rem;
+  padding-bottom: 1.5rem;
+}
+
+.customize-deck-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.customize-deck-panel::-webkit-scrollbar-thumb {
+  background: var(--border-highlight);
+  border-radius: 4px;
 }
 
 .config-subtabs-nav {
@@ -1566,6 +1576,8 @@
   align-items: center;
   gap: 0.35rem;
   transition: all 0.2s ease;
+  width: auto !important;
+  flex-shrink: 0;
 }
 
 .config-subtab-btn:hover {
