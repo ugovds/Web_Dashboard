@@ -2,7 +2,7 @@
  * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache PWA)
  */
 
-const CACHE_NAME = 'violet-startpage-v1';
+const CACHE_NAME = 'violet-startpage-v2.2';
 
 const STATIC_ASSETS = [
   './',
@@ -52,7 +52,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activation : nettoyage des anciens caches
+// Activation : nettoyage immédiat des anciens caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -67,28 +67,26 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Interception des requêtes réseau : Stratégie Cache-First pour les assets locaux, Network-First pour les APIs
+// Interception des requêtes réseau :
+// Network-First pour les assets locaux pour voir instantanément les mises à jour sans bloquer sur l'ancien cache
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   // Requêtes non-GET ignorées
   if (event.request.method !== 'GET') return;
 
-  // Assets locaux : Cache-First avec mise à jour en arrière-plan
+  // Assets locaux : Network-First avec repli sur cache si hors-ligne
   if (url.origin === self.location.origin) {
     event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          // Mise à jour en arrière-plan (Stale-While-Revalidate)
-          fetch(event.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
-            }
-          }).catch(() => {});
-          return cachedResponse;
-        }
-        return fetch(event.request);
-      })
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }
