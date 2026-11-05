@@ -63,6 +63,16 @@ let isEditMode = false;
 let currentEditingTarget = { catIdx: null, linkIdx: null }; // linkIdx === null signifie ajout d'un nouveau lien
 let currentEditingCategoryIdx = null; // null = ajout de catégorie
 
+function getCleanDomain(url) {
+  if (!url) return '';
+  try {
+    const u = new URL(url);
+    return u.hostname.replace(/^www\./, '');
+  } catch {
+    return url.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0] || '';
+  }
+}
+
 // Variables pour le Glisser-Déposer
 let draggedData = null; // { catIdx, linkIdx }
 let didDragOccur = false;
@@ -146,8 +156,13 @@ function renderCategories() {
                   ? `<span class="link-drag-handle" title="Glisser pour réorganiser"><i class="fa-solid fa-grip-vertical"></i></span>`
                   : ''
               }
-              <i class="${link.icon}"></i>
-              <span class="link-name-text">${link.name}</span>
+              <div class="link-icon-box">
+                <i class="${link.icon || 'fa-solid fa-bookmark'}"></i>
+              </div>
+              <div class="link-meta">
+                <span class="link-name-text">${link.name}</span>
+                <span class="link-domain-text">${getCleanDomain(link.url)}</span>
+              </div>
               ${
                 isEditMode
                   ? `
