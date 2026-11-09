@@ -155,10 +155,12 @@ function exportTodosToICS() {
   }
 }
 
-function saveAndRenderTodos() {
-  localStorage.setItem('startpage_todos_v2', JSON.stringify(todos));
+function saveAndRenderTodos(skipStorageSave = false, skipCalendar = false) {
+  if (!skipStorageSave) {
+    localStorage.setItem('startpage_todos_v2', JSON.stringify(todos));
+  }
 
-  if (typeof renderCalendar === 'function') {
+  if (!skipCalendar && typeof renderCalendar === 'function') {
     renderCalendar();
   }
 
@@ -464,5 +466,5 @@ function initTasks() {
     });
   }
 
-  saveAndRenderTodos();
+  saveAndRenderTodos(true, true);
 }

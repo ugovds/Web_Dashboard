@@ -119,8 +119,12 @@ function applyAppearance() {
     wallpaperEl.style.opacity = opacityVal;
   }
 
-  updateAppearanceInputs();
-  updateAppearanceLivePreview();
+  // Mettre à jour l'aperçu et les inputs uniquement si l'onglet configuration est affiché
+  const appearanceTab = document.getElementById('hub-tab-appearance');
+  if (appearanceTab && !appearanceTab.hidden) {
+    updateAppearanceInputs();
+    updateAppearanceLivePreview();
+  }
 }
 
 function updateAppearanceInputs() {
@@ -284,8 +288,6 @@ function renderUserCustomThemes() {
 
 function initAppearance() {
   loadAppearanceSettings();
-  renderPalettesList();
-  renderUserCustomThemes();
   applyAppearance();
 
   const resetBtn = document.getElementById('appearance-reset-btn');

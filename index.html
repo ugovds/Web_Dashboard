@@ -5,34 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Startpage // Violet & Cyberdeck</title>
 
-    <!-- Polices Google : Inter, JetBrains Mono, Orbitron, Share Tech Mono, VT323 -->
+    <!-- Préconnexions prioritaires pour le CRP & DNS Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <link rel="dns-prefetch" href="https://wttr.in" />
+    <link rel="dns-prefetch" href="https://1.1.1.1" />
+    <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
+    <link rel="dns-prefetch" href="https://api.coingecko.com" />
+
+    <!-- Polices Google : Inter, JetBrains Mono, Orbitron, Share Tech Mono, VT323 (Non-bloquant) -->
     <link
+      rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800;900&family=Share+Tech+Mono&family=VT323&display=swap"
-      rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800;900&family=Share+Tech+Mono&family=VT323&display=swap"
+      />
+    </noscript>
 
-    <!-- Font Awesome Icons -->
+    <!-- Font Awesome Icons (Préchargement asynchrone non-bloquant) -->
     <link
-      rel="stylesheet"
+      rel="preload"
+      as="style"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      />
+    </noscript>
 
-    <!-- Stylesheets modulaires -->
-    <link rel="stylesheet" href="css/base.css?v=2.3" />
-    <link rel="stylesheet" href="css/clock.css?v=2.3" />
-    <link rel="stylesheet" href="css/search.css?v=2.3" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=2.3" />
-    <link rel="stylesheet" href="css/calendar.css?v=2.3" />
-    <link rel="stylesheet" href="css/tasks.css?v=2.3" />
-    <link rel="stylesheet" href="css/deck.css?v=2.3" />
-    <link rel="stylesheet" href="css/widgets.css?v=2.3" />
-    <link rel="stylesheet" href="css/modals.css?v=2.3" />
-    <link rel="stylesheet" href="css/responsive.css?v=2.3" />
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.3" />
-    <link rel="stylesheet" href="css/themes/sakura.css?v=2.3" />
-    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.3" />
+    <!-- Stylesheets modulaires critiques (Above-The-Fold) -->
+    <link rel="stylesheet" href="css/base.css?v=2.4" />
+    <link rel="stylesheet" href="css/clock.css?v=2.4" />
+    <link rel="stylesheet" href="css/search.css?v=2.4" />
+    <link rel="stylesheet" href="css/bookmarks.css?v=2.4" />
+    <link rel="stylesheet" href="css/calendar.css?v=2.4" />
+    <link rel="stylesheet" href="css/tasks.css?v=2.4" />
+    <link rel="stylesheet" href="css/deck.css?v=2.4" />
+    <link rel="stylesheet" href="css/responsive.css?v=2.4" />
+    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.4" />
+
+    <!-- Stylesheets secondaires différées (Widgets hors-écran, Modales, Thèmes inactifs) -->
+    <link rel="stylesheet" href="css/widgets.css?v=2.4" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/modals.css?v=2.4" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/sakura.css?v=2.4" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.4" media="print" onload="this.media='all'" />
   </head>
 
   <body data-theme="1">
@@ -52,7 +77,7 @@
         <aside class="col-left">
           <!-- Artwork Card proportionné en haut -->
           <div class="art-card col-left-art">
-            <img id="main-art" src="images/gif.gif" alt="Theme Artwork" />
+            <img id="main-art" src="images/gif.gif" alt="Theme Artwork" width="280" height="220" fetchpriority="high" />
             <div class="art-badge">
               <span class="pulse-dot"></span>
               <span id="art-badge-text">修理 // ONLINE</span>
@@ -1363,21 +1388,21 @@
       </div>
     </div>
 
-    <!-- Scripts JavaScript modulaires -->
-    <script src="js/themes.js?v=2.3"></script>
-    <script src="js/appearance.js?v=2.3"></script>
-    <script src="js/clock.js?v=2.3"></script>
-    <script src="js/weather-fx.js?v=2.3"></script>
-    <script src="js/weather.js?v=2.3"></script>
-    <script src="js/calendar.js?v=2.3"></script>
-    <script src="js/tasks.js?v=2.3"></script>
-    <script src="js/search.js?v=2.3"></script>
-    <script src="js/feeds.js?v=2.3"></script>
-    <script src="js/bookmarks.js?v=2.3"></script>
-    <script src="js/widgets.js?v=2.3"></script>
-    <script src="js/custom-hub.js?v=2.3"></script>
-    <script src="js/command-palette.js?v=2.3"></script>
-    <script src="js/shortcuts.js?v=2.3"></script>
-    <script src="js/app.js?v=2.3"></script>
+    <!-- Scripts JavaScript modulaires différés (téléchargement parallèle sans bloquer le parsing DOM) -->
+    <script defer src="js/themes.js?v=2.4"></script>
+    <script defer src="js/appearance.js?v=2.4"></script>
+    <script defer src="js/clock.js?v=2.4"></script>
+    <script defer src="js/weather-fx.js?v=2.4"></script>
+    <script defer src="js/weather.js?v=2.4"></script>
+    <script defer src="js/calendar.js?v=2.4"></script>
+    <script defer src="js/tasks.js?v=2.4"></script>
+    <script defer src="js/search.js?v=2.4"></script>
+    <script defer src="js/feeds.js?v=2.4"></script>
+    <script defer src="js/bookmarks.js?v=2.4"></script>
+    <script defer src="js/widgets.js?v=2.4"></script>
+    <script defer src="js/custom-hub.js?v=2.4"></script>
+    <script defer src="js/command-palette.js?v=2.4"></script>
+    <script defer src="js/shortcuts.js?v=2.4"></script>
+    <script defer src="js/app.js?v=2.4"></script>
   </body>
 </html>

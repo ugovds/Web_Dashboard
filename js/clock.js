@@ -46,6 +46,9 @@ function saveClockSettings() {
   localStorage.setItem('startpage_clock_settings', JSON.stringify(currentClockSettings));
   applyClockSettings();
   updateClock();
+  if (!clockRafId && (currentClockSettings.showSeconds || currentClockSettings.style === 'analog')) {
+    clockRafId = requestAnimationFrame(runClockAnimationLoop);
+  }
 }
 
 function applyClockSettings() {
@@ -436,38 +439,42 @@ function updateClock() {
  * Boucle d'animation fluide 60 FPS pour l'arc radial des secondes et trotteuse analogique
  */
 function runClockAnimationLoop() {
-  const zonedDate = getZonedDate(currentClockSettings);
-  const secArc = document.getElementById('clock-sec-arc');
-  const msTickEl = document.getElementById('clock-ms-tick');
-  const secHand = document.getElementById('analog-sec-hand');
+  const isAnalog = currentClockSettings.style === 'analog';
+  const showSec = currentClockSettings.showSeconds === true;
 
+  // Si ni l'analogique ni les secondes ne sont demandés, arrêter la boucle rAF
+  if (!showSec && !isAnalog) {
+    clockRafId = null;
+    return;
+  }
+
+  const zonedDate = getZonedDate(currentClockSettings);
   const s = zonedDate.getSeconds();
   const ms = zonedDate.getMilliseconds();
   const frac = s + ms / 1000;
 
   // Trotteuse fluide 60 FPS pour l'horloge analogique suisse
-  if (secHand) {
-    const secDeg = frac * 6;
-    secHand.setAttribute('transform', `rotate(${secDeg} 100 100)`);
+  if (isAnalog) {
+    const secHand = document.getElementById('analog-sec-hand');
+    if (secHand) {
+      const secDeg = frac * 6;
+      secHand.setAttribute('transform', `rotate(${secDeg} 100 100)`);
+    }
   }
 
-  if (currentClockSettings.showSeconds) {
-    // Arc des secondes SVG (circonférence = 2 * PI * 96 ≈ 603.18)
+  if (showSec) {
+    const secArc = document.getElementById('clock-sec-arc');
     if (secArc) {
       const circum = 603.18;
       const offset = circum - (frac / 60) * circum;
       secArc.style.strokeDashoffset = offset.toFixed(2);
-      secArc.style.display = '';
     }
 
+    const msTickEl = document.getElementById('clock-ms-tick');
     if (msTickEl) {
       const msHundreds = Math.floor(ms / 10);
       msTickEl.textContent = `.${String(msHundreds).padStart(2, '0')}`;
-      msTickEl.style.display = '';
     }
-  } else {
-    if (secArc) secArc.style.display = 'none';
-    if (msTickEl) msTickEl.style.display = 'none';
   }
 
   clockRafId = requestAnimationFrame(runClockAnimationLoop);
@@ -487,15 +494,15 @@ function initClock() {
       }
     } else {
       updateClock();
-      if (!clockRafId) {
+      if (!clockRafId && (currentClockSettings.showSeconds || currentClockSettings.style === 'analog')) {
         clockRafId = requestAnimationFrame(runClockAnimationLoop);
       }
     }
   });
 
-  // Actualisation continue de l'horloge
+  // Actualisation continue de l'horloge (1s pour affichage standard HH:MM)
   setInterval(updateClock, 1000);
-  if (!clockRafId) {
+  if (!clockRafId && (currentClockSettings.showSeconds || currentClockSettings.style === 'analog')) {
     clockRafId = requestAnimationFrame(runClockAnimationLoop);
   }
 

@@ -8,6 +8,21 @@
 
 let cachedWeatherData = null;
 
+function getStoredWeatherCache() {
+  try {
+    const raw = localStorage.getItem('startpage_weather_cache');
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredWeatherCache(data) {
+  try {
+    localStorage.setItem('startpage_weather_cache', JSON.stringify({ data, time: Date.now() }));
+  } catch {}
+}
+
 const weatherDescFr = {
   'clear': 'Ciel dégagé',
   'sunny': 'Ensoleillé',
@@ -151,6 +166,7 @@ async function fetchWeather() {
     }
 
     cachedWeatherData = data;
+    setStoredWeatherCache(data);
     renderWeatherDeckView(data);
     updateFavButtonState();
     renderWeatherFavorites();
@@ -486,6 +502,18 @@ function initWeather() {
 
   renderWeatherFavorites();
   updateFavButtonState();
-  fetchWeather();
+
+  // Hydratation synchrone immédiate depuis le cache local (0 ms de latence)
+  const cacheEntry = getStoredWeatherCache();
+  if (cacheEntry && cacheEntry.data) {
+    cachedWeatherData = cacheEntry.data;
+    renderWeatherDeckView(cacheEntry.data);
+  }
+
+  // Revalidation réseau si le cache est absent ou périmé (> 30 min)
+  const isExpired = !cacheEntry || (Date.now() - (cacheEntry.time || 0) > 1800000);
+  if (isExpired) {
+    fetchWeather();
+  }
   setInterval(fetchWeather, 1800000); // 30 minutes
 }

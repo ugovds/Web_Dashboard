@@ -59,6 +59,21 @@ function saveCustomFeedsToStorage() {
   localStorage.setItem('startpage_custom_feeds', JSON.stringify(customFeeds));
 }
 
+function getStoredFeedCache(feedId) {
+  try {
+    const raw = localStorage.getItem(`startpage_feed_cache_${feedId}`);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredFeedCache(feedId, html) {
+  try {
+    localStorage.setItem(`startpage_feed_cache_${feedId}`, JSON.stringify({ html, time: Date.now() }));
+  } catch {}
+}
+
 async function fetchRssWithFallback(rssUrl) {
   try {
     const res = await fetch(
@@ -99,9 +114,16 @@ async function loadFeed(feedId) {
     btn.classList.toggle('active', btn.dataset.feed === feedId);
   });
 
-  feedList.innerHTML = '<li class="feed-skeleton">Récupération des dépêches...</li>';
+  // Affichage immédiat du cache si disponible (0ms de latence)
+  const cached = getStoredFeedCache(feedId);
+  if (cached && cached.html) {
+    feedList.innerHTML = cached.html;
+  } else {
+    feedList.innerHTML = '<li class="feed-skeleton">Récupération des dépêches...</li>';
+  }
 
   try {
+    let renderedHtml = '';
     if (feedId === 'tech') {
       const res = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
       const ids = (await res.json()).slice(0, 5);
@@ -110,7 +132,7 @@ async function loadFeed(feedId) {
           fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then((r) => r.json())
         )
       );
-      feedList.innerHTML = items
+      renderedHtml = items
         .map(
           (item) => `
           <li>
@@ -124,7 +146,7 @@ async function loadFeed(feedId) {
     } else if (builtinFeeds[feedId]) {
       const articles = await fetchRssWithFallback(builtinFeeds[feedId].url);
       const tag = escapeFeedHtml(feedId.toUpperCase());
-      feedList.innerHTML = articles
+      renderedHtml = articles
         .map(
           (item) => `
           <li>
@@ -142,7 +164,7 @@ async function loadFeed(feedId) {
 
       const articles = await fetchRssWithFallback(customFeed.url);
       const tag = escapeFeedHtml((customFeed.name || 'RSS').toUpperCase().slice(0, 5));
-      feedList.innerHTML = articles
+      renderedHtml = articles
         .map(
           (item) => `
           <li>
@@ -154,8 +176,15 @@ async function loadFeed(feedId) {
         )
         .join('');
     }
+
+    if (renderedHtml) {
+      feedList.innerHTML = renderedHtml;
+      setStoredFeedCache(feedId, renderedHtml);
+    }
   } catch (err) {
-    feedList.innerHTML = '<li class="feed-skeleton">Flux temporairement indisponible ou protégé.</li>';
+    if (!cached || !cached.html) {
+      feedList.innerHTML = '<li class="feed-skeleton">Flux temporairement indisponible ou protégé.</li>';
+    }
   }
 }
 

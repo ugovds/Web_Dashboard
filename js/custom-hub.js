@@ -75,6 +75,8 @@ function switchHubTab(tabName) {
   if (tabName === 'shortcuts') {
     renderHubShortcuts();
   } else if (tabName === 'appearance') {
+    if (typeof renderPalettesList === 'function') renderPalettesList();
+    if (typeof renderUserCustomThemes === 'function') renderUserCustomThemes();
     if (typeof updateAppearanceInputs === 'function') updateAppearanceInputs();
     if (typeof updateAppearanceLivePreview === 'function') updateAppearanceLivePreview();
   } else if (tabName === 'clock') {

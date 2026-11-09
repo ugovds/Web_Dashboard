@@ -41,24 +41,34 @@ function showToast(message, type = 'info') {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Initialisation des différents modules
+  // === PHASE 1 : CRITIQUE (Affichage immédiat de l'interface) ===
   if (typeof initThemes === 'function') initThemes();
   if (typeof initAppearance === 'function') initAppearance();
-  if (typeof initWeatherFx === 'function') initWeatherFx();
   if (typeof initBookmarks === 'function') initBookmarks();
-  if (typeof initCustomHub === 'function') initCustomHub();
-  if (typeof initWidgets === 'function') initWidgets();
   if (typeof initClock === 'function') initClock();
-  if (typeof initWeather === 'function') initWeather();
   if (typeof initTasks === 'function') initTasks();
   if (typeof initCalendar === 'function') initCalendar();
   if (typeof initSearch === 'function') initSearch();
-  if (typeof initFeeds === 'function') initFeeds();
-  if (typeof initCommandPalette === 'function') initCommandPalette();
   if (typeof initShortcuts === 'function') initShortcuts();
 
-  // Enregistrement du Service Worker pour le mode hors-ligne PWA
-  if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+  // === PHASE 2 : DIFFÉRÉE (Tâches secondaires libérant le thread) ===
+  const deferNonCritical = () => {
+    if (typeof initCustomHub === 'function') initCustomHub();
+    if (typeof initWidgets === 'function') initWidgets();
+    if (typeof initWeather === 'function') initWeather();
+    if (typeof initWeatherFx === 'function') initWeatherFx();
+    if (typeof initFeeds === 'function') initFeeds();
+    if (typeof initCommandPalette === 'function') initCommandPalette();
+
+    // Enregistrement du Service Worker pour le mode hors-ligne PWA
+    if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  };
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(deferNonCritical, { timeout: 800 });
+  } else {
+    setTimeout(deferNonCritical, 50);
   }
 });
