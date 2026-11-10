@@ -1,0 +1,18 @@
+/* ========================================================
+   Thème 4 : Retro Wave (Monochrome Ukiyo-e & 8-Bit)
+   Inspiré de La Grande Vague de Kanagawa & Retro Gaming
+   ======================================================== */
+body[data-theme="4"] {
+  --bg-deep: #030406;
+  --surface: rgba(13, 16, 22, 0.82);
+  --surface-strong: rgba(20, 24, 34, 0.96);
+  --border-subtle: rgba(220, 230, 245, 0.11);
+  --border-highlight: rgba(225, 235, 250, 0.52);
+  --accent-primary: #e2ebf5;
+  --accent-secondary: #8295a8;
+  --accent-white: #ffffff;
+  --text-main: #f0f4f8;
+  --text-muted: #78879b;
+  --orb-1: rgba(226, 235, 245, 0.22);
+  --orb-2: rgba(85, 110, 140, 0.28);
+}

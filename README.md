@@ -20,12 +20,12 @@
 
 ## 📸 Thèmes Visuels
 
-La startpage intègre 3 thèmes visuels avec éclairage ambiant (Ambilight), orbes lumineux et scanlines rétro, sélectionnables via les raccourcis clavier (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>) ou dans le centre de configuration :
+La startpage intègre 4 thèmes visuels avec éclairage ambiant (Ambilight), orbes lumineux et scanlines rétro, sélectionnables via les raccourcis clavier (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd>) ou dans le centre de configuration :
 
-| Thème 1 : Kanagawa 🌊 | Thème 2 : Sakura 🌸 | Thème 3 : Cyberdeck ⚡ |
-| :---: | :---: | :---: |
-| <img src="images/gif.gif" width="240" /> | <img src="images/gif2.gif" width="240" /> | <img src="images/gif3.gif" width="240" /> |
-| *Palette Cyan & Menthe froide* | *Palette Rose & Néo-Pastel* | *Palette Cyberpunk Violet & Néon* |
+| Thème 1 : Kanagawa 🌊 | Thème 2 : Sakura 🌸 | Thème 3 : Cyberdeck ⚡ | Thème 4 : Retro Wave 🎮 |
+| :---: | :---: | :---: | :---: |
+| <img src="images/gif.gif" width="190" /> | <img src="images/gif2.gif" width="190" /> | <img src="images/gif3.gif" width="190" /> | <img src="images/gif4.gif" width="190" /> |
+| *Palette Cyan & Menthe froide* | *Palette Rose & Néo-Pastel* | *Palette Cyberpunk Violet & Néon* | *Palette Monochrome Ukiyo & 8-Bit* |
 
 ---
 
@@ -157,7 +157,8 @@ violet-startpage/
 │   └── themes/                 # Thèmes visuels
 │       ├── kanagawa.css        # Thème 1 : Kanagawa (Cyan / Menthe froide)
 │       ├── sakura.css          # Thème 2 : Sakura (Rose / Néo-pastel)
-│       └── cyberdeck.css       # Thème 3 : Cyberdeck (Néon violet & cyan)
+│       ├── cyberdeck.css       # Thème 3 : Cyberdeck (Néon violet & cyan)
+│       └── retrowave.css       # Thème 4 : Retro Wave (Monochrome Ukiyo & 8-Bit)
 │
 ├── js/                         # Modules JavaScript
 │   ├── app.js                  # Point d'entrée de l'application
@@ -179,6 +180,7 @@ violet-startpage/
     ├── gif.gif                 # Artwork Thème 1 (Kanagawa)
     ├── gif2.gif                # Artwork Thème 2 (Sakura)
     ├── gif3.gif                # Artwork Thème 3 (Cyberdeck)
+    ├── gif4.gif                # Artwork Thème 4 (Retro Wave)
     └── gif_origin.gif
 ```
 

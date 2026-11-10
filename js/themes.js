@@ -1,5 +1,5 @@
 /**
- * themes.js - Gestion des 3 thèmes visuels et du système Ambilight
+ * themes.js - Gestion des 4 thèmes visuels et du système Ambilight
  */
 const themesConfig = {
   '1': {
@@ -19,10 +19,16 @@ const themesConfig = {
     img: 'images/gif3.gif',
     badge: '電脳 // CYBERDECK',
     accent: '#31e1f7'
+  },
+  '4': {
+    name: 'Retro Wave',
+    img: 'images/gif4.gif',
+    badge: '浪裏 // RETRO WAVE',
+    accent: '#e2ebf5'
   }
 };
 
-let currentTheme = '1';
+let currentTheme = '4';
 
 function applyTheme(themeId) {
   const cfg = themesConfig[themeId];
@@ -44,6 +50,11 @@ function applyTheme(themeId) {
     btn.classList.toggle('active', btn.dataset.themeBtn === themeId);
   });
 
+  const hubThemeBtns = document.querySelectorAll('.hub-theme-card-btn');
+  hubThemeBtns.forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.hubTheme === themeId);
+  });
+
   localStorage.setItem('startpage_theme', themeId);
 
   if (typeof applyAppearance === 'function') {
@@ -52,7 +63,8 @@ function applyTheme(themeId) {
 }
 
 function initThemes() {
-  const saved = localStorage.getItem('startpage_theme') || '1';
+  const urlParam = new URLSearchParams(window.location.search).get('theme');
+  const saved = (urlParam && themesConfig[urlParam]) ? urlParam : (localStorage.getItem('startpage_theme') || '4');
   currentTheme = themesConfig[saved] ? saved : '1';
 
   const themeBtns = document.querySelectorAll('.theme-btn');

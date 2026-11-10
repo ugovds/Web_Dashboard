@@ -420,11 +420,17 @@
   gap: 0.4rem;
 }
 
-/* Grille de sélection des 3 thèmes de base */
+/* Grille de sélection des thèmes de base */
 .hub-themes-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.55rem;
+}
+
+@media (max-width: 680px) {
+  .hub-themes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .hub-theme-card-btn {
@@ -475,6 +481,10 @@
 
 .cyberdeck-color {
   background: linear-gradient(135deg, #31e1f7, #b55fe6);
+}
+
+.retrowave-color {
+  background: linear-gradient(135deg, #e2ebf5, #1e2430);
 }
 
 .theme-card-name {

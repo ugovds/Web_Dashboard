@@ -22,6 +22,7 @@ const CYBER_PALETTES = [
   { name: 'Kanagawa Cyan', primary: '#a8e6f0', secondary: '#7aa89f' },
   { name: 'Sakura Rose', primary: '#ff85c0', secondary: '#ffa39e' },
   { name: 'Cyberdeck Violet', primary: '#31e1f7', secondary: '#b55fe6' },
+  { name: 'Retro Wave Monochrome', primary: '#e2ebf5', secondary: '#8295a8' },
   { name: 'Matrix Emerald', primary: '#00ff66', secondary: '#00cc88' },
   { name: 'Tokyo Neon', primary: '#ff007f', secondary: '#00f0ff' },
   { name: 'Synthwave Amber', primary: '#ffb86c', secondary: '#ff79c6' },
@@ -187,9 +188,8 @@ function updateAppearanceLivePreview() {
   // Tag du thème actif
   const themeTag = document.getElementById('preview-active-theme-tag');
   const activeThemeId = document.body.getAttribute('data-theme') || '1';
-  let themeName = 'Kanagawa';
-  if (activeThemeId === '2') themeName = 'Sakura';
-  if (activeThemeId === '3') themeName = 'Cyberdeck';
+  const cfg = (typeof themesConfig !== 'undefined' && themesConfig[activeThemeId]) ? themesConfig[activeThemeId] : null;
+  const themeName = cfg ? cfg.name : (activeThemeId === '2' ? 'Sakura' : (activeThemeId === '3' ? 'Cyberdeck' : (activeThemeId === '4' ? 'Retro Wave' : 'Kanagawa')));
 
   if (themeTag) {
     if (currentAppearance.customAccent) {
@@ -203,15 +203,8 @@ function updateAppearanceLivePreview() {
   const bannerArt = document.getElementById('preview-banner-art');
   const badgeName = document.getElementById('preview-badge-name');
   if (bannerArt) {
-    let gifImg = 'images/gif.gif';
-    let badgeText = '修理 // KANAGAWA';
-    if (activeThemeId === '2') {
-      gifImg = 'images/gif2.gif';
-      badgeText = '桜 // SAKURA';
-    } else if (activeThemeId === '3') {
-      gifImg = 'images/gif3.gif';
-      badgeText = '電脳 // CYBERDECK';
-    }
+    const gifImg = cfg ? cfg.img : 'images/gif.gif';
+    const badgeText = cfg ? cfg.badge : '修理 // KANAGAWA';
     bannerArt.style.backgroundImage = `url("${gifImg}")`;
     if (badgeName) badgeName.textContent = badgeText;
   }

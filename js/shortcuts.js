@@ -160,7 +160,8 @@ function initShortcuts() {
       e.code === 'Numpad1' ||
       e.code === 'Numpad2' ||
       e.code === 'Numpad3' ||
-      ((isNotTyping || isSearchEmpty) && ['1', '2', '3'].includes(e.key));
+      e.code === 'Numpad4' ||
+      ((isNotTyping || isSearchEmpty) && ['1', '2', '3', '4'].includes(e.key));
 
     if (isThemeKey && !isTodoFocused && (isNotTyping || isSearchEmpty)) {
       const num = e.code.startsWith('Numpad') ? e.code.replace('Numpad', '') : e.key;
