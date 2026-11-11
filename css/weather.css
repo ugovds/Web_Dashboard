@@ -38,15 +38,15 @@
   background: var(--accent-primary);
 }
 
-/* Conteneur principal fluide inspiré Samsung */
+/* Conteneur principal fluide plein format inspiré Samsung */
 .samsung-weather-container {
-  max-width: 1320px;
   width: 100%;
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 2vh, 26px);
-  padding: clamp(10px, 1.5vh, 20px) clamp(16px, 2vw, 36px) clamp(48px, 6vh, 80px);
+  gap: clamp(18px, 2.5vh, 32px);
+  padding: clamp(12px, 1.8vh, 26px) clamp(20px, 2.6vw, 56px) clamp(60px, 8vh, 100px);
   box-sizing: border-box;
 }
 
@@ -215,47 +215,48 @@
   opacity: 0.8;
 }
 
-/* --- 2. HERO CARD STYLE SAMSUNG --- */
+/* --- 2. HERO CARD STYLE SAMSUNG (Plein Format Équilibré) --- */
 .samsung-hero-card {
   position: relative;
-  background: radial-gradient(circle at 82% 24%, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18) 0%, rgba(14, 18, 28, 0.8) 100%);
+  background: radial-gradient(circle at 82% 24%, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22) 0%, rgba(14, 18, 28, 0.82) 100%);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: clamp(22px, 2.8vh, 32px);
-  padding: clamp(26px, 3.4vh, 44px) clamp(24px, 3vw, 48px);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: clamp(24px, 3.2vh, 36px);
+  min-height: clamp(220px, 26vh, 340px);
+  padding: clamp(28px, 3.6vh, 52px) clamp(28px, 3.2vw, 56px);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.14);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 1.5rem;
+  gap: 2rem;
   overflow: hidden;
 }
 
 .samsung-hero-content {
   display: flex;
   flex-direction: column;
-  gap: clamp(6px, 1vh, 10px);
+  gap: clamp(8px, 1.2vh, 14px);
   z-index: 2;
 }
 
 .samsung-hero-loc {
-  font-size: clamp(1.15rem, 1.8vh, 1.45rem);
+  font-size: clamp(1.25rem, 2vh, 1.6rem);
   font-weight: 700;
   color: #ffffff;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   letter-spacing: -0.01em;
 }
 
 .samsung-hero-loc i {
   color: var(--accent-primary);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .samsung-hero-time {
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 500;
   color: var(--text-muted);
   margin-left: 0.5rem;
@@ -265,40 +266,40 @@
 .samsung-hero-temp-row {
   display: flex;
   align-items: baseline;
-  gap: 1.25rem;
+  gap: 1.5rem;
   margin-top: 2px;
 }
 
 .samsung-hero-temp {
-  font-size: clamp(4rem, 7vh, 6.2rem);
+  font-size: clamp(4.8rem, 8.8vh, 7.6rem);
   font-weight: 300;
   line-height: 0.95;
   color: #ffffff;
   font-family: "Inter", -apple-system, sans-serif;
-  letter-spacing: -2px;
-  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  letter-spacing: -3px;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
 }
 
 .samsung-hero-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .samsung-hero-desc {
-  font-size: clamp(1.15rem, 1.8vh, 1.45rem);
+  font-size: clamp(1.25rem, 2vh, 1.7rem);
   font-weight: 600;
   color: rgba(255, 255, 255, 0.95);
   text-transform: capitalize;
 }
 
 .samsung-hero-highlow {
-  font-size: clamp(0.85rem, 1.2vh, 1rem);
+  font-size: clamp(0.92rem, 1.3vh, 1.15rem);
   font-weight: 500;
   color: rgba(255, 255, 255, 0.78);
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
 .samsung-hero-highlow strong {
@@ -314,9 +315,9 @@
 }
 
 .samsung-hero-art i {
-  font-size: clamp(4.5rem, 8.5vh, 7.5rem);
+  font-size: clamp(5.5rem, 11vh, 9.5rem);
   color: var(--accent-primary);
-  filter: drop-shadow(0 0 28px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.55));
+  filter: drop-shadow(0 0 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.6));
   transition: all 0.3s ease;
 }
 
@@ -445,13 +446,13 @@
   margin: 0;
 }
 
-/* Courbe SVG Bézier fluide */
+/* Courbe SVG Bézier fluide (Grand format proportionnel) */
 .samsung-curve-wrap {
   width: 100%;
-  height: 85px;
+  height: clamp(100px, 14vh, 160px);
   position: relative;
   overflow: visible;
-  margin: 0.25rem 0;
+  margin: 0.4rem 0;
 }
 
 .samsung-curve-wrap svg {
@@ -463,20 +464,20 @@
 /* Carrousel d'heures */
 .samsung-hourly-timeline {
   display: flex;
-  gap: clamp(10px, 1.4vw, 20px);
+  gap: clamp(12px, 1.4vw, 24px);
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 0.4rem 0 0.6rem 0;
+  padding: 0.6rem 0 0.8rem 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
 .samsung-hourly-timeline::-webkit-scrollbar {
-  height: 4px;
+  height: 5px;
 }
 
 .samsung-hourly-timeline::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 99px;
 }
 
@@ -484,40 +485,46 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-width: 58px;
+  gap: 8px;
+  min-width: clamp(66px, 5.5vw, 98px);
   flex: 1;
   text-align: center;
-  transition: all 0.18s ease;
+  padding: clamp(8px, 1.1vh, 14px) clamp(4px, 0.5vw, 8px);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .samsung-hour-cell:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
   transform: translateY(-2px);
 }
 
 .hour-time-label {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--text-muted);
 }
 
 .hour-icon {
-  font-size: 1.15rem;
+  font-size: 1.25rem;
   color: var(--accent-primary);
-  height: 24px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .hour-temp-val {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: #ffffff;
 }
 
 .hour-rain-drop {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: #8be9fd;
   display: flex;
@@ -529,13 +536,13 @@
 .samsung-precip-section {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  padding-top: 0.75rem;
+  gap: 0.75rem;
+  padding-top: 0.85rem;
   border-top: 1px dashed rgba(255, 255, 255, 0.08);
 }
 
 .precip-section-title {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -548,11 +555,11 @@
 .samsung-precip-bars-row {
   display: flex;
   align-items: flex-end;
-  gap: clamp(10px, 1.4vw, 20px);
-  height: 65px;
+  gap: clamp(12px, 1.4vw, 24px);
+  height: clamp(75px, 9vh, 115px);
   overflow-x: auto;
   overflow-y: hidden;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
 }
 
 .precip-bar-col {
@@ -560,38 +567,38 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  min-width: 58px;
+  min-width: clamp(66px, 5.5vw, 98px);
   flex: 1;
   height: 100%;
-  gap: 4px;
+  gap: 6px;
 }
 
 .precip-bar-fill {
-  width: 14px;
+  width: 16px;
   background: linear-gradient(180deg, #8be9fd 0%, rgba(139, 233, 253, 0.25) 100%);
-  border-radius: 6px 6px 2px 2px;
-  box-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
+  border-radius: 7px 7px 2px 2px;
+  box-shadow: 0 0 10px rgba(139, 233, 253, 0.35);
   transition: height 0.3s ease;
   min-height: 2px;
 }
 
 .precip-val-label {
-  font-size: 0.62rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-/* --- 5. DISPOSITION EN COLONNES BENTO (Sur Grand Écran / 34") --- */
+/* --- 5. DISPOSITION EN COLONNES BENTO (Grand Écran & 34" Ultrawide) --- */
 .samsung-bento-columns {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-  gap: clamp(16px, 2vh, 26px);
+  gap: clamp(18px, 2.5vh, 32px);
   width: 100%;
   box-sizing: border-box;
 }
 
-/* Colonne Gauche : Prévisions Multi-Jours Samsung */
+/* Colonne Gauche : Prévisions Multi-Jours Samsung (7 jours complets) */
 .samsung-multiday-card {
   height: 100%;
 }
@@ -599,43 +606,43 @@
 .samsung-multiday-list {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.6rem;
 }
 
 .multiday-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.65rem 0.85rem;
+  gap: 1rem;
+  padding: clamp(10px, 1.3vh, 16px) clamp(14px, 1.6vw, 22px);
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
+  border-radius: 16px;
   transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .multiday-row:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
-  transform: translateX(2px);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+  transform: translateX(3px);
 }
 
 .multiday-day-info {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  width: 130px;
+  gap: 0.75rem;
+  width: clamp(120px, 11vw, 160px);
   flex-shrink: 0;
 }
 
 .multiday-name {
-  font-size: 0.82rem;
+  font-size: clamp(0.85rem, 1.2vh, 1rem);
   font-weight: 600;
   color: #ffffff;
 }
 
 .multiday-rain-badge {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: #8be9fd;
   display: inline-flex;
@@ -647,8 +654,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  font-size: 1.15rem;
+  width: 36px;
+  font-size: 1.25rem;
   color: var(--accent-primary);
   flex-shrink: 0;
 }
@@ -656,24 +663,24 @@
 .multiday-slider-wrap {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
   flex: 1;
   min-width: 0;
   justify-content: flex-end;
 }
 
 .multiday-min-temp {
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   color: var(--text-muted);
   font-weight: 600;
-  width: 26px;
+  width: 30px;
   text-align: right;
 }
 
 .multiday-range-track {
   flex: 1;
-  max-width: 140px;
-  height: 5px;
+  max-width: 240px;
+  height: 6px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 99px;
   overflow: hidden;
@@ -687,35 +694,37 @@
 }
 
 .multiday-max-temp {
-  font-size: 0.86rem;
+  font-size: 0.92rem;
   color: #ffffff;
   font-weight: 700;
-  width: 26px;
+  width: 30px;
 }
 
 /* Colonne Droite : Grille des Métriques Détaillées Samsung */
 .samsung-metrics-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: clamp(10px, 1.3vh, 16px);
+  gap: clamp(12px, 1.6vh, 20px);
 }
 
 .samsung-metric-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 16px;
-  padding: 0.85rem 1rem;
+  border-radius: 18px;
+  padding: clamp(14px, 1.8vh, 22px) clamp(16px, 1.8vw, 24px);
+  min-height: clamp(90px, 12vh, 130px);
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  justify-content: space-between;
+  gap: 0.45rem;
   transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 .samsung-metric-card:hover {
   background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
 
 .metric-card-top {
@@ -725,23 +734,23 @@
 }
 
 .metric-card-title {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 600;
   color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
 
 .metric-card-title i {
   color: var(--accent-primary);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .metric-card-val {
-  font-size: clamp(1.15rem, 1.6vh, 1.4rem);
+  font-size: clamp(1.35rem, 2vh, 1.75rem);
   font-weight: 700;
   color: #ffffff;
   font-family: inherit;
@@ -749,7 +758,7 @@
 }
 
 .metric-card-sub {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   line-height: 1.25;
 }
@@ -762,10 +771,10 @@
 
 .weather-radar-iframe-wrap {
   width: 100%;
-  height: clamp(380px, 46vh, 520px);
-  border-radius: 16px;
+  height: clamp(460px, 55vh, 680px);
+  border-radius: 20px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.09);
   background: #080a12;
   position: relative;
 }
@@ -782,24 +791,33 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.4rem;
+  padding: 1.2rem 1.6rem;
 }
 
 .samsung-fx-label {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  font-size: 0.82rem;
+  gap: 0.85rem;
+  font-size: 0.86rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .samsung-fx-label i {
   color: var(--accent-primary);
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 /* --- 8. ADAPTATIF / RESPONSIVE (34" Ultrawide, Laptops, Tablettes, Mobiles) --- */
+@media (min-width: 1800px) {
+  .samsung-metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .samsung-metric-card:last-child {
+    grid-column: span 3;
+  }
+}
+
 @media (max-width: 1100px) {
   .samsung-bento-columns {
     grid-template-columns: 1fr;
@@ -808,7 +826,7 @@
 
 @media (max-width: 768px) {
   .samsung-weather-container {
-    padding: 10px 12px 60px;
+    padding: 10px 14px 60px;
     gap: 16px;
   }
 
@@ -816,10 +834,11 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 24px 20px;
+    min-height: auto;
   }
 
   .samsung-hero-temp {
-    font-size: 3.8rem;
+    font-size: 4rem;
   }
 
   .samsung-metrics-grid {
@@ -827,6 +846,6 @@
   }
 
   .weather-radar-iframe-wrap {
-    height: 320px;
+    height: 340px;
   }
 }

@@ -47,6 +47,41 @@ const weatherDescFr = {
   'blizzard': 'Blizzard'
 };
 
+const WMO_CODES = {
+  0: { desc: 'Ciel dégagé', icon: 'fa-solid fa-sun' },
+  1: { desc: 'Principalement dégagé', icon: 'fa-solid fa-sun' },
+  2: { desc: 'Éclaircies', icon: 'fa-solid fa-cloud-sun' },
+  3: { desc: 'Couvert', icon: 'fa-solid fa-cloud' },
+  45: { desc: 'Brouillard', icon: 'fa-solid fa-smog' },
+  48: { desc: 'Brouillard givrant', icon: 'fa-solid fa-smog' },
+  51: { desc: 'Bruine légère', icon: 'fa-solid fa-cloud-rain' },
+  53: { desc: 'Bruine modérée', icon: 'fa-solid fa-cloud-rain' },
+  55: { desc: 'Bruine dense', icon: 'fa-solid fa-cloud-showers-heavy' },
+  56: { desc: 'Bruine verglaçante', icon: 'fa-solid fa-snowflake' },
+  57: { desc: 'Forte bruine verglaçante', icon: 'fa-solid fa-snowflake' },
+  61: { desc: 'Pluie faible', icon: 'fa-solid fa-cloud-rain' },
+  63: { desc: 'Pluie modérée', icon: 'fa-solid fa-cloud-rain' },
+  65: { desc: 'Forte pluie', icon: 'fa-solid fa-cloud-showers-heavy' },
+  66: { desc: 'Pluie verglaçante', icon: 'fa-solid fa-snowflake' },
+  67: { desc: 'Forte pluie verglaçante', icon: 'fa-solid fa-snowflake' },
+  71: { desc: 'Chutes de neige légères', icon: 'fa-solid fa-snowflake' },
+  73: { desc: 'Chutes de neige modérées', icon: 'fa-solid fa-snowflake' },
+  75: { desc: 'Fortes chutes de neige', icon: 'fa-solid fa-snowflake' },
+  77: { desc: 'Grains de neige', icon: 'fa-solid fa-snowflake' },
+  80: { desc: 'Averses légères', icon: 'fa-solid fa-cloud-rain' },
+  81: { desc: 'Averses modérées', icon: 'fa-solid fa-cloud-rain' },
+  82: { desc: 'Violentes averses', icon: 'fa-solid fa-cloud-showers-heavy' },
+  85: { desc: 'Averses de neige', icon: 'fa-solid fa-snowflake' },
+  86: { desc: 'Fortes averses de neige', icon: 'fa-solid fa-snowflake' },
+  95: { desc: 'Orage', icon: 'fa-solid fa-cloud-bolt' },
+  96: { desc: 'Orage et grêle', icon: 'fa-solid fa-cloud-bolt' },
+  99: { desc: 'Violent orage de grêle', icon: 'fa-solid fa-cloud-bolt' }
+};
+
+function getWmoInfo(code) {
+  return WMO_CODES[code] || { desc: 'Partiellement nuageux', icon: 'fa-solid fa-cloud' };
+}
+
 function translateWeatherDesc(desc) {
   if (!desc) return '';
   const clean = desc.trim().toLowerCase();
@@ -142,11 +177,174 @@ function updateFavButtonState() {
   favBtn.title = isFav ? `Retirer "${currentCity}" des favoris` : `Ajouter "${currentCity || 'cette ville'}" aux favoris`;
 }
 
-async function fetchWeather() {
-  const city = getSavedCity();
+function degreesToCompass(deg) {
+  if (deg === undefined || deg === null) return 'N';
+  const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  const idx = Math.round(deg / 22.5) % 16;
+  return dirs[idx];
+}
+
+async function fetchOpenMeteo(city) {
+  let locInfo = null;
+  if (city) {
+    const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=fr&format=json`;
+    const geoRes = await fetch(geoUrl);
+    if (!geoRes.ok) return null;
+    const geoData = await geoRes.json();
+    if (!geoData.results || !geoData.results.length) return null;
+    const first = geoData.results[0];
+    locInfo = {
+      name: first.name,
+      country: first.country || '',
+      latitude: first.latitude,
+      longitude: first.longitude
+    };
+  } else {
+    // Détection automatique basée sur l'adresse IP
+    try {
+      const wttrRes = await fetch('https://wttr.in/?format=j1');
+      if (wttrRes.ok) {
+        const wttrData = await wttrRes.json();
+        const area = wttrData.nearest_area && wttrData.nearest_area[0];
+        if (area) {
+          locInfo = {
+            name: area.areaName?.[0]?.value || 'Position locale',
+            country: area.country?.[0]?.value || '',
+            latitude: parseFloat(area.latitude) || 48.8566,
+            longitude: parseFloat(area.longitude) || 2.3522
+          };
+        }
+      }
+    } catch {}
+    if (!locInfo) {
+      locInfo = { name: 'Paris', country: 'France', latitude: 48.8566, longitude: 2.3522 };
+    }
+  }
+
+  // Requête Open-Meteo pour 7 jours complets + données horaires et instantanées
+  const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${locInfo.latitude}&longitude=${locInfo.longitude}&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,sunrise,sunset,uv_index_max&hourly=temperature_2m,precipitation_probability,precipitation,weathercode&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m&timezone=auto&forecast_days=7`;
+  const fRes = await fetch(forecastUrl);
+  if (!fRes.ok) return null;
+  const omData = await fRes.json();
+
+  const current = omData.current || {};
+  const daily = omData.daily || {};
+  const hourly = omData.hourly || {};
+  const wmo = getWmoInfo(current.weather_code);
+
+  // Échantillonnage de 8 créneaux horaires sur les prochaines 24 heures (toutes les 3h)
+  const nowIso = new Date().toISOString().slice(0, 13);
+  let startIdx = 0;
+  if (hourly.time && hourly.time.length) {
+    const foundIdx = hourly.time.findIndex((t) => t.startsWith(nowIso));
+    if (foundIdx !== -1) {
+      startIdx = foundIdx;
+    } else {
+      const currentHour = new Date().getHours();
+      startIdx = Math.min(hourly.time.length - 1, Math.max(0, currentHour));
+    }
+  }
+
+  const sampleHourly = [];
+  for (let i = 0; i < 8; i++) {
+    const idx = Math.min(hourly.time.length - 1, startIdx + i * 3);
+    const rawTime = hourly.time[idx] || '';
+    const code = hourly.weathercode?.[idx] ?? 0;
+    const hourWmo = getWmoInfo(code);
+    sampleHourly.push({
+      time: rawTime,
+      tempC: Math.round(hourly.temperature_2m?.[idx] ?? current.temperature_2m ?? 0).toString(),
+      chanceofrain: Math.round(hourly.precipitation_probability?.[idx] ?? 0).toString(),
+      precipMM: (hourly.precipitation?.[idx] ?? 0).toString(),
+      weatherDesc: [{ value: hourWmo.desc }],
+      weatherIcon: hourWmo.icon
+    });
+  }
+
+  // Formatage des 7 jours de prévisions
+  const daysList = [];
+  const numDays = (daily.time || []).length;
+  for (let d = 0; d < numDays; d++) {
+    const dateStr = daily.time[d];
+    const code = daily.weathercode?.[d] ?? 0;
+    const dayWmo = getWmoInfo(code);
+    const maxT = Math.round(daily.temperature_2m_max?.[d] ?? 0).toString();
+    const minT = Math.round(daily.temperature_2m_min?.[d] ?? 0).toString();
+    const rainProb = Math.round(daily.precipitation_probability_max?.[d] ?? 0).toString();
+
+    const sunriseIso = daily.sunrise?.[d] || '';
+    const sunsetIso = daily.sunset?.[d] || '';
+    const sunriseStr = sunriseIso.includes('T') ? sunriseIso.split('T')[1].slice(0, 5) : sunriseIso;
+    const sunsetStr = sunsetIso.includes('T') ? sunsetIso.split('T')[1].slice(0, 5) : sunsetIso;
+
+    daysList.push({
+      date: dateStr,
+      maxtempC: maxT,
+      mintempC: minT,
+      astronomy: [
+        {
+          sunrise: sunriseStr || '07:00',
+          sunset: sunsetStr || '19:00'
+        }
+      ],
+      hourly: [
+        {
+          time: '1200',
+          tempC: maxT,
+          chanceofrain: rainProb,
+          precipMM: (daily.precipitation_sum?.[d] ?? 0).toString(),
+          weatherDesc: [{ value: dayWmo.desc }],
+          weatherIcon: dayWmo.icon
+        }
+      ]
+    });
+  }
+
+  // Le jour d'aujourd'hui reçoit l'échantillon 24h pour le graphique
+  if (daysList[0]) {
+    daysList[0].hourly = sampleHourly;
+  }
+
+  return {
+    source: 'open-meteo',
+    current_condition: [
+      {
+        temp_C: Math.round(current.temperature_2m ?? 0).toString(),
+        FeelsLikeC: Math.round(current.apparent_temperature ?? current.temperature_2m ?? 0).toString(),
+        humidity: Math.round(current.relative_humidity_2m ?? 50).toString(),
+        windspeedKmph: Math.round(current.wind_speed_10m ?? 0).toString(),
+        winddir16Point: degreesToCompass(current.wind_direction_10m),
+        uvIndex: Math.round(daily.uv_index_max?.[0] ?? 0).toString(),
+        pressure: Math.round(current.surface_pressure ?? 1013).toString(),
+        visibility: '10',
+        weatherDesc: [{ value: wmo.desc }],
+        weatherIcon: wmo.icon,
+        precipMM: (current.precipitation ?? 0).toString()
+      }
+    ],
+    nearest_area: [
+      {
+        areaName: [{ value: locInfo.name || 'Position locale' }],
+        country: [{ value: locInfo.country || '' }],
+        latitude: String(locInfo.latitude || '48.8566'),
+        longitude: String(locInfo.longitude || '2.3522')
+      }
+    ],
+    weather: daysList
+  };
+}
+
+async function fetchWttrIn(city) {
   const queryUrl = city
     ? `https://wttr.in/${encodeURIComponent(city)}?format=j1`
     : 'https://wttr.in/?format=j1';
+  const res = await fetch(queryUrl);
+  if (!res.ok) throw new Error('Erreur wttr.in');
+  return await res.json();
+}
+
+async function fetchWeather() {
+  const city = getSavedCity();
 
   const locEl = document.getElementById('deck-weather-loc');
   const tempEl = document.getElementById('deck-weather-temp');
@@ -158,11 +356,19 @@ async function fetchWeather() {
   if (descEl) descEl.textContent = 'Actualisation en cours...';
 
   try {
-    const res = await fetch(queryUrl);
-    if (!res.ok) throw new Error('Erreur météo');
-    const data = await res.json();
-    if (!data.current_condition || !data.current_condition[0]) {
-      throw new Error('Données invalides');
+    let data = null;
+    try {
+      data = await fetchOpenMeteo(city);
+    } catch (e) {
+      console.warn('Open-Meteo failed, trying wttr.in fallback:', e);
+    }
+
+    if (!data) {
+      data = await fetchWttrIn(city);
+    }
+
+    if (!data || !data.current_condition || !data.current_condition[0]) {
+      throw new Error('Données météo invalides');
     }
 
     cachedWeatherData = data;
@@ -312,7 +518,7 @@ function renderWeatherDeckView(data) {
       const hourlyMid = w.hourly && (w.hourly[4] || w.hourly[0]);
       const dayDescRaw = hourlyMid?.weatherDesc?.[0]?.value || '';
       const dayDesc = translateWeatherDesc(dayDescRaw);
-      const dayIcon = getWeatherIconClass(dayDescRaw);
+      const dayIcon = hourlyMid?.weatherIcon || getWeatherIconClass(dayDescRaw);
 
       const maxRain = Math.max(0, ...((w.hourly || []).map((h) => parseInt(h.chanceofrain, 10) || 0)));
       const rainHtml = maxRain > 15 ? `<span class="multiday-rain-badge"><i class="fa-solid fa-droplet"></i> ${maxRain}%</span>` : '';
@@ -368,10 +574,10 @@ function renderWeatherHourlyGraph(data) {
   const maxTemp = Math.max(...temps) + 1;
   const tempRange = Math.max(1, maxTemp - minTemp);
 
-  const svgW = 720;
-  const svgH = 85;
-  const padX = 36;
-  const padY = 16;
+  const svgW = 1000;
+  const svgH = 130;
+  const padX = 45;
+  const padY = 24;
   const usableW = svgW - padX * 2;
   const usableH = svgH - padY * 2;
 
@@ -386,7 +592,8 @@ function renderWeatherHourlyGraph(data) {
       hour: h.time,
       rain: parseInt(h.chanceofrain, 10) || 0,
       precip: parseFloat(h.precipMM) || 0,
-      desc: h.weatherDesc?.[0]?.value || ''
+      desc: h.weatherDesc?.[0]?.value || '',
+      icon: h.weatherIcon
     };
   });
 
@@ -414,12 +621,16 @@ function renderWeatherHourlyGraph(data) {
   if (chipsRow) {
     const formatHour = (rawTime, idx) => {
       if (idx === 0) return 'Maintenant';
+      if (typeof rawTime === 'string') {
+        if (rawTime.includes('T')) return rawTime.split('T')[1].slice(0, 5);
+        if (rawTime.includes(':')) return rawTime.slice(0, 5);
+      }
       const h = Math.floor(parseInt(rawTime, 10) / 100);
       return `${String(h).padStart(2, '0')}:00`;
     };
 
     chipsRow.innerHTML = points.map((p, idx) => {
-      const iconCls = getWeatherIconClass(p.desc);
+      const iconCls = p.icon || getWeatherIconClass(p.desc);
       const rainHtml = p.rain > 10
         ? `<span class="hour-rain-drop"><i class="fa-solid fa-droplet"></i> ${p.rain}%</span>`
         : '<span class="hour-rain-drop" style="opacity:0;">--</span>';
