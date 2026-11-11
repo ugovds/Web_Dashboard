@@ -347,6 +347,10 @@ function initTasks() {
   const sortBtn = document.getElementById('task-sort-btn');
   const exportIcsBtn = document.getElementById('task-export-ics-btn');
 
+  if (todoPrioritySelect) {
+    todoPrioritySelect.value = localStorage.getItem('startpage_agenda_default_priority') || 'normal';
+  }
+
   // Boutons de filtrage (Toutes, À faire, Faites, Auj)
   document.querySelectorAll('.task-filter-btn[data-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -395,6 +399,9 @@ function initTasks() {
       });
 
       todoInput.value = '';
+      if (todoPrioritySelect) {
+        todoPrioritySelect.value = localStorage.getItem('startpage_agenda_default_priority') || 'normal';
+      }
       saveAndRenderTodos();
     });
   }

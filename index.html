@@ -50,9 +50,10 @@
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
-    <link rel="stylesheet" href="css/calendar.css?v=3.0" />
-    <link rel="stylesheet" href="css/tasks.css?v=3.0" />
-    <link rel="stylesheet" href="css/responsive.css?v=3.0" />
+    <link rel="stylesheet" href="css/calendar.css?v=3.1" />
+    <link rel="stylesheet" href="css/tasks.css?v=3.1" />
+    <link rel="stylesheet" href="css/weather.css?v=3.1" />
+    <link rel="stylesheet" href="css/responsive.css?v=3.1" />
     <link rel="stylesheet" href="css/themes/kanagawa.css?v=3.0" />
 
     <!-- Stylesheets secondaires différées (Widgets hors-écran, Modales, Thèmes inactifs) -->
@@ -443,119 +444,209 @@
             </div>
           </div>
 
-              <!-- VUE 2 : MÉTÉO COMPLÈTE & PRÉVISIONS -->
+              <!-- VUE 2 : MÉTÉO COMPLÈTE & PRÉVISIONS (INSPIRATION SAMSUNG ONE UI) -->
               <div id="deck-view-weather" class="deck-slide-view weather-full-view" hidden>
-                <div class="deck-widget-panel weather-deck-panel">
-                  <div class="weather-deck-search">
-                    <input type="text" id="deck-city-input" placeholder="Changer de ville (Paris, Tokyo...)" />
-                    <button type="button" id="deck-city-search-btn" class="deck-icon-action" title="Rechercher"><i class="fa-solid fa-magnifying-glass"></i></button>
-                    <button type="button" id="deck-city-fav-btn" class="deck-icon-action" title="Ajouter / Retirer des favoris"><i class="fa-regular fa-star"></i></button>
-                    <button type="button" id="deck-city-gps-btn" class="deck-icon-action" title="Détection automatique"><i class="fa-solid fa-location-crosshairs"></i></button>
-                    <button type="button" id="deck-weather-refresh-btn" class="deck-icon-action" title="Actualiser"><i class="fa-solid fa-rotate-right"></i></button>
+                <div class="samsung-weather-container">
+                  <!-- 1. BARRE DE RECHERCHE FLOTTANTE & FAVORIS -->
+                  <div class="weather-search-card">
+                    <div class="weather-search-main-row">
+                      <div class="weather-search-input-wrap">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input
+                          type="text"
+                          id="deck-city-input"
+                          class="weather-search-input"
+                          placeholder="Rechercher une ville (Paris, Tokyo, New York...)"
+                          autocomplete="off"
+                        />
+                      </div>
+                      <button type="button" id="deck-city-search-btn" class="weather-action-btn search-submit-btn" title="Rechercher">
+                        <i class="fa-solid fa-arrow-right"></i>
+                      </button>
+                      <button type="button" id="deck-city-fav-btn" class="weather-action-btn fav-btn" title="Ajouter / Retirer des favoris">
+                        <i class="fa-regular fa-star"></i>
+                      </button>
+                      <button type="button" id="deck-city-gps-btn" class="weather-action-btn" title="Détection automatique GPS / IP">
+                        <i class="fa-solid fa-location-crosshairs"></i>
+                      </button>
+                      <button type="button" id="deck-weather-refresh-btn" class="weather-action-btn" title="Actualiser la météo">
+                        <i class="fa-solid fa-rotate-right"></i>
+                      </button>
+                    </div>
+                    <!-- Barre des villes favorites -->
+                    <div id="weather-favorites-bar" class="weather-favorites-bar"></div>
                   </div>
 
-                  <!-- Barre des villes favorites -->
-                  <div id="weather-favorites-bar" class="weather-favorites-bar"></div>
-
-                  <!-- Onglets de vue météo : Prévisions/Graphique vs Radar direct -->
-                  <div class="weather-view-tabs">
-                    <button type="button" class="weather-view-tab-btn active" id="weather-tab-overview" data-weather-view="overview">
-                      <i class="fa-solid fa-chart-line"></i> Prévisions & Graphique
-                    </button>
-                    <button type="button" class="weather-view-tab-btn" id="weather-tab-radar" data-weather-view="radar">
-                      <i class="fa-solid fa-satellite-dish"></i> Radar Direct
-                    </button>
-                  </div>
-
-                  <!-- 1. VUE PRINCIPALE : HERO, GRAPHIQUE 24H, MÉTRIQUES & PRÉVISIONS -->
-                  <div id="weather-overview-panel" class="weather-overview-panel">
-                    <div class="weather-deck-hero">
-                      <div class="weather-hero-left">
-                        <div class="weather-hero-loc">
-                          <i class="fa-solid fa-location-dot"></i>
-                          <span id="deck-weather-loc">Chargement...</span>
+                  <!-- 2. HERO HEADER SAMSUNG (GRANDE TEMPÉRATURE & AMBIANCE) -->
+                  <div class="samsung-hero-card" id="samsung-hero-card">
+                    <div class="samsung-hero-content">
+                      <div class="samsung-hero-loc">
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span id="deck-weather-loc">Chargement de la ville...</span>
+                        <span id="deck-weather-updated" class="samsung-hero-time">Actualisation en cours</span>
+                      </div>
+                      <div class="samsung-hero-temp-row">
+                        <span id="deck-weather-temp" class="samsung-hero-temp">--°</span>
+                        <div class="samsung-hero-meta">
+                          <span id="deck-weather-desc" class="samsung-hero-desc">Météo en direct</span>
+                          <span class="samsung-hero-highlow" id="deck-weather-highlow">
+                            ↑ --° / ↓ --° • Ressenti <strong id="deck-weather-feels-hero">--°</strong>
+                          </span>
                         </div>
-                        <span id="deck-weather-temp" class="weather-hero-temp">--°C</span>
-                        <span id="deck-weather-desc" class="weather-hero-desc">Météo en direct</span>
-                        <span id="deck-weather-updated" class="telemetry-sub">Actualisation en cours</span>
-                      </div>
-                      <div class="weather-hero-right">
-                        <i id="deck-weather-icon" class="fa-solid fa-cloud"></i>
                       </div>
                     </div>
+                    <div class="samsung-hero-art">
+                      <i id="deck-weather-icon" class="fa-solid fa-cloud-sun"></i>
+                    </div>
+                  </div>
 
-                    <!-- Graphique interactif des températures et pluie (24h) -->
-                    <div class="weather-chart-section">
-                      <div class="weather-chart-header">
-                        <span class="weather-chart-title"><i class="fa-solid fa-chart-area"></i> Températures & Pluie (24h)</span>
-                        <span id="weather-chart-summary" class="weather-chart-summary">Aujourd'hui</span>
-                      </div>
-                      <div class="weather-hourly-graph-wrap">
-                        <svg id="weather-hourly-svg" class="weather-hourly-svg" viewBox="0 0 340 60" preserveAspectRatio="none">
-                          <defs>
-                            <linearGradient id="weatherTempGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="var(--accent-primary, #a78bfa)" stop-opacity="0.45" />
-                              <stop offset="100%" stop-color="var(--accent-primary, #a78bfa)" stop-opacity="0.0" />
-                            </linearGradient>
-                          </defs>
-                          <path id="weather-graph-area" fill="url(#weatherTempGrad)" d=""></path>
-                          <path id="weather-graph-line" fill="none" stroke="var(--accent-primary, #a78bfa)" stroke-width="2.5" d=""></path>
-                        </svg>
-                        <div id="weather-hourly-chips-row" class="weather-hourly-chips-row"></div>
-                      </div>
+                  <!-- 3. BANNIÈRE PERSPECTIVES / ALERTES SAMSUNG -->
+                  <div class="samsung-card samsung-alert-card" id="weather-insight-card">
+                    <div class="samsung-alert-icon">
+                      <i class="fa-solid fa-bullhorn"></i>
+                    </div>
+                    <div class="samsung-alert-content">
+                      <span class="samsung-alert-title">Perspectives Météo</span>
+                      <p id="weather-insight-text" class="samsung-alert-text">Chargement des données météo en temps réel...</p>
+                    </div>
+                  </div>
+
+                  <!-- 4. PRÉVISIONS HORAIRES : COURBE BÉZIER 24H & PRÉCIPITATIONS MM -->
+                  <div class="samsung-card samsung-hourly-card">
+                    <div class="samsung-card-header">
+                      <span class="samsung-card-title"><i class="fa-solid fa-chart-line"></i> Prévisions Heure par Heure</span>
+                      <span id="weather-chart-summary" class="samsung-card-badge">Aujourd'hui</span>
+                    </div>
+                    <p id="weather-hourly-summary" class="hourly-summary-text">Évolution des températures et risques d'ondées sur 24 heures.</p>
+
+                    <!-- Courbe SVG Bézier fluide -->
+                    <div class="samsung-curve-wrap">
+                      <svg id="weather-hourly-svg" class="weather-hourly-svg" viewBox="0 0 720 85" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="weatherTempGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="var(--accent-primary, #a78bfa)" stop-opacity="0.45" />
+                            <stop offset="100%" stop-color="var(--accent-primary, #a78bfa)" stop-opacity="0.0" />
+                          </linearGradient>
+                        </defs>
+                        <path id="weather-graph-area" fill="url(#weatherTempGrad)" d=""></path>
+                        <path id="weather-graph-line" fill="none" stroke="var(--accent-primary, #a78bfa)" stroke-width="3" stroke-linecap="round" d=""></path>
+                      </svg>
                     </div>
 
-                    <div class="weather-deck-metrics">
-                      <div class="weather-deck-metric-card">
-                        <span class="metric-label"><i class="fa-solid fa-temperature-half"></i> Ressenti</span>
-                        <span id="deck-weather-feels" class="metric-val">--°C</span>
-                      </div>
-                      <div class="weather-deck-metric-card">
-                        <span class="metric-label"><i class="fa-solid fa-droplet"></i> Humidité</span>
-                        <span id="deck-weather-humidity" class="metric-val">--%</span>
-                      </div>
-                      <div class="weather-deck-metric-card">
-                        <span class="metric-label"><i class="fa-solid fa-wind"></i> Vent</span>
-                        <span id="deck-weather-wind" class="metric-val">-- km/h</span>
-                      </div>
-                      <div class="weather-deck-metric-card">
-                        <span class="metric-label"><i class="fa-solid fa-sun"></i> Indice UV</span>
-                        <span id="deck-weather-uv" class="metric-val">-- / 10</span>
-                      </div>
-                      <div class="weather-deck-metric-card">
-                        <span class="metric-label"><i class="fa-solid fa-gauge-high"></i> Pression</span>
-                        <span id="deck-weather-pressure" class="metric-val">1015 hPa</span>
-                      </div>
-                      <div class="weather-deck-metric-card">
-                        <span class="metric-label"><i class="fa-solid fa-eye"></i> Visibilité</span>
-                        <span id="deck-weather-visibility" class="metric-val">10 km</span>
-                      </div>
-                    </div>
+                    <!-- Carrousel des heures avec icônes et % de pluie -->
+                    <div id="weather-hourly-chips-row" class="samsung-hourly-timeline"></div>
 
-                    <div class="weather-deck-forecast-section">
-                      <div class="forecast-section-title"><i class="fa-solid fa-calendar-days"></i> Prévisions sur 3 Jours</div>
-                      <div id="deck-weather-forecast-list" class="forecast-cards-row">
+                    <!-- Sous-section Samsung : Barres de précipitations (mm) -->
+                    <div class="samsung-precip-section">
+                      <div class="precip-section-title">
+                        <i class="fa-solid fa-droplet"></i> Volume de Précipitations (mm)
+                      </div>
+                      <div id="weather-precip-bars-row" class="samsung-precip-bars-row"></div>
+                    </div>
+                  </div>
+
+                  <!-- 5. BENTO COLONNES : PRÉVISIONS MULTI-JOURS (GAUCHE) & MÉTRIQUES DÉTAILLÉES (DROITE) -->
+                  <div class="samsung-bento-columns">
+                    <!-- Colonne 1 : Prévisions multi-jours avec jauges thermiques -->
+                    <div class="samsung-card samsung-multiday-card">
+                      <div class="samsung-card-header">
+                        <span class="samsung-card-title"><i class="fa-regular fa-calendar-days"></i> Prévisions des prochains jours</span>
+                        <span class="samsung-card-badge">Tendance</span>
+                      </div>
+                      <div id="deck-weather-forecast-list" class="samsung-multiday-list">
                         <div class="forecast-loading">Chargement des prévisions...</div>
                       </div>
                     </div>
 
-                    <div class="weather-fx-box">
-                      <label class="fx-toggle-label">
-                        <span>Effets météo animés d'arrière-plan (Canvas)</span>
-                        <input type="checkbox" id="deck-weather-fx-toggle" checked />
-                        <span class="switch-slider"></span>
-                      </label>
+                    <!-- Colonne 2 : Grille des métriques Samsung -->
+                    <div class="samsung-card">
+                      <div class="samsung-card-header">
+                        <span class="samsung-card-title"><i class="fa-solid fa-gauge-high"></i> Conditions & Métriques</span>
+                        <span class="samsung-card-badge">Direct</span>
+                      </div>
+                      <div class="samsung-metrics-grid">
+                        <div class="samsung-metric-card">
+                          <div class="metric-card-top">
+                            <span class="metric-card-title"><i class="fa-solid fa-temperature-half"></i> Ressenti</span>
+                          </div>
+                          <span id="deck-weather-feels" class="metric-card-val">--°C</span>
+                          <span id="deck-weather-feels-sub" class="metric-card-sub">Indice de confort thermique</span>
+                        </div>
+
+                        <div class="samsung-metric-card">
+                          <div class="metric-card-top">
+                            <span class="metric-card-title"><i class="fa-solid fa-droplet"></i> Humidité</span>
+                          </div>
+                          <span id="deck-weather-humidity" class="metric-card-val">--%</span>
+                          <span id="deck-weather-humidity-sub" class="metric-card-sub">Point de rosée normal</span>
+                        </div>
+
+                        <div class="samsung-metric-card">
+                          <div class="metric-card-top">
+                            <span class="metric-card-title"><i class="fa-solid fa-wind"></i> Vent</span>
+                          </div>
+                          <span id="deck-weather-wind" class="metric-card-val">-- km/h</span>
+                          <span id="deck-weather-wind-sub" class="metric-card-sub">Vitesse et rafales</span>
+                        </div>
+
+                        <div class="samsung-metric-card">
+                          <div class="metric-card-top">
+                            <span class="metric-card-title"><i class="fa-solid fa-sun"></i> Indice UV</span>
+                          </div>
+                          <span id="deck-weather-uv" class="metric-card-val">-- / 10</span>
+                          <span id="deck-weather-uv-sub" class="metric-card-sub">Niveau d'exposition</span>
+                        </div>
+
+                        <div class="samsung-metric-card">
+                          <div class="metric-card-top">
+                            <span class="metric-card-title"><i class="fa-solid fa-gauge"></i> Pression</span>
+                          </div>
+                          <span id="deck-weather-pressure" class="metric-card-val">1015 hPa</span>
+                          <span id="deck-weather-pressure-sub" class="metric-card-sub">Baromètre stable</span>
+                        </div>
+
+                        <div class="samsung-metric-card">
+                          <div class="metric-card-top">
+                            <span class="metric-card-title"><i class="fa-solid fa-eye"></i> Visibilité</span>
+                          </div>
+                          <span id="deck-weather-visibility" class="metric-card-val">10 km</span>
+                          <span id="deck-weather-vis-sub" class="metric-card-sub">Clarté atmosphérique</span>
+                        </div>
+
+                        <div class="samsung-metric-card" style="grid-column: 1 / -1;">
+                          <div class="metric-card-top">
+                            <span class="metric-card-title"><i class="fa-solid fa-sun-plant-wilt"></i> Soleil & Éphéméride</span>
+                          </div>
+                          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                            <span id="deck-weather-sunrise" style="font-size: 0.82rem; color: #fadb14; font-weight: 600;"><i class="fa-regular fa-sun"></i> Lever : --</span>
+                            <span id="deck-weather-sunset" style="font-size: 0.82rem; color: #ff7875; font-weight: 600;"><i class="fa-solid fa-moon"></i> Coucher : --</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <!-- 2. VUE RADAR SATELLITE EN DIRECT (RAINVIEWER) -->
-                  <div id="weather-radar-panel" class="weather-radar-panel" hidden>
-                    <div class="weather-radar-header">
-                      <span><i class="fa-solid fa-satellite-dish"></i> Radar précipitations satellite en direct</span>
+                  <!-- 6. RADAR SATELLITE EN DIRECT (DANS LE FLUX PRINCIPAL) -->
+                  <div id="weather-radar-panel" class="samsung-card samsung-radar-card">
+                    <div class="samsung-card-header">
+                      <span class="samsung-card-title"><i class="fa-solid fa-satellite-dish"></i> Radar des Précipitations Satellite en Direct</span>
+                      <span class="samsung-card-badge live"><span class="live-dot"></span> Direct RainViewer</span>
                     </div>
                     <div class="weather-radar-iframe-wrap">
                       <iframe id="weather-radar-iframe" class="weather-radar-iframe" title="Radar des précipitations en direct" src="" loading="lazy"></iframe>
                     </div>
+                  </div>
+
+                  <!-- 7. EFFETS D'ARRIÈRE-PLAN CANVAS -->
+                  <div class="samsung-card samsung-fx-card">
+                    <div class="samsung-fx-label">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i>
+                      <span>Effets météo dynamiques d'arrière-plan (Canvas pluie, neige & étoiles)</span>
+                    </div>
+                    <label class="fx-toggle-label switch-only">
+                      <input type="checkbox" id="deck-weather-fx-toggle" checked />
+                      <span class="switch-slider"></span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -1300,6 +1391,26 @@
                         <div class="widget-config-body">
                           <div class="widget-pill-badge"><i class="fa-solid fa-list-check"></i> Organisation & Rappels</div>
                         </div>
+
+                        <!-- Options de personnalisation de l'Agenda -->
+                        <div class="agenda-settings-subcard">
+                          <div class="agenda-pref-row">
+                            <label for="agenda-pref-task-display"><i class="fa-solid fa-calendar-day"></i> Affichage dans les cases :</label>
+                            <select id="agenda-pref-task-display" class="hub-select-mini">
+                              <option value="detailed" selected>Puces détaillées avec titre</option>
+                              <option value="compact">Pastilles compactes (couleur)</option>
+                              <option value="hidden">Masquer les tâches dans l'agenda</option>
+                            </select>
+                          </div>
+                          <div class="agenda-pref-row">
+                            <label for="agenda-pref-default-priority"><i class="fa-solid fa-flag"></i> Priorité par défaut :</label>
+                            <select id="agenda-pref-default-priority" class="hub-select-mini">
+                              <option value="normal" selected>🟡 Moyenne (Normal)</option>
+                              <option value="urgent">🔴 Haute (Urgent)</option>
+                              <option value="low">🟢 Basse (Faible)</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
 
                       <!-- Widget Météo -->
@@ -1765,20 +1876,20 @@
     </div>
 
     <!-- Scripts JavaScript modulaires différés (téléchargement parallèle sans bloquer le parsing DOM) -->
-    <script defer src="js/themes.js?v=3.0"></script>
-    <script defer src="js/appearance.js?v=3.0"></script>
-    <script defer src="js/clock.js?v=3.0"></script>
-    <script defer src="js/weather-fx.js?v=3.0"></script>
-    <script defer src="js/weather.js?v=3.0"></script>
-    <script defer src="js/calendar.js?v=3.0"></script>
-    <script defer src="js/tasks.js?v=3.0"></script>
-    <script defer src="js/search.js?v=3.0"></script>
-    <script defer src="js/feeds.js?v=3.0"></script>
-    <script defer src="js/bookmarks.js?v=3.0"></script>
-    <script defer src="js/widgets.js?v=3.0"></script>
-    <script defer src="js/custom-hub.js?v=3.0"></script>
-    <script defer src="js/command-palette.js?v=3.0"></script>
-    <script defer src="js/shortcuts.js?v=3.0"></script>
-    <script defer src="js/app.js?v=3.0"></script>
+    <script defer src="js/themes.js?v=3.1"></script>
+    <script defer src="js/appearance.js?v=3.1"></script>
+    <script defer src="js/clock.js?v=3.1"></script>
+    <script defer src="js/weather-fx.js?v=3.1"></script>
+    <script defer src="js/weather.js?v=3.1"></script>
+    <script defer src="js/calendar.js?v=3.1"></script>
+    <script defer src="js/tasks.js?v=3.1"></script>
+    <script defer src="js/search.js?v=3.1"></script>
+    <script defer src="js/feeds.js?v=3.1"></script>
+    <script defer src="js/bookmarks.js?v=3.1"></script>
+    <script defer src="js/widgets.js?v=3.1"></script>
+    <script defer src="js/custom-hub.js?v=3.1"></script>
+    <script defer src="js/command-palette.js?v=3.1"></script>
+    <script defer src="js/shortcuts.js?v=3.1"></script>
+    <script defer src="js/app.js?v=3.1"></script>
   </body>
 </html>

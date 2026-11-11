@@ -61,28 +61,39 @@ function renderCalendar() {
 
     const totalTasks = stats ? (stats.pending + stats.done) : 0;
 
-    // Affichage direct des tâches dans l'agenda avec badge de priorité et état
+    // Affichage direct des tâches dans l'agenda avec options de personnalisation
+    const taskDisplayMode = localStorage.getItem('startpage_agenda_task_display') || 'detailed';
     let tasksHtml = '';
     let tasksSummary = '';
-    if (stats && stats.tasks && stats.tasks.length > 0) {
+    if (taskDisplayMode !== 'hidden' && stats && stats.tasks && stats.tasks.length > 0) {
       tasksSummary = stats.tasks.map((t) => `\n • [${t.priority || 'normal'}] ${t.text}`).join('');
-      const maxVisibleTasks = 2;
-      const visibleTasks = stats.tasks.slice(0, maxVisibleTasks);
-      const remainingCount = stats.tasks.length - maxVisibleTasks;
 
-      const taskPills = visibleTasks.map((t) => {
-        const priorityCls = `priority-${t.priority || 'normal'}`;
-        const doneCls = t.done ? 'is-done' : '';
-        return `
-          <div class="cal-task-pill ${priorityCls} ${doneCls}" title="${safeEscape(t.text)} (${t.priority || 'normal'})">
-            <span class="cal-task-pip"></span>
-            <span class="cal-task-title">${safeEscape(t.text)}</span>
-          </div>
-        `;
-      }).join('');
+      if (taskDisplayMode === 'compact') {
+        const maxDots = 4;
+        const visibleDots = stats.tasks.slice(0, maxDots);
+        const rem = stats.tasks.length - maxDots;
+        const dots = visibleDots.map((t) => `<span class="cal-dot priority-${t.priority || 'normal'} ${t.done ? 'done' : ''}"></span>`).join('');
+        const more = rem > 0 ? `<span class="cal-dot-count">+${rem}</span>` : '';
+        tasksHtml = `<div class="cal-day-dots">${dots}${more}</div>`;
+      } else {
+        const maxVisibleTasks = 2;
+        const visibleTasks = stats.tasks.slice(0, maxVisibleTasks);
+        const remainingCount = stats.tasks.length - maxVisibleTasks;
 
-      const countBadge = remainingCount > 0 ? `<div class="cal-task-more">+${remainingCount} autre${remainingCount > 1 ? 's' : ''}</div>` : '';
-      tasksHtml = `<div class="cal-day-tasks-list">${taskPills}${countBadge}</div>`;
+        const taskPills = visibleTasks.map((t) => {
+          const priorityCls = `priority-${t.priority || 'normal'}`;
+          const doneCls = t.done ? 'is-done' : '';
+          return `
+            <div class="cal-task-pill ${priorityCls} ${doneCls}" title="${safeEscape(t.text)} (${t.priority || 'normal'})">
+              <span class="cal-task-pip"></span>
+              <span class="cal-task-title">${safeEscape(t.text)}</span>
+            </div>
+          `;
+        }).join('');
+
+        const countBadge = remainingCount > 0 ? `<div class="cal-task-more">+${remainingCount} autre${remainingCount > 1 ? 's' : ''}</div>` : '';
+        tasksHtml = `<div class="cal-day-tasks-list">${taskPills}${countBadge}</div>`;
+      }
     }
 
     const dayTitle = `${d} ${monthName} • ${totalTasks} tâche(s)${tasksSummary}`;
@@ -167,6 +178,32 @@ function initCalendar() {
           handleSelectDay(dayEl);
         }
       }
+    });
+  }
+
+  // Gestionnaires des préférences utilisateur pour l'Agenda
+  const prefDisplay = document.getElementById('agenda-pref-task-display');
+  const prefPriority = document.getElementById('agenda-pref-default-priority');
+
+  if (prefDisplay) {
+    prefDisplay.value = localStorage.getItem('startpage_agenda_task_display') || 'detailed';
+    prefDisplay.addEventListener('change', () => {
+      localStorage.setItem('startpage_agenda_task_display', prefDisplay.value);
+      renderCalendar();
+      if (typeof showToast === 'function') showToast('Affichage du calendrier mis à jour', 'success');
+    });
+  }
+
+  if (prefPriority) {
+    const savedPriority = localStorage.getItem('startpage_agenda_default_priority') || 'normal';
+    prefPriority.value = savedPriority;
+    const todoPrioritySelect = document.getElementById('todo-priority');
+    if (todoPrioritySelect) todoPrioritySelect.value = savedPriority;
+
+    prefPriority.addEventListener('change', () => {
+      localStorage.setItem('startpage_agenda_default_priority', prefPriority.value);
+      if (todoPrioritySelect) todoPrioritySelect.value = prefPriority.value;
+      if (typeof showToast === 'function') showToast('Priorité par défaut mise à jour', 'success');
     });
   }
 

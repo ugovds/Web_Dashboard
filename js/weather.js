@@ -205,20 +205,31 @@ function renderWeatherDeckView(data) {
   const rawDesc = current.weatherDesc[0]?.value || '';
   const frDesc = translateWeatherDesc(rawDesc);
   const iconCls = getWeatherIconClass(rawDesc);
+  const todayWeather = data.weather && data.weather[0];
 
-  // Éléments du hero
+  // Éléments du hero Samsung
   const tempEl = document.getElementById('deck-weather-temp');
   const descEl = document.getElementById('deck-weather-desc');
   const locEl = document.getElementById('deck-weather-loc');
   const iconEl = document.getElementById('deck-weather-icon');
   const updatedEl = document.getElementById('deck-weather-updated');
   const inputEl = document.getElementById('deck-city-input');
+  const highLowEl = document.getElementById('deck-weather-highlow');
+  const feelsHeroEl = document.getElementById('deck-weather-feels-hero');
 
-  if (tempEl) tempEl.textContent = `${current.temp_C}°C`;
+  if (tempEl) tempEl.textContent = `${current.temp_C}°`;
   if (descEl) descEl.textContent = frDesc;
   if (locEl) locEl.textContent = fullLoc;
   if (iconEl) iconEl.className = iconCls;
   if (inputEl && !inputEl.value) inputEl.value = getSavedCity();
+
+  if (todayWeather && highLowEl) {
+    const maxT = todayWeather.maxtempC || current.temp_C;
+    const minT = todayWeather.mintempC || current.temp_C;
+    highLowEl.innerHTML = `↑ ${maxT}° / ↓ ${minT}° • Ressenti <strong id="deck-weather-feels-hero">${current.FeelsLikeC}°</strong>`;
+  } else if (feelsHeroEl) {
+    feelsHeroEl.textContent = `${current.FeelsLikeC}°`;
+  }
 
   const topbarWeatherText = document.getElementById('topbar-weather-text');
   if (topbarWeatherText) topbarWeatherText.textContent = `${current.temp_C}°C • ${fullLoc.split(',')[0]}`;
@@ -228,7 +239,29 @@ function renderWeatherDeckView(data) {
     updatedEl.textContent = `Mis à jour à ${timeStr}`;
   }
 
-  // Métriques
+  // Perspectives / Alerte Météo (Style Samsung)
+  const insightText = document.getElementById('weather-insight-text');
+  const hourlySummary = document.getElementById('weather-hourly-summary');
+  if (todayWeather) {
+    const maxT = todayWeather.maxtempC;
+    const minT = todayWeather.mintempC;
+    const hourlyRains = (todayWeather.hourly || []).map((h) => parseInt(h.chanceofrain, 10) || 0);
+    const maxRainToday = Math.max(0, ...hourlyRains);
+    let rainAdvice = ' Pas de fortes précipitations prévues aujourd\'hui.';
+    if (maxRainToday > 60) {
+      rainAdvice = ' Risque important d\'averses, prévoyez un parapluie.';
+    } else if (maxRainToday > 30) {
+      rainAdvice = ' Risque modéré de pluies ou d\'ondées passagères.';
+    }
+    if (insightText) {
+      insightText.textContent = `${frDesc}. Maximales : ${maxT}°C, Minimales : ${minT}°C.${rainAdvice}`;
+    }
+    if (hourlySummary) {
+      hourlySummary.textContent = `Aujourd'hui : ${frDesc.toLowerCase()} avec des températures oscillant entre ${minT}°C et ${maxT}°C.`;
+    }
+  }
+
+  // Métriques détaillées
   const feelsEl = document.getElementById('deck-weather-feels');
   const humidityEl = document.getElementById('deck-weather-humidity');
   const windEl = document.getElementById('deck-weather-wind');
@@ -239,47 +272,78 @@ function renderWeatherDeckView(data) {
   if (feelsEl) feelsEl.textContent = `${current.FeelsLikeC}°C`;
   if (humidityEl) humidityEl.textContent = `${current.humidity}%`;
   if (windEl) windEl.textContent = `${current.windspeedKmph} km/h (${current.winddir16Point || ''})`;
-  if (uvEl) uvEl.textContent = `${current.uvIndex || '0'} / 10`;
+
+  const uvVal = parseInt(current.uvIndex, 10) || 0;
+  let uvLabel = 'Faible';
+  if (uvVal >= 8) uvLabel = 'Très Élevé';
+  else if (uvVal >= 6) uvLabel = 'Élevé';
+  else if (uvVal >= 3) uvLabel = 'Modéré';
+  if (uvEl) uvEl.textContent = `${uvVal} / 10 (${uvLabel})`;
+
   if (pressureEl) pressureEl.textContent = `${current.pressure || '1015'} hPa`;
   if (visibilityEl) visibilityEl.textContent = `${current.visibility || '10'} km`;
 
-  // Prévisions 3 jours
-  const forecastList = document.getElementById('deck-weather-forecast-list');
-  if (forecastList && data.weather && Array.isArray(data.weather)) {
-    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    const todayStr = new Date().toISOString().slice(0, 10);
-
-    forecastList.innerHTML = data.weather
-      .slice(0, 3)
-      .map((w, idx) => {
-        const parts = w.date.split('-').map(Number);
-        const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
-        let dayLabel = days[dateObj.getDay()];
-        if (w.date === todayStr || idx === 0) dayLabel = 'Aujourd\'hui';
-        else if (idx === 1) dayLabel = 'Demain';
-
-        const hourlyMid = w.hourly && (w.hourly[4] || w.hourly[0]);
-        const dayDescRaw = hourlyMid?.weatherDesc?.[0]?.value || '';
-        const dayDesc = translateWeatherDesc(dayDescRaw);
-        const dayIcon = getWeatherIconClass(dayDescRaw);
-
-        return `
-          <div class="forecast-card">
-            <span class="forecast-day">${dayLabel}</span>
-            <i class="${dayIcon} forecast-icon"></i>
-            <span class="forecast-temps">
-              <span class="temp-max">${w.maxtempC}°</span>
-              <span class="temp-sep">/</span>
-              <span class="temp-min">${w.mintempC}°</span>
-            </span>
-            <span class="forecast-desc">${dayDesc}</span>
-          </div>
-        `;
-      })
-      .join('');
+  // Lever et Coucher du soleil
+  const sunriseEl = document.getElementById('deck-weather-sunrise');
+  const sunsetEl = document.getElementById('deck-weather-sunset');
+  const astro = todayWeather?.astronomy?.[0];
+  if (astro) {
+    if (sunriseEl) sunriseEl.innerHTML = `<i class="fa-regular fa-sun"></i> Lever : <strong>${astro.sunrise}</strong>`;
+    if (sunsetEl) sunsetEl.innerHTML = `<i class="fa-solid fa-moon"></i> Coucher : <strong>${astro.sunset}</strong>`;
   }
 
-  // Graphique interactif des températures et de pluie sur 24h
+  // Prévisions Multi-Jours Samsung (avec jauges thermiques)
+  const forecastList = document.getElementById('deck-weather-forecast-list');
+  if (forecastList && data.weather && Array.isArray(data.weather)) {
+    const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    const allMin = Math.min(...data.weather.map((w) => parseInt(w.mintempC, 10)));
+    const allMax = Math.max(...data.weather.map((w) => parseInt(w.maxtempC, 10)));
+    const totalSpan = Math.max(1, allMax - allMin);
+
+    forecastList.innerHTML = data.weather.map((w, idx) => {
+      const parts = w.date.split('-').map(Number);
+      const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+      let dayLabel = days[dateObj.getDay()];
+      if (w.date === todayStr || idx === 0) dayLabel = 'Aujourd\'hui';
+      else if (idx === 1) dayLabel = 'Demain';
+
+      const hourlyMid = w.hourly && (w.hourly[4] || w.hourly[0]);
+      const dayDescRaw = hourlyMid?.weatherDesc?.[0]?.value || '';
+      const dayDesc = translateWeatherDesc(dayDescRaw);
+      const dayIcon = getWeatherIconClass(dayDescRaw);
+
+      const maxRain = Math.max(0, ...((w.hourly || []).map((h) => parseInt(h.chanceofrain, 10) || 0)));
+      const rainHtml = maxRain > 15 ? `<span class="multiday-rain-badge"><i class="fa-solid fa-droplet"></i> ${maxRain}%</span>` : '';
+
+      const minT = parseInt(w.mintempC, 10);
+      const maxT = parseInt(w.maxtempC, 10);
+      const leftPct = Math.max(0, Math.min(80, ((minT - allMin) / totalSpan) * 100));
+      const widthPct = Math.max(12, Math.min(100 - leftPct, ((maxT - minT) / totalSpan) * 100));
+
+      return `
+        <div class="multiday-row" title="${dayLabel} : ${dayDesc}, Min ${minT}°C / Max ${maxT}°C">
+          <div class="multiday-day-info">
+            <span class="multiday-name">${dayLabel}</span>
+            ${rainHtml}
+          </div>
+          <div class="multiday-icon-box">
+            <i class="${dayIcon}"></i>
+          </div>
+          <div class="multiday-slider-wrap">
+            <span class="multiday-min-temp">${minT}°</span>
+            <div class="multiday-range-track">
+              <div class="multiday-range-fill" style="margin-left: ${leftPct.toFixed(1)}%; width: ${widthPct.toFixed(1)}%;"></div>
+            </div>
+            <span class="multiday-max-temp">${maxT}°</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Graphique interactif des températures et barres de pluie (24h)
   renderWeatherHourlyGraph(data);
 
   // Mise à jour de l'URL du radar satellite RainViewer
@@ -287,13 +351,14 @@ function renderWeatherDeckView(data) {
 }
 
 /**
- * Construit un graphique SVG fluide (courbe de Bézier) de la météo 24h
+ * Construit la courbe de Bézier et les barres de précipitations Samsung 24h
  */
 function renderWeatherHourlyGraph(data) {
   const lineEl = document.getElementById('weather-graph-line');
   const areaEl = document.getElementById('weather-graph-area');
   const chipsRow = document.getElementById('weather-hourly-chips-row');
   const chartSummary = document.getElementById('weather-chart-summary');
+  const precipRow = document.getElementById('weather-precip-bars-row');
 
   if (!data?.weather?.[0]?.hourly) return;
   const hourly = data.weather[0].hourly;
@@ -303,14 +368,29 @@ function renderWeatherHourlyGraph(data) {
   const maxTemp = Math.max(...temps) + 1;
   const tempRange = Math.max(1, maxTemp - minTemp);
 
+  const svgW = 720;
+  const svgH = 85;
+  const padX = 36;
+  const padY = 16;
+  const usableW = svgW - padX * 2;
+  const usableH = svgH - padY * 2;
+
   const points = hourly.map((h, i) => {
-    const x = 16 + i * (308 / (hourly.length - 1));
+    const x = padX + i * (usableW / (hourly.length - 1));
     const t = parseInt(h.tempC, 10);
-    const y = 50 - ((t - minTemp) / tempRange) * 38;
-    return { x, y, temp: t, hour: h.time, rain: h.chanceofrain, desc: h.weatherDesc?.[0]?.value || '' };
+    const y = padY + (1 - (t - minTemp) / tempRange) * usableH;
+    return {
+      x,
+      y,
+      temp: t,
+      hour: h.time,
+      rain: parseInt(h.chanceofrain, 10) || 0,
+      precip: parseFloat(h.precipMM) || 0,
+      desc: h.weatherDesc?.[0]?.value || ''
+    };
   });
 
-  // Construction de la courbe SVG lissée
+  // Construction de la courbe SVG lissée (Bézier spline)
   let linePath = `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`;
   for (let i = 1; i < points.length; i++) {
     const prev = points[i - 1];
@@ -319,7 +399,7 @@ function renderWeatherHourlyGraph(data) {
     linePath += ` C ${cX.toFixed(1)} ${prev.y.toFixed(1)}, ${cX.toFixed(1)} ${curr.y.toFixed(1)}, ${curr.x.toFixed(1)} ${curr.y.toFixed(1)}`;
   }
 
-  const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(1)} 58 L ${points[0].x.toFixed(1)} 58 Z`;
+  const areaPath = `${linePath} L ${points[points.length - 1].x.toFixed(1)} ${svgH} L ${points[0].x.toFixed(1)} ${svgH} Z`;
 
   if (lineEl) lineEl.setAttribute('d', linePath);
   if (areaEl) areaEl.setAttribute('d', areaPath);
@@ -330,23 +410,41 @@ function renderWeatherHourlyGraph(data) {
     chartSummary.textContent = `Min ${minT}°C • Max ${maxT}°C`;
   }
 
-  // Mini-colonnes horaires avec icône, température et probabilité de pluie
+  // Carrousel horizontal Samsung avec heure, icône, température et probabilité de pluie
   if (chipsRow) {
-    const formatHour = (rawTime) => {
+    const formatHour = (rawTime, idx) => {
+      if (idx === 0) return 'Maintenant';
       const h = Math.floor(parseInt(rawTime, 10) / 100);
-      return `${String(h).padStart(2, '0')}h`;
+      return `${String(h).padStart(2, '0')}:00`;
     };
 
-    chipsRow.innerHTML = points.map((p) => {
+    chipsRow.innerHTML = points.map((p, idx) => {
       const iconCls = getWeatherIconClass(p.desc);
-      const rainInt = parseInt(p.rain, 10) || 0;
-      const rainHtml = rainInt > 10 ? `<span class="hourly-chip-rain"><i class="fa-solid fa-droplet"></i> ${rainInt}%</span>` : '<span class="hourly-chip-rain" style="opacity:0;">--</span>';
+      const rainHtml = p.rain > 10
+        ? `<span class="hour-rain-drop"><i class="fa-solid fa-droplet"></i> ${p.rain}%</span>`
+        : '<span class="hour-rain-drop" style="opacity:0;">--</span>';
       return `
-        <div class="hourly-chip" title="${formatHour(p.hour)} : ${p.temp}°C, Risque pluie ${rainInt}%, ${p.desc}">
-          <span class="hourly-chip-time">${formatHour(p.hour)}</span>
-          <i class="${iconCls} hourly-chip-icon"></i>
-          <span class="hourly-chip-temp">${p.temp}°</span>
+        <div class="samsung-hour-cell" title="${formatHour(p.hour, idx)} : ${p.temp}°C, Pluie ${p.rain}%, ${p.desc}">
+          <span class="hour-time-label">${formatHour(p.hour, idx)}</span>
+          <div class="hour-icon"><i class="${iconCls}"></i></div>
+          <span class="hour-temp-val">${p.temp}°</span>
           ${rainHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Barres de précipitations Samsung en mm
+  if (precipRow) {
+    const precips = points.map((p) => p.precip);
+    const maxPrecip = Math.max(1.5, ...precips); // minimum 1.5mm pour que l'échelle soit jolie
+
+    precipRow.innerHTML = points.map((p) => {
+      const heightPct = Math.min(100, Math.max(4, (p.precip / maxPrecip) * 100));
+      return `
+        <div class="precip-bar-col" title="${p.precip.toFixed(2)} mm de précipitations">
+          <div class="precip-bar-fill" style="height: ${heightPct.toFixed(0)}%;"></div>
+          <span class="precip-val-label">${p.precip > 0 ? p.precip.toFixed(1) : '0.0'} mm</span>
         </div>
       `;
     }).join('');
@@ -481,26 +579,10 @@ function initWeather() {
     });
   }
 
-  // Bascule entre vue Prévisions/Graphique et vue Radar Satellite direct
-  const tabOverview = document.getElementById('weather-tab-overview');
-  const tabRadar = document.getElementById('weather-tab-radar');
-  const overviewPanel = document.getElementById('weather-overview-panel');
+  // Le radar satellite est désormais intégré directement dans le flux principal
   const radarPanel = document.getElementById('weather-radar-panel');
-
-  if (tabOverview && tabRadar && overviewPanel && radarPanel) {
-    tabOverview.addEventListener('click', () => {
-      tabOverview.classList.add('active');
-      tabRadar.classList.remove('active');
-      overviewPanel.hidden = false;
-      radarPanel.hidden = true;
-    });
-
-    tabRadar.addEventListener('click', () => {
-      tabRadar.classList.add('active');
-      tabOverview.classList.remove('active');
-      overviewPanel.hidden = true;
-      radarPanel.hidden = false;
-    });
+  if (radarPanel) {
+    radarPanel.hidden = false;
   }
 
   renderWeatherFavorites();

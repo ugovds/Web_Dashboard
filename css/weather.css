@@ -1,0 +1,832 @@
+/* ========================================================
+   css/weather.css - Météo Samsung One UI Moderne
+   - Disposition Spacieuse & Défilement Vertical Fluide
+   - Hero Élégant avec Température Géante & Conditions
+   - Courbe Bézier 24h & Barres de Précipitations (mm)
+   - Prévisions Multi-Jours avec Barres de Plage Thermique
+   - Bento Grid des Métriques & Radar Satellite en Direct
+   ======================================================== */
+
+.weather-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+  background: transparent;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35) rgba(255, 255, 255, 0.02);
+}
+
+.weather-full-view::-webkit-scrollbar {
+  width: 6px;
+}
+
+.weather-full-view::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.weather-full-view::-webkit-scrollbar-thumb {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+  border-radius: 99px;
+}
+
+.weather-full-view::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}
+
+/* Conteneur principal fluide inspiré Samsung */
+.samsung-weather-container {
+  max-width: 1320px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vh, 26px);
+  padding: clamp(10px, 1.5vh, 20px) clamp(16px, 2vw, 36px) clamp(48px, 6vh, 80px);
+  box-sizing: border-box;
+}
+
+/* --- 1. BARRE DE RECHERCHE FLOTTANTE & FAVORIS --- */
+.weather-search-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: rgba(14, 18, 28, 0.65);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(16px, 2vh, 22px);
+  padding: clamp(10px, 1.2vh, 16px) clamp(14px, 1.5vw, 20px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.weather-search-main-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.weather-search-input-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.weather-search-input-wrap i {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  pointer-events: none;
+}
+
+.weather-search-input {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.6rem;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.82rem;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.weather-search-input:focus {
+  outline: none;
+  background: rgba(0, 0, 0, 0.55);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+.weather-search-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.weather-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.weather-action-btn:hover {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16);
+  border-color: var(--accent-primary);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.weather-action-btn.search-submit-btn {
+  background: linear-gradient(135deg, var(--accent-primary) 0%, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.85) 100%);
+  color: #0b0c10;
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.32);
+}
+
+.weather-action-btn.search-submit-btn:hover {
+  color: #0b0c10;
+  filter: brightness(1.1);
+  box-shadow: 0 4px 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.5);
+}
+
+.weather-action-btn.fav-btn i.fav-active,
+#deck-city-fav-btn i.fav-active {
+  color: #fadb14 !important;
+  text-shadow: 0 0 10px rgba(250, 219, 20, 0.7);
+}
+
+/* Villes favorites en capsules */
+.weather-favorites-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.weather-fav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.weather-fav-chip:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.4);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.weather-fav-chip.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16);
+  border-color: var(--accent-primary);
+  color: #ffffff;
+  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+}
+
+.fav-chip-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 2px;
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.fav-chip-remove:hover {
+  color: #ff5555;
+}
+
+.fav-empty-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+  opacity: 0.8;
+}
+
+/* --- 2. HERO CARD STYLE SAMSUNG --- */
+.samsung-hero-card {
+  position: relative;
+  background: radial-gradient(circle at 82% 24%, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18) 0%, rgba(14, 18, 28, 0.8) 100%);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(22px, 2.8vh, 32px);
+  padding: clamp(26px, 3.4vh, 44px) clamp(24px, 3vw, 48px);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.samsung-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1vh, 10px);
+  z-index: 2;
+}
+
+.samsung-hero-loc {
+  font-size: clamp(1.15rem, 1.8vh, 1.45rem);
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.samsung-hero-loc i {
+  color: var(--accent-primary);
+  font-size: 1.1rem;
+}
+
+.samsung-hero-time {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 0.5rem;
+  opacity: 0.85;
+}
+
+.samsung-hero-temp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 1.25rem;
+  margin-top: 2px;
+}
+
+.samsung-hero-temp {
+  font-size: clamp(4rem, 7vh, 6.2rem);
+  font-weight: 300;
+  line-height: 0.95;
+  color: #ffffff;
+  font-family: "Inter", -apple-system, sans-serif;
+  letter-spacing: -2px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.samsung-hero-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.samsung-hero-desc {
+  font-size: clamp(1.15rem, 1.8vh, 1.45rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  text-transform: capitalize;
+}
+
+.samsung-hero-highlow {
+  font-size: clamp(0.85rem, 1.2vh, 1rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.samsung-hero-highlow strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.samsung-hero-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.samsung-hero-art i {
+  font-size: clamp(4.5rem, 8.5vh, 7.5rem);
+  color: var(--accent-primary);
+  filter: drop-shadow(0 0 28px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.55));
+  transition: all 0.3s ease;
+}
+
+/* --- 3. CARTE GÉNÉRIQUE SAMSUNG & ALERTES --- */
+.samsung-card {
+  background: rgba(14, 18, 28, 0.7);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(18px, 2.2vh, 26px);
+  padding: clamp(18px, 2.2vh, 26px) clamp(20px, 2.4vw, 30px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.2vh, 16px);
+  box-sizing: border-box;
+}
+
+.samsung-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.samsung-card-title {
+  font-size: clamp(0.85rem, 1.2vh, 1rem);
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.samsung-card-title i {
+  color: var(--accent-primary);
+}
+
+.samsung-card-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.18rem 0.55rem;
+  border-radius: 99px;
+}
+
+.samsung-card-badge.live {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.12);
+  border-color: rgba(255, 77, 79, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff4d4f;
+  box-shadow: 0 0 8px #ff4d4f;
+  animation: liveBlink 1.5s infinite ease-in-out;
+}
+
+@keyframes liveBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Carte Alerte / Perspectives Samsung */
+.samsung-alert-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(14px, 1.6vh, 18px) clamp(18px, 2vw, 24px);
+  background: linear-gradient(135deg, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12) 0%, rgba(14, 18, 28, 0.75) 100%);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+}
+
+.samsung-alert-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.samsung-alert-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.samsung-alert-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--accent-primary);
+}
+
+.samsung-alert-text {
+  font-size: clamp(0.82rem, 1.15vh, 0.92rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+}
+
+/* --- 4. PRÉVISIONS HORAIRES : COURBE & CARROUSEL SAMSUNG --- */
+.samsung-hourly-card {
+  gap: 1.1rem;
+}
+
+.hourly-summary-text {
+  font-size: clamp(0.85rem, 1.2vh, 0.95rem);
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Courbe SVG Bézier fluide */
+.samsung-curve-wrap {
+  width: 100%;
+  height: 85px;
+  position: relative;
+  overflow: visible;
+  margin: 0.25rem 0;
+}
+
+.samsung-curve-wrap svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Carrousel d'heures */
+.samsung-hourly-timeline {
+  display: flex;
+  gap: clamp(10px, 1.4vw, 20px);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.4rem 0 0.6rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.samsung-hourly-timeline::-webkit-scrollbar {
+  height: 4px;
+}
+
+.samsung-hourly-timeline::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 99px;
+}
+
+.samsung-hour-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 58px;
+  flex: 1;
+  text-align: center;
+  transition: all 0.18s ease;
+}
+
+.samsung-hour-cell:hover {
+  transform: translateY(-2px);
+}
+
+.hour-time-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.hour-icon {
+  font-size: 1.15rem;
+  color: var(--accent-primary);
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hour-temp-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.hour-rain-drop {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #8be9fd;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Graphique des précipitations en mm (Style Samsung exact) */
+.samsung-precip-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+}
+
+.precip-section-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8be9fd;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.samsung-precip-bars-row {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(10px, 1.4vw, 20px);
+  height: 65px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 4px;
+}
+
+.precip-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 58px;
+  flex: 1;
+  height: 100%;
+  gap: 4px;
+}
+
+.precip-bar-fill {
+  width: 14px;
+  background: linear-gradient(180deg, #8be9fd 0%, rgba(139, 233, 253, 0.25) 100%);
+  border-radius: 6px 6px 2px 2px;
+  box-shadow: 0 0 8px rgba(139, 233, 253, 0.3);
+  transition: height 0.3s ease;
+  min-height: 2px;
+}
+
+.precip-val-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* --- 5. DISPOSITION EN COLONNES BENTO (Sur Grand Écran / 34") --- */
+.samsung-bento-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(16px, 2vh, 26px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Colonne Gauche : Prévisions Multi-Jours Samsung */
+.samsung-multiday-card {
+  height: 100%;
+}
+
+.samsung-multiday-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.multiday-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.multiday-row:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+  transform: translateX(2px);
+}
+
+.multiday-day-info {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 130px;
+  flex-shrink: 0;
+}
+
+.multiday-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.multiday-rain-badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #8be9fd;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.multiday-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  font-size: 1.15rem;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.multiday-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.multiday-min-temp {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  width: 26px;
+  text-align: right;
+}
+
+.multiday-range-track {
+  flex: 1;
+  max-width: 140px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  overflow: hidden;
+  position: relative;
+}
+
+.multiday-range-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8be9fd 0%, var(--accent-primary) 50%, #fadb14 100%);
+  border-radius: 99px;
+}
+
+.multiday-max-temp {
+  font-size: 0.86rem;
+  color: #ffffff;
+  font-weight: 700;
+  width: 26px;
+}
+
+/* Colonne Droite : Grille des Métriques Détaillées Samsung */
+.samsung-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(10px, 1.3vh, 16px);
+}
+
+.samsung-metric-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.samsung-metric-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.metric-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-card-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.metric-card-title i {
+  color: var(--accent-primary);
+  font-size: 0.85rem;
+}
+
+.metric-card-val {
+  font-size: clamp(1.15rem, 1.6vh, 1.4rem);
+  font-weight: 700;
+  color: #ffffff;
+  font-family: inherit;
+  margin-top: 2px;
+}
+
+.metric-card-sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  line-height: 1.25;
+}
+
+/* --- 6. RADAR SATELLITE EN DIRECT (DANS LE FLUX PRINCIPAL) --- */
+.samsung-radar-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.weather-radar-iframe-wrap {
+  width: 100%;
+  height: clamp(380px, 46vh, 520px);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #080a12;
+  position: relative;
+}
+
+.weather-radar-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* --- 7. EFFETS D'ARRIÈRE-PLAN CANVAS (CARTE BASSE) --- */
+.samsung-fx-card {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.4rem;
+}
+
+.samsung-fx-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.samsung-fx-label i {
+  color: var(--accent-primary);
+  font-size: 1rem;
+}
+
+/* --- 8. ADAPTATIF / RESPONSIVE (34" Ultrawide, Laptops, Tablettes, Mobiles) --- */
+@media (max-width: 1100px) {
+  .samsung-bento-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .samsung-weather-container {
+    padding: 10px 12px 60px;
+    gap: 16px;
+  }
+
+  .samsung-hero-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 24px 20px;
+  }
+
+  .samsung-hero-temp {
+    font-size: 3.8rem;
+  }
+
+  .samsung-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .weather-radar-iframe-wrap {
+    height: 320px;
+  }
+}
