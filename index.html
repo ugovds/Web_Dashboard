@@ -53,6 +53,7 @@
     <link rel="stylesheet" href="css/calendar.css?v=3.1" />
     <link rel="stylesheet" href="css/tasks.css?v=3.1" />
     <link rel="stylesheet" href="css/weather.css?v=3.1" />
+    <link rel="stylesheet" href="css/feeds.css?v=3.2" />
     <link rel="stylesheet" href="css/responsive.css?v=3.1" />
     <link rel="stylesheet" href="css/themes/kanagawa.css?v=3.0" />
 
@@ -651,18 +652,73 @@
                 </div>
               </div>
 
-              <!-- VUE 3 : INFOS / ACTUALITÉS (MENU GLISSANT) -->
+              <!-- VUE 3 : INFOS / ACTUALITÉS (GRILLE EN DIRECT) -->
               <div id="deck-view-feeds" class="deck-slide-view feeds-full-view" hidden>
-                <div class="feeds-tab-bar">
-                  <div class="tab-group">
-                    <button class="tab-btn active" data-feed="f1">F1</button>
-                    <button class="tab-btn" data-feed="foot">Foot</button>
-                    <button class="tab-btn" data-feed="tech">Tech</button>
-                  </div>
+                <div class="news-container">
+                  <!-- En-tête / Barre d'outils du Hub Actualités -->
+                  <header class="news-header">
+                    <div class="news-header-top">
+                      <div class="news-brand">
+                        <div class="news-live-badge">
+                          <span class="live-dot"></span>
+                          <span>EN DIRECT</span>
+                        </div>
+                        <h2 class="news-title">Fil d'Actualités</h2>
+                        <span class="news-subtitle" id="news-subtitle">Le Soir, The Athletic, Financial Times &amp; flux en continu</span>
+                      </div>
+
+                      <div class="news-actions">
+                        <div class="news-search-box">
+                          <i class="fa-solid fa-magnifying-glass"></i>
+                          <input
+                            type="text"
+                            id="news-search-input"
+                            class="news-search-input"
+                            placeholder="Filtrer les actualités..."
+                            autocomplete="off"
+                          />
+                          <button type="button" id="news-search-clear" class="news-search-clear" hidden title="Effacer">&times;</button>
+                        </div>
+
+                        <div class="news-view-toggle">
+                          <button type="button" id="news-view-grid-btn" class="news-btn-icon active" title="Vue Grille visuelle">
+                            <i class="fa-solid fa-grip"></i>
+                          </button>
+                          <button type="button" id="news-view-list-btn" class="news-btn-icon" title="Vue Liste condensée">
+                            <i class="fa-solid fa-list"></i>
+                          </button>
+                        </div>
+
+                        <button type="button" id="news-refresh-btn" class="news-action-btn" title="Actualiser les dépêches">
+                          <i class="fa-solid fa-rotate-right"></i>
+                          <span>Actualiser</span>
+                        </button>
+
+                        <button type="button" id="btn-manage-feeds" class="news-action-btn secondary" title="Gérer vos flux RSS">
+                          <i class="fa-solid fa-sliders"></i>
+                          <span>Mes Flux</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Barre des catégories / sources -->
+                    <nav class="news-nav-bar feeds-tab-bar" aria-label="Catégories d'actualités">
+                      <div class="tab-group" id="news-tab-group">
+                        <!-- Rempli dynamiquement par renderFeedTabs() -->
+                      </div>
+                    </nav>
+                  </header>
+
+                  <!-- Grille d'actualités réactive -->
+                  <main class="news-main">
+                    <div id="feed-list" class="news-grid feed-list merged-feed-list">
+                      <div class="news-skeleton-card"></div>
+                      <div class="news-skeleton-card"></div>
+                      <div class="news-skeleton-card"></div>
+                      <div class="news-skeleton-card"></div>
+                    </div>
+                  </main>
                 </div>
-                <ul id="feed-list" class="feed-list merged-feed-list">
-                  <li class="feed-skeleton">Connexion au flux en direct...</li>
-                </ul>
               </div>
 
               <!-- VUE 4 : MONITEUR SYSTÈME & MARCHÉS BOURSIERS -->
