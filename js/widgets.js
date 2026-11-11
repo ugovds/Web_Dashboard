@@ -72,21 +72,61 @@ function applyWidgetVisibility() {
 }
 
 /* ========================================================
-   1. MINUTEUR FOCUS / POMODORO (DRIFT-PROOF & RELIABLE)
+   1. STUDIO DE RÉVISIONS & FOCUS POMODORO (100% FIABLE)
    ======================================================== */
+const REVISION_PROGRAMS = {
+  standard: {
+    id: 'standard',
+    name: 'Standard',
+    icon: 'fa-solid fa-graduation-cap',
+    focus: 25 * 60,
+    short: 5 * 60,
+    long: 15 * 60,
+    desc: '25m Focus • 5m Pause'
+  },
+  deep: {
+    id: 'deep',
+    name: 'Examen & Deep',
+    icon: 'fa-solid fa-brain',
+    focus: 50 * 60,
+    short: 10 * 60,
+    long: 20 * 60,
+    desc: '50m Focus • 10m Pause'
+  },
+  sprint: {
+    id: 'sprint',
+    name: 'Sprint Flash',
+    icon: 'fa-solid fa-bolt',
+    focus: 15 * 60,
+    short: 3 * 60,
+    long: 10 * 60,
+    desc: '15m Focus • 3m Pause'
+  },
+  lecture: {
+    id: 'lecture',
+    name: 'Fiches & Lecture',
+    icon: 'fa-solid fa-book-open',
+    focus: 40 * 60,
+    short: 8 * 60,
+    long: 15 * 60,
+    desc: '40m Focus • 8m Pause'
+  }
+};
+
 let POMO_DURATIONS = {
   focus: 25 * 60,
   short: 5 * 60,
   long: 15 * 60
 };
 
+let pomoActiveProgram = 'standard';
 let pomoMode = 'focus'; // 'focus', 'short', 'long'
 let pomoTimeLeft = POMO_DURATIONS.focus;
 let pomoTargetEndTime = 0;
 let pomoInterval = null;
 let pomoIsRunning = false;
 let pomoCompletedCount = 0;
-let pomoActivePreset = 25;
+let pomoActiveSubject = '📐 Mathématiques';
 let pomoWidgetInitialized = false;
 
 /**
@@ -100,7 +140,7 @@ function playPomoChime() {
     if (ctx.state === 'suspended') {
       ctx.resume().catch(() => {});
     }
-    const chord = [523.25, 659.25, 783.99, 1046.5]; // Accord majeur C5-E5-G5-C6
+    const chord = [523.25, 659.25, 783.99, 1046.5]; // C5-E5-G5-C6
     const now = ctx.currentTime;
 
     chord.forEach((freq, idx) => {
@@ -127,124 +167,214 @@ function playPomoChime() {
 }
 
 /**
- * Données d'activité des 7 derniers jours
+ * Récupération et calcul des révisions de la semaine (Lun - Dim)
  */
-function getPomoHistoryData() {
-  let hist = null;
+function getWeeklyRevisionData() {
+  let weekly = null;
   try {
-    const raw = localStorage.getItem('startpage_pomo_history');
-    if (raw) hist = JSON.parse(raw);
-  } catch (e) {
-    hist = null;
+    const raw = localStorage.getItem('startpage_weekly_revisions');
+    if (raw) weekly = JSON.parse(raw);
+  } catch {
+    weekly = null;
   }
 
   const today = new Date();
-  const todayKey = today.toISOString().split('T')[0];
+  const currentDayOfWeek = (today.getDay() + 6) % 7; // 0 = Lundi, 6 = Dimanche
 
-  if (!hist || typeof hist !== 'object') {
-    hist = {};
-    const sampleCounts = [2, 4, 3, 5, 2, 4, pomoCompletedCount || 3];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(today.getDate() - i);
+  // Si aucun historique, initialisation avec des données représentatives
+  if (!weekly || typeof weekly !== 'object') {
+    weekly = {};
+    const sampleMinutes = [50, 75, 45, 90, 60, 40, Math.max(25, pomoCompletedCount * 25)];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - (currentDayOfWeek - i));
       const k = d.toISOString().split('T')[0];
-      hist[k] = sampleCounts[6 - i];
+      weekly[k] = i <= currentDayOfWeek ? sampleMinutes[i] : 0;
     }
     try {
-      localStorage.setItem('startpage_pomo_history', JSON.stringify(hist));
-    } catch (e) {}
+      localStorage.setItem('startpage_weekly_revisions', JSON.stringify(weekly));
+    } catch {}
   }
 
-  if (pomoCompletedCount > 0 && (Number(hist[todayKey]) || 0) < pomoCompletedCount) {
-    hist[todayKey] = pomoCompletedCount;
-  }
-
+  const dayLabels = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   const days = [];
-  const dayLabels = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(today.getDate() - i);
-    const key = d.toISOString().split('T')[0];
-    const label = dayLabels[d.getDay()];
-    const count = Number(hist[key]) || 0;
-    days.push({ key, label, count, isToday: i === 0 });
+  let totalWeekMinutes = 0;
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - (currentDayOfWeek - i));
+    const k = d.toISOString().split('T')[0];
+    const minutes = Number(weekly[k]) || 0;
+    totalWeekMinutes += minutes;
+    days.push({
+      dateKey: k,
+      label: dayLabels[i],
+      minutes,
+      isToday: i === currentDayOfWeek
+    });
   }
 
-  return days;
+  return { days, totalWeekMinutes };
 }
 
-function recordPomoSessionInHistory() {
+function recordRevisionMinutes(minutes) {
   try {
     const todayKey = new Date().toISOString().split('T')[0];
-    let hist = {};
+    let weekly = {};
     try {
-      hist = JSON.parse(localStorage.getItem('startpage_pomo_history') || '{}');
+      weekly = JSON.parse(localStorage.getItem('startpage_weekly_revisions') || '{}');
     } catch {}
-    hist[todayKey] = (Number(hist[todayKey]) || 0) + 1;
-    localStorage.setItem('startpage_pomo_history', JSON.stringify(hist));
-  } catch (e) {}
+    weekly[todayKey] = (Number(weekly[todayKey]) || 0) + minutes;
+    localStorage.setItem('startpage_weekly_revisions', JSON.stringify(weekly));
+  } catch {}
 }
 
 /**
- * Rendu du mini graphique BarChart SVG
+ * Rendu du graphique hebdomadaire des révisions en SVG
  */
-function renderPomoHistoryChart() {
-  const svg = document.getElementById('pomo-history-chart');
+function renderWeeklyRevisionChart() {
+  const svg = document.getElementById('revision-weekly-chart');
   if (!svg) return;
 
-  const data = getPomoHistoryData();
-  const maxVal = Math.max(4, ...data.map(d => d.count));
-  const svgWidth = 280;
-  const svgHeight = 80;
-  const bottomPad = 20;
-  const topPad = 8;
+  const { days, totalWeekMinutes } = getWeeklyRevisionData();
+
+  // Mise à jour du badge total de la semaine
+  const totalBadgeText = document.getElementById('revision-week-total-text');
+  if (totalBadgeText) {
+    const hrs = Math.floor(totalWeekMinutes / 60);
+    const mins = totalWeekMinutes % 60;
+    totalBadgeText.textContent = hrs > 0 ? `${hrs}h ${mins > 0 ? mins + 'm' : ''}` : `${mins}m`;
+  }
+
+  const maxMin = Math.max(60, ...days.map(d => d.minutes));
+  const svgWidth = 320;
+  const svgHeight = 95;
+  const bottomPad = 22;
+  const topPad = 12;
   const chartHeight = svgHeight - bottomPad - topPad;
 
-  const barWidth = 22;
-  const slotWidth = svgWidth / data.length;
+  const barWidth = 24;
+  const slotWidth = svgWidth / days.length;
 
   let html = '';
-  html += '<line x1="8" y1="' + (svgHeight - bottomPad) + '" x2="' + (svgWidth - 8) + '" y2="' + (svgHeight - bottomPad) + '" stroke="rgba(255,255,255,0.08)" stroke-width="1" />';
+  // Ligne de sol
+  html += `<line x1="8" y1="${svgHeight - bottomPad}" x2="${svgWidth - 8}" y2="${svgHeight - bottomPad}" stroke="rgba(255,255,255,0.08)" stroke-width="1" />`;
 
-  data.forEach((item, idx) => {
+  days.forEach((item, idx) => {
     const x = Math.round(idx * slotWidth + (slotWidth - barWidth) / 2);
-    const barH = item.count > 0 ? Math.max(6, Math.round((item.count / maxVal) * chartHeight)) : 0;
+    const barH = item.minutes > 0 ? Math.max(6, Math.round((item.minutes / maxMin) * chartHeight)) : 0;
     const y = Math.round(svgHeight - bottomPad - barH);
 
-    html += '<rect class="bar-track" x="' + x + '" y="' + topPad + '" width="' + barWidth + '" height="' + chartHeight + '" rx="5" fill="rgba(255,255,255,0.04)" />';
+    // Fond de colonne
+    html += `<rect class="bar-track" x="${x}" y="${topPad}" width="${barWidth}" height="${chartHeight}" rx="5" fill="rgba(255,255,255,0.04)" />`;
 
+    // Barre active
     if (barH > 0) {
       const fill = item.isToday ? 'var(--accent-primary)' : 'rgba(167, 139, 250, 0.45)';
       const shadow = item.isToday ? 'filter="drop-shadow(0 0 6px var(--accent-primary))"' : '';
-      html += '<rect class="bar-fill ' + (item.isToday ? 'today' : '') + '" x="' + x + '" y="' + y + '" width="' + barWidth + '" height="' + barH + '" rx="5" fill="' + fill + '" ' + shadow + '>';
-      html += '<title>' + item.label + ' (' + item.key + ') : ' + item.count + ' session' + (item.count > 1 ? 's' : '') + '</title>';
-      html += '</rect>';
+      html += `<rect class="bar-fill ${item.isToday ? 'today' : ''}" x="${x}" y="${y}" width="${barWidth}" height="${barH}" rx="5" fill="${fill}" ${shadow}>`;
+      html += `<title>${item.label} : ${item.minutes} min de révision</title>`;
+      html += `</rect>`;
 
+      // Label de durée au-dessus si assez de place
       if (barH >= 14) {
-        html += '<text x="' + (x + barWidth / 2) + '" y="' + (y + 11) + '" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="800">' + item.count + '</text>';
+        const valText = item.minutes >= 60 ? `${(item.minutes / 60).toFixed(1)}h` : `${item.minutes}m`;
+        html += `<text x="${x + barWidth / 2}" y="${y + 10}" text-anchor="middle" font-size="7.5" fill="#ffffff" font-weight="800">${valText}</text>`;
       }
     }
 
+    // Libellé du jour (Lun, Mar, ...)
     const textColor = item.isToday ? 'var(--accent-primary)' : 'rgba(255,255,255,0.45)';
-    const textWeight = item.isToday ? '800' : '500';
-    html += '<text x="' + (x + barWidth / 2) + '" y="' + (svgHeight - 4) + '" text-anchor="middle" font-size="9" fill="' + textColor + '" font-weight="' + textWeight + '">' + item.label + '</text>';
+    const textWeight = item.isToday ? '800' : '600';
+    html += `<text x="${x + barWidth / 2}" y="${svgHeight - 6}" text-anchor="middle" font-size="9" fill="${textColor}" font-weight="${textWeight}">${item.label}</text>`;
   });
 
   svg.innerHTML = html;
 }
 
 /**
- * Mise à jour complète de l'interface Pomodoro
+ * Gestion de l'historique des révisions
+ */
+function getRevisionHistory() {
+  try {
+    const raw = localStorage.getItem('startpage_revision_history');
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return [
+    {
+      id: 1,
+      subject: '📐 Mathématiques',
+      program: 'Standard (25m)',
+      durationMin: 25,
+      timeFormatted: '16:45',
+      dateFormatted: 'Aujourd\'hui'
+    },
+    {
+      id: 2,
+      subject: '💻 Programmation',
+      program: 'Deep (50m)',
+      durationMin: 50,
+      timeFormatted: '14:20',
+      dateFormatted: 'Aujourd\'hui'
+    }
+  ];
+}
+
+function addRevisionToHistory(durationMin) {
+  try {
+    const history = getRevisionHistory();
+    const now = new Date();
+    const timeFormatted = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const prog = REVISION_PROGRAMS[pomoActiveProgram] || REVISION_PROGRAMS.standard;
+
+    const entry = {
+      id: Date.now(),
+      subject: pomoActiveSubject || '📖 Révision',
+      program: `${prog.name} (${durationMin}m)`,
+      durationMin,
+      timeFormatted,
+      dateFormatted: 'Aujourd\'hui'
+    };
+
+    history.unshift(entry);
+    if (history.length > 20) history.pop();
+    localStorage.setItem('startpage_revision_history', JSON.stringify(history));
+    renderRevisionHistory();
+  } catch {}
+}
+
+function renderRevisionHistory() {
+  const container = document.getElementById('revision-history-list');
+  if (!container) return;
+
+  const history = getRevisionHistory();
+  if (history.length === 0) {
+    container.innerHTML = '<p class="history-empty-msg">Aucune révision enregistrée pour l\'instant.<br>Lancez votre première session !</p>';
+    return;
+  }
+
+  container.innerHTML = history.slice(0, 8).map(item => `
+    <div class="history-item">
+      <span class="history-subj">${item.subject}</span>
+      <div class="history-meta">
+        <span class="history-dur-badge">${item.durationMin} min</span>
+        <span class="history-time">${item.dateFormatted} • ${item.timeFormatted}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+/**
+ * Mise à jour globale de l'interface
  */
 function updatePomoUI() {
   const display = document.getElementById('pomo-time') || document.getElementById('pomo-timer-display');
-  const status = document.getElementById('pomo-status') || document.getElementById('pomo-status-label');
+  const status = document.getElementById('pomo-status');
   const substatus = document.getElementById('pomo-substatus');
-  const progressBar = document.getElementById('pomo-progress-fill') || document.getElementById('pomo-progress-bar');
+  const progressBar = document.getElementById('pomo-progress-fill');
   const ringArc = document.getElementById('pomo-ring-arc');
   const dialRing = document.getElementById('pomo-dial-ring');
-  const toggleBtn = document.getElementById('pomo-start-btn') || document.getElementById('pomo-btn-toggle');
-  const countBadge = document.getElementById('pomo-cycles-count') || document.getElementById('pomo-sessions-count');
+  const toggleBtn = document.getElementById('pomo-start-btn');
 
   const m = String(Math.floor(pomoTimeLeft / 60)).padStart(2, '0');
   const s = String(pomoTimeLeft % 60).padStart(2, '0');
@@ -253,7 +383,7 @@ function updatePomoUI() {
   if (display) display.textContent = timeFormatted;
 
   if (pomoIsRunning) {
-    const modeLabel = pomoMode === 'focus' ? 'Focus' : 'Pause';
+    const modeLabel = pomoMode === 'focus' ? 'Révision' : 'Pause';
     document.title = `(${timeFormatted}) ${modeLabel} • Startpage`;
   } else {
     document.title = 'Startpage';
@@ -264,7 +394,7 @@ function updatePomoUI() {
   if (progressBar) progressBar.style.width = `${pct}%`;
 
   if (ringArc) {
-    const r = parseFloat(ringArc.getAttribute('r')) || 142;
+    const r = parseFloat(ringArc.getAttribute('r')) || 150;
     const circum = 2 * Math.PI * r;
     ringArc.style.strokeDasharray = circum.toFixed(2);
     const offset = circum - (pct / 100) * circum;
@@ -278,80 +408,73 @@ function updatePomoUI() {
   if (toggleBtn) {
     toggleBtn.innerHTML = pomoIsRunning
       ? '<i class="fa-solid fa-pause"></i> <span>Mettre en pause</span>'
-      : '<i class="fa-solid fa-play"></i> <span>Démarrer la session</span>';
+      : '<i class="fa-solid fa-play"></i> <span>Démarrer la révision</span>';
     toggleBtn.classList.toggle('running', pomoIsRunning);
   }
 
   if (status) {
     if (pomoIsRunning) {
-      status.textContent = pomoMode === 'focus' ? 'Focus en cours...' : 'Pause en cours...';
+      status.textContent = pomoMode === 'focus' ? 'Révision en cours...' : 'Pause en cours...';
     } else {
-      status.textContent = pomoMode === 'focus' ? 'Focus Time' : 'Temps de Pause';
+      status.textContent = pomoMode === 'focus' ? 'Session Prête' : 'Pause Prête';
     }
   }
 
   if (substatus) {
+    const completedInCycle = pomoCompletedCount % 4;
+    const currentNum = completedInCycle + 1;
     if (pomoIsRunning) {
-      substatus.textContent = pomoMode === 'focus' ? 'Restez concentré sur votre tâche' : 'Détendez-vous et respirez';
+      substatus.textContent = pomoMode === 'focus' ? `Séance ${currentNum} sur 4 • Concentration maximale` : 'Détendez-vous et hydratez-vous';
     } else {
-      substatus.textContent = pomoMode === 'focus' ? 'Prêt à démarrer (Espace)' : 'Prêt pour la pause (Espace)';
+      substatus.textContent = pomoMode === 'focus' ? `Séance ${currentNum} sur 4 avant pause longue` : 'Prêt à relancer une séance';
     }
   }
 
-  const activeModeTag = document.getElementById('pomo-active-mode-tag');
-  if (activeModeTag) {
-    const mins = Math.round(total / 60);
-    if (pomoMode === 'focus') {
-      activeModeTag.innerHTML = `<i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS • ${mins} MIN`;
-    } else if (pomoMode === 'short') {
-      activeModeTag.innerHTML = `<i class="fa-solid fa-mug-hot text-accent"></i> PAUSE COURTE • ${mins} MIN`;
-    } else {
-      activeModeTag.innerHTML = `<i class="fa-solid fa-couch text-accent"></i> PAUSE LONGUE • ${mins} MIN`;
-    }
+  // Nom du programme actif dans l'en-tête
+  const progTag = document.getElementById('revision-active-program-name');
+  if (progTag) {
+    const p = REVISION_PROGRAMS[pomoActiveProgram] || REVISION_PROGRAMS.standard;
+    const mins = Math.round(POMO_DURATIONS[pomoMode] / 60);
+    const modeLabel = pomoMode === 'focus' ? `${p.name} • ${mins} min` : `Pause • ${mins} min`;
+    progTag.textContent = `${p.name} : ${modeLabel}`;
   }
 
-  const completedInCycle = pomoCompletedCount % 4;
-  const currentNum = completedInCycle + 1;
-  const cycleCurrentEl = document.getElementById('pomo-cycle-current');
-  if (cycleCurrentEl) {
-    cycleCurrentEl.textContent = currentNum <= 4 ? currentNum : 4;
-  }
+  // Cartes de programmes actives
+  document.querySelectorAll('.program-card').forEach((card) => {
+    card.classList.toggle('active', card.dataset.program === pomoActiveProgram);
+  });
 
-  if (countBadge) countBadge.textContent = pomoCompletedCount;
+  // Puces de phase (Focus / Pause courte / Pause longue)
+  document.querySelectorAll('.phase-chip').forEach((chip) => {
+    chip.classList.toggle('active', chip.dataset.pomoMode === pomoMode);
+  });
 
-  const totalTimeEl = document.getElementById('pomo-total-time');
-  if (totalTimeEl) {
+  // Mini statistiques
+  const todayTimeEl = document.getElementById('revision-today-time');
+  if (todayTimeEl) {
     const focusDurationMin = Math.round((POMO_DURATIONS.focus || 1500) / 60);
     const totalMin = pomoCompletedCount * focusDurationMin;
     const hrs = Math.floor(totalMin / 60);
     const mins = totalMin % 60;
-    totalTimeEl.textContent = hrs > 0 ? `${hrs}h ${mins > 0 ? mins + 'm' : ''}` : `${mins} min`;
+    todayTimeEl.textContent = hrs > 0 ? `${hrs}h ${mins > 0 ? mins + 'm' : ''}` : `${mins} min`;
   }
 
-  const nextBreakEl = document.getElementById('pomo-next-break');
+  const todaySessionsEl = document.getElementById('revision-today-sessions');
+  if (todaySessionsEl) {
+    todaySessionsEl.textContent = pomoCompletedCount;
+  }
+
+  const nextBreakEl = document.getElementById('revision-next-break');
   if (nextBreakEl) {
     const isLongNext = ((pomoCompletedCount + 1) % 4 === 0) && pomoCompletedCount > 0;
     nextBreakEl.textContent = isLongNext
       ? `${Math.round((POMO_DURATIONS.long || 900) / 60)} min (Longue)`
       : `${Math.round((POMO_DURATIONS.short || 300) / 60)} min`;
   }
-
-  const dots = document.querySelectorAll('#pomo-dots-wrap .pomo-dot');
-  dots.forEach((dot, idx) => {
-    dot.classList.toggle('done', idx < completedInCycle || (completedInCycle === 0 && pomoCompletedCount > 0 && pomoMode !== 'focus'));
-  });
-
-  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
-    chip.classList.toggle('active', chip.dataset.pomoMode === pomoMode);
-  });
-
-  document.querySelectorAll('.pomo-preset-btn').forEach((btn) => {
-    btn.classList.toggle('active', Number(btn.dataset.pomoPreset) === pomoActivePreset);
-  });
 }
 
 /**
- * Gestion de fin de session (Focus ou Pause)
+ * Fin de session (Focus ou Pause)
  */
 function handlePomoSessionComplete() {
   if (pomoInterval) clearInterval(pomoInterval);
@@ -362,42 +485,45 @@ function handlePomoSessionComplete() {
   if (pomoMode === 'focus') {
     pomoCompletedCount++;
     try { localStorage.setItem('startpage_pomo_count', pomoCompletedCount); } catch {}
-    recordPomoSessionInHistory();
-    renderPomoHistoryChart();
+
+    const focusMin = Math.round(POMO_DURATIONS.focus / 60);
+    recordRevisionMinutes(focusMin);
+    addRevisionToHistory(focusMin);
+    renderWeeklyRevisionChart();
 
     try {
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-        new Notification('🎉 Focus Terminé !', {
-          body: 'Prenez une pause bien méritée.',
+        new Notification(`🎉 Révision terminée ! (${pomoActiveSubject})`, {
+          body: `Super travail ! +${focusMin} min de révision enregistrées. Prenez une pause bien méritée.`,
           icon: 'images/gif.gif'
         });
       }
-    } catch (e) {}
+    } catch {}
 
     const isLongBreak = (pomoCompletedCount % 4 === 0);
     if (typeof showToast === 'function') {
-      showToast(isLongBreak ? '🎉 4 sessions terminées ! Pause longue de 15 min.' : '🎉 Session Focus terminée ! Pause de 5 min.', 'success');
+      showToast(isLongBreak ? `🎉 4 séances finies ! Pause longue de 15 min bien méritée.` : `🎉 Séance terminée ! +${focusMin}m (${pomoActiveSubject}) enregistrés. Pause de 5 min.`, 'success');
     }
     setPomoMode(isLongBreak ? 'long' : 'short');
   } else {
     try {
       if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         new Notification('⚡ Pause Terminée !', {
-          body: 'Prêt à reprendre une session de focus !',
+          body: 'Prêt à reprendre vos révisions !',
           icon: 'images/gif.gif'
         });
       }
-    } catch (e) {}
+    } catch {}
 
     if (typeof showToast === 'function') {
-      showToast('⚡ Pause terminée ! Prêt à reprendre le focus.', 'info');
+      showToast('⚡ Pause terminée ! Prêt pour la prochaine séance de révision.', 'info');
     }
     setPomoMode('focus');
   }
 }
 
 /**
- * Démarrer le minuteur
+ * Commandes du minuteur
  */
 function startPomoTimer() {
   if (pomoIsRunning) return;
@@ -406,7 +532,7 @@ function startPomoTimer() {
     if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
       Notification.requestPermission().catch(() => {});
     }
-  } catch (e) {}
+  } catch {}
 
   pomoIsRunning = true;
   pomoTargetEndTime = Date.now() + pomoTimeLeft * 1000;
@@ -424,9 +550,6 @@ function startPomoTimer() {
   }, 250);
 }
 
-/**
- * Mettre en pause le minuteur
- */
 function pausePomoTimer() {
   pomoIsRunning = false;
   if (pomoInterval) clearInterval(pomoInterval);
@@ -434,18 +557,12 @@ function pausePomoTimer() {
   updatePomoUI();
 }
 
-/**
- * Remettre à zéro le minuteur
- */
 function resetPomoTimer() {
   pausePomoTimer();
   pomoTimeLeft = POMO_DURATIONS[pomoMode] || 1500;
   updatePomoUI();
 }
 
-/**
- * Passer à l'étape suivante (Focus -> Pause, Pause -> Focus)
- */
 function skipPomoStep() {
   pausePomoTimer();
   if (pomoMode === 'focus') {
@@ -457,60 +574,35 @@ function skipPomoStep() {
   } else {
     setPomoMode('focus');
     if (typeof showToast === 'function') {
-      showToast('Prêt pour une nouvelle session Focus', 'info');
+      showToast('Prêt pour une nouvelle séance de révision', 'info');
     }
   }
 }
 
-/**
- * Changer de mode (Focus, Pause courte, Pause longue)
- */
 function setPomoMode(mode) {
   pomoMode = (mode === 'work' || mode === 'focus') ? 'focus' : mode;
   resetPomoTimer();
 }
 
 /**
- * Appliquer un preset de rythmes (25, 50, 15)
+ * Changement de programme de révision
  */
-function applyPomoPreset(presetValue) {
-  pomoActivePreset = Number(presetValue) || 25;
-  try { localStorage.setItem('startpage_pomo_preset', pomoActivePreset); } catch {}
+function setRevisionProgram(programId) {
+  const p = REVISION_PROGRAMS[programId] || REVISION_PROGRAMS.standard;
+  pomoActiveProgram = p.id;
+  try { localStorage.setItem('startpage_revision_program', pomoActiveProgram); } catch {}
 
-  if (pomoActivePreset === 50) {
-    POMO_DURATIONS.focus = 50 * 60;
-    POMO_DURATIONS.short = 10 * 60;
-    POMO_DURATIONS.long = 20 * 60;
-  } else if (pomoActivePreset === 15) {
-    POMO_DURATIONS.focus = 15 * 60;
-    POMO_DURATIONS.short = 3 * 60;
-    POMO_DURATIONS.long = 10 * 60;
-  } else {
-    POMO_DURATIONS.focus = 25 * 60;
-    POMO_DURATIONS.short = 5 * 60;
-    POMO_DURATIONS.long = 15 * 60;
-  }
-
-  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
-    const m = chip.dataset.pomoMode;
-    const span = chip.querySelector('span');
-    if (!span) return;
-    if (m === 'focus' || m === 'work') {
-      span.textContent = `Focus (${Math.round(POMO_DURATIONS.focus / 60)}m)`;
-    } else if (m === 'short') {
-      span.textContent = `Pause (${Math.round(POMO_DURATIONS.short / 60)}m)`;
-    } else if (m === 'long') {
-      span.textContent = `Longue (${Math.round(POMO_DURATIONS.long / 60)}m)`;
-    }
-  });
+  POMO_DURATIONS.focus = p.focus;
+  POMO_DURATIONS.short = p.short;
+  POMO_DURATIONS.long = p.long;
 
   resetPomoTimer();
   if (typeof showToast === 'function') {
-    showToast(`Rythmes configurés : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
+    showToast(`Programme activé : ${p.name} (${Math.round(p.focus / 60)}m Focus / ${Math.round(p.short / 60)}m Pause)`, 'info');
   }
 }
 
-// Expositions globales fiables
+// Expositions globales
 window.pomoStartToggle = function() {
   if (pomoIsRunning) pausePomoTimer();
   else startPomoTimer();
@@ -518,11 +610,11 @@ window.pomoStartToggle = function() {
 window.pomoReset = resetPomoTimer;
 window.pomoSkip = skipPomoStep;
 window.setPomoMode = setPomoMode;
-window.applyPomoPreset = applyPomoPreset;
+window.setRevisionProgram = setRevisionProgram;
 window.playPomoChime = playPomoChime;
 
 /**
- * Initialisation unique et fiable du widget Pomodoro
+ * Initialisation unique du module Pomodoro & Révisions
  */
 function initPomodoroWidget() {
   try {
@@ -532,21 +624,17 @@ function initPomodoroWidget() {
   }
 
   try {
-    const savedPreset = Number(localStorage.getItem('startpage_pomo_preset') || 25);
-    if ([15, 25, 50].includes(savedPreset)) {
-      pomoActivePreset = savedPreset;
-      if (pomoActivePreset === 50) {
-        POMO_DURATIONS.focus = 50 * 60;
-        POMO_DURATIONS.short = 10 * 60;
-        POMO_DURATIONS.long = 20 * 60;
-      } else if (pomoActivePreset === 15) {
-        POMO_DURATIONS.focus = 15 * 60;
-        POMO_DURATIONS.short = 3 * 60;
-        POMO_DURATIONS.long = 10 * 60;
-      }
+    const savedProgram = localStorage.getItem('startpage_revision_program') || 'standard';
+    if (REVISION_PROGRAMS[savedProgram]) {
+      pomoActiveProgram = savedProgram;
+      const p = REVISION_PROGRAMS[savedProgram];
+      POMO_DURATIONS.focus = p.focus;
+      POMO_DURATIONS.short = p.short;
+      POMO_DURATIONS.long = p.long;
     }
   } catch {}
 
+  // Attachement DIRECT et UNIQUE des écouteurs
   const startBtn = document.getElementById('pomo-start-btn');
   if (startBtn) {
     startBtn.onclick = (e) => {
@@ -573,20 +661,58 @@ function initPomodoroWidget() {
     };
   }
 
-  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+  // Cartes de programmes
+  document.querySelectorAll('.program-card').forEach((card) => {
+    card.onclick = (e) => {
+      e.preventDefault();
+      setRevisionProgram(card.dataset.program);
+    };
+  });
+
+  // Puces de phase
+  document.querySelectorAll('.phase-chip').forEach((chip) => {
     chip.onclick = (e) => {
       e.preventDefault();
       setPomoMode(chip.dataset.pomoMode);
     };
   });
 
-  document.querySelectorAll('.pomo-preset-btn').forEach((btn) => {
-    btn.onclick = (e) => {
-      e.preventDefault();
-      applyPomoPreset(btn.dataset.pomoPreset);
-    };
-  });
+  // Sélecteur de matière
+  const subjectSelect = document.getElementById('revision-subject-select');
+  if (subjectSelect) {
+    try {
+      const savedSubj = localStorage.getItem('startpage_revision_subject');
+      if (savedSubj) {
+        subjectSelect.value = savedSubj;
+        pomoActiveSubject = savedSubj;
+      } else {
+        pomoActiveSubject = subjectSelect.value;
+      }
+    } catch {}
 
+    subjectSelect.onchange = () => {
+      pomoActiveSubject = subjectSelect.value;
+      try { localStorage.setItem('startpage_revision_subject', pomoActiveSubject); } catch {}
+      if (typeof showToast === 'function') {
+        showToast(`Matière active : ${pomoActiveSubject}`, 'info');
+      }
+    };
+  }
+
+  // Bouton vider l'historique
+  const clearHistoryBtn = document.getElementById('revision-clear-history-btn');
+  if (clearHistoryBtn) {
+    clearHistoryBtn.onclick = (e) => {
+      e.preventDefault();
+      if (confirm('Voulez-vous effacer l\'historique de vos révisions ?')) {
+        try { localStorage.setItem('startpage_revision_history', '[]'); } catch {}
+        renderRevisionHistory();
+        if (typeof showToast === 'function') showToast('Historique effacé', 'info');
+      }
+    };
+  }
+
+  // Bouton test carillon
   const chimeBtn = document.getElementById('pomo-test-chime-btn');
   if (chimeBtn) {
     chimeBtn.onclick = (e) => {
@@ -596,6 +722,7 @@ function initPomodoroWidget() {
     };
   }
 
+  // Champ d'objectif de session
   const taskInput = document.getElementById('pomo-task-input');
   const taskClearBtn = document.getElementById('pomo-task-clear-btn');
   if (taskInput) {
@@ -623,6 +750,7 @@ function initPomodoroWidget() {
     };
   }
 
+  // Écouteur clavier unique
   if (!pomoWidgetInitialized) {
     pomoWidgetInitialized = true;
     document.addEventListener('keydown', (e) => {
@@ -639,7 +767,7 @@ function initPomodoroWidget() {
       } else if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
         resetPomoTimer();
-        if (typeof showToast === 'function') showToast('Compteur réinitialisé', 'info');
+        if (typeof showToast === 'function') showToast('Minuteur réinitialisé', 'info');
       } else if (e.code === 'KeyS' && !e.ctrlKey && !e.metaKey && !e.altKey) {
         e.preventDefault();
         skipPomoStep();
@@ -648,7 +776,8 @@ function initPomodoroWidget() {
   }
 
   updatePomoUI();
-  renderPomoHistoryChart();
+  renderWeeklyRevisionChart();
+  renderRevisionHistory();
 }
 
 /* ========================================================
@@ -1267,268 +1396,10 @@ function updateSessionUptime() {
   uptimeEl.textContent = diffSec >= 3600 ? `${h}h ${m}m` : `${m}m ${s}s`;
 }
 
-/* ========================================================
-   GESTIONNAIRE DES MARCHÉS & INDICES BOURSIERS
-   ======================================================== */
-const DEFAULT_MARKET_ASSETS = [
-  { id: '10ap', name: 'Amundi S&P 500 (10AP)', symbol: '10AP.DU', icon: 'fa-solid fa-chart-line', basePrice: 136.76, baseChange: 0.52, unit: '€', enabled: true },
-  { id: 'lyp6', name: 'Amundi Stoxx 600 (LYP6)', symbol: 'LYP6.DE', icon: 'fa-solid fa-landmark', basePrice: 324.95, baseChange: 0.38, unit: '€', enabled: true },
-  { id: 'xmme', name: 'Xtrackers MSCI EM (XMME)', symbol: 'XMME.DE', icon: 'fa-solid fa-earth-americas', basePrice: 76.65, baseChange: -0.42, unit: '€', enabled: true },
-  { id: 'nvda', name: 'NVIDIA Corp. (NVDA)', symbol: 'NVDA', icon: 'fa-solid fa-microchip', basePrice: 200.13, baseChange: 1.84, unit: '$', enabled: true },
-  { id: 'btc', name: 'Bitcoin USD (BTC)', symbol: 'BTC-USD', icon: 'fa-brands fa-bitcoin', basePrice: 80360, baseChange: 3.45, unit: '$', enabled: true, isVolatile: true },
-  { id: 'sol', name: 'Solana (SOL)', symbol: 'SOL-USD', icon: 'fa-solid fa-bolt', basePrice: 95.66, baseChange: -4.82, unit: '$', enabled: true, isVolatile: true },
-  { id: 'tsla', name: 'Tesla Inc. (TSLA)', symbol: 'TSLA', icon: 'fa-solid fa-car', basePrice: 248.50, baseChange: 3.12, unit: '$', enabled: true, isVolatile: true },
-  { id: 'mstr', name: 'MicroStrategy (MSTR)', symbol: 'MSTR', icon: 'fa-solid fa-fire', basePrice: 215.30, baseChange: 8.65, unit: '$', enabled: true, isVolatile: true },
-  { id: 'sp500', name: 'S&P 500 Index', symbol: '^GSPC', icon: 'fa-solid fa-chart-line', basePrice: 5864.67, baseChange: 0.41, unit: 'pts', enabled: false },
-  { id: 'eurusd', name: 'EUR / USD Forex', symbol: 'EUR/USD', icon: 'fa-solid fa-euro-sign', basePrice: 1.085, baseChange: 0.12, unit: '$', enabled: false }
-];
-
-let isMarketVolatileFilterActive = false;
-let marketAssets = loadMarketAssets();
-
-function loadMarketAssets() {
-  try {
-    const raw = localStorage.getItem('violet_market_assets_v3');
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch {}
-  return JSON.parse(JSON.stringify(DEFAULT_MARKET_ASSETS));
-}
-
-function saveMarketAssets() {
-  try {
-    localStorage.setItem('violet_market_assets_v3', JSON.stringify(marketAssets));
-  } catch {}
-}
-
-function renderMarketCards() {
-  const container = document.getElementById('crypto-ticker-cards');
-  if (!container) return;
-
-  let enabledAssets = marketAssets.filter((a) => a.enabled);
-
-  if (isMarketVolatileFilterActive) {
-    // Filtrage et tri par forte volatilité du jour
-    enabledAssets = enabledAssets
-      .filter((a) => a.isVolatile || Math.abs(a.baseChange) >= 1.5)
-      .sort((a, b) => Math.abs(b.baseChange) - Math.abs(a.baseChange));
-  }
-
-  if (enabledAssets.length === 0) {
-    container.innerHTML = `
-      <div class="market-empty-hint">
-        <span>${isMarketVolatileFilterActive ? 'Aucun actif fortement volatile actif.' : 'Aucun actif sélectionné.'}</span>
-        <button type="button" class="hub-action-btn primary" id="market-open-empty-btn"><i class="fa-solid fa-sliders"></i> Personnaliser</button>
-      </div>
-    `;
-    document.getElementById('market-open-empty-btn')?.addEventListener('click', toggleMarketConfigDrawer);
-    return;
-  }
-
-  container.innerHTML = enabledAssets.map((asset) => {
-    const isLive = asset.id === 'eurusd' || asset.id === 'btc' || asset.isReal;
-    const isPositive = asset.baseChange >= 0;
-    const sign = isPositive ? '+' : '';
-    let formattedPrice = '';
-    if (asset.unit === 'pts') {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`;
-    } else if (asset.unit === '$') {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
-    } else if (asset.unit === '€') {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
-    } else {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${asset.unit}`;
-    }
-
-    const cardTitle = isLive ? `${asset.name} • Cours en direct via API (${asset.isReal ? 'Yahoo Finance' : 'Live'})` : `${asset.name} • Cotation indicative de marché`;
-    const pillText = asset.isReal ? 'Yahoo' : (isLive ? 'Live' : 'Marché');
-    const isHighVolatile = Math.abs(asset.baseChange) >= 2.5 || asset.isVolatile;
-    const volatileHtml = isHighVolatile ? `<span class="volatile-tag"><i class="fa-solid fa-fire"></i> Volatile</span>` : '';
-
-    return `
-      <div class="crypto-card market-card" data-asset-id="${asset.id}" title="${cardTitle}">
-        <span class="crypto-coin">
-          <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
-          <span class="market-asset-name">${asset.name}</span>
-          <span class="market-type-pill ${isLive ? 'live' : 'sim'}">${pillText}</span>
-          ${volatileHtml}
-        </span>
-        <span class="crypto-price" id="price-${asset.id}">${formattedPrice}</span>
-        <span class="crypto-change ${isPositive ? 'up' : 'down'}" id="change-${asset.id}">${sign}${asset.baseChange.toFixed(2)}%</span>
-      </div>
-    `;
-  }).join('');
-}
-
-function renderMarketChecklist() {
-  const listEl = document.getElementById('market-assets-checklist');
-  if (!listEl) return;
-
-  listEl.innerHTML = marketAssets.map((asset) => `
-    <label class="market-check-item">
-      <input type="checkbox" data-asset-id="${asset.id}" ${asset.enabled ? 'checked' : ''} />
-      <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
-      <div class="market-check-info">
-        <span class="market-check-name">${asset.name}</span>
-        <span class="market-check-sym">${asset.symbol}</span>
-      </div>
-      ${asset.isCustom ? `<button type="button" class="market-del-custom" data-del-id="${asset.id}" title="Supprimer cet actif"><i class="fa-solid fa-trash-can"></i></button>` : ''}
-    </label>
-  `).join('');
-
-  listEl.querySelectorAll('input[type="checkbox"]').forEach((chk) => {
-    chk.addEventListener('change', () => {
-      const id = chk.dataset.assetId;
-      const target = marketAssets.find((a) => a.id === id);
-      if (target) {
-        target.enabled = chk.checked;
-        saveMarketAssets();
-        renderMarketCards();
-      }
-    });
-  });
-
-  listEl.querySelectorAll('.market-del-custom').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      const id = btn.dataset.delId;
-      marketAssets = marketAssets.filter((a) => a.id !== id);
-      saveMarketAssets();
-      renderMarketChecklist();
-      renderMarketCards();
-      if (typeof showToast === 'function') showToast('Actif personnalisé supprimé', 'info');
-    });
-  });
-}
-
-function toggleMarketConfigDrawer() {
-  const drawer = document.getElementById('market-config-drawer');
-  if (!drawer) return;
-  const isHidden = drawer.hasAttribute('hidden');
-  if (isHidden) {
-    drawer.removeAttribute('hidden');
-    renderMarketChecklist();
-  } else {
-    drawer.setAttribute('hidden', '');
-  }
-}
-
-/**
- * Récupère la cotation réelle d'un actif via l'API Yahoo Finance
- * avec bascule automatique entre proxys CORS sécurisés
- */
-async function fetchYahooQuote(symbol) {
-  if (!symbol) return null;
-  const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=2d`;
-
-  const proxies = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(yahooUrl)}`,
-    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(yahooUrl)}`,
-    `https://corsproxy.io/?url=${encodeURIComponent(yahooUrl)}`,
-    yahooUrl
-  ];
-
-  for (const url of proxies) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4500);
-      const res = await fetch(url, { signal: controller.signal });
-      clearTimeout(timeoutId);
-
-      if (res.ok) {
-        const data = await res.json();
-        const meta = data?.chart?.result?.[0]?.meta;
-        if (meta && typeof meta.regularMarketPrice === 'number') {
-          const price = meta.regularMarketPrice;
-          const prevClose = meta.chartPreviousClose || meta.previousClose || price;
-          const change = prevClose ? ((price - prevClose) / prevClose) * 100 : 0;
-          return { price, change };
-        }
-      }
-    } catch {}
-  }
-  return null;
-}
-
-async function fetchMarketRates() {
-  const refreshBtn = document.getElementById('crypto-refresh-btn');
-  if (refreshBtn) refreshBtn.querySelector('i')?.classList.add('fa-spin');
-
-  // 1. Taux réel EUR/USD via api.frankfurter.dev
-  const eurUsdAsset = marketAssets.find((a) => a.id === 'eurusd');
-  if (eurUsdAsset && eurUsdAsset.enabled) {
-    try {
-      const res = await fetch('https://api.frankfurter.dev/v1/latest?base=EUR&symbols=USD');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.rates && data.rates.USD) {
-          eurUsdAsset.basePrice = Number(data.rates.USD.toFixed(4));
-          eurUsdAsset.isReal = true;
-        }
-      }
-    } catch {}
-  }
-
-  // 2. Bitcoin réel via CoinGecko
-  const btcAsset = marketAssets.find((a) => a.id === 'btc');
-  if (btcAsset && btcAsset.enabled) {
-    try {
-      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.bitcoin) {
-          btcAsset.basePrice = Math.round(data.bitcoin.usd);
-          if (data.bitcoin.usd_24h_change) {
-            btcAsset.baseChange = Number(data.bitcoin.usd_24h_change.toFixed(2));
-          }
-          btcAsset.isReal = true;
-        }
-      }
-    } catch {}
-  }
-
-  // 3. Récupération des vraies cotations boursières via Yahoo Finance API (10AP, LYP6, XMME, Nvidia...)
-  const yahooTasks = marketAssets
-    .filter((a) => a.enabled && a.id !== 'eurusd' && a.id !== 'btc' && a.symbol)
-    .map(async (asset) => {
-      const quote = await fetchYahooQuote(asset.symbol);
-      if (quote) {
-        asset.basePrice = Number(quote.price.toFixed(2));
-        asset.baseChange = Number(quote.change.toFixed(2));
-        asset.isReal = true;
-      }
-    });
-
-  await Promise.allSettled(yahooTasks);
-
-  saveMarketAssets();
-  renderMarketCards();
-
-  // Animation de flash subtile sur les cartes
-  document.querySelectorAll('.market-card').forEach((card) => {
-    card.classList.remove('flash-update');
-    void card.offsetWidth; // Reflow
-    card.classList.add('flash-update');
-  });
-
-  if (refreshBtn) {
-    setTimeout(() => {
-      refreshBtn.querySelector('i')?.classList.remove('fa-spin');
-    }, 600);
-  }
-}
-
-function initMarketWidget() {
+function initSystemWidget() {
   if (typeof initMarkets === 'function') {
     initMarkets();
   }
-}
-
-function initSystemWidget() {
-  initMarketWidget();
 }
 
 /* ========================================================
@@ -1814,7 +1685,8 @@ function setTabVisibilityWithAnimation(key, isEnabled, callback) {
   function run() {
     try { initPomodoroWidget(); } catch (e) {}
     try { initAmbientWidget(); } catch (e) {}
-    try { renderPomoHistoryChart(); } catch (e) {}
+    try { renderWeeklyRevisionChart(); } catch (e) {}
+    try { renderRevisionHistory(); } catch (e) {}
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', run);

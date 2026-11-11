@@ -495,13 +495,13 @@
 }
 
 /* ========================================================
-   VUE 5 : STUDIO FOCUS POMODORO & AMBIANCE LO-FI (2 Colonnes)
+   VUE 5 : STUDIO DE RÉVISIONS & FOCUS (2 Colonnes Épurées)
    ======================================================== */
 .pomodoro-full-view,
 .deck-slide-view.pomodoro-full-view.active {
   display: grid !important;
-  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr) !important;
-  gap: clamp(16px, 1.8vw, 28px) !important;
+  grid-template-columns: minmax(0, 1.45fr) minmax(380px, 1fr) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
   height: 100% !important;
   min-height: 0 !important;
   width: 100% !important;
@@ -519,22 +519,34 @@
 @media (max-width: 1050px) {
   .pomodoro-full-view,
   .deck-slide-view.pomodoro-full-view.active {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    height: auto !important;
+    min-height: 100% !important;
     overflow-y: auto !important;
+    padding-bottom: 40px !important;
+  }
+
+  .revision-timer-col,
+  .revision-cockpit-col {
+    height: auto !important;
+    min-height: min-content !important;
+    flex: 0 0 auto !important;
+    overflow: visible !important;
   }
 }
 
-/* Les deux piliers inspirés directement de l'Agenda */
-.pomo-timer-stage,
-.pomo-side-cockpit {
-  background: rgba(12, 16, 26, 0.74);
+/* Les deux grands piliers en verre satiné */
+.revision-timer-col,
+.revision-cockpit-col {
+  background: rgba(13, 17, 28, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: clamp(18px, 2.2vh, 26px);
-  padding: clamp(14px, 2vh, 24px) clamp(18px, 2vw, 28px);
+  border-radius: clamp(18px, 2.2vh, 24px);
+  padding: clamp(14px, 2vh, 22px) clamp(16px, 2vw, 24px);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.09);
   height: 100%;
   min-height: 0;
   display: flex;
@@ -544,93 +556,111 @@
   overflow: hidden;
 }
 
-/* ========================================================
-   COLONNE GAUCHE (~58%) : MINUTEUR HÉROS XXL & COMMANDES
-   ======================================================== */
-.pomo-timer-stage {
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(10px, 1.5vh, 18px);
+@media (max-width: 1050px) {
+  .revision-timer-col,
+  .revision-cockpit-col {
+    height: auto !important;
+    overflow: visible !important;
+  }
 }
 
-.pomo-timer-stage::before {
+/* ========================================================
+   COLONNE GAUCHE : GRAND MINUTEUR DE RÉVISION & COMMANDES
+   ======================================================== */
+.revision-timer-col {
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(10px, 1.4vh, 16px);
+}
+
+.revision-timer-col::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 15%;
-  right: 15%;
+  left: 20%;
+  right: 20%;
   height: 2px;
   background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
-.pomo-hero-badge-row {
+.revision-top-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  gap: 0.75rem;
 }
 
-.pomo-active-mode-tag {
-  font-size: 0.76rem;
-  font-weight: 800;
-  color: var(--accent-primary);
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
-  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.28);
-  padding: 0.35rem 0.95rem;
-  border-radius: 99px;
-  letter-spacing: 0.06em;
+.revision-subject-picker {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 0.25rem 0.75rem;
 }
 
-.pomo-cycle-badge {
-  font-size: 0.74rem;
+.subject-picker-label {
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  padding: 0.35rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.revision-subject-select {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.revision-subject-select option {
+  background: #111624;
+  color: #ffffff;
+}
+
+.revision-program-tag {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+  padding: 0.32rem 0.85rem;
   border-radius: 99px;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
 }
 
-.pomo-cycle-badge strong {
-  color: #ffffff;
-  font-weight: 800;
-}
-
-/* Intention de focus */
-.pomo-intention-bar {
+/* Barre d'objectif / tâche de révision */
+.revision-task-bar {
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  width: min(100%, 460px);
+  width: min(100%, 480px);
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
-  padding: 0.45rem 0.85rem;
-  transition: all 0.25s ease;
+  padding: 0.5rem 0.9rem;
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
-.pomo-intention-bar:focus-within {
+.revision-task-bar:focus-within {
   border-color: var(--accent-primary);
   background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.08);
-  box-shadow: 0 0 18px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.2);
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
 }
 
-.pomo-intention-bar .intention-icon {
-  font-size: 0.85rem;
-  color: var(--accent-primary);
-  opacity: 0.85;
-}
-
-.pomo-intention-input {
+.revision-task-input {
   flex: 1;
   background: transparent;
   border: none;
@@ -641,12 +671,12 @@
   font-weight: 500;
 }
 
-.pomo-intention-input::placeholder {
+.revision-task-input::placeholder {
   color: var(--text-muted);
   font-size: 0.8rem;
 }
 
-.pomo-intention-clear {
+.revision-task-clear {
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -659,50 +689,50 @@
   transition: all 0.2s ease;
 }
 
-.pomo-intention-clear.visible {
+.revision-task-clear.visible {
   opacity: 1;
   pointer-events: auto;
 }
 
-.pomo-intention-clear:hover {
+.revision-task-clear:hover {
   color: #ffffff;
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Cadran Circulaire XXL Majestueux */
-.pomo-dial-wrap {
+/* LE GRAND CADRAN CIRCULAIRE XXL */
+.revision-dial-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   width: 100%;
-  flex: 1;
-  min-height: 0;
-  padding: clamp(4px, 1vh, 14px) 0;
+  flex: 1 0 auto;
+  min-height: clamp(280px, 36vh, 360px);
+  padding: clamp(6px, 1.2vh, 16px) 0;
 }
 
-.pomo-dial-ring {
+.revision-dial-circle {
   position: relative;
-  width: clamp(270px, 38vh, 390px);
-  height: clamp(270px, 38vh, 390px);
-  max-width: 90%;
+  width: clamp(280px, 42vh, 410px);
+  height: clamp(280px, 42vh, 410px);
+  max-width: 92%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12) 0%, rgba(8, 12, 20, 0.95) 74%);
+  background: radial-gradient(circle, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14) 0%, rgba(9, 12, 22, 0.96) 74%);
   border: 2px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.75), inset 0 0 45px rgba(0, 0, 0, 0.9), 0 0 30px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.75), inset 0 0 45px rgba(0, 0, 0, 0.9), 0 0 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
 }
 
-.pomo-dial-ring.running {
-  box-shadow: 0 0 60px rgba(0, 0, 0, 0.85), inset 0 0 50px rgba(0, 0, 0, 0.95), 0 0 40px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+.revision-dial-circle.running {
+  box-shadow: 0 0 65px rgba(0, 0, 0, 0.85), inset 0 0 50px rgba(0, 0, 0, 0.95), 0 0 42px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.36);
   border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
 }
 
-.pomo-svg-ring {
+.revision-svg {
   position: absolute;
   top: 0;
   left: 0;
@@ -712,22 +742,22 @@
   transform: rotate(-90deg);
 }
 
-.pomo-ring-track {
+.revision-svg-track {
   fill: none;
   stroke: rgba(255, 255, 255, 0.06);
-  stroke-width: 7;
+  stroke-width: 8;
 }
 
-.pomo-ring-arc {
+.revision-svg-arc {
   fill: none;
   stroke: var(--accent-primary);
-  stroke-width: 8;
+  stroke-width: 8.5;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.5s ease-out;
+  transition: stroke-dashoffset 0.4s ease-out;
   filter: drop-shadow(0 0 10px var(--accent-primary));
 }
 
-.pomo-dial-content {
+.revision-dial-center {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -737,45 +767,47 @@
   text-align: center;
 }
 
-.pomo-digits {
+/* Chiffres géants du minuteur */
+.revision-time-digits {
   font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(3.6rem, 5.2vw, 4.6rem);
+  font-size: clamp(4.2rem, 6.2vw, 5.6rem);
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.04em;
   line-height: 1;
-  text-shadow: 0 0 32px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 32px rgba(255, 255, 255, 0.28);
 }
 
-.pomo-status {
-  font-size: 0.8rem;
+.revision-status-badge {
+  font-size: 0.78rem;
   color: var(--accent-primary);
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.14em;
   font-weight: 800;
   background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
   border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
-  padding: 0.3rem 1rem;
+  padding: 0.28rem 0.95rem;
   border-radius: 99px;
+  transition: all 0.2s ease;
 }
 
-.pomo-substatus {
+.revision-session-hint {
   font-size: 0.72rem;
   color: var(--text-muted);
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 /* Jauge linéaire */
-.pomo-progress-bar-wrap {
-  width: min(100%, 460px);
+.revision-progress-bar {
+  width: min(100%, 480px);
   height: 6px;
   background: rgba(255, 255, 255, 0.07);
   border-radius: 99px;
   overflow: hidden;
 }
 
-.pomo-progress-fill {
+.revision-progress-fill {
   height: 100%;
   background: linear-gradient(90deg, #38bdf8, var(--accent-primary));
   border-radius: 99px;
@@ -783,16 +815,16 @@
   box-shadow: 0 0 10px var(--accent-primary);
 }
 
-/* Boutons de commandes principaux */
-.pomo-controls-row {
+/* Commandes principales */
+.revision-controls-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  width: min(100%, 460px);
+  width: min(100%, 480px);
 }
 
-.pomo-start-btn {
+.revision-btn-main {
   flex: 1;
   padding: 0.95rem 1.6rem;
   border-radius: 14px;
@@ -812,26 +844,26 @@
   user-select: none;
 }
 
-.pomo-start-btn:hover {
+.revision-btn-main:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.5);
 }
 
-.pomo-start-btn:active {
+.revision-btn-main:active {
   transform: translateY(1px);
 }
 
-.pomo-start-btn.running {
+.revision-btn-main.running {
   background: #f59e0b;
   color: #0c0f17;
   box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
 }
 
-.pomo-start-btn * {
+.revision-btn-main * {
   pointer-events: none;
 }
 
-.pomo-ctrl-btn {
+.revision-btn-icon {
   width: 48px;
   height: 48px;
   border-radius: 14px;
@@ -847,39 +879,31 @@
   user-select: none;
 }
 
-.pomo-ctrl-btn:hover {
+.revision-btn-icon:hover {
   background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.22);
 }
 
-.pomo-reset-btn:hover {
-  transform: rotate(-35deg);
-}
-
-.pomo-skip-btn:hover {
-  transform: translateX(2px);
-}
-
-.pomo-ctrl-btn:active {
+.revision-btn-icon:active {
   transform: scale(0.95);
 }
 
-.pomo-ctrl-btn * {
+.revision-btn-icon * {
   pointer-events: none;
 }
 
-.pomo-hero-keyboard-footer {
+.revision-keyboard-hints {
   display: flex;
   align-items: center;
   gap: 1.25rem;
   font-size: 0.72rem;
   color: var(--text-muted);
-  padding-top: 0.3rem;
+  padding-top: 0.25rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.pomo-hero-keyboard-footer kbd {
+.revision-keyboard-hints kbd {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 4px;
@@ -892,74 +916,205 @@
 }
 
 /* ========================================================
-   COLONNE DROITE (~42%) : COCKPIT SUIVI, GRAPHIQUE & OPTIONS
+   COLONNE DROITE : PROGRAMMES, GRAPHIQUE, HISTORIQUE
    ======================================================== */
-.pomo-side-cockpit {
+.revision-cockpit-col {
   overflow-y: auto;
-  gap: clamp(12px, 1.6vh, 18px);
+  gap: clamp(12px, 1.5vh, 16px);
   justify-content: flex-start;
-  padding-right: clamp(14px, 1.8vw, 24px);
+  padding-right: clamp(12px, 1.6vw, 20px);
 }
 
-.pomo-side-cockpit::-webkit-scrollbar {
+.revision-cockpit-col::-webkit-scrollbar {
   width: 6px;
 }
-.pomo-side-cockpit::-webkit-scrollbar-track {
+.revision-cockpit-col::-webkit-scrollbar-track {
   background: transparent;
 }
-.pomo-side-cockpit::-webkit-scrollbar-thumb {
+.revision-cockpit-col::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 99px;
 }
-.pomo-side-cockpit::-webkit-scrollbar-thumb:hover {
+.revision-cockpit-col::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.22);
 }
 
-.pomo-panel-box {
+.revision-card {
   background: rgba(16, 22, 35, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: clamp(14px, 1.8vh, 18px);
   padding: clamp(12px, 1.6vh, 16px) clamp(14px, 1.6vw, 18px);
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  gap: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   flex-shrink: 0;
 }
 
-.pomo-box-head {
+.revision-card-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.6rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 0.65rem;
+  padding-bottom: 0.6rem;
 }
 
-.pomo-box-title {
+.card-title {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  font-size: 0.88rem;
+  gap: 0.55rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #ffffff;
 }
 
-.stats-badge {
+.revision-card-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Grille des 4 programmes de révision */
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.program-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.program-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.program-card.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22);
+}
+
+.program-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.program-card.active .program-icon-box {
+  background: var(--accent-primary);
+  color: #0c0f17;
+}
+
+.program-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.program-text strong {
+  font-size: 0.78rem;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.program-text span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.program-card * {
+  pointer-events: none;
+}
+
+/* Phase switcher */
+.revision-phase-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 3px;
+  margin-top: 0.2rem;
+}
+
+.phase-chip {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.42rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-family: inherit;
+}
+
+.phase-chip:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.phase-chip.active {
+  background: var(--accent-primary);
+  color: #0c0f17;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+.phase-chip * {
+  pointer-events: none;
+}
+
+/* Graphique hebdomadaire */
+.revision-week-total {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.26);
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.74rem;
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  padding: 0.2rem 0.65rem;
-  border-radius: 99px;
-  font-weight: 700;
 }
 
-/* Mini Bar Chart SVG des 7 derniers jours */
-.pomo-history-chart-wrap {
+.revision-week-total strong {
+  color: #ffffff;
+}
+
+.revision-svg-chart-wrap {
   width: 100%;
   background: rgba(8, 12, 20, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -968,372 +1123,238 @@
   box-sizing: border-box;
 }
 
-.pomo-history-chart {
+.revision-weekly-chart {
   width: 100%;
-  height: 80px;
+  height: 95px;
   display: block;
 }
 
-.pomo-history-chart text {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-}
-
-.pomo-history-chart rect.bar-track {
-  fill: rgba(255, 255, 255, 0.04);
-}
-
-.pomo-history-chart rect.bar-fill {
-  transition: all 0.3s ease;
-}
-
-.pomo-dots-milestones {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.pomo-dots-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.pomo-dot {
-  flex: 1;
-  height: 30px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1.5px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  transition: all 0.3s ease;
-}
-
-.pomo-dot.done {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: #0c0f17;
-  font-weight: 800;
-  box-shadow: 0 0 12px var(--accent-primary);
-}
-
-.pomo-dots-sub {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.pomo-stats-inline {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.55rem;
-}
-
-.pomo-stat-pill {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  padding: 0.5rem 0.8rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pomo-stat-pill .label {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
-
-.pomo-stat-pill .val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-/* Module Rythmes & Presets */
-.pomo-mini-chime-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.3rem 0.75rem;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.pomo-mini-chime-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.pomo-mini-chime-btn * {
-  pointer-events: none;
-}
-
-.pomo-modes-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 99px;
-  padding: 3px;
-}
-
-.pomo-mode-chip {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 0.48rem 0.5rem;
-  border-radius: 99px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  font-family: inherit;
-  white-space: nowrap;
-}
-
-.pomo-mode-chip:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.pomo-mode-chip.active {
-  background: var(--accent-primary);
-  color: #0c0f17;
-  font-weight: 800;
-  box-shadow: 0 4px 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
-}
-
-.pomo-mode-chip * {
-  pointer-events: none;
-}
-
-.pomo-presets-grid {
+.revision-quick-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 
-.pomo-preset-btn {
-  padding: 0.6rem 0.45rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-muted);
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s ease;
+.quick-stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 2px;
   text-align: center;
 }
 
-.pomo-preset-btn strong {
-  font-size: 0.82rem;
-  color: #ffffff;
+.quick-stat-box .stat-lbl {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.quick-stat-box .stat-val {
   font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
 }
 
-.pomo-preset-btn span {
-  font-size: 0.68rem;
+/* Historique des révisions */
+.revision-clear-btn {
+  background: transparent;
+  border: none;
   color: var(--text-muted);
-}
-
-.pomo-preset-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-.pomo-preset-btn.active {
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16);
-  border-color: var(--accent-primary);
-}
-
-.pomo-preset-btn.active strong {
-  color: var(--accent-primary);
-}
-
-.pomo-preset-btn * {
-  pointer-events: none;
-}
-
-/* Module Ambiance Lo-Fi Combiné */
-.pomo-ambient-badge {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 0.2rem 0.65rem;
-  border-radius: 99px;
+  cursor: pointer;
+  padding: 0.25rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
   transition: all 0.2s ease;
 }
 
-.pomo-ambient-badge.playing {
-  color: #a78bfa;
-  background: rgba(167, 139, 250, 0.16);
-  border-color: rgba(167, 139, 250, 0.35);
+.revision-clear-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
 }
 
-.pomo-visualizer-container {
-  position: relative;
-  width: 100%;
-  height: 60px;
-  background: rgba(6, 9, 16, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 6px 10px;
-  box-sizing: border-box;
+.revision-history-list {
   display: flex;
   flex-direction: column;
+  gap: 0.45rem;
+  max-height: 170px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.revision-history-list::-webkit-scrollbar {
+  width: 5px;
+}
+.revision-history-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  font-size: 0.74rem;
+  transition: all 0.2s ease;
 }
 
-.ambient-waves-canvas {
-  width: 100%;
-  height: 34px;
-  display: block;
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-.ambient-now-playing {
+.history-subj {
+  font-weight: 700;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.history-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   font-size: 0.7rem;
   color: var(--text-muted);
-  font-weight: 600;
-  letter-spacing: 0.03em;
 }
 
-.ambient-modes-grid {
+.history-dur-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+}
+
+.history-empty-msg {
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  padding: 1rem 0.5rem;
+  font-style: italic;
+}
+
+/* Ambiance d'étude */
+.ambient-chips-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
 }
 
-.ambient-mode-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.65rem 0.4rem;
-  border-radius: 12px;
+.ambient-chip {
+  padding: 0.45rem 0.35rem;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.07);
   color: var(--text-muted);
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
   font-family: inherit;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.ambient-mode-card i {
-  font-size: 1.05rem;
-  color: var(--text-secondary);
-  transition: color 0.2s ease;
-}
-
-.ambient-mode-card:hover {
-  background: rgba(255, 255, 255, 0.08);
+.ambient-chip:hover {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.07);
 }
 
-.ambient-mode-card.active {
-  background: rgba(167, 139, 250, 0.18);
+.ambient-chip.active {
+  background: rgba(167, 139, 250, 0.16);
   border-color: #a78bfa;
   color: #ffffff;
   font-weight: 700;
-  box-shadow: 0 0 14px rgba(167, 139, 250, 0.25);
 }
 
-.ambient-mode-card.active i {
-  color: #a78bfa;
-}
-
-.ambient-mode-card * {
+.ambient-chip * {
   pointer-events: none;
 }
 
-.ambient-controls-bar {
+.ambient-footer-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.8rem;
-  padding-top: 0.4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.65rem;
+  padding-top: 0.25rem;
 }
 
-.ambient-master-btn {
+.ambient-play-toggle {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 12px;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #ffffff;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
   font-family: inherit;
+  transition: all 0.2s ease;
 }
 
-.ambient-master-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
-}
-
-.ambient-master-btn.playing {
+.ambient-play-toggle.playing {
   background: #10b981;
   color: #0c0f17;
   border-color: #10b981;
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
 }
 
-.ambient-master-btn * {
+.ambient-play-toggle * {
   pointer-events: none;
 }
 
-.ambient-volume-wrap {
+.ambient-slider-group {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  color: var(--text-muted);
-  font-size: 0.78rem;
+  gap: 0.45rem;
   flex: 1;
-  max-width: 160px;
 }
 
-.ambient-volume-wrap input[type="range"] {
+.ambient-slider-group input[type="range"] {
   width: 100%;
   accent-color: var(--accent-primary);
   height: 4px;
 }
+
+.chime-test-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.chime-test-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.chime-test-btn * {
+  pointer-events: none;
+}
+
+/* ========================================================
 
 /* ========================================================
    VUE 7 : BLOC-NOTES SCRATCHPAD

@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="css/base.css?v=3.0" />
     <link rel="stylesheet" href="css/deck.css?v=3.0" />
     <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
-    <link rel="stylesheet" href="css/dashboard.css?v=3.9" />
+    <link rel="stylesheet" href="css/dashboard.css?v=4.0" />
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
@@ -1114,244 +1114,1150 @@
                 </div>
               </div>
 
-              <!-- VUE 5 : STUDIO FOCUS POMODORO & AMBIANCE LO-FI (2 COLONNES) -->
+              <!-- VUE 5 : STUDIO DE RÉVISIONS & FOCUS POMODORO (2 COLONNES) -->
               <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view" hidden>
                 
-                <!-- COLONNE GAUCHE (~58%) : STUDIO FOCUS & CADRAN CHRONO -->
-                <div class="pomo-timer-stage">
+                <!-- COLONNE GAUCHE (~56%) : GRAND MINUTEUR DE RÉVISION & COMMANDES -->
+                <div class="revision-timer-col">
                   
-                  <!-- En-tête : Badge Mode & Indicateur de Cycle -->
-                  <div class="pomo-hero-badge-row">
-                    <span class="pomo-active-mode-tag" id="pomo-active-mode-tag">
-                      <i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS • 25 MIN
-                    </span>
-                    <span class="pomo-cycle-badge" id="pomo-cycle-badge">
-                      <i class="fa-solid fa-fire text-accent"></i> Session <strong id="pomo-cycle-current">1</strong> / 4
-                    </span>
+                  <!-- Barre supérieure : Sujet & Programme actif -->
+                  <div class="revision-top-bar">
+                    <div class="revision-subject-picker">
+                      <span class="subject-picker-label"><i class="fa-solid fa-graduation-cap text-accent"></i> Matière :</span>
+                      <select id="revision-subject-select" class="revision-subject-select" title="Choisir la matière à réviser">
+                        <option value="📐 Mathématiques">📐 Mathématiques</option>
+                        <option value="💻 Programmation">💻 Programmation</option>
+                        <option value="📚 Économie &amp; Gestion">📚 Économie &amp; Gestion</option>
+                        <option value="🔬 Sciences &amp; Physique">🔬 Sciences &amp; Physique</option>
+                        <option value="🌍 Langues vivantes">🌍 Langues vivantes</option>
+                        <option value="✍️ Droit &amp; Rédaction">✍️ Droit &amp; Rédaction</option>
+                        <option value="📖 Culture générale">📖 Culture générale</option>
+                      </select>
+                    </div>
+
+                    <div class="revision-program-tag" id="revision-active-program-tag">
+                      <span class="pulse-dot"></span>
+                      <span id="revision-active-program-name">🎓 Programme Standard • 25 min</span>
+                    </div>
                   </div>
 
-                  <!-- Intention de focus du cycle actuel -->
-                  <div class="pomo-intention-bar">
-                    <i class="fa-solid fa-crosshairs intention-icon"></i>
+                  <!-- Champ d'objectif de la séance (ex: Chapitre 4, Fiche 12...) -->
+                  <div class="revision-task-bar">
+                    <i class="fa-solid fa-pen-nib text-accent"></i>
                     <input
                       type="text"
                       id="pomo-task-input"
-                      class="pomo-intention-input"
-                      placeholder="Sur quoi vous concentrez-vous pendant ce cycle ?"
-                      maxlength="100"
+                      class="revision-task-input"
+                      placeholder="Chapitre ou objectif de cette session (ex: Chapitre 3 - Théorème de Bayes)..."
+                      maxlength="120"
                       autocomplete="off"
                     />
-                    <button type="button" id="pomo-task-clear-btn" class="pomo-intention-clear" title="Effacer l'objectif">
+                    <button type="button" id="pomo-task-clear-btn" class="revision-task-clear" title="Effacer l'objectif">
                       <i class="fa-solid fa-xmark"></i>
                     </button>
                   </div>
 
-                  <!-- Grand cadran circulaire XXL Majestueux -->
-                  <div class="pomo-dial-wrap">
-                    <div class="pomo-dial-ring" id="pomo-dial-ring">
-                      <svg class="pomo-svg-ring" viewBox="0 0 320 320">
-                        <circle class="pomo-ring-track" cx="160" cy="160" r="142"></circle>
+                  <!-- LE GRAND MINUTEUR XXL (HERO ELEMENT) -->
+                  <div class="revision-dial-wrapper">
+                    <div class="revision-dial-circle" id="pomo-dial-ring">
+                      <!-- Anneau SVG circulaire épuré -->
+                      <svg class="revision-svg" viewBox="0 0 340 340">
+                        <circle class="revision-svg-track" cx="170" cy="170" r="150"></circle>
                         <circle
                           id="pomo-ring-arc"
-                          class="pomo-ring-arc"
-                          cx="160"
-                          cy="160"
-                          r="142"
-                          stroke-dasharray="892.21"
+                          class="revision-svg-arc"
+                          cx="170"
+                          cy="170"
+                          r="150"
+                          stroke-dasharray="942.48"
                           stroke-dashoffset="0"
                         ></circle>
                       </svg>
-                      <div class="pomo-dial-content">
-                        <span id="pomo-time" class="pomo-digits">25:00</span>
-                        <span id="pomo-status" class="pomo-status">Focus Time</span>
-                        <span id="pomo-substatus" class="pomo-substatus">Prêt à démarrer</span>
+                      
+                      <!-- Contenu central XXL -->
+                      <div class="revision-dial-center">
+                        <span id="pomo-time" class="revision-time-digits">25:00</span>
+                        <div class="revision-status-badge" id="pomo-status">Session Prête</div>
+                        <span class="revision-session-hint" id="pomo-substatus">Session 1 sur 4 avant pause longue</span>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Jauge de progression linéaire -->
-                  <div class="pomo-progress-bar-wrap">
-                    <div id="pomo-progress-fill" class="pomo-progress-fill" style="width: 0%;"></div>
+                  <!-- Barre de progression linéaire -->
+                  <div class="revision-progress-bar">
+                    <div id="pomo-progress-fill" class="revision-progress-fill" style="width: 0%;"></div>
                   </div>
 
-                  <!-- Boutons de commande principaux -->
-                  <div class="pomo-controls-row">
-                    <button type="button" id="pomo-start-btn" class="pomo-start-btn" title="Démarrer ou suspendre la session (Espace)">
+                  <!-- Boutons d'action principaux grand format -->
+                  <div class="revision-controls-row">
+                    <button type="button" id="pomo-start-btn" class="revision-btn-main" title="Démarrer ou suspendre la révision (Espace)">
                       <i class="fa-solid fa-play"></i>
-                      <span>Démarrer la session</span>
+                      <span>Démarrer la révision</span>
                     </button>
-                    <button type="button" id="pomo-reset-btn" class="pomo-ctrl-btn pomo-reset-btn" title="Remettre à zéro (R)">
+                    <button type="button" id="pomo-reset-btn" class="revision-btn-icon" title="Remettre à zéro (R)">
                       <i class="fa-solid fa-rotate-left"></i>
                     </button>
-                    <button type="button" id="pomo-skip-btn" class="pomo-ctrl-btn pomo-skip-btn" title="Passer à l'étape suivante (S)">
+                    <button type="button" id="pomo-skip-btn" class="revision-btn-icon" title="Passer à l'étape suivante (S)">
                       <i class="fa-solid fa-forward-step"></i>
                     </button>
                   </div>
 
-                  <!-- Raccourcis clavier discrets sous les commandes -->
-                  <div class="pomo-hero-keyboard-footer">
-                    <span><kbd>Espace</kbd> Play / Pause</span>
+                  <!-- Raccourcis clavier discrets -->
+                  <div class="revision-keyboard-hints">
+                    <span><kbd>Espace</kbd> Démarrer / Pause</span>
                     <span><kbd>R</kbd> Réinitialiser</span>
                     <span><kbd>S</kbd> Passer</span>
                   </div>
 
                 </div>
 
-                <!-- COLONNE DROITE (~42%) : COCKPIT STATS, RYTHMES & AMBIANCE -->
-                <div class="pomo-side-cockpit">
+                <!-- COLONNE DROITE (~44%) : PROGRAMMES, GRAPHIQUE, HISTORIQUE & AMBIANCE -->
+                <div class="revision-cockpit-col">
                   
-                  <!-- MODULE 1 : SESSIONS, OBJECTIF DU JOUR & MINI GRAPHIQUE SVG -->
-                  <div class="pomo-panel-box pomo-history-box">
-                    <div class="pomo-box-head">
-                      <div class="pomo-box-title">
-                        <i class="fa-solid fa-chart-column text-accent"></i>
-                        <span>Sessions &amp; Objectif</span>
+                  <!-- BLOC 1 : SÉLECTION DU PROGRAMME DE RÉVISION -->
+                  <div class="revision-card revision-programs-card">
+                    <div class="revision-card-head">
+                      <div class="card-title">
+                        <i class="fa-solid fa-layer-group text-accent"></i>
+                        <span>Programmes de Révision</span>
                       </div>
-                      <span class="stats-badge" id="pomo-today-sessions-badge">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span id="pomo-cycles-count">0</span> / 4 terminées
+                      <span class="revision-card-hint">Rythmes d'étude</span>
+                    </div>
+
+                    <div class="programs-grid">
+                      <button type="button" class="program-card active" data-program="standard">
+                        <div class="program-icon-box"><i class="fa-solid fa-graduation-cap"></i></div>
+                        <div class="program-text">
+                          <strong>Standard</strong>
+                          <span>25m Focus • 5m Pause</span>
+                        </div>
+                      </button>
+
+                      <button type="button" class="program-card" data-program="deep">
+                        <div class="program-icon-box"><i class="fa-solid fa-brain"></i></div>
+                        <div class="program-text">
+                          <strong>Examen &amp; Deep</strong>
+                          <span>50m Focus • 10m Pause</span>
+                        </div>
+                      </button>
+
+                      <button type="button" class="program-card" data-program="sprint">
+                        <div class="program-icon-box"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="program-text">
+                          <strong>Sprint Flash</strong>
+                          <span>15m Focus • 3m Pause</span>
+                        </div>
+                      </button>
+
+                      <button type="button" class="program-card" data-program="lecture">
+                        <div class="program-icon-box"><i class="fa-solid fa-book-open"></i></div>
+                        <div class="program-text">
+                          <strong>Fiches &amp; Lecture</strong>
+                          <span>40m Focus • 8m Pause</span>
+                        </div>
+                      </button>
+                    </div>
+
+                    <!-- Sélecteur rapide de phase (Focus / Pause courte / Pause longue) -->
+                    <div class="revision-phase-switcher">
+                      <button type="button" class="phase-chip active" data-pomo-mode="focus">
+                        <i class="fa-solid fa-brain"></i> Focus
+                      </button>
+                      <button type="button" class="phase-chip" data-pomo-mode="short">
+                        <i class="fa-solid fa-mug-hot"></i> Pause courte
+                      </button>
+                      <button type="button" class="phase-chip" data-pomo-mode="long">
+                        <i class="fa-solid fa-couch"></i> Pause longue
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- BLOC 2 : GRAPHIQUE À BARRES DES RÉVISIONS DE LA SEMAINE -->
+                  <div class="revision-card revision-chart-card">
+                    <div class="revision-card-head">
+                      <div class="card-title">
+                        <i class="fa-solid fa-chart-column text-accent"></i>
+                        <span>Révisions de la Semaine</span>
+                      </div>
+                      <span class="revision-week-total" id="revision-week-total-badge">
+                        <i class="fa-regular fa-clock"></i> <strong id="revision-week-total-text">0h 00m</strong>
                       </span>
                     </div>
 
-                    <!-- Mini Graphique BarChart SVG des 7 derniers jours -->
-                    <div class="pomo-history-chart-wrap">
-                      <svg id="pomo-history-chart" class="pomo-history-chart" viewBox="0 0 280 80">
-                        <!-- Généré dynamiquement en JS -->
+                    <!-- Graphique SVG BarChart élégant -->
+                    <div class="revision-svg-chart-wrap">
+                      <svg id="revision-weekly-chart" class="revision-weekly-chart" viewBox="0 0 320 95">
+                        <!-- Barres générées dynamiquement en JS -->
                       </svg>
                     </div>
 
-                    <!-- Jalons du cycle de 4 sessions -->
-                    <div class="pomo-dots-milestones">
-                      <div class="pomo-dots-wrap" id="pomo-dots-wrap">
-                        <div class="pomo-dot" data-step="1"><span>1</span></div>
-                        <div class="pomo-dot" data-step="2"><span>2</span></div>
-                        <div class="pomo-dot" data-step="3"><span>3</span></div>
-                        <div class="pomo-dot" data-step="4"><span>4</span></div>
+                    <!-- Mini stats récapitulatives -->
+                    <div class="revision-quick-stats">
+                      <div class="quick-stat-box">
+                        <span class="stat-lbl">Aujourd'hui</span>
+                        <strong class="stat-val text-accent" id="revision-today-time">0 min</strong>
                       </div>
-                      <span class="pomo-dots-sub"><i class="fa-solid fa-clock-rotate-left"></i> Pause longue de 15 min après 4 sessions accomplies</span>
-                    </div>
-
-                    <!-- Chiffres clés du jour -->
-                    <div class="pomo-stats-inline">
-                      <div class="pomo-stat-pill">
-                        <span class="label">Temps focus total</span>
-                        <strong class="val" id="pomo-total-time">0 min</strong>
+                      <div class="quick-stat-box">
+                        <span class="stat-lbl">Séances finies</span>
+                        <strong class="stat-val" id="revision-today-sessions">0</strong>
                       </div>
-                      <div class="pomo-stat-pill">
-                        <span class="label">Prochaine pause</span>
-                        <strong class="val" id="pomo-next-break">5 min</strong>
+                      <div class="quick-stat-box">
+                        <span class="stat-lbl">Prochaine pause</span>
+                        <strong class="stat-val" id="revision-next-break">5 min</strong>
                       </div>
                     </div>
                   </div>
 
-                  <!-- MODULE 2 : PARAMÉTRAGE DES RYTHMES & PRESETS -->
-                  <div class="pomo-panel-box pomo-modes-box">
-                    <div class="pomo-box-head">
-                      <div class="pomo-box-title">
-                        <i class="fa-solid fa-sliders text-accent"></i>
-                        <span>Rythmes &amp; Intervalles</span>
+                  <!-- BLOC 3 : HISTORIQUE DES DERNIÈRES RÉVISIONS -->
+                  <div class="revision-card revision-history-card">
+                    <div class="revision-card-head">
+                      <div class="card-title">
+                        <i class="fa-solid fa-clock-rotate-left text-accent"></i>
+                        <span>Historique des Révisions</span>
                       </div>
-                      <button type="button" id="pomo-test-chime-btn" class="pomo-mini-chime-btn" title="Tester le carillon zen">
-                        <i class="fa-solid fa-bell"></i>
-                        <span>Carillon</span>
+                      <button type="button" id="revision-clear-history-btn" class="revision-clear-btn" title="Vider l'historique">
+                        <i class="fa-solid fa-trash-can"></i>
                       </button>
                     </div>
 
-                    <!-- Sélecteur de mode -->
-                    <div class="pomo-modes-bar">
-                      <button type="button" class="pomo-mode-chip active" data-pomo-mode="focus">
-                        <i class="fa-solid fa-brain"></i>
-                        <span>Focus (25m)</span>
-                      </button>
-                      <button type="button" class="pomo-mode-chip" data-pomo-mode="short">
-                        <i class="fa-solid fa-mug-hot"></i>
-                        <span>Pause (5m)</span>
-                      </button>
-                      <button type="button" class="pomo-mode-chip" data-pomo-mode="long">
-                        <i class="fa-solid fa-couch"></i>
-                        <span>Longue (15m)</span>
-                      </button>
-                    </div>
-
-                    <!-- Presets de travail -->
-                    <div class="pomo-presets-grid">
-                      <button type="button" class="pomo-preset-btn active" data-pomo-preset="25">
-                        <strong>25 / 5 min</strong>
-                        <span>Classique</span>
-                      </button>
-                      <button type="button" class="pomo-preset-btn" data-pomo-preset="50">
-                        <strong>50 / 10 min</strong>
-                        <span>Deep Work</span>
-                      </button>
-                      <button type="button" class="pomo-preset-btn" data-pomo-preset="15">
-                        <strong>15 / 3 min</strong>
-                        <span>Sprint</span>
-                      </button>
+                    <div class="revision-history-list" id="revision-history-list">
+                      <!-- Éléments d'historique ajoutés dynamiquement -->
                     </div>
                   </div>
 
-                  <!-- MODULE 3 : STUDIO D'AMBIANCE SONORE LO-FI COMBINÉ -->
-                  <div class="pomo-panel-box pomo-ambient-box">
-                    <div class="pomo-box-head">
-                      <div class="pomo-box-title">
+                  <!-- BLOC 4 : AMBIANCE SONORE DE RÉVISION (CALME & FOCUS) -->
+                  <div class="revision-card revision-ambient-card">
+                    <div class="revision-card-head">
+                      <div class="card-title">
                         <i class="fa-solid fa-headphones text-purple"></i>
-                        <span>Ambiance Sonore &amp; Lo-Fi</span>
+                        <span>Ambiance Sonore d'Étude</span>
                       </div>
-                      <span class="pomo-ambient-badge" id="pomo-ambient-live-tag">Inactif</span>
+                      <span class="revision-card-hint" id="pomo-ambient-live-tag">Inactif</span>
                     </div>
 
-                    <!-- Visualiseur dynamique de fréquences -->
-                    <div class="pomo-visualizer-container">
-                      <canvas id="ambient-waves-canvas" class="ambient-waves-canvas" width="380" height="48"></canvas>
-                      <span id="ambient-now-playing" class="ambient-now-playing">Générateur Procédural Audio</span>
-                    </div>
-
-                    <!-- Grille des 6 ambiances sonores -->
-                    <div class="ambient-modes-grid">
-                      <button type="button" class="ambient-mode-card active" data-ambient-mode="rain">
-                        <i class="fa-solid fa-cloud-showers-heavy"></i>
-                        <span>Pluie cyber</span>
+                    <div class="ambient-chips-row">
+                      <button type="button" class="ambient-chip active" data-ambient-mode="rain">
+                        <i class="fa-solid fa-cloud-rain"></i> Pluie calme
                       </button>
-                      <button type="button" class="ambient-mode-card" data-ambient-mode="lofi">
-                        <i class="fa-solid fa-radio"></i>
-                        <span>Radio Lo-Fi</span>
+                      <button type="button" class="ambient-chip" data-ambient-mode="lofi">
+                        <i class="fa-solid fa-radio"></i> Radio Lo-Fi
                       </button>
-                      <button type="button" class="ambient-mode-card" data-ambient-mode="brown">
-                        <i class="fa-solid fa-wave-square"></i>
-                        <span>Bruit brun</span>
+                      <button type="button" class="ambient-chip" data-ambient-mode="brown">
+                        <i class="fa-solid fa-wave-square"></i> Bruit brun
                       </button>
-                      <button type="button" class="ambient-mode-card" data-ambient-mode="storm">
-                        <i class="fa-solid fa-bolt"></i>
-                        <span>Orage néon</span>
-                      </button>
-                      <button type="button" class="ambient-mode-card" data-ambient-mode="space">
-                        <i class="fa-solid fa-shuttle-space"></i>
-                        <span>Deep space</span>
-                      </button>
-                      <button type="button" class="ambient-mode-card" data-ambient-mode="night">
-                        <i class="fa-solid fa-moon"></i>
-                        <span>Nuit synthé</span>
+                      <button type="button" class="ambient-chip" data-ambient-mode="storm">
+                        <i class="fa-solid fa-wind"></i> Vent &amp; Orage
                       </button>
                     </div>
 
-                    <!-- Contrôles audio (Master Play + Slider Volume) -->
-                    <div class="ambient-controls-bar">
-                      <button type="button" id="ambient-master-toggle" class="ambient-master-btn">
+                    <div class="ambient-footer-row">
+                      <button type="button" id="ambient-master-toggle" class="ambient-play-toggle">
                         <i id="ambient-master-icon" class="fa-solid fa-play"></i>
                         <span id="ambient-master-label">Écouter</span>
                       </button>
-
-                      <div class="ambient-volume-wrap">
-                        <i class="fa-solid fa-volume-low"></i>
+                      <div class="ambient-slider-group">
+                        <i class="fa-solid fa-volume-low text-muted"></i>
                         <input type="range" id="ambient-vol-slider" min="0" max="1" step="0.05" value="0.5" />
-                        <i class="fa-solid fa-volume-high"></i>
+                        <i class="fa-solid fa-volume-high text-muted"></i>
                       </div>
+                      <button type="button" id="pomo-test-chime-btn" class="chime-test-btn" title="Tester le carillon zen">
+                        <i class="fa-solid fa-bell"></i>
+                      </button>
                     </div>
                   </div>
 
                 </div>
 
               </div>
+
+              """
+
+index_path = os.path.join(base_dir, "index.html")
+with open(index_path, "r", encoding="utf-8") as f:
+    idx_content = f.read()
+
+s_idx = idx_content.find("<!-- VUE 5 : STUDIO")
+e_idx = idx_content.find("<!-- VUE 6 : BLOC-NOTES RAPIDE")
+assert s_idx != -1 and e_idx != -1
+
+new_idx = idx_content[:s_idx] + html_code + idx_content[e_idx:]
+with open(index_path, "w", encoding="utf-8") as f:
+    f.write(new_idx)
+print("index.html updated!")
+
+
+# ========================================================
+# 2. CSS FOR css/dashboard.css
+# ========================================================
+css_code = """/* ========================================================
+   VUE 5 : STUDIO DE RÉVISIONS & FOCUS (2 Colonnes Épurées)
+   ======================================================== */
+.pomodoro-full-view,
+.deck-slide-view.pomodoro-full-view.active {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.45fr) minmax(380px, 1fr) !important;
+  gap: clamp(16px, 1.8vw, 24px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+@media (max-width: 1050px) {
+  .pomodoro-full-view,
+  .deck-slide-view.pomodoro-full-view.active {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+  }
+}
+
+/* Les deux grands piliers en verre satiné */
+.revision-timer-col,
+.revision-cockpit-col {
+  background: rgba(13, 17, 28, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(18px, 2.2vh, 24px);
+  padding: clamp(14px, 2vh, 22px) clamp(16px, 2vw, 24px);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (max-width: 1050px) {
+  .revision-timer-col,
+  .revision-cockpit-col {
+    height: auto !important;
+    overflow: visible !important;
+  }
+}
+
+/* ========================================================
+   COLONNE GAUCHE : GRAND MINUTEUR DE RÉVISION & COMMANDES
+   ======================================================== */
+.revision-timer-col {
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(10px, 1.4vh, 16px);
+}
+
+.revision-timer-col::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+  opacity: 0.8;
+}
+
+.revision-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 0.75rem;
+}
+
+.revision-subject-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 0.25rem 0.75rem;
+}
+
+.subject-picker-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.revision-subject-select {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none;
+}
+
+.revision-subject-select option {
+  background: #111624;
+  color: #ffffff;
+}
+
+.revision-program-tag {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+  padding: 0.32rem 0.85rem;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Barre d'objectif / tâche de révision */
+.revision-task-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: min(100%, 480px);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 0.5rem 0.9rem;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.revision-task-bar:focus-within {
+  border-color: var(--accent-primary);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.08);
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
+}
+
+.revision-task-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.revision-task-input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.revision-task-clear {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.revision-task-clear.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.revision-task-clear:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* LE GRAND CADRAN CIRCULAIRE XXL */
+.revision-dial-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  padding: clamp(6px, 1.2vh, 16px) 0;
+}
+
+.revision-dial-circle {
+  position: relative;
+  width: clamp(280px, 42vh, 410px);
+  height: clamp(280px, 42vh, 410px);
+  max-width: 92%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14) 0%, rgba(9, 12, 22, 0.96) 74%);
+  border: 2px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.75), inset 0 0 45px rgba(0, 0, 0, 0.9), 0 0 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.revision-dial-circle.running {
+  box-shadow: 0 0 65px rgba(0, 0, 0, 0.85), inset 0 0 50px rgba(0, 0, 0, 0.95), 0 0 42px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.36);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+.revision-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform: rotate(-90deg);
+}
+
+.revision-svg-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 8;
+}
+
+.revision-svg-arc {
+  fill: none;
+  stroke: var(--accent-primary);
+  stroke-width: 8.5;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease-out;
+  filter: drop-shadow(0 0 10px var(--accent-primary));
+}
+
+.revision-dial-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  z-index: 2;
+  text-align: center;
+}
+
+/* Chiffres géants du minuteur */
+.revision-time-digits {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(4.2rem, 6.2vw, 5.6rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-shadow: 0 0 32px rgba(255, 255, 255, 0.28);
+}
+
+.revision-status-badge {
+  font-size: 0.78rem;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 800;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+  padding: 0.28rem 0.95rem;
+  border-radius: 99px;
+  transition: all 0.2s ease;
+}
+
+.revision-session-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+/* Jauge linéaire */
+.revision-progress-bar {
+  width: min(100%, 480px);
+  height: 6px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.revision-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, var(--accent-primary));
+  border-radius: 99px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+/* Commandes principales */
+.revision-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: min(100%, 480px);
+}
+
+.revision-btn-main {
+  flex: 1;
+  padding: 0.95rem 1.6rem;
+  border-radius: 14px;
+  background: var(--accent-primary);
+  color: #0c0f17;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 25px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+  user-select: none;
+}
+
+.revision-btn-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.5);
+}
+
+.revision-btn-main:active {
+  transform: translateY(1px);
+}
+
+.revision-btn-main.running {
+  background: #f59e0b;
+  color: #0c0f17;
+  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
+}
+
+.revision-btn-main * {
+  pointer-events: none;
+}
+
+.revision-btn-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.revision-btn-icon:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.revision-btn-icon:active {
+  transform: scale(0.95);
+}
+
+.revision-btn-icon * {
+  pointer-events: none;
+}
+
+.revision-keyboard-hints {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  padding-top: 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.revision-keyboard-hints kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================================
+   COLONNE DROITE : PROGRAMMES, GRAPHIQUE, HISTORIQUE
+   ======================================================== */
+.revision-cockpit-col {
+  overflow-y: auto;
+  gap: clamp(12px, 1.5vh, 16px);
+  justify-content: flex-start;
+  padding-right: clamp(12px, 1.6vw, 20px);
+}
+
+.revision-cockpit-col::-webkit-scrollbar {
+  width: 6px;
+}
+.revision-cockpit-col::-webkit-scrollbar-track {
+  background: transparent;
+}
+.revision-cockpit-col::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+}
+.revision-cockpit-col::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.revision-card {
+  background: rgba(16, 22, 35, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: clamp(14px, 1.8vh, 18px);
+  padding: clamp(12px, 1.6vh, 16px) clamp(14px, 1.6vw, 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.revision-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.6rem;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.revision-card-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Grille des 4 programmes de révision */
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.program-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.program-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+.program-card.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22);
+}
+
+.program-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.program-card.active .program-icon-box {
+  background: var(--accent-primary);
+  color: #0c0f17;
+}
+
+.program-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  overflow: hidden;
+}
+
+.program-text strong {
+  font-size: 0.78rem;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.program-text span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.program-card * {
+  pointer-events: none;
+}
+
+/* Phase switcher */
+.revision-phase-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 3px;
+  margin-top: 0.2rem;
+}
+
+.phase-chip {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.42rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-family: inherit;
+}
+
+.phase-chip:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.phase-chip.active {
+  background: var(--accent-primary);
+  color: #0c0f17;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+.phase-chip * {
+  pointer-events: none;
+}
+
+/* Graphique hebdomadaire */
+.revision-week-total {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.26);
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.revision-week-total strong {
+  color: #ffffff;
+}
+
+.revision-svg-chart-wrap {
+  width: 100%;
+  background: rgba(8, 12, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+.revision-weekly-chart {
+  width: 100%;
+  height: 95px;
+  display: block;
+}
+
+.revision-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.quick-stat-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+
+.quick-stat-box .stat-lbl {
+  font-size: 0.66rem;
+  color: var(--text-muted);
+}
+
+.quick-stat-box .stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Historique des révisions */
+.revision-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  transition: all 0.2s ease;
+}
+
+.revision-clear-btn:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.revision-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  max-height: 170px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.revision-history-list::-webkit-scrollbar {
+  width: 5px;
+}
+.revision-history-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 99px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.65rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  font-size: 0.74rem;
+  transition: all 0.2s ease;
+}
+
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.history-subj {
+  font-weight: 700;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.history-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.history-dur-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  padding: 0.12rem 0.45rem;
+  border-radius: 6px;
+}
+
+.history-empty-msg {
+  text-align: center;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  padding: 1rem 0.5rem;
+  font-style: italic;
+}
+
+/* Ambiance d'étude */
+.ambient-chips-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+
+.ambient-chip {
+  padding: 0.45rem 0.35rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.ambient-chip:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.ambient-chip.active {
+  background: rgba(167, 139, 250, 0.16);
+  border-color: #a78bfa;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.ambient-chip * {
+  pointer-events: none;
+}
+
+.ambient-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding-top: 0.25rem;
+}
+
+.ambient-play-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.ambient-play-toggle.playing {
+  background: #10b981;
+  color: #0c0f17;
+  border-color: #10b981;
+}
+
+.ambient-play-toggle * {
+  pointer-events: none;
+}
+
+.ambient-slider-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.ambient-slider-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent-primary);
+  height: 4px;
+}
+
+.chime-test-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.chime-test-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+.chime-test-btn * {
+  pointer-events: none;
+}
+
+/* ========================================================
+   """
+
+css_path = os.path.join(base_dir, "css", "dashboard.css")
+with open(css_path, "r", encoding="utf-8") as f:
+    css_content = f.read()
+
+c_s = css_content.find("VUE 5 : STUDIO FOCUS POMODORO")
+if c_s == -1:
+    c_s = css_content.find("VUE 5 : STUDIO")
+c_s = css_content.rfind("/*", 0, c_s)
+
+c_e = css_content.find("VUE 7 : BLOC-NOTES SCRATCHPAD")
+assert c_s != -1 and c_e != -1
+
+new_css = css_content[:c_s] + css_code + css_content[c_e:]
+with open(css_path, "w", encoding="utf-8") as f:
+    f.write(new_css)
+print("css/dashboard.css updated!")
 
               <!-- VUE 6 : BLOC-NOTES RAPIDE (SCRATCHPAD) -->
               <div id="deck-view-notes" class="deck-slide-view notes-full-view" hidden>
@@ -2342,7 +3248,7 @@
     <script defer src="js/feeds.js?v=3.1"></script>
     <script defer src="js/bookmarks.js?v=3.1"></script>
     <script defer src="js/markets.js?v=3.3"></script>
-    <script defer src="js/widgets.js?v=3.9"></script>
+    <script defer src="js/widgets.js?v=4.0"></script>
     <script defer src="js/custom-hub.js?v=3.2"></script>
     <script defer src="js/command-palette.js?v=3.2"></script>
     <script defer src="js/shortcuts.js?v=3.2"></script>
