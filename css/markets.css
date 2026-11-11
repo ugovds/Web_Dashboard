@@ -607,12 +607,20 @@
   animation: fadeIn 0.25s ease;
 }
 
+.market-chart-modal[hidden],
+.market-chart-modal.is-hidden,
+.market-config-drawer[hidden],
+.market-config-drawer.is-hidden {
+  display: none !important;
+}
+
 .market-chart-backdrop {
   position: absolute;
   inset: 0;
   background: rgba(6, 8, 14, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  cursor: pointer;
 }
 
 .market-chart-dialog {
@@ -739,6 +747,36 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  position: relative;
+  z-index: 10;
+}
+
+.chart-dialog-controls .deck-icon-action {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-main, #ffffff);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.chart-dialog-controls .deck-icon-action:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.chart-dialog-controls #chart-dialog-close-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.5);
 }
 
 .chart-timeframe-picker {

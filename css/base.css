@@ -8,6 +8,12 @@
   margin: 0;
 }
 
+/* --- Respect absolu des éléments masqués HTML5 / utilitaire universel --- */
+[hidden],
+.is-hidden {
+  display: none !important;
+}
+
 button,
 input,
 select,

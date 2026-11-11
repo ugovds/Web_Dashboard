@@ -565,7 +565,10 @@ function openChartModal(asset) {
   // Chargement du graphique TradingView interactif haute résolution
   loadTradingViewIframe(asset.symbol, currentChartTimeframe);
 
+  modal.removeAttribute('hidden');
   modal.hidden = false;
+  modal.classList.remove('is-hidden');
+  modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 }
 
@@ -583,8 +586,15 @@ function loadTradingViewIframe(symbol, interval = 'D') {
 function closeChartModal() {
   const modal = document.getElementById('market-chart-modal');
   if (modal) {
+    modal.setAttribute('hidden', '');
     modal.hidden = true;
+    modal.classList.add('is-hidden');
+    modal.style.display = 'none';
     document.body.style.overflow = '';
+    const iframe = document.getElementById('tradingview-chart-iframe');
+    if (iframe) {
+      iframe.src = 'about:blank';
+    }
   }
 }
 
@@ -636,12 +646,18 @@ function renderMarketChecklist() {
 function toggleMarketConfigDrawer() {
   const drawer = document.getElementById('market-config-drawer');
   if (!drawer) return;
-  const isHidden = drawer.hasAttribute('hidden');
+  const isHidden = drawer.hasAttribute('hidden') || drawer.classList.contains('is-hidden') || drawer.style.display === 'none';
   if (isHidden) {
     drawer.removeAttribute('hidden');
+    drawer.hidden = false;
+    drawer.classList.remove('is-hidden');
+    drawer.style.display = 'flex';
     renderMarketChecklist();
   } else {
     drawer.setAttribute('hidden', '');
+    drawer.hidden = true;
+    drawer.classList.add('is-hidden');
+    drawer.style.display = 'none';
   }
 }
 
