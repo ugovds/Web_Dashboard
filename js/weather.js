@@ -220,6 +220,9 @@ function renderWeatherDeckView(data) {
   if (iconEl) iconEl.className = iconCls;
   if (inputEl && !inputEl.value) inputEl.value = getSavedCity();
 
+  const topbarWeatherText = document.getElementById('topbar-weather-text');
+  if (topbarWeatherText) topbarWeatherText.textContent = `${current.temp_C}°C • ${fullLoc.split(',')[0]}`;
+
   if (updatedEl) {
     const timeStr = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     updatedEl.textContent = `Mis à jour à ${timeStr}`;

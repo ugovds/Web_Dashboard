@@ -1,0 +1,495 @@
+/* ========================================================
+   css/dashboard.css - Layout Dashboard Moderne & Vues Plein Format
+   ======================================================== */
+
+/* --- ESPACE PRINCIPAL DE TRAVAIL --- */
+.dashboard-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  background: transparent;
+}
+
+/* --- TOPBAR HUD MINIMALISTE --- */
+.dashboard-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1.75rem;
+  background: rgba(10, 12, 18, 0.55);
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 20;
+  flex-shrink: 0;
+  gap: 1rem;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.topbar-view-info {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.topbar-view-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-highlight);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.topbar-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar-view-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--accent-white, #fff);
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+
+.topbar-view-subtitle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* Topbar Center : Quick Search trigger */
+.topbar-search-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 1rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.topbar-search-trigger:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-highlight);
+  color: var(--accent-white, #fff);
+}
+
+.topbar-search-trigger kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.08rem 0.35rem;
+  color: var(--accent-primary);
+}
+
+/* Topbar Right : Status Pills */
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.topbar-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.topbar-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-highlight);
+  color: var(--accent-white, #fff);
+}
+
+.topbar-pill i {
+  color: var(--accent-primary);
+  font-size: 0.78rem;
+}
+
+/* --- VIEWPORT DES VUES --- */
+.dashboard-viewport {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.25rem 1.75rem 1.75rem 1.75rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animation douce lors du basculement d'onglet */
+@keyframes viewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.deck-slide-view {
+  display: none;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.deck-slide-view.active {
+  display: flex;
+  flex-direction: column;
+  animation: viewFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ========================================================
+   VUE 1 : ACCUEIL / DASHBOARD GÉNÉRAL (Recherche + Horloge + Signets)
+   ======================================================== */
+.dashboard-overview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Zone haute de l'accueil : Omnibox pleine largeur avec calculatrice */
+.dashboard-search-hero {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Grille principale de l'accueil : Horloge / Cockpit Card à gauche + Grille des signets spacieuse à droite */
+.dashboard-overview-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.25rem;
+  min-height: 0;
+  height: 100%;
+}
+
+.overview-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+  height: 100%;
+}
+
+.overview-clock-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.overview-right-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.overview-right-col .categories-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-auto-rows: minmax(170px, 1fr);
+  gap: 1.15rem;
+  min-height: 0;
+  height: 100%;
+}
+
+.overview-bookmarks-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+/* ========================================================
+   VUE 2 : AGENDA & TÂCHES (Spacieux en 2 colonnes)
+   ======================================================== */
+.agenda-full-view {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 1.5rem;
+  height: 100%;
+  min-height: 0;
+}
+
+.agenda-cal-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.agenda-tasks-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.agenda-full-view .merged-calendar-section,
+.agenda-full-view .merged-tasks-section {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 1.25rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.agenda-full-view .merged-tasks-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+}
+
+.agenda-full-view .merged-todo-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ========================================================
+   VUE 3 : MÉTÉO & RADAR (Studio étendu)
+   ======================================================== */
+.weather-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 1.25rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+}
+
+.weather-full-view .weather-deck-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================================
+   VUE 4 : ACTUALITÉS / FEEDS (Grid Spacieuse)
+   ======================================================== */
+.feeds-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 1.25rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.feeds-full-view .merged-feed-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1rem;
+  padding: 0.5rem 0;
+}
+
+/* ========================================================
+   VUE 5 : SYSTÈME & BOURSE
+   ======================================================== */
+.system-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 1.25rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+}
+
+.system-full-view .crypto-ticker-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.9rem;
+}
+
+/* ========================================================
+   VUE 6 : POMODORO
+   ======================================================== */
+.pomodoro-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 2rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.pomodoro-full-view .pomo-panel {
+  max-width: 520px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+/* ========================================================
+   VUE 7 : BLOC-NOTES SCRATCHPAD
+   ======================================================== */
+.notes-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 1.25rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.notes-full-view .notes-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.notes-full-view .notes-editor {
+  flex: 1;
+  min-height: 280px;
+}
+
+/* ========================================================
+   VUE 8 : AMBIANCE SONORE LO-FI
+   ======================================================== */
+.ambient-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 2rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.ambient-full-view .ambient-panel {
+  max-width: 680px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ========================================================
+   VUE 9 : CITATIONS CYBERPUNK
+   ======================================================== */
+.quotes-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 2rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.quotes-full-view .quotes-panel {
+  max-width: 680px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ========================================================
+   VUE 10 : CONFIGURATION & PARAMÈTRES
+   ======================================================== */
+.customize-full-view {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  padding: 1.25rem;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+}
+
+.customize-full-view .customize-deck-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

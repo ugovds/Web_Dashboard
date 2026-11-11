@@ -3,6 +3,8 @@
    ======================================================== */
 
 @import url("base.css");
+@import url("sidebar.css");
+@import url("dashboard.css");
 @import url("clock.css");
 @import url("search.css");
 @import url("bookmarks.css");

@@ -50,11 +50,11 @@ function applyWidgetVisibility() {
     }
   });
 
-  // Si la vue active actuelle a été désactivée, revenir à agenda
+  // Si la vue active actuelle a été désactivée, revenir à l'accueil
   const activeNavBtn = document.querySelector('.deck-nav-btn.active');
   if (activeNavBtn && activeNavBtn.style.display === 'none') {
-    const agendaBtn = document.querySelector('.deck-nav-btn[data-deck-view="agenda"]');
-    if (agendaBtn) agendaBtn.click();
+    const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]') || document.querySelector('.deck-nav-btn[data-deck-view="agenda"]');
+    if (homeBtn) homeBtn.click();
   }
 }
 
@@ -658,6 +658,11 @@ function updateAmbientUI() {
     if (ambientCurrentMode === 'space') modeLabel = 'Deep Space';
     if (ambientCurrentMode === 'night') modeLabel = 'Nuit Synthé';
     nowPlaying.textContent = ambientIsPlaying ? `En lecture : ${modeLabel}` : 'Générateur Procédural Audio';
+  }
+
+  const topbarAmbientText = document.getElementById('topbar-ambient-text');
+  if (topbarAmbientText) {
+    topbarAmbientText.textContent = ambientIsPlaying ? 'En lecture ♪' : 'Audio';
   }
 }
 

@@ -10,6 +10,7 @@
  */
 function initShortcuts() {
   const DECK_VIEWS_ORDER = [
+    'dashboard',
     'agenda',
     'weather',
     'feeds',
@@ -87,29 +88,32 @@ function initShortcuts() {
       return;
     }
 
-    // Navigation dans le deck via Alt+1 à Alt+9
+    // Navigation dans le deck via Alt+1 à Alt+9 et Alt+0
     if (e.altKey && !e.ctrlKey && !e.metaKey) {
       let num = null;
       if (e.code.startsWith('Digit')) {
         num = parseInt(e.code.replace('Digit', ''), 10);
       } else if (e.code.startsWith('Numpad')) {
         num = parseInt(e.code.replace('Numpad', ''), 10);
-      } else if (e.key >= '1' && e.key <= '9') {
+      } else if (e.key >= '0' && e.key <= '9') {
         num = parseInt(e.key, 10);
       }
 
-      if (num !== null && num >= 1 && num <= DECK_VIEWS_ORDER.length) {
-        e.preventDefault();
-        const targetViewKey = DECK_VIEWS_ORDER[num - 1];
-        const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${targetViewKey}"]`);
-        if (navBtn) {
-          navBtn.click();
-          if (typeof showToast === 'function') {
-            const label = navBtn.querySelector('span')?.textContent || targetViewKey;
-            showToast(`Vue Deck : ${label} (Alt+${num})`, 'info');
+      if (num !== null) {
+        const targetIdx = num === 0 ? 9 : num - 1;
+        if (targetIdx >= 0 && targetIdx < DECK_VIEWS_ORDER.length) {
+          e.preventDefault();
+          const targetViewKey = DECK_VIEWS_ORDER[targetIdx];
+          const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${targetViewKey}"]`);
+          if (navBtn) {
+            navBtn.click();
+            if (typeof showToast === 'function') {
+              const label = navBtn.querySelector('.nav-label')?.textContent || navBtn.querySelector('span')?.textContent || targetViewKey;
+              showToast(`Vue : ${label} (Alt+${num})`, 'info');
+            }
           }
+          return;
         }
-        return;
       }
     }
 
@@ -124,7 +128,26 @@ function initShortcuts() {
 
     const isTodoFocused = active === todoInput || active === todoDate;
     const isSearchEmpty = active === searchInput && searchInput.value.trim() === '';
-    const isNotTyping = active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA';
+    const isNotTyping = active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA' && active.tagName !== 'SELECT';
+
+    // Navigation au clavier par touches Flèches Haut & Bas entre les onglets
+    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isNotTyping) {
+      e.preventDefault();
+      const visibleBtns = Array.from(document.querySelectorAll('.deck-nav-btn')).filter(
+        (b) => b.offsetParent !== null && b.style.display !== 'none'
+      );
+      if (visibleBtns.length) {
+        const activeIdx = visibleBtns.findIndex((b) => b.classList.contains('active'));
+        let targetIdx;
+        if (e.key === 'ArrowDown') {
+          targetIdx = activeIdx < 0 ? 0 : (activeIdx + 1) % visibleBtns.length;
+        } else {
+          targetIdx = activeIdx < 0 ? 0 : (activeIdx - 1 + visibleBtns.length) % visibleBtns.length;
+        }
+        visibleBtns[targetIdx].click();
+      }
+      return;
+    }
 
     // Raccourci B : Ouvrir la palette de commande si on ne tape nulle part
     if ((e.key === 'b' || e.key === 'B') && isNotTyping) {

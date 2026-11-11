@@ -1,19 +1,50 @@
 /**
- * custom-hub.js - Personnalisation intégrée dans le Deck (colonne droite) & Slider de navigation
+ * custom-hub.js - Personnalisation intégrée, navigation Dashboard & Menu Latéral
  */
+
+const VIEW_TITLES = {
+  dashboard: { title: 'Accueil', sub: 'Tableau de bord & Signets', icon: 'fa-solid fa-house' },
+  agenda: { title: 'Agenda & Tâches', sub: 'Calendrier mensuel & To-Do list', icon: 'fa-regular fa-calendar-check' },
+  weather: { title: 'Météo & Radar', sub: 'Prévisions 24h & Satellite direct', icon: 'fa-solid fa-cloud-sun' },
+  feeds: { title: 'Actualités en Direct', sub: 'F1, Football, Tech & Flux RSS', icon: 'fa-solid fa-newspaper' },
+  system: { title: 'Système & Marchés', sub: 'Télémétrie PC, Ping & Bourse', icon: 'fa-solid fa-microchip' },
+  pomodoro: { title: 'Focus Pomodoro', sub: 'Minuteur de productivité & Intervalles', icon: 'fa-solid fa-stopwatch' },
+  notes: { title: 'Bloc-Notes', sub: 'Scratchpad Markdown & Sauvegarde locale', icon: 'fa-solid fa-note-sticky' },
+  ambient: { title: 'Ambiance Sonore', sub: 'Générateur audio Lo-Fi procédural', icon: 'fa-solid fa-headphones' },
+  quotes: { title: 'Citations & Motivation', sub: 'Philosophie hacker & science-fiction', icon: 'fa-solid fa-quote-left' },
+  customize: { title: 'Paramètres & Hub', sub: 'Thèmes, Couleurs, Horloge & Sauvegarde', icon: 'fa-solid fa-sliders' }
+};
 
 function initDeckViewSlider() {
   const navBtns = document.querySelectorAll('.deck-nav-btn');
   const allViews = document.querySelectorAll('.deck-slide-view');
-  const indicator = document.querySelector('.deck-nav-indicator');
+  const indicator = document.querySelector('.deck-nav-indicator') || document.querySelector('.sidebar-indicator');
 
   function updateIndicator(activeBtn) {
     if (!indicator || !activeBtn) return;
-    indicator.style.width = `${activeBtn.offsetWidth}px`;
-    indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+    const isVertical = activeBtn.classList.contains('sidebar-nav-item') || activeBtn.closest('.sidebar-nav');
+    if (isVertical) {
+      indicator.style.height = `${activeBtn.offsetHeight}px`;
+      indicator.style.transform = `translateY(${activeBtn.offsetTop}px)`;
+      indicator.style.width = '';
+    } else {
+      indicator.style.width = `${activeBtn.offsetWidth}px`;
+      indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+      indicator.style.height = '';
+    }
     try {
       activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     } catch {}
+  }
+
+  function updateTopbarInfo(targetKey) {
+    const meta = VIEW_TITLES[targetKey] || { title: targetKey, sub: '', icon: 'fa-solid fa-layer-group' };
+    const titleEl = document.getElementById('topbar-view-title');
+    const subEl = document.getElementById('topbar-view-subtitle');
+    const iconEl = document.getElementById('topbar-view-icon');
+    if (titleEl) titleEl.textContent = meta.title;
+    if (subEl) subEl.textContent = meta.sub;
+    if (iconEl) iconEl.innerHTML = `<i class="${meta.icon}"></i>`;
   }
 
   navBtns.forEach((btn) => {
@@ -28,6 +59,8 @@ function initDeckViewSlider() {
         view.classList.toggle('active', isTarget);
       });
 
+      updateTopbarInfo(target);
+
       if (target === 'customize') {
         const activeSubtab = document.querySelector('.hub-tab-btn.active')?.dataset.hubTab || 'appearance';
         switchHubTab(activeSubtab);
@@ -39,12 +72,159 @@ function initDeckViewSlider() {
 
   const initialActive = document.querySelector('.deck-nav-btn.active');
   if (initialActive) {
-    setTimeout(() => updateIndicator(initialActive), 60);
+    const initialTarget = initialActive.dataset.deckView || 'dashboard';
+    updateTopbarInfo(initialTarget);
+    setTimeout(() => updateIndicator(initialActive), 80);
   }
+
   window.addEventListener('resize', () => {
     const curr = document.querySelector('.deck-nav-btn.active');
     if (curr) updateIndicator(curr);
   });
+}
+
+function initSidebarControls() {
+  const sidebar = document.getElementById('dashboard-sidebar');
+  const toggleBtn = document.getElementById('sidebar-toggle-btn');
+  const isLocked = localStorage.getItem('startpage_sidebar_expanded') === 'true';
+
+  if (sidebar && isLocked) {
+    sidebar.classList.add('locked-expanded');
+    if (toggleBtn) toggleBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
+  }
+
+  if (toggleBtn && sidebar) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('locked-expanded');
+      const expanded = sidebar.classList.contains('locked-expanded');
+      localStorage.setItem('startpage_sidebar_expanded', expanded ? 'true' : 'false');
+      toggleBtn.innerHTML = expanded ? '<i class="fa-solid fa-chevron-left"></i>' : '<i class="fa-solid fa-chevron-right"></i>';
+
+      const curr = document.querySelector('.deck-nav-btn.active');
+      const ind = document.querySelector('.sidebar-indicator');
+      if (curr && ind) {
+        setTimeout(() => {
+          ind.style.height = `${curr.offsetHeight}px`;
+          ind.style.transform = `translateY(${curr.offsetTop}px)`;
+        }, 120);
+      }
+    });
+  }
+
+  // Expansion fluide au survol si non verrouillée
+  if (sidebar) {
+    sidebar.addEventListener('mouseenter', () => {
+      if (!sidebar.classList.contains('locked-expanded')) {
+        sidebar.classList.add('expanded');
+        const curr = document.querySelector('.deck-nav-btn.active');
+        const ind = document.querySelector('.sidebar-indicator');
+        if (curr && ind) {
+          setTimeout(() => {
+            ind.style.height = `${curr.offsetHeight}px`;
+            ind.style.transform = `translateY(${curr.offsetTop}px)`;
+          }, 80);
+        }
+      }
+    });
+
+    sidebar.addEventListener('mouseleave', () => {
+      sidebar.classList.remove('expanded');
+      const curr = document.querySelector('.deck-nav-btn.active');
+      const ind = document.querySelector('.sidebar-indicator');
+      if (curr && ind) {
+        setTimeout(() => {
+          ind.style.height = `${curr.offsetHeight}px`;
+          ind.style.transform = `translateY(${curr.offsetTop}px)`;
+        }, 80);
+      }
+    });
+  }
+
+  // Clic sur l'avatar du thème dans la sidebar pour cycler le thème
+  const brandAvatar = document.getElementById('sidebar-brand-avatar');
+  if (brandAvatar) {
+    brandAvatar.addEventListener('click', () => {
+      const themes = ['1', '2', '3', '4'];
+      const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
+      if (typeof applyTheme === 'function') applyTheme(nextTheme);
+    });
+  }
+
+  // Boutons rapides du pied de sidebar
+  const dimBtn = document.getElementById('sidebar-dim-btn');
+  if (dimBtn) {
+    dimBtn.addEventListener('click', () => {
+      if (typeof toggleDimMode === 'function') toggleDimMode();
+    });
+  }
+
+  const themeCycleBtn = document.getElementById('sidebar-theme-cycle-btn');
+  if (themeCycleBtn) {
+    themeCycleBtn.addEventListener('click', () => {
+      const themes = ['1', '2', '3', '4'];
+      const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
+      if (typeof applyTheme === 'function') applyTheme(nextTheme);
+    });
+  }
+
+  const paletteBtn = document.getElementById('sidebar-palette-btn');
+  if (paletteBtn) {
+    paletteBtn.addEventListener('click', () => {
+      if (typeof openCommandPalette === 'function') openCommandPalette();
+    });
+  }
+
+  // Topbar : Déclencheur recherche
+  const topbarSearchBtn = document.getElementById('topbar-search-btn');
+  if (topbarSearchBtn) {
+    topbarSearchBtn.addEventListener('click', () => {
+      const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]');
+      if (homeBtn && !homeBtn.classList.contains('active')) {
+        homeBtn.click();
+      }
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        setTimeout(() => {
+          searchInput.focus();
+          searchInput.select();
+        }, 60);
+      }
+    });
+  }
+
+  // Topbar : Pilule météo
+  const topbarWeatherPill = document.getElementById('topbar-weather-pill');
+  if (topbarWeatherPill) {
+    topbarWeatherPill.addEventListener('click', () => {
+      const weatherBtn = document.querySelector('.deck-nav-btn[data-deck-view="weather"]');
+      if (weatherBtn) weatherBtn.click();
+    });
+  }
+
+  // Topbar : Pilule ambiance
+  const topbarAmbientPill = document.getElementById('topbar-ambient-pill');
+  if (topbarAmbientPill) {
+    topbarAmbientPill.addEventListener('click', () => {
+      const toggle = document.getElementById('ambient-master-toggle');
+      if (toggle) {
+        toggle.click();
+      } else {
+        const ambientBtn = document.querySelector('.deck-nav-btn[data-deck-view="ambient"]');
+        if (ambientBtn) ambientBtn.click();
+      }
+    });
+  }
+
+  // Topbar : Pilule thème
+  const topbarThemePill = document.getElementById('topbar-theme-pill');
+  if (topbarThemePill) {
+    topbarThemePill.addEventListener('click', () => {
+      const themes = ['1', '2', '3', '4'];
+      const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
+      if (typeof applyTheme === 'function') applyTheme(nextTheme);
+    });
+  }
 }
 
 function openCustomHub(tabName = 'appearance') {
@@ -54,8 +234,8 @@ function openCustomHub(tabName = 'appearance') {
 }
 
 function closeCustomHub() {
-  const agendaBtn = document.querySelector('.deck-nav-btn[data-deck-view="agenda"]');
-  if (agendaBtn) agendaBtn.click();
+  const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]');
+  if (homeBtn) homeBtn.click();
 }
 
 function switchHubTab(tabName) {
@@ -231,6 +411,7 @@ function renderHubShortcuts() {
 
 function initCustomHub() {
   initDeckViewSlider();
+  initSidebarControls();
 
   const addCategoryBtn = document.getElementById('hub-add-category-btn');
 

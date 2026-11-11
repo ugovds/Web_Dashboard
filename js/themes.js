@@ -45,6 +45,9 @@ function applyTheme(themeId) {
   if (bgWallpaperEl) bgWallpaperEl.style.backgroundImage = `url("${cfg.img}")`;
   if (artBadgeText) artBadgeText.textContent = cfg.badge;
 
+  const topbarThemeText = document.getElementById('topbar-theme-text');
+  if (topbarThemeText) topbarThemeText.textContent = cfg.name || cfg.badge.replace(/^.*?\/\/\s*/, '');
+
   const themeBtns = document.querySelectorAll('.theme-btn');
   themeBtns.forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.themeBtn === themeId);

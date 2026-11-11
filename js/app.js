@@ -49,11 +49,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initTasks === 'function') initTasks();
   if (typeof initCalendar === 'function') initCalendar();
   if (typeof initSearch === 'function') initSearch();
+  if (typeof initCustomHub === 'function') initCustomHub();
   if (typeof initShortcuts === 'function') initShortcuts();
 
   // === PHASE 2 : DIFFÉRÉE (Tâches secondaires libérant le thread) ===
   const deferNonCritical = () => {
-    if (typeof initCustomHub === 'function') initCustomHub();
     if (typeof initWidgets === 'function') initWidgets();
     if (typeof initWeather === 'function') initWeather();
     if (typeof initWeatherFx === 'function') initWeatherFx();

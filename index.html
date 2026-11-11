@@ -43,15 +43,17 @@
     </noscript>
 
     <!-- Stylesheets modulaires critiques (Above-The-Fold) -->
-    <link rel="stylesheet" href="css/base.css?v=2.4" />
-    <link rel="stylesheet" href="css/clock.css?v=2.4" />
-    <link rel="stylesheet" href="css/search.css?v=2.4" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=2.4" />
-    <link rel="stylesheet" href="css/calendar.css?v=2.4" />
-    <link rel="stylesheet" href="css/tasks.css?v=2.4" />
-    <link rel="stylesheet" href="css/deck.css?v=2.4" />
-    <link rel="stylesheet" href="css/responsive.css?v=2.4" />
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.4" />
+    <link rel="stylesheet" href="css/base.css?v=2.5" />
+    <link rel="stylesheet" href="css/sidebar.css?v=2.5" />
+    <link rel="stylesheet" href="css/dashboard.css?v=2.5" />
+    <link rel="stylesheet" href="css/clock.css?v=2.5" />
+    <link rel="stylesheet" href="css/search.css?v=2.5" />
+    <link rel="stylesheet" href="css/bookmarks.css?v=2.5" />
+    <link rel="stylesheet" href="css/calendar.css?v=2.5" />
+    <link rel="stylesheet" href="css/tasks.css?v=2.5" />
+    <link rel="stylesheet" href="css/deck.css?v=2.5" />
+    <link rel="stylesheet" href="css/responsive.css?v=2.5" />
+    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.5" />
 
     <!-- Stylesheets secondaires différées (Widgets hors-écran, Modales, Thèmes inactifs) -->
     <link rel="stylesheet" href="css/widgets.css?v=2.4" media="print" onload="this.media='all'" />
@@ -71,193 +73,310 @@
       <div class="bg-scanlines"></div>
     </div>
 
-    <div class="dashboard">
-      <!-- GRILLE PRINCIPALE À 3 COLONNES SANS TOPBAR -->
-      <main class="deck-grid">
-        <!-- COLONNE GAUCHE : ARTWORK RÉDUIT (HAUT) + HORLOGE & DATE (BAS) -->
-        <aside class="col-left">
-          <!-- Artwork Card proportionné en haut -->
-          <div class="art-card col-left-art">
-            <img id="main-art" src="images/gif4.gif" alt="Theme Artwork" width="280" height="220" fetchpriority="high" />
-            <div class="art-badge">
-              <span class="pulse-dot"></span>
-              <span id="art-badge-text">浪裏 // RETRO WAVE</span>
+    <div class="dashboard-layout" id="dashboard-layout">
+      <!-- ==============================================
+           1. MENU LATÉRAL GAUCHE (SIDEBAR COCKPIT SLIM & RÉTRACTABLE)
+           ============================================== -->
+      <aside class="dashboard-sidebar" id="dashboard-sidebar" aria-label="Menu Principal">
+        <!-- Header / Logo du Dashboard -->
+        <div class="sidebar-header">
+          <div class="sidebar-brand-avatar" id="sidebar-brand-avatar" title="Cliquer pour changer de thème">
+            <img id="main-art" src="images/gif4.gif" alt="Theme Artwork" width="40" height="40" fetchpriority="high" />
+            <span class="sidebar-status-dot"></span>
+          </div>
+          <div class="sidebar-brand-info">
+            <span class="sidebar-brand-title">CYBERDECK</span>
+            <span class="sidebar-brand-sub" id="art-badge-text">RETRO WAVE</span>
+          </div>
+          <button type="button" id="sidebar-toggle-btn" class="sidebar-toggle-btn" title="Réduire / Déplier le menu">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Navigation Verticale des Onglets -->
+        <nav class="sidebar-nav" id="sidebar-nav">
+          <div class="sidebar-indicator deck-nav-indicator" id="sidebar-indicator"></div>
+
+          <!-- 1. ACCUEIL (Tableau de bord / Omnibox & Signets) -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item active" data-deck-view="dashboard" title="Accueil & Signets (Alt+1)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
+            <span class="nav-label">Accueil</span>
+            <kbd class="nav-kbd">1</kbd>
+            <div class="sidebar-tooltip">Accueil & Signets <kbd>1</kbd></div>
+          </button>
+
+          <!-- 2. AGENDA & TÂCHES -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="agenda" data-widget-nav="agenda" title="Agenda & Tâches (Alt+2)">
+            <div class="nav-icon-wrap"><i class="fa-regular fa-calendar-check"></i></div>
+            <span class="nav-label">Agenda & Tâches</span>
+            <kbd class="nav-kbd">2</kbd>
+            <div class="sidebar-tooltip">Agenda & Tâches <kbd>2</kbd></div>
+          </button>
+
+          <!-- 3. MÉTÉO & RADAR -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="weather" data-widget-nav="weather" title="Météo Détaillée & Radar (Alt+3)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-cloud-sun"></i></div>
+            <span class="nav-label">Météo & Radar</span>
+            <kbd class="nav-kbd">3</kbd>
+            <div class="sidebar-tooltip">Météo & Radar <kbd>3</kbd></div>
+          </button>
+
+          <!-- 4. ACTUALITÉS -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="feeds" data-widget-nav="feeds" title="Actualités en direct (Alt+4)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-newspaper"></i></div>
+            <span class="nav-label">Actualités</span>
+            <kbd class="nav-kbd">4</kbd>
+            <div class="sidebar-tooltip">Actualités <kbd>4</kbd></div>
+          </button>
+
+          <!-- 5. SYSTÈME & BOURSE -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="system" data-widget-nav="system" title="Moniteur Système & Bourse (Alt+5)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-microchip"></i></div>
+            <span class="nav-label">Système & Bourse</span>
+            <kbd class="nav-kbd">5</kbd>
+            <div class="sidebar-tooltip">Système & Bourse <kbd>5</kbd></div>
+          </button>
+
+          <!-- 6. FOCUS / POMODORO -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="pomodoro" data-widget-nav="pomodoro" title="Minuteur Focus Pomodoro (Alt+6)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
+            <span class="nav-label">Focus Pomodoro</span>
+            <kbd class="nav-kbd">6</kbd>
+            <div class="sidebar-tooltip">Focus Pomodoro <kbd>6</kbd></div>
+          </button>
+
+          <!-- 7. BLOC-NOTES -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="notes" data-widget-nav="notes" title="Bloc-Notes Markdown (Alt+7)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-note-sticky"></i></div>
+            <span class="nav-label">Bloc-Notes</span>
+            <kbd class="nav-kbd">7</kbd>
+            <div class="sidebar-tooltip">Bloc-Notes <kbd>7</kbd></div>
+          </button>
+
+          <!-- 8. AMBIANCE SONORE LO-FI -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="ambient" data-widget-nav="ambient" title="Ambiance Lo-Fi (Alt+8)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-headphones"></i></div>
+            <span class="nav-label">Ambiance Lo-Fi</span>
+            <kbd class="nav-kbd">8</kbd>
+            <div class="sidebar-tooltip">Ambiance Lo-Fi <kbd>8</kbd></div>
+          </button>
+
+          <!-- 9. CITATIONS -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="quotes" data-widget-nav="quotes" title="Citations Cyberpunk (Alt+9)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-quote-left"></i></div>
+            <span class="nav-label">Citations</span>
+            <kbd class="nav-kbd">9</kbd>
+            <div class="sidebar-tooltip">Citations <kbd>9</kbd></div>
+          </button>
+
+          <!-- 10. PARAMÈTRES & CONFIG -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item deck-nav-config" data-deck-view="customize" title="Paramètres & Personnalisation (Alt+0)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-sliders"></i></div>
+            <span class="nav-label">Paramètres</span>
+            <kbd class="nav-kbd">0</kbd>
+            <div class="sidebar-tooltip">Paramètres <kbd>0</kbd></div>
+          </button>
+        </nav>
+
+        <!-- Pied de menu : Aide clavier & Boutons rapides -->
+        <div class="sidebar-footer">
+          <div class="sidebar-kbd-help" title="Utilisez les flèches directionnelles Haut et Bas pour naviguer entre les onglets">
+            <span class="kbd-pill">↑</span>
+            <span class="kbd-pill">↓</span>
+            <span class="kbd-text">Naviguer</span>
+          </div>
+          <div class="sidebar-actions-grid">
+            <button type="button" id="sidebar-dim-btn" class="sidebar-action-btn" title="Mode Nuit / Atténuation HUD (Ctrl+Shift+D)">
+              <i class="fa-solid fa-moon"></i>
+            </button>
+            <button type="button" id="sidebar-theme-cycle-btn" class="sidebar-action-btn" title="Changer de thème (1-4)">
+              <i class="fa-solid fa-palette"></i>
+            </button>
+            <button type="button" id="sidebar-palette-btn" class="sidebar-action-btn" title="Palette de commandes (Ctrl+K)">
+              <i class="fa-solid fa-terminal"></i>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ==============================================
+           2. ESPACE PRINCIPAL (TOPBAR + VIEWPORT)
+           ============================================== -->
+      <div class="dashboard-main-area">
+        <!-- Topbar HUD minimaliste -->
+        <header class="dashboard-topbar">
+          <div class="topbar-left">
+            <div class="topbar-view-info">
+              <div class="topbar-view-icon" id="topbar-view-icon">
+                <i class="fa-solid fa-house"></i>
+              </div>
+              <div class="topbar-title-group">
+                <span class="topbar-view-title" id="topbar-view-title">Accueil</span>
+                <span class="topbar-view-subtitle" id="topbar-view-subtitle">Tableau de bord & Signets</span>
+              </div>
             </div>
           </div>
 
-          <!-- Grand Cadre Horloge & Date Moderne -->
-          <div class="left-clock-card font-inter clock-style-editorial clock-size-medium" id="left-clock-card">
-            <div class="clock-card-top">
-              <button type="button" id="clock-tz-badge" class="clock-tz-pill" title="Cliquer pour changer de fuseau horaire">
-                <i class="fa-solid fa-globe"></i> LOCAL • PARIS
-              </button>
-              <button type="button" id="clock-mode-toggle" class="clock-tz-pill clock-mode-pill" title="Basculer entre Horloge et Compte à rebours">
-                <i id="clock-mode-icon" class="fa-solid fa-clock"></i> <span id="clock-mode-label">Horloge</span>
-              </button>
-            </div>
+          <button type="button" class="topbar-search-trigger" id="topbar-search-btn" title="Cibler la recherche (Touche /)">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Rechercher, calculer...</span>
+            <kbd>/</kbd>
+          </button>
 
-            <!-- Salutation chaleureuse & moderne -->
-            <span id="clock-greeting" class="clock-greeting">Bonjour</span>
+          <div class="topbar-right">
+            <button type="button" class="topbar-pill" id="topbar-weather-pill" title="Ouvrir la météo détaillée">
+              <i class="fa-solid fa-cloud-sun"></i>
+              <span id="topbar-weather-text">Météo</span>
+            </button>
+            <button type="button" class="topbar-pill" id="topbar-ambient-pill" title="Ambiance sonore Lo-Fi">
+              <i class="fa-solid fa-headphones"></i>
+              <span id="topbar-ambient-text">Audio</span>
+            </button>
+            <button type="button" class="topbar-pill" id="topbar-theme-pill" title="Changer de thème">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <span id="topbar-theme-text">Thème</span>
+            </button>
+          </div>
+        </header>
 
-            <!-- Affichage moderne et épuré de l'heure -->
-            <div class="left-clock-display" id="left-clock-display">
-              <div class="time-digits-box">
-                <span id="time" class="left-time-main">00:00</span>
-                <span id="clock-ms-tick" class="clock-ms-tick" style="display: none;">.00</span>
-              </div>
-              <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
-            </div>
+        <!-- Viewport des vues du dashboard -->
+        <main class="dashboard-viewport" id="dashboard-viewport">
+          <!-- VUE 1 : ACCUEIL (DASHBOARD GÉNÉRAL AVEC HORLOGE ET SIGNETS) -->
+          <div id="deck-view-dashboard" class="deck-slide-view active">
+            <div class="dashboard-overview-container">
+              <!-- Barre de Recherche Omnibox -->
+              <div class="dashboard-search-hero">
+                <div class="search-wrapper">
+                  <form id="search-form" class="search-box">
+                    <div id="engine-badge" class="engine-badge">
+                      <i id="engine-icon" class="fa-brands fa-google"></i>
+                      <span id="engine-name">Google</span>
+                    </div>
+                    <span class="prompt-arrow">&gt;</span>
+                    <input
+                      id="search-input"
+                      type="text"
+                      placeholder="Rechercher, calculer (12*8) ou taper !help pour les préfixes..."
+                      autocomplete="off"
+                      autofocus
+                    />
+                    <span id="calc-preview" class="calc-preview" hidden></span>
+                    <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
+                  </form>
 
-            <!-- Affichage Flip Clock Rétro (style Fliqlo) -->
-            <div id="clock-flip-wrap" class="clock-flip-wrap" style="display: none;">
-              <div class="flip-unit"><span class="flip-digit" id="flip-h">12</span></div>
-              <span class="flip-sep">:</span>
-              <div class="flip-unit"><span class="flip-digit" id="flip-m">30</span></div>
-              <span class="flip-sep" id="flip-sec-sep" style="display:none;">:</span>
-              <div class="flip-unit" id="flip-sec-unit" style="display:none;"><span class="flip-digit" id="flip-s">00</span></div>
-            </div>
-
-            <!-- Affichage Horloge Analogique Suisse (style Braun) -->
-            <div id="clock-analog-wrap" class="clock-analog-wrap" style="display: none;">
-              <svg class="clock-analog-svg" viewBox="0 0 200 200">
-                <circle class="analog-face" cx="100" cy="100" r="92" />
-                <!-- 12 graduations -->
-                <line class="analog-tick major" x1="100" y1="14" x2="100" y2="26" />
-                <line class="analog-tick major" x1="100" y1="186" x2="100" y2="174" />
-                <line class="analog-tick major" x1="14" y1="100" x2="26" y2="100" />
-                <line class="analog-tick major" x1="186" y1="100" x2="174" y2="100" />
-                <line class="analog-tick" x1="143" y1="25" x2="137" y2="35" />
-                <line class="analog-tick" x1="175" y1="57" x2="165" y2="63" />
-                <line class="analog-tick" x1="175" y1="143" x2="165" y2="137" />
-                <line class="analog-tick" x1="143" y1="175" x2="137" y2="165" />
-                <line class="analog-tick" x1="57" y1="175" x2="63" y2="165" />
-                <line class="analog-tick" x1="25" y1="143" x2="35" y2="137" />
-                <line class="analog-tick" x1="25" y1="57" x2="35" y2="63" />
-                <line class="analog-tick" x1="57" y1="25" x2="63" y2="35" />
-                <!-- Aiguilles -->
-                <line id="analog-hour-hand" class="analog-hand-hour" x1="100" y1="100" x2="100" y2="52" />
-                <line id="analog-min-hand" class="analog-hand-min" x1="100" y1="100" x2="100" y2="34" />
-                <line id="analog-sec-hand" class="analog-hand-sec" x1="100" y1="114" x2="100" y2="24" />
-                <circle class="analog-center-dot" cx="100" cy="100" r="4.5" />
-              </svg>
-            </div>
-
-            <!-- Télémétrie Calendaire & Cycle Solaire -->
-            <div class="left-clock-telemetry">
-              <div id="date" class="left-date-main">Chargement...</div>
-              <div class="clock-telemetry-chips">
-                <span class="chrono-chip" id="clock-week-chip">
-                  <i class="fa-solid fa-calendar-week"></i>
-                  <span id="clock-week-text">Sem. --</span>
-                </span>
-                <span class="chrono-chip" id="clock-day-chip">
-                  <i class="fa-solid fa-hourglass-half"></i>
-                  <span id="clock-day-text">Jour --/365</span>
-                </span>
-                <span class="chrono-chip solar-chip" id="clock-solar-chip">
-                  <i id="clock-solar-icon" class="fa-solid fa-sun"></i>
-                  <span id="clock-solar-text">Diurne</span>
-                </span>
-              </div>
-            </div>
-
-            <!-- Progression du cycle journalier (%) -->
-            <div id="day-progress-wrap" class="day-progress-wrap">
-              <div class="day-progress-header">
-                <span class="day-progress-title">
-                  <i class="fa-solid fa-circle-notch"></i> Progression Journée
-                </span>
-                <div class="day-progress-stats">
-                  <span id="day-progress-pct" class="progress-pct-bold">0%</span>
-                  <span id="day-progress-remaining" class="progress-remaining-sub">(12h 00m restants)</span>
+                  <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
                 </div>
               </div>
-              <div class="day-progress-track">
-                <div id="day-progress-fill" class="day-progress-fill" style="width: 0%;">
-                  <span class="progress-glow-head"></span>
-                </div>
+
+              <!-- Grille Cockpit : Horloge à gauche + Signets à droite -->
+              <div class="dashboard-overview-body">
+                <aside class="overview-left-col">
+                  <!-- Grand Cadre Horloge & Date Moderne -->
+                  <div class="left-clock-card font-inter clock-style-editorial clock-size-medium" id="left-clock-card">
+                    <div class="clock-card-top">
+                      <button type="button" id="clock-tz-badge" class="clock-tz-pill" title="Cliquer pour changer de fuseau horaire">
+                        <i class="fa-solid fa-globe"></i> LOCAL • PARIS
+                      </button>
+                      <button type="button" id="clock-mode-toggle" class="clock-tz-pill clock-mode-pill" title="Basculer entre Horloge et Compte à rebours">
+                        <i id="clock-mode-icon" class="fa-solid fa-clock"></i> <span id="clock-mode-label">Horloge</span>
+                      </button>
+                    </div>
+
+                    <!-- Salutation chaleureuse & moderne -->
+                    <span id="clock-greeting" class="clock-greeting">Bonjour</span>
+
+                    <!-- Affichage moderne et épuré de l'heure -->
+                    <div class="left-clock-display" id="left-clock-display">
+                      <div class="time-digits-box">
+                        <span id="time" class="left-time-main">00:00</span>
+                        <span id="clock-ms-tick" class="clock-ms-tick" style="display: none;">.00</span>
+                      </div>
+                      <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
+                    </div>
+
+                    <!-- Affichage Flip Clock Rétro (style Fliqlo) -->
+                    <div id="clock-flip-wrap" class="clock-flip-wrap" style="display: none;">
+                      <div class="flip-unit"><span class="flip-digit" id="flip-h">12</span></div>
+                      <span class="flip-sep">:</span>
+                      <div class="flip-unit"><span class="flip-digit" id="flip-m">30</span></div>
+                      <span class="flip-sep" id="flip-sec-sep" style="display:none;">:</span>
+                      <div class="flip-unit" id="flip-sec-unit" style="display:none;"><span class="flip-digit" id="flip-s">00</span></div>
+                    </div>
+
+                    <!-- Affichage Horloge Analogique Suisse (style Braun) -->
+                    <div id="clock-analog-wrap" class="clock-analog-wrap" style="display: none;">
+                      <svg class="clock-analog-svg" viewBox="0 0 200 200">
+                        <circle class="analog-face" cx="100" cy="100" r="92" />
+                        <!-- 12 graduations -->
+                        <line class="analog-tick major" x1="100" y1="14" x2="100" y2="26" />
+                        <line class="analog-tick major" x1="100" y1="186" x2="100" y2="174" />
+                        <line class="analog-tick major" x1="14" y1="100" x2="26" y2="100" />
+                        <line class="analog-tick major" x1="186" y1="100" x2="174" y2="100" />
+                        <line class="analog-tick" x1="143" y1="25" x2="137" y2="35" />
+                        <line class="analog-tick" x1="175" y1="57" x2="165" y2="63" />
+                        <line class="analog-tick" x1="175" y1="143" x2="165" y2="137" />
+                        <line class="analog-tick" x1="143" y1="175" x2="137" y2="165" />
+                        <line class="analog-tick" x1="57" y1="175" x2="63" y2="165" />
+                        <line class="analog-tick" x1="25" y1="143" x2="35" y2="137" />
+                        <line class="analog-tick" x1="25" y1="57" x2="35" y2="63" />
+                        <line class="analog-tick" x1="57" y1="25" x2="63" y2="35" />
+                        <!-- Aiguilles -->
+                        <line id="analog-hour-hand" class="analog-hand-hour" x1="100" y1="100" x2="100" y2="52" />
+                        <line id="analog-min-hand" class="analog-hand-min" x1="100" y1="100" x2="100" y2="34" />
+                        <line id="analog-sec-hand" class="analog-hand-sec" x1="100" y1="114" x2="100" y2="24" />
+                        <circle class="analog-center-dot" cx="100" cy="100" r="4.5" />
+                      </svg>
+                    </div>
+
+                    <!-- Télémétrie Calendaire & Cycle Solaire -->
+                    <div class="left-clock-telemetry">
+                      <div id="date" class="left-date-main">Chargement...</div>
+                      <div class="clock-telemetry-chips">
+                        <span class="chrono-chip" id="clock-week-chip">
+                          <i class="fa-solid fa-calendar-week"></i>
+                          <span id="clock-week-text">Sem. --</span>
+                        </span>
+                        <span class="chrono-chip" id="clock-day-chip">
+                          <i class="fa-solid fa-hourglass-half"></i>
+                          <span id="clock-day-text">Jour --/365</span>
+                        </span>
+                        <span class="chrono-chip solar-chip" id="clock-solar-chip">
+                          <i id="clock-solar-icon" class="fa-solid fa-sun"></i>
+                          <span id="clock-solar-text">Diurne</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <!-- Progression du cycle journalier (%) -->
+                    <div id="day-progress-wrap" class="day-progress-wrap">
+                      <div class="day-progress-header">
+                        <span class="day-progress-title">
+                          <i class="fa-solid fa-circle-notch"></i> Progression Journée
+                        </span>
+                        <div class="day-progress-stats">
+                          <span id="day-progress-pct" class="progress-pct-bold">0%</span>
+                          <span id="day-progress-remaining" class="progress-remaining-sub">(12h 00m restants)</span>
+                        </div>
+                      </div>
+                      <div class="day-progress-track">
+                        <div id="day-progress-fill" class="day-progress-fill" style="width: 0%;">
+                          <span class="progress-glow-head"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+
+                <!-- Zone droite de l'accueil : Grille des Catégories de Signets -->
+                <section class="overview-right-col">
+                  <div id="categories-container" class="categories-grid"></div>
+                </section>
               </div>
             </div>
           </div>
-        </aside>
 
-        <!-- COLONNE CENTRALE : BARRE DE RECHERCHE + GRILLE DES CATÉGORIES -->
-        <section class="col-center">
-          <div class="search-wrapper">
-            <form id="search-form" class="search-box">
-              <div id="engine-badge" class="engine-badge">
-                <i id="engine-icon" class="fa-brands fa-google"></i>
-                <span id="engine-name">Google</span>
-              </div>
-              <span class="prompt-arrow">&gt;</span>
-              <input
-                id="search-input"
-                type="text"
-                placeholder="Rechercher, calculer (12*8) ou taper !help pour les préfixes..."
-                autocomplete="off"
-                autofocus
-              />
-              <span id="calc-preview" class="calc-preview" hidden></span>
-              <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
-            </form>
-
-            <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
-          </div>
-
-          <!-- Conteneur des catégories (ajustement automatique de la taille pour rester harmonieux > 6 liens) -->
-          <div id="categories-container" class="categories-grid"></div>
-        </section>
-
-        <!-- COLONNE DROITE : DECK UNIFIÉ (SLIDER NAVIGATION MULTI-VUES) -->
-        <aside class="col-right">
-          <div class="unified-deck-card">
-            <!-- Sélecteur d'onglets glissant (scrollable horizontal) -->
-            <div class="deck-view-header">
-              <div class="deck-view-nav" id="deck-view-nav">
-                <button type="button" class="deck-nav-btn active" data-deck-view="agenda" title="Agenda & Tâches (Alt+1)">
-                  <i class="fa-regular fa-calendar-check"></i>
-                  <span>Agenda</span>
-                </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="weather" data-widget-nav="weather" title="Météo Détaillée (Alt+2)">
-                  <i class="fa-solid fa-cloud-sun"></i>
-                  <span>Météo</span>
-                </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="feeds" data-widget-nav="feeds" title="Actualités en direct (Alt+3)">
-                  <i class="fa-solid fa-newspaper"></i>
-                  <span>Actus</span>
-                </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="system" data-widget-nav="system" title="Moniteur Système & Marchés (Alt+4)">
-                  <i class="fa-solid fa-microchip"></i>
-                  <span>Système</span>
-                </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="pomodoro" data-widget-nav="pomodoro" title="Minuteur Focus / Pomodoro (Alt+5)">
-                  <i class="fa-solid fa-stopwatch"></i>
-                  <span>Focus</span>
-                </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="notes" data-widget-nav="notes" title="Bloc-Notes Rapide (Alt+6)">
-                  <i class="fa-solid fa-note-sticky"></i>
-                  <span>Notes</span>
-                </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="ambient" data-widget-nav="ambient" title="Ambiance Sonore (Alt+7)">
-                  <i class="fa-solid fa-headphones"></i>
-                  <span>Ambiance</span>
-                </button>
-                <button type="button" class="deck-nav-btn" data-deck-view="quotes" data-widget-nav="quotes" title="Citations & Motivation Dev (Alt+8)">
-                  <i class="fa-solid fa-quote-left"></i>
-                  <span>Quotes</span>
-                </button>
-                <button type="button" class="deck-nav-btn deck-nav-config" data-deck-view="customize" title="Personnalisation de la Startpage (Alt+9)">
-                  <i class="fa-solid fa-sliders"></i>
-                  <span>Config</span>
-                </button>
-                <div class="deck-nav-indicator"></div>
-              </div>
-            </div>
-
-            <!-- Conteneur des vues glissantes du deck -->
-            <div class="deck-views-wrapper">
-              <!-- VUE 1 : CALENDRIER & TÂCHES FUSIONNÉS -->
-              <div id="deck-view-agenda" class="deck-slide-view active">
+          <!-- VUE 2 : CALENDRIER & TÂCHES FUSIONNÉS -->
+          <div id="deck-view-agenda" class="deck-slide-view" hidden>
                 <div class="merged-calendar-section">
                   <div class="cal-controls-row">
                     <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
@@ -1260,8 +1379,8 @@
               </div>
             </div>
           </div>
-        </aside>
-      </main>
+        </main>
+      </div>
     </div>
 
     <!-- MODALE D'ÉDITION D'UN RACCOURCI -->
