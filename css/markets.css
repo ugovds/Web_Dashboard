@@ -1073,10 +1073,10 @@
 
 /* TABLEAU DE COTATION WATCHLIST */
 .watchlist-table-container {
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   gap: 0.4rem;
-  width: 100%;
+  width: 100% !important;
 }
 
 .watchlist-table-header {

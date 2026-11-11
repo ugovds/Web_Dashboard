@@ -484,8 +484,8 @@
   overflow-y: auto;
 }
 
-.system-full-view .crypto-ticker-cards,
-.markets-full-view .crypto-ticker-cards {
+.system-full-view .crypto-ticker-cards.markets-grid,
+.markets-full-view .crypto-ticker-cards.markets-grid {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
   gap: clamp(14px, 1.8vh, 22px) !important;
@@ -646,7 +646,7 @@
     grid-template-columns: 460px 1fr;
     gap: 2rem;
   }
-  .system-full-view .crypto-ticker-cards {
+  .system-full-view .crypto-ticker-cards.markets-grid {
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
   }
   .feeds-full-view .merged-feed-list {

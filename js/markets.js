@@ -1711,7 +1711,10 @@ function renderMarketChecklist() {
       saveMarketAssets();
       renderMarketChecklist();
       renderMarketCards();
-      renderMarketsHighlights();
+      renderHeroSpotlight(currentHeroAssetId);
+      renderMarketBarometer();
+      renderMarketMovers();
+      renderForexCryptoModule();
       if (typeof showToast === 'function') showToast('Actif personnalisé supprimé', 'info');
     });
   });
@@ -1806,7 +1809,10 @@ async function fetchLiveMarketData() {
 
   saveMarketAssets();
   renderMarketCards();
-  renderMarketsHighlights();
+  renderHeroSpotlight(currentHeroAssetId);
+  renderMarketBarometer();
+  renderMarketMovers();
+  renderForexCryptoModule();
   updateMarketGlobalStatus();
 
   if (refreshBtn) {
