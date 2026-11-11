@@ -1153,123 +1153,12 @@ async function fetchMarketRates() {
 }
 
 function initMarketWidget() {
-  renderMarketCards();
-  renderMarketChecklist();
-
-  // Bouton de filtrage par forte volatilité du jour
-  const volatileFilterBtn = document.getElementById('market-filter-volatile-btn');
-  if (volatileFilterBtn) {
-    volatileFilterBtn.addEventListener('click', () => {
-      isMarketVolatileFilterActive = !isMarketVolatileFilterActive;
-      volatileFilterBtn.classList.toggle('active', isMarketVolatileFilterActive);
-      renderMarketCards();
-      if (typeof showToast === 'function') {
-        showToast(isMarketVolatileFilterActive ? 'Affichage des actifs les plus volatiles du jour' : 'Affichage de tous les actifs', 'info');
-      }
-    });
+  if (typeof initMarkets === 'function') {
+    initMarkets();
   }
-
-  // Boutons du tiroir
-  const toggleBtn = document.getElementById('market-config-toggle-btn');
-  const closeBtn = document.getElementById('market-config-close-btn');
-
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', toggleMarketConfigDrawer);
-  }
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      document.getElementById('market-config-drawer')?.setAttribute('hidden', '');
-    });
-  }
-
-  // Boutons de presets rapides
-  document.querySelectorAll('.market-preset-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const preset = btn.dataset.preset;
-      if (preset === 'portfolio') {
-        marketAssets.forEach((a) => {
-          a.enabled = ['10ap', 'lyp6', 'xmme', 'nvda'].includes(a.id);
-        });
-      } else if (preset === 'volatile') {
-        marketAssets.forEach((a) => {
-          a.enabled = ['btc', 'sol', 'tsla', 'mstr', 'nvda'].includes(a.id);
-        });
-      } else if (preset === 'all') {
-        marketAssets.forEach((a) => {
-          a.enabled = true;
-        });
-      }
-      saveMarketAssets();
-      renderMarketChecklist();
-      renderMarketCards();
-      if (typeof showToast === 'function') showToast(`Preset "${btn.textContent}" activé`, 'success');
-    });
-  });
-
-  // Ajout d'actif personnalisé
-  const addBtn = document.getElementById('market-add-custom-btn');
-  if (addBtn) {
-    addBtn.addEventListener('click', () => {
-      const nameInput = document.getElementById('market-new-name');
-      const symInput = document.getElementById('market-new-sym');
-      const priceInput = document.getElementById('market-new-price');
-
-      const name = nameInput?.value.trim();
-      const sym = symInput?.value.trim().toUpperCase();
-      const price = parseFloat(priceInput?.value);
-
-      if (!name || !sym || isNaN(price) || price <= 0) {
-        if (typeof showToast === 'function') showToast('Veuillez renseigner un nom, symbole et prix valide', 'error');
-        return;
-      }
-
-      const newAsset = {
-        id: `custom_${Date.now()}`,
-        name: name,
-        symbol: sym,
-        icon: 'fa-solid fa-chart-line',
-        basePrice: price,
-        baseChange: 0.0,
-        unit: '$',
-        enabled: true,
-        isCustom: true
-      };
-
-      marketAssets.push(newAsset);
-      saveMarketAssets();
-
-      if (nameInput) nameInput.value = '';
-      if (symInput) symInput.value = '';
-      if (priceInput) priceInput.value = '';
-
-      renderMarketChecklist();
-      renderMarketCards();
-      if (typeof showToast === 'function') showToast(`Actif ${name} ajouté avec succès !`, 'success');
-    });
-  }
-
-  // Bouton de rafraîchissement
-  const refreshBtn = document.getElementById('crypto-refresh-btn');
-  if (refreshBtn) {
-    refreshBtn.addEventListener('click', async () => {
-      await fetchMarketRates();
-      if (typeof showToast === 'function') showToast('Marchés actualisés (S&P 500, Stoxx 600, Emerging, NVDA...)', 'info');
-    });
-  }
-
-  // Actualisation automatique discrète toutes les 45 secondes
-  setInterval(fetchMarketRates, 45000);
 }
 
 function initSystemWidget() {
-  checkNetworkPing();
-  setInterval(checkNetworkPing, 20000);
-
-  initBatteryMonitor();
-  updateHardwareInfo();
-  updateSessionUptime();
-  setInterval(updateSessionUptime, 1000);
-
   initMarketWidget();
 }
 

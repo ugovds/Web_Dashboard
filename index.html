@@ -54,6 +54,7 @@
     <link rel="stylesheet" href="css/tasks.css?v=3.1" />
     <link rel="stylesheet" href="css/weather.css?v=3.1" />
     <link rel="stylesheet" href="css/feeds.css?v=3.2" />
+    <link rel="stylesheet" href="css/markets.css?v=3.2" />
     <link rel="stylesheet" href="css/responsive.css?v=3.1" />
     <link rel="stylesheet" href="css/themes/kanagawa.css?v=3.0" />
 
@@ -131,12 +132,12 @@
             <div class="sidebar-tooltip">Actualités <kbd>4</kbd></div>
           </button>
 
-          <!-- 5. SYSTÈME & BOURSE -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="system" data-widget-nav="system" title="Moniteur Système & Bourse (Alt+5)">
-            <div class="nav-icon-wrap"><i class="fa-solid fa-microchip"></i></div>
-            <span class="nav-label">Système & Bourse</span>
+          <!-- 5. MARCHÉS & ETF -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="system" data-widget-nav="system" title="Marchés Boursiers, Actions &amp; ETF (Alt+5)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-chart-line"></i></div>
+            <span class="nav-label">Marchés</span>
             <kbd class="nav-kbd">5</kbd>
-            <div class="sidebar-tooltip">Système & Bourse <kbd>5</kbd></div>
+            <div class="sidebar-tooltip">Marchés &amp; ETF <kbd>5</kbd></div>
           </button>
 
           <!-- 6. FOCUS / POMODORO -->
@@ -721,99 +722,177 @@
                 </div>
               </div>
 
-              <!-- VUE 4 : MONITEUR SYSTÈME & MARCHÉS BOURSIERS -->
-              <div id="deck-view-system" class="deck-slide-view system-full-view" hidden>
-                <div class="deck-widget-panel system-panel">
-                  <div class="system-telemetry-grid">
-                    <div class="telemetry-card">
-                      <div class="telemetry-label"><i class="fa-solid fa-tower-broadcast"></i> Latence Ping</div>
-                      <div class="telemetry-val-row">
-                        <span id="sys-ping-dot" class="telemetry-indicator"></span>
-                        <span id="sys-ping-val" class="telemetry-number">-- ms</span>
+              <!-- VUE 4 : MARCHÉS BOURSIERS, ACTIONS & ETF (STUDIO TRADINGVIEW) -->
+              <div id="deck-view-system" class="deck-slide-view system-full-view markets-full-view" hidden>
+                <div class="markets-container">
+                  <!-- 1. HEADER DU HUB MARCHÉS -->
+                  <header class="markets-header">
+                    <div class="markets-header-top">
+                      <div class="markets-brand">
+                        <div class="markets-status-pill" id="markets-global-status">
+                          <span class="status-dot pulse-green"></span>
+                          <span id="market-status-text">Wall Street &amp; Euronext Actifs</span>
+                        </div>
+                        <h2 class="markets-title">Marchés &amp; Portefeuille</h2>
+                        <span class="markets-subtitle">Cotations en temps réel, ETF indiciels (10AP, LYP6, XMME), actions tech &amp; graphiques interactifs</span>
                       </div>
-                      <span id="sys-ping-state" class="telemetry-sub">Mesure...</span>
-                      <div class="ping-sparkline-wrap">
-                        <svg id="sys-ping-sparkline" class="ping-sparkline" viewBox="0 0 100 24" preserveAspectRatio="none">
-                          <defs>
-                            <linearGradient id="pingGrad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="var(--accent-primary)" stop-opacity="0.45"/>
-                              <stop offset="100%" stop-color="var(--accent-primary)" stop-opacity="0.0"/>
-                            </linearGradient>
-                          </defs>
-                          <path class="ping-spark-area" fill="url(#pingGrad)" d=""></path>
-                          <path class="ping-spark-line" fill="none" stroke="var(--accent-primary)" stroke-width="1.8" d=""></path>
-                        </svg>
+
+                      <div class="markets-actions">
+                        <div class="markets-search-box">
+                          <i class="fa-solid fa-magnifying-glass"></i>
+                          <input
+                            type="text"
+                            id="market-search-input"
+                            class="markets-search-input"
+                            placeholder="Rechercher une action, ETF, crypto (NVDA, 10AP, BTC)..."
+                            autocomplete="off"
+                          />
+                          <button type="button" id="market-search-clear" class="markets-search-clear" hidden title="Effacer">&times;</button>
+                        </div>
+
+                        <button type="button" id="market-filter-volatile-btn" class="market-btn-secondary" title="Filtrer les actifs les plus volatiles du jour">
+                          <i class="fa-solid fa-fire"></i>
+                          <span>Volatiles</span>
+                        </button>
+
+                        <button type="button" id="market-config-toggle-btn" class="market-btn-secondary" title="Personnaliser les actifs et la liste">
+                          <i class="fa-solid fa-sliders"></i>
+                          <span>Personnaliser</span>
+                        </button>
+
+                        <button type="button" id="crypto-refresh-btn" class="market-btn-primary" title="Actualiser les cours en direct">
+                          <i class="fa-solid fa-rotate-right"></i>
+                          <span>Actualiser</span>
+                        </button>
                       </div>
                     </div>
 
-                    <div class="telemetry-card" id="sys-power-card">
-                      <div class="telemetry-label" id="sys-power-label"><i class="fa-solid fa-plug"></i> Alimentation</div>
-                      <div class="telemetry-val-row">
-                        <i id="sys-bat-icon" class="fa-solid fa-plug telemetry-bat-icon ac-power"></i>
-                        <span id="sys-bat-val" class="telemetry-number">Secteur AC</span>
+                    <!-- Bandeau Défilant des Grands Indices Mondiaux -->
+                    <div class="markets-marquee-wrap">
+                      <div class="markets-marquee-track" id="markets-indices-marquee">
+                        <!-- Rempli dynamiquement par renderIndicesMarquee() -->
                       </div>
-                      <span id="sys-bat-state" class="telemetry-sub">PC Station • Stable</span>
                     </div>
 
-                    <div class="telemetry-card">
-                      <div class="telemetry-label"><i class="fa-solid fa-stopwatch-20"></i> Session Uptime</div>
-                      <div class="telemetry-val-row">
-                        <span id="sys-uptime-val" class="telemetry-number">00:00</span>
+                    <!-- Barre des filtres par catégorie -->
+                    <nav class="markets-nav-bar" aria-label="Catégories d'actifs">
+                      <div class="tab-group" id="markets-tab-group">
+                        <button type="button" class="tab-btn active" data-market-category="all"><i class="fa-solid fa-layer-group"></i> Tous les Actifs</button>
+                        <button type="button" class="tab-btn" data-market-category="etf"><i class="fa-solid fa-landmark"></i> ETF &amp; Fonds</button>
+                        <button type="button" class="tab-btn" data-market-category="stock"><i class="fa-solid fa-building"></i> Actions</button>
+                        <button type="button" class="tab-btn" data-market-category="crypto"><i class="fa-brands fa-bitcoin"></i> Cryptomonnaies</button>
+                        <button type="button" class="tab-btn" data-market-category="index"><i class="fa-solid fa-chart-line"></i> Indices &amp; Forex</button>
                       </div>
-                      <span class="telemetry-sub">Depuis ouverture</span>
+                    </nav>
+                  </header>
+
+                  <!-- 2. TIROIR DE PERSONNALISATION / AJOUT D'ACTIF -->
+                  <div id="market-config-drawer" class="market-config-drawer" hidden>
+                    <div class="market-drawer-top">
+                      <span class="market-drawer-title"><i class="fa-solid fa-sliders"></i> Personnaliser la Watchlist</span>
+                      <button type="button" id="market-config-close-btn" class="deck-icon-action" title="Fermer"><i class="fa-solid fa-xmark"></i></button>
                     </div>
 
-                    <div class="telemetry-card">
-                      <div class="telemetry-label"><i class="fa-solid fa-microchip"></i> Matériel & CPU</div>
-                      <div class="telemetry-val-row">
-                        <span id="sys-hardware-val" class="telemetry-number">-- Cores</span>
+                    <div class="market-presets-row">
+                      <button type="button" class="market-preset-btn" data-preset="portfolio">Favoris de base (10AP, LYP6, XMME, NVDA)</button>
+                      <button type="button" class="market-preset-btn" data-preset="volatile">Top Volatilité</button>
+                      <button type="button" class="market-preset-btn" data-preset="all">Activer Tout</button>
+                    </div>
+
+                    <div class="market-assets-checklist" id="market-assets-checklist"></div>
+
+                    <div class="market-add-custom-box">
+                      <span class="add-custom-title"><i class="fa-solid fa-plus"></i> Ajouter une Action, un ETF ou un Ticker</span>
+                      <div class="market-custom-inputs">
+                        <input type="text" id="market-new-name" placeholder="Nom complet (ex: LVMH)" maxlength="24" />
+                        <input type="text" id="market-new-sym" placeholder="Symbole TradingView (ex: EURONEXT:MC ou MC)" maxlength="16" />
+                        <select id="market-new-type" class="hub-select-mini">
+                          <option value="stock">Action</option>
+                          <option value="etf">ETF</option>
+                          <option value="crypto">Crypto</option>
+                          <option value="index">Indice</option>
+                        </select>
+                        <input type="number" id="market-new-price" placeholder="Prix indicatif (€ ou $)" step="any" />
                       </div>
-                      <span id="sys-hardware-sub" class="telemetry-sub">Système 64-bit</span>
+                      <button type="button" id="market-add-custom-btn" class="modal-btn primary"><i class="fa-solid fa-plus"></i> Ajouter à la Watchlist</button>
                     </div>
                   </div>
 
-                  <!-- Ticker Marchés Boursiers & Indices avec Personnalisation -->
-                  <div class="crypto-ticker-section market-ticker-section">
-                    <div class="crypto-ticker-header market-ticker-header">
-                      <span title="Cours réels pour EUR/USD, 10AP, LYP6, XMME, NVIDIA et BTC"><i class="fa-solid fa-chart-line"></i> Marchés & Indices</span>
-                      <div class="market-header-actions">
-                        <button type="button" id="market-filter-volatile-btn" class="market-filter-btn" title="Filtrer les actifs les plus volatiles du jour">
-                          <i class="fa-solid fa-fire"></i> Volatiles
-                        </button>
-                        <button type="button" id="market-config-toggle-btn" class="deck-mini-refresh" title="Personnaliser les indices et actions">
-                          <i class="fa-solid fa-sliders"></i>
-                        </button>
-                        <button type="button" id="crypto-refresh-btn" class="deck-mini-refresh" title="Actualiser les cours">
-                          <i class="fa-solid fa-rotate-right"></i>
-                        </button>
-                      </div>
+                  <!-- 3. GRILLE DES CARTES D'ACTIFS -->
+                  <main class="markets-main">
+                    <div class="markets-grid crypto-ticker-cards" id="crypto-ticker-cards">
+                      <!-- Cartes injectées dynamiquement -->
                     </div>
+                  </main>
 
-                    <div id="market-config-drawer" class="market-config-drawer" hidden>
-                      <div class="market-drawer-top">
-                        <span class="market-drawer-title"><i class="fa-solid fa-sliders"></i> Personnaliser les Marchés</span>
-                        <button type="button" id="market-config-close-btn" class="deck-icon-action" title="Fermer"><i class="fa-solid fa-xmark"></i></button>
-                      </div>
-
-                      <div class="market-presets-row">
-                        <button type="button" class="market-preset-btn" data-preset="portfolio">Sélection (10AP, LYP6, XMME, NVDA)</button>
-                        <button type="button" class="market-preset-btn" data-preset="volatile">Top Volatilité</button>
-                        <button type="button" class="market-preset-btn" data-preset="all">Tout</button>
-                      </div>
-
-                      <div class="market-assets-checklist" id="market-assets-checklist"></div>
-
-                      <div class="market-add-custom-box">
-                        <div class="market-custom-inputs">
-                          <input type="text" id="market-new-name" placeholder="Nom (Tesla)" maxlength="16" />
-                          <input type="text" id="market-new-sym" placeholder="Symbole (TSLA)" maxlength="8" />
-                          <input type="number" id="market-new-price" placeholder="Prix ($)" step="any" />
+                  <!-- 4. MODALE / STUDIO DE GRAPHIQUE INTERACTIF TRADINGVIEW -->
+                  <div id="market-chart-modal" class="market-chart-modal" hidden>
+                    <div class="market-chart-backdrop"></div>
+                    <div class="market-chart-dialog">
+                      <header class="chart-dialog-header">
+                        <div class="chart-asset-headline">
+                          <div class="chart-asset-icon-box" id="chart-dialog-icon">
+                            <i class="fa-solid fa-chart-line"></i>
+                          </div>
+                          <div>
+                            <div class="chart-title-row">
+                              <h3 id="chart-dialog-name">NVIDIA Corporation</h3>
+                              <span class="chart-symbol-badge" id="chart-dialog-sym">NASDAQ:NVDA</span>
+                              <span class="chart-type-badge" id="chart-dialog-type">ACTION</span>
+                            </div>
+                            <div class="chart-price-row">
+                              <span class="chart-big-price" id="chart-dialog-price">175.76 $</span>
+                              <span class="chart-change-badge up" id="chart-dialog-change">+2.84%</span>
+                              <span class="chart-exchange-name" id="chart-dialog-exchange">Nasdaq Stock Market</span>
+                            </div>
+                          </div>
                         </div>
-                        <button type="button" id="market-add-custom-btn" class="modal-btn primary"><i class="fa-solid fa-plus"></i> Ajouter</button>
+
+                        <div class="chart-dialog-controls">
+                          <div class="chart-timeframe-picker">
+                            <button type="button" class="tf-btn" data-tf="1">1m</button>
+                            <button type="button" class="tf-btn" data-tf="5">5m</button>
+                            <button type="button" class="tf-btn" data-tf="60">1h</button>
+                            <button type="button" class="tf-btn active" data-tf="D">1J</button>
+                            <button type="button" class="tf-btn" data-tf="W">1S</button>
+                            <button type="button" class="tf-btn" data-tf="M">1M</button>
+                          </div>
+                          <button type="button" id="chart-fullscreen-btn" class="deck-icon-action" title="Plein écran"><i class="fa-solid fa-expand"></i></button>
+                          <button type="button" id="chart-dialog-close-btn" class="deck-icon-action" title="Fermer"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                      </header>
+
+                      <!-- Statistiques Clés -->
+                      <div class="chart-stats-strip">
+                        <div class="chart-stat-item">
+                          <span class="stat-label">Plus Haut Jour</span>
+                          <span class="stat-val" id="chart-stat-high">178.45 $</span>
+                        </div>
+                        <div class="chart-stat-item">
+                          <span class="stat-label">Plus Bas Jour</span>
+                          <span class="stat-val" id="chart-stat-low">173.10 $</span>
+                        </div>
+                        <div class="chart-stat-item">
+                          <span class="stat-label">Écart Jour</span>
+                          <div class="stat-range-bar">
+                            <div class="stat-range-fill" id="chart-stat-range-fill" style="width: 65%;"></div>
+                          </div>
+                        </div>
+                        <div class="chart-stat-item">
+                          <span class="stat-label">Devise</span>
+                          <span class="stat-val" id="chart-stat-curr">USD ($)</span>
+                        </div>
+                        <div class="chart-stat-item">
+                          <span class="stat-label">Place Boursière</span>
+                          <span class="stat-val" id="chart-stat-market">NASDAQ</span>
+                        </div>
+                      </div>
+
+                      <!-- Zone du Graphique TradingView en Direct -->
+                      <div class="chart-iframe-container">
+                        <iframe id="tradingview-chart-iframe" class="tradingview-chart-iframe" src="" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen></iframe>
                       </div>
                     </div>
-
-                    <div class="crypto-ticker-cards" id="crypto-ticker-cards"></div>
                   </div>
                 </div>
               </div>
@@ -1942,6 +2021,7 @@
     <script defer src="js/search.js?v=3.1"></script>
     <script defer src="js/feeds.js?v=3.1"></script>
     <script defer src="js/bookmarks.js?v=3.1"></script>
+    <script defer src="js/markets.js?v=3.2"></script>
     <script defer src="js/widgets.js?v=3.1"></script>
     <script defer src="js/custom-hub.js?v=3.1"></script>
     <script defer src="js/command-palette.js?v=3.1"></script>

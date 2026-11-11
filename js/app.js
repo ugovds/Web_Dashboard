@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // === PHASE 2 : DIFFÉRÉE (Tâches secondaires libérant le thread) ===
   const deferNonCritical = () => {
     if (typeof initWidgets === 'function') initWidgets();
+    if (typeof initMarkets === 'function') initMarkets();
     if (typeof initWeather === 'function') initWeather();
     if (typeof initWeatherFx === 'function') initWeatherFx();
     if (typeof initFeeds === 'function') initFeeds();
