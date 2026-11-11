@@ -431,7 +431,15 @@ const ANIM_DEFAULTS = {
   style: 'deck-slide',
   speed: 'normal',
   blur: 'medium',
-  indicatorStyle: 'glass'
+  indicatorStyle: 'glass',
+  tabAnim: 'scale-pop'
+};
+
+const TAB_ANIM_LABELS = {
+  'scale-pop': 'Éclosion & Rebond',
+  'slide-fade': 'Glissement Latéral',
+  'cyber-glow': 'Cyber Glow',
+  'instant': 'Instantané'
 };
 
 const SPEED_DURATIONS = {
@@ -478,6 +486,9 @@ function applyAnimationSettings(settings) {
   const badge = document.getElementById('anim-speed-val-badge');
   if (badge) badge.textContent = speedInfo.label;
 
+  const tabBadge = document.getElementById('tab-anim-val-badge');
+  if (tabBadge) tabBadge.textContent = TAB_ANIM_LABELS[settings.tabAnim] || 'Éclosion & Rebond';
+
   document.querySelectorAll('.hub-anim-card-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.animStyle === settings.style);
   });
@@ -489,6 +500,9 @@ function applyAnimationSettings(settings) {
   });
   document.querySelectorAll('.indicator-style-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.indicatorStyle === settings.indicatorStyle);
+  });
+  document.querySelectorAll('.tab-anim-preset-pill').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.tabAnim === (settings.tabAnim || 'scale-pop'));
   });
 }
 
@@ -534,6 +548,18 @@ function initAnimationHubControls() {
       if (typeof showToast === 'function') {
         const name = btn.querySelector('span:last-child')?.textContent || cur.indicatorStyle;
         showToast(`Surbrillance : ${name}`, 'info');
+      }
+    });
+  });
+
+  document.querySelectorAll('.tab-anim-preset-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getAnimationSettings();
+      cur.tabAnim = btn.dataset.tabAnim;
+      saveAnimationSettings(cur);
+      if (typeof showToast === 'function') {
+        const name = btn.querySelector('span')?.textContent || cur.tabAnim;
+        showToast(`Animation onglet : ${name}`, 'info');
       }
     });
   });

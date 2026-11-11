@@ -264,73 +264,82 @@
 }
 
 /* ========================================================
-   VUE 1 : ACCUEIL / DASHBOARD GÉNÉRAL (Recherche + Horloge + Signets)
+   VUE 1 : ACCUEIL COCKPIT (4 QUADRANTS / BENTO MODERNE)
    ======================================================== */
 .dashboard-overview-container {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: clamp(10px, 1.4vh, 18px);
   height: 100%;
   min-height: 0;
+  width: 100%;
 }
 
-/* Zone haute de l'accueil : Omnibox pleine largeur avec calculatrice */
+/* Zone haute de l'accueil : Omnibox moderne flottante */
 .dashboard-search-hero {
   flex-shrink: 0;
   width: 100%;
-  max-width: 960px;
+  max-width: 760px;
   margin: 0 auto;
 }
 
-/* Grille principale de l'accueil : Horloge / Cockpit Card à gauche + Grille des signets spacieuse à droite */
+.dashboard-search-hero .search-box {
+  padding: 0.65rem 1.2rem;
+  border-radius: 99px;
+  background: rgba(14, 18, 28, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Corps de l'accueil : Les 4 Quadrants occupant 100% de la hauteur et largeur de l'écran */
 .dashboard-overview-body {
-  flex: 1;
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.overview-categories-section {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/* Grille 4 Quadrants (1 catégorie dans chaque coin de l'écran) */
+.overview-categories-section .categories-grid {
+  flex: 1 1 0;
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 1.25rem;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: clamp(14px, 1.8vh, 26px);
   min-height: 0;
   height: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.overview-left-col {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  min-height: 0;
-  height: 100%;
+/* Fallback si plus de 4 catégories (ex: 5 ou 6 catégories) */
+.overview-categories-section .categories-grid.multi-categories {
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
 }
 
-.overview-clock-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.overview-right-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
-}
-
-.overview-right-col .categories-grid {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  grid-auto-rows: minmax(170px, 1fr);
-  gap: 1.15rem;
-  min-height: 0;
-  height: 100%;
-}
-
-.overview-bookmarks-wrap {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
+@media (max-width: 950px), (max-height: 700px) {
+  .dashboard-viewport {
+    overflow-y: auto;
+  }
+  .overview-categories-section .categories-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+    min-height: 0;
+    gap: 16px;
+  }
 }
 
 /* ========================================================

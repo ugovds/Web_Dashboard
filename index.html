@@ -43,24 +43,24 @@
     </noscript>
 
     <!-- Stylesheets modulaires critiques (Above-The-Fold) -->
-    <link rel="stylesheet" href="css/base.css?v=2.8" />
-    <link rel="stylesheet" href="css/deck.css?v=2.8" />
-    <link rel="stylesheet" href="css/sidebar.css?v=2.8" />
-    <link rel="stylesheet" href="css/dashboard.css?v=2.8" />
-    <link rel="stylesheet" href="css/clock.css?v=2.8" />
-    <link rel="stylesheet" href="css/search.css?v=2.8" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=2.8" />
-    <link rel="stylesheet" href="css/calendar.css?v=2.8" />
-    <link rel="stylesheet" href="css/tasks.css?v=2.8" />
-    <link rel="stylesheet" href="css/responsive.css?v=2.8" />
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.8" />
+    <link rel="stylesheet" href="css/base.css?v=2.9" />
+    <link rel="stylesheet" href="css/deck.css?v=2.9" />
+    <link rel="stylesheet" href="css/sidebar.css?v=2.9" />
+    <link rel="stylesheet" href="css/dashboard.css?v=2.9" />
+    <link rel="stylesheet" href="css/clock.css?v=2.9" />
+    <link rel="stylesheet" href="css/search.css?v=2.9" />
+    <link rel="stylesheet" href="css/bookmarks.css?v=2.9" />
+    <link rel="stylesheet" href="css/calendar.css?v=2.9" />
+    <link rel="stylesheet" href="css/tasks.css?v=2.9" />
+    <link rel="stylesheet" href="css/responsive.css?v=2.9" />
+    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.9" />
 
     <!-- Stylesheets secondaires différées (Widgets hors-écran, Modales, Thèmes inactifs) -->
-    <link rel="stylesheet" href="css/widgets.css?v=2.8" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/modals.css?v=2.8" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/sakura.css?v=2.8" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.8" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/retrowave.css?v=2.8" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/widgets.css?v=2.9" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/modals.css?v=2.9" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/sakura.css?v=2.9" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.9" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/retrowave.css?v=2.9" media="print" onload="this.media='all'" />
   </head>
 
   <body data-theme="4">
@@ -248,9 +248,10 @@
                 </div>
               </div>
 
-              <!-- Grille Cockpit : Horloge à gauche + Signets à droite -->
+              <!-- Grille Cockpit : 4 Quadrants pour les Catégories de Signets -->
               <div class="dashboard-overview-body">
-                <aside class="overview-left-col">
+                <!-- Horloge masquée (conservée sans affichage pour réactivation éventuelle sans casser les scripts) -->
+                <aside class="overview-left-col" id="overview-clock-col" style="display: none !important;" aria-hidden="true">
                   <!-- Grand Cadre Horloge & Date Moderne -->
                   <div class="left-clock-card font-inter clock-style-editorial clock-size-medium" id="left-clock-card">
                     <div class="clock-card-top">
@@ -347,8 +348,8 @@
                   </div>
                 </aside>
 
-                <!-- Zone droite de l'accueil : Grille des Catégories de Signets -->
-                <section class="overview-right-col">
+                <!-- Zone principale : Grille des 4 Quadrants pour les Catégories -->
+                <section class="overview-categories-section">
                   <div id="categories-container" class="categories-grid"></div>
                 </section>
               </div>
@@ -1546,6 +1547,36 @@
                         </button>
                       </div>
                     </div>
+
+                    <!-- 5. Animation d'Apparition des Onglets Sidebar -->
+                    <div class="appearance-section">
+                      <div class="section-label-row">
+                        <label class="section-label">Animation d'Apparition des Onglets (Sidebar) :</label>
+                        <span class="anim-speed-badge" id="tab-anim-val-badge">Éclosion & Rebond</span>
+                      </div>
+                      <div class="hub-tab-anim-presets">
+                        <button type="button" class="tab-anim-preset-pill active" data-tab-anim="scale-pop">
+                          <i class="fa-solid fa-seedling"></i>
+                          <span>Éclosion & Rebond</span>
+                          <small>Zoom dynamique élastique</small>
+                        </button>
+                        <button type="button" class="tab-anim-preset-pill" data-tab-anim="slide-fade">
+                          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                          <span>Glissement Latéral</span>
+                          <small>Glisse depuis le dock</small>
+                        </button>
+                        <button type="button" class="tab-anim-preset-pill" data-tab-anim="cyber-glow">
+                          <i class="fa-solid fa-wand-magic-sparkles"></i>
+                          <span>Cyber Glow</span>
+                          <small>Flash néon lumineux</small>
+                        </button>
+                        <button type="button" class="tab-anim-preset-pill" data-tab-anim="instant">
+                          <i class="fa-solid fa-forward"></i>
+                          <span>Instantané</span>
+                          <small>Sans transition</small>
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- 7. SOUS-ONGLET : SAUVEGARDE & RESTAURATION -->
@@ -1720,20 +1751,20 @@
     </div>
 
     <!-- Scripts JavaScript modulaires différés (téléchargement parallèle sans bloquer le parsing DOM) -->
-    <script defer src="js/themes.js?v=2.8"></script>
-    <script defer src="js/appearance.js?v=2.8"></script>
-    <script defer src="js/clock.js?v=2.8"></script>
-    <script defer src="js/weather-fx.js?v=2.8"></script>
-    <script defer src="js/weather.js?v=2.8"></script>
-    <script defer src="js/calendar.js?v=2.8"></script>
-    <script defer src="js/tasks.js?v=2.8"></script>
-    <script defer src="js/search.js?v=2.8"></script>
-    <script defer src="js/feeds.js?v=2.8"></script>
-    <script defer src="js/bookmarks.js?v=2.8"></script>
-    <script defer src="js/widgets.js?v=2.8"></script>
-    <script defer src="js/custom-hub.js?v=2.8"></script>
-    <script defer src="js/command-palette.js?v=2.8"></script>
-    <script defer src="js/shortcuts.js?v=2.8"></script>
-    <script defer src="js/app.js?v=2.8"></script>
+    <script defer src="js/themes.js?v=2.9"></script>
+    <script defer src="js/appearance.js?v=2.9"></script>
+    <script defer src="js/clock.js?v=2.9"></script>
+    <script defer src="js/weather-fx.js?v=2.9"></script>
+    <script defer src="js/weather.js?v=2.9"></script>
+    <script defer src="js/calendar.js?v=2.9"></script>
+    <script defer src="js/tasks.js?v=2.9"></script>
+    <script defer src="js/search.js?v=2.9"></script>
+    <script defer src="js/feeds.js?v=2.9"></script>
+    <script defer src="js/bookmarks.js?v=2.9"></script>
+    <script defer src="js/widgets.js?v=2.9"></script>
+    <script defer src="js/custom-hub.js?v=2.9"></script>
+    <script defer src="js/command-palette.js?v=2.9"></script>
+    <script defer src="js/shortcuts.js?v=2.9"></script>
+    <script defer src="js/app.js?v=2.9"></script>
   </body>
 </html>

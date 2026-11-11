@@ -1470,14 +1470,83 @@ function initWidgets() {
     const toggle = document.getElementById(`widget-toggle-${key}`);
     if (toggle) {
       toggle.addEventListener('change', () => {
-        currentWidgetSettings[key] = toggle.checked;
-        saveWidgetSettings();
-        if (typeof showToast === 'function') {
-          const name = widgetLabels[key] || key;
-          showToast(`Onglet "${name}" ${toggle.checked ? 'affiché dans la barre latérale' : 'masqué de la barre latérale'}`, toggle.checked ? 'success' : 'info');
-        }
+        const isChecked = toggle.checked;
+        currentWidgetSettings[key] = isChecked;
+        localStorage.setItem('startpage_widget_settings', JSON.stringify(currentWidgetSettings));
+        setTabVisibilityWithAnimation(key, isChecked, () => {
+          if (typeof showToast === 'function') {
+            const name = widgetLabels[key] || key;
+            showToast(`Onglet "${name}" ${isChecked ? 'affiché dans la barre latérale' : 'masqué de la barre latérale'}`, isChecked ? 'success' : 'info');
+          }
+        });
       });
     }
   });
+}
+
+function setTabVisibilityWithAnimation(key, isEnabled, callback) {
+  const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${key}"]`);
+  if (!navBtn) {
+    if (callback) callback();
+    return;
+  }
+
+  const animSettings = typeof getAnimationSettings === 'function' ? getAnimationSettings() : {};
+  const tabAnim = animSettings.tabAnim || 'scale-pop';
+
+  if (tabAnim === 'instant' || tabAnim === 'none') {
+    if (isEnabled) {
+      navBtn.classList.remove('tab-hidden');
+      navBtn.style.removeProperty('display');
+    } else {
+      navBtn.classList.add('tab-hidden');
+      navBtn.style.setProperty('display', 'none', 'important');
+    }
+    const activeNavBtn = document.querySelector('.deck-nav-btn.active');
+    if (!isEnabled && activeNavBtn && activeNavBtn === navBtn) {
+      const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]');
+      if (homeBtn) homeBtn.click();
+    } else if (activeNavBtn && typeof updateDeckIndicator === 'function') {
+      updateDeckIndicator(activeNavBtn);
+    }
+    if (callback) callback();
+    return;
+  }
+
+  const enterClass = `tab-anim-enter-${tabAnim}`;
+  const exitClass = `tab-anim-exit-${tabAnim}`;
+
+  if (isEnabled) {
+    navBtn.classList.remove('tab-hidden', exitClass);
+    navBtn.style.removeProperty('display');
+    navBtn.classList.add(enterClass);
+
+    setTimeout(() => {
+      navBtn.classList.remove(enterClass);
+      const activeNavBtn = document.querySelector('.deck-nav-btn.active');
+      if (activeNavBtn && typeof updateDeckIndicator === 'function') {
+        updateDeckIndicator(activeNavBtn);
+      }
+      if (callback) callback();
+    }, 320);
+  } else {
+    navBtn.classList.remove(enterClass);
+    navBtn.classList.add(exitClass);
+
+    setTimeout(() => {
+      navBtn.classList.remove(exitClass);
+      navBtn.classList.add('tab-hidden');
+      navBtn.style.setProperty('display', 'none', 'important');
+
+      const activeNavBtn = document.querySelector('.deck-nav-btn.active');
+      if (activeNavBtn && activeNavBtn === navBtn) {
+        const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]');
+        if (homeBtn) homeBtn.click();
+      } else if (activeNavBtn && typeof updateDeckIndicator === 'function') {
+        updateDeckIndicator(activeNavBtn);
+      }
+      if (callback) callback();
+    }, 260);
+  }
 }
 

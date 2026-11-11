@@ -2495,4 +2495,82 @@
   }
 }
 
+/* --- PRÉSÉLECTIONS D'ANIMATION DE TOGGLE D'ONGLET --- */
+.hub-tab-anim-presets {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 0.65rem !important;
+}
+
+.tab-anim-preset-pill {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 0.75rem 0.6rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 0.35rem !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  color: var(--text-main) !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+  outline: none !important;
+}
+
+.tab-anim-preset-pill i {
+  font-size: 1.15rem !important;
+  color: var(--text-muted) !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.tab-anim-preset-pill span {
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+}
+
+.tab-anim-preset-pill small {
+  font-size: 0.66rem !important;
+  color: var(--text-muted) !important;
+}
+
+.tab-anim-preset-pill:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+
+.tab-anim-preset-pill:hover i {
+  color: #fff !important;
+  transform: scale(1.1) !important;
+}
+
+.tab-anim-preset-pill.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25) !important;
+}
+
+.tab-anim-preset-pill.active i {
+  color: var(--accent-primary) !important;
+  transform: scale(1.1) !important;
+}
+
+.tab-anim-preset-pill.active span {
+  color: #fff !important;
+}
+
+.tab-anim-preset-pill.active small {
+  color: var(--accent-primary) !important;
+  opacity: 0.9 !important;
+}
+
+@media (max-width: 768px) {
+  .hub-tab-anim-presets {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 
