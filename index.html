@@ -774,47 +774,6 @@
                       </div>
                     </div>
 
-                    <!-- NOUVEAU : Blocs Bento Highlights (Top Volatilité & Actifs les Plus Échangés) -->
-                    <div class="markets-highlights-grid">
-                      <div class="markets-highlight-box highlight-volatile">
-                        <div class="highlight-box-head">
-                          <div class="highlight-box-title">
-                            <i class="fa-solid fa-fire text-orange"></i>
-                            <span>Top Volatilité (Movers du Jour)</span>
-                          </div>
-                          <span class="highlight-box-tag">Fortes variations</span>
-                        </div>
-                        <div class="highlight-pills-row" id="highlight-volatile-pills">
-                          <!-- Rempli dynamiquement par renderMarketsHighlights() -->
-                        </div>
-                      </div>
-
-                      <div class="markets-highlight-box highlight-active">
-                        <div class="highlight-box-head">
-                          <div class="highlight-box-title">
-                            <i class="fa-solid fa-bolt text-yellow"></i>
-                            <span>Les Plus Échangés (Volume &amp; Mega-Caps)</span>
-                          </div>
-                          <span class="highlight-box-tag">Actifs Phares</span>
-                        </div>
-                        <div class="highlight-pills-row" id="highlight-active-pills">
-                          <!-- Rempli dynamiquement par renderMarketsHighlights() -->
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Barre des filtres par catégorie -->
-                    <nav class="markets-nav-bar" aria-label="Catégories d'actifs">
-                      <div class="tab-group" id="markets-tab-group">
-                        <button type="button" class="tab-btn active" data-market-category="all"><i class="fa-solid fa-layer-group"></i> Tous</button>
-                        <button type="button" class="tab-btn" data-market-category="stock"><i class="fa-solid fa-building"></i> Actions</button>
-                        <button type="button" class="tab-btn" data-market-category="etf"><i class="fa-solid fa-landmark"></i> ETF &amp; Fonds</button>
-                        <button type="button" class="tab-btn" data-market-category="index"><i class="fa-solid fa-chart-line"></i> Indices</button>
-                        <button type="button" class="tab-btn" data-market-category="forex"><i class="fa-solid fa-money-bill-transfer"></i> Forex</button>
-                        <button type="button" class="tab-btn" data-market-category="commodity"><i class="fa-solid fa-coins"></i> Matières 1ères</button>
-                        <button type="button" class="tab-btn" data-market-category="crypto"><i class="fa-brands fa-bitcoin"></i> Cryptos</button>
-                      </div>
-                    </nav>
                   </header>
 
                   <!-- 2. TIROIR DE PERSONNALISATION / AJOUT D'ACTIF -->
@@ -849,14 +808,216 @@
                     </div>
                   </div>
 
-                  <!-- 3. GRILLE DES CARTES D'ACTIFS -->
-                  <main class="markets-main">
-                    <div class="markets-grid crypto-ticker-cards" id="crypto-ticker-cards">
-                      <!-- Cartes injectées dynamiquement -->
-                    </div>
-                  </main>
+                  <!-- 3. ARCHITECTURE BENTO ASYMÉTRIQUE MULTI-MODULES -->
+                  <div class="markets-bento-layout">
+                    <!-- MODULE 1 : HERO SPOTLIGHT (Actif Vedette avec grand graphique 24h direct) -->
+                    <div class="market-bento-hero" id="market-hero-module">
+                      <div class="hero-top-row">
+                        <div class="hero-asset-brand">
+                          <div class="hero-icon-bubble" id="hero-asset-icon">
+                            <i class="fa-solid fa-microchip"></i>
+                          </div>
+                          <div class="hero-titles">
+                            <div class="hero-name-row">
+                              <h3 class="hero-asset-name" id="hero-asset-name">NVIDIA Corporation</h3>
+                              <span class="hero-sym-badge" id="hero-asset-sym">NVDA</span>
+                              <span class="hero-live-pill"><span class="status-dot pulse-green"></span> 24H DIRECT</span>
+                            </div>
+                            <span class="hero-exchange-sub" id="hero-asset-exchange">Nasdaq Stock Market • Marché Actions US</span>
+                          </div>
+                        </div>
+                        <!-- Sélecteur rapide des 5 actifs phares -->
+                        <div class="hero-quick-switch" id="hero-quick-switch">
+                          <button type="button" class="hero-pill-btn active" data-hero-id="nvda">NVDA</button>
+                          <button type="button" class="hero-pill-btn" data-hero-id="tsla">TSLA</button>
+                          <button type="button" class="hero-pill-btn" data-hero-id="btc">BTC</button>
+                          <button type="button" class="hero-pill-btn" data-hero-id="sp500">S&amp;P 500</button>
+                          <button type="button" class="hero-pill-btn" data-hero-id="cw8">CW8 (World)</button>
+                        </div>
+                      </div>
 
-                  <!-- 4. MODALE / STUDIO DE GRAPHIQUE ÉPURÉ & INSTANTANÉ (DROITE NETTE & INTUITIVE) -->
+                      <div class="hero-pricing-row">
+                        <div class="hero-price-group">
+                          <span class="hero-price-val" id="hero-price-val">175.76 $</span>
+                          <span class="hero-change-badge up" id="hero-change-badge">
+                            <i class="fa-solid fa-arrow-trend-up"></i> +2.84% (24h)
+                          </span>
+                        </div>
+                        <div class="hero-range-mini">
+                          <div class="range-mini-labels">
+                            <span>Bas 24h: <strong id="hero-stat-low">170.10 $</strong></span>
+                            <span>Haut 24h: <strong id="hero-stat-high">178.45 $</strong></span>
+                          </div>
+                          <div class="range-mini-track">
+                            <div class="range-mini-fill" id="hero-range-fill" style="width: 72%;"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Grand graphique interactif 24h direct -->
+                      <div class="hero-chart-container" id="hero-chart-container">
+                        <svg id="hero-chart-svg" class="hero-chart-svg" viewBox="0 0 1000 230" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="heroGradientUp" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"></stop>
+                              <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"></stop>
+                            </linearGradient>
+                            <linearGradient id="heroGradientDown" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"></stop>
+                              <stop offset="100%" stop-color="#ef4444" stop-opacity="0.0"></stop>
+                            </linearGradient>
+                          </defs>
+                          <line id="hero-baseline" x1="0" y1="115" x2="1000" y2="115" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4 4" stroke-width="1.5" />
+                          <path id="hero-svg-area" d="" fill="url(#heroGradientUp)"></path>
+                          <path id="hero-svg-line" d="" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <g id="hero-hover-tracker" style="display: none;">
+                            <line id="hero-hover-line" x1="0" y1="0" x2="0" y2="230" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+                            <circle id="hero-hover-dot" cx="0" cy="0" r="5.5" fill="#ffffff" stroke="#10b981" stroke-width="3"></circle>
+                          </g>
+                        </svg>
+                        <div id="hero-tooltip" class="hero-tooltip" style="display: none;">
+                          <span id="hero-tooltip-price">--</span>
+                          <span id="hero-tooltip-time">--</span>
+                        </div>
+                        <div class="hero-chart-time-labels">
+                          <span>Il y a 24h</span>
+                          <span>Il y a 12h</span>
+                          <span>Maintenant (En Direct)</span>
+                        </div>
+                      </div>
+
+                      <!-- Métriques clés au pied du Hero -->
+                      <div class="hero-metrics-grid">
+                        <div class="hero-metric-item">
+                          <span class="metric-label">Volume 24h (Est.)</span>
+                          <span class="metric-val" id="hero-metric-vol">48.2M titres</span>
+                        </div>
+                        <div class="hero-metric-item">
+                          <span class="metric-label">Capitalisation</span>
+                          <span class="metric-val" id="hero-metric-cap">4.32 B $</span>
+                        </div>
+                        <div class="hero-metric-item">
+                          <span class="metric-label">Séance &amp; Devise</span>
+                          <span class="metric-val" id="hero-metric-session">USD ($) • Ouvert</span>
+                        </div>
+                        <div class="hero-metric-item">
+                          <button type="button" class="hero-expand-btn" id="hero-expand-btn" title="Inspecter dans la modale plein écran">
+                            <i class="fa-solid fa-chart-line"></i> Agrandir
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- MODULE 2 : BAROMÈTRE & INDICES MONDIAUX -->
+                    <div class="market-bento-box bento-barometer" id="market-barometer-module">
+                      <div class="bento-box-head">
+                        <div class="bento-head-title">
+                          <i class="fa-solid fa-compass text-accent"></i>
+                          <span>Baromètre &amp; Piliers Mondiaux</span>
+                        </div>
+                        <span class="bento-badge" id="market-sentiment-tag">76% Haussier</span>
+                      </div>
+                      <div class="barometer-gauge-box">
+                        <div class="gauge-labels">
+                          <span>Climat Général</span>
+                          <strong id="barometer-score-text">Positif / Bullish</strong>
+                        </div>
+                        <div class="barometer-track">
+                          <div class="barometer-fill" id="barometer-fill-bar" style="width: 76%;"></div>
+                        </div>
+                      </div>
+                      <div class="barometer-indices-list" id="barometer-indices-list">
+                        <!-- Injecté dynamiquement (S&P 500, Nasdaq 100, CAC 40, DAX 40) -->
+                      </div>
+                    </div>
+
+                    <!-- MODULE 3 : TOP MOVERS DU JOUR (Hausses vs Replis) -->
+                    <div class="market-bento-box bento-movers" id="market-movers-module">
+                      <div class="bento-box-head">
+                        <div class="bento-head-title">
+                          <i class="fa-solid fa-arrows-up-down text-orange"></i>
+                          <span>Top Movers (Variations 24h)</span>
+                        </div>
+                        <span class="bento-badge">Dynamique</span>
+                      </div>
+                      <div class="movers-dual-columns">
+                        <div class="movers-col">
+                          <span class="movers-col-title text-green"><i class="fa-solid fa-arrow-trend-up"></i> Top Hausses</span>
+                          <div class="movers-items-list" id="movers-gainers-list">
+                            <!-- Injecté dynamiquement -->
+                          </div>
+                        </div>
+                        <div class="movers-col">
+                          <span class="movers-col-title text-red"><i class="fa-solid fa-arrow-trend-down"></i> Replis &amp; Consolidations</span>
+                          <div class="movers-items-list" id="movers-losers-list">
+                            <!-- Injecté dynamiquement -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- MODULE 4 : DEVISES (FOREX) & CRYPTO EN DIRECT -->
+                    <div class="market-bento-box bento-forex-crypto" id="market-forex-crypto-module">
+                      <div class="bento-box-head">
+                        <div class="bento-head-title">
+                          <i class="fa-solid fa-money-bill-transfer text-blue"></i>
+                          <span>Taux Forex &amp; Crypto Live</span>
+                        </div>
+                        <span class="bento-badge live-dot-badge"><span class="status-dot pulse-green"></span> BCE &amp; CoinGecko</span>
+                      </div>
+                      <div class="forex-crypto-rows" id="forex-crypto-rows">
+                        <!-- Injecté dynamiquement -->
+                      </div>
+                      <div class="quick-converter-bar">
+                        <div class="conv-input-group">
+                          <input type="number" id="quick-conv-amount" value="100" min="1" step="any" />
+                          <span class="conv-currency">EUR (€)</span>
+                        </div>
+                        <i class="fa-solid fa-arrow-right conv-arrow"></i>
+                        <div class="conv-result-group">
+                          <span id="quick-conv-result">108.20 $</span>
+                          <span class="conv-sub" id="quick-conv-btc">~ 0.00115 BTC</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 4. SECTION WATCHLIST COMPLÈTE & FILTRABLE (Présentation moderne type Apple Bourse) -->
+                  <div class="markets-watchlist-section">
+                    <div class="watchlist-section-header">
+                      <div class="watchlist-title-col">
+                        <h4 class="watchlist-title"><i class="fa-solid fa-list-check"></i> Watchlist &amp; Cotations Complètes</h4>
+                        <span class="watchlist-subtitle">Tableau de bord exhaustif de vos actions, ETF, indices, forex et cryptos</span>
+                      </div>
+                      <div class="watchlist-tools-row">
+                        <nav class="markets-nav-bar" aria-label="Catégories d'actifs">
+                          <div class="tab-group" id="markets-tab-group">
+                            <button type="button" class="tab-btn active" data-market-category="all"><i class="fa-solid fa-layer-group"></i> Tous</button>
+                            <button type="button" class="tab-btn" data-market-category="stock"><i class="fa-solid fa-building"></i> Actions</button>
+                            <button type="button" class="tab-btn" data-market-category="etf"><i class="fa-solid fa-landmark"></i> ETF &amp; Fonds</button>
+                            <button type="button" class="tab-btn" data-market-category="index"><i class="fa-solid fa-chart-line"></i> Indices</button>
+                            <button type="button" class="tab-btn" data-market-category="forex"><i class="fa-solid fa-money-bill-transfer"></i> Forex</button>
+                            <button type="button" class="tab-btn" data-market-category="commodity"><i class="fa-solid fa-coins"></i> Matières 1ères</button>
+                            <button type="button" class="tab-btn" data-market-category="crypto"><i class="fa-brands fa-bitcoin"></i> Cryptos</button>
+                          </div>
+                        </nav>
+                        <div class="watchlist-view-toggle">
+                          <button type="button" class="view-btn active" id="view-mode-list-btn" title="Vue Tableau / Liste">
+                            <i class="fa-solid fa-bars"></i>
+                          </button>
+                          <button type="button" class="view-btn" id="view-mode-grid-btn" title="Vue Grille">
+                            <i class="fa-solid fa-grip"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="markets-watchlist-body" id="crypto-ticker-cards">
+                      <!-- Cartes ou lignes de tableau injectées dynamiquement -->
+                    </div>
+                  </div>
+
+                  <!-- 5. MODALE / STUDIO DE GRAPHIQUE ÉPURÉ & INSTANTANÉ (24 DERNIÈRES HEURES) -->
                   <div id="market-chart-modal" class="market-chart-modal is-hidden" hidden style="display: none;">
                     <div class="market-chart-backdrop"></div>
                     <div class="market-chart-dialog">
@@ -880,11 +1041,9 @@
                         </div>
 
                         <div class="chart-dialog-controls">
-                          <div class="chart-timeframe-picker">
-                            <button type="button" class="tf-btn active" data-tf="1D">1J</button>
-                            <button type="button" class="tf-btn" data-tf="1W">1S</button>
-                            <button type="button" class="tf-btn" data-tf="1M">1M</button>
-                            <button type="button" class="tf-btn" data-tf="1Y">1A</button>
+                          <div class="chart-period-badge" id="chart-period-badge">
+                            <i class="fa-regular fa-clock"></i>
+                            <span>24 Dernières Heures (Intraday)</span>
                           </div>
                           <button type="button" id="chart-dialog-close-btn" class="deck-icon-action" title="Fermer (Échap)"><i class="fa-solid fa-xmark"></i></button>
                         </div>
@@ -925,11 +1084,11 @@
                           </div>
                         </div>
 
-                        <!-- Axe temporel simplifié -->
+                        <!-- Axe temporel simplifié (24 Heures) -->
                         <div class="chart-time-axis">
-                          <span id="chart-time-start">Ouverture</span>
-                          <span id="chart-time-mid">Mi-Séance</span>
-                          <span id="chart-time-end">En Direct</span>
+                          <span id="chart-time-start">Il y a 24h</span>
+                          <span id="chart-time-mid">Il y a 12h</span>
+                          <span id="chart-time-end">Maintenant (En Direct)</span>
                         </div>
                       </div>
 

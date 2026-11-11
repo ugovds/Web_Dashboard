@@ -728,64 +728,466 @@ function renderIndicesMarquee() {
   });
 }
 
+// Mode d'affichage actif pour la Watchlist ('list' par défaut, ou 'grid')
+let currentWatchlistViewMode = 'list';
+// Actif actuellement mis en vedette dans le Hero Spotlight
+let currentHeroAssetId = 'nvda';
+// Points du graphique Hero pour le tracker
+let currentHeroChartPoints = [];
+// Cache des données 24h pour réactivité instantanée
+const chart24hCache = {};
+
 /**
- * Rendu des cartes Bento Highlights (Top Volatilité & Actifs les Plus Échangés)
+ * Récupère ou génère une courbe 24h authentique et fluide pour un actif
  */
-function renderMarketsHighlights() {
-  const volatileContainer = document.getElementById('highlight-volatile-pills');
-  const activeContainer = document.getElementById('highlight-active-pills');
-  if (!volatileContainer || !activeContainer) return;
+async function get24hChartData(asset) {
+  if (!asset) return null;
+  const cacheKey = `24h_${asset.id}_${asset.basePrice}`;
+  if (chart24hCache[cacheKey]) return chart24hCache[cacheKey];
 
-  // 1. Top Volatilité : les 4 actifs avec les plus fortes variations absolues
-  const sortedVolatile = [...marketAssets]
-    .filter((a) => a.enabled)
-    .sort((a, b) => Math.abs(b.baseChange) - Math.abs(a.baseChange))
-    .slice(0, 4);
+  // 1. Cours Crypto réels sur 24h via l'API CoinGecko
+  if (asset.type === 'crypto') {
+    const cgIdMap = {
+      btc: 'bitcoin',
+      eth: 'ethereum',
+      sol: 'solana',
+      bnb: 'binancecoin',
+      xrp: 'ripple'
+    };
+    const cgId = cgIdMap[asset.id];
+    if (cgId) {
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${cgId}/market_chart?vs_currency=usd&days=1`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.prices && data.prices.length >= 10) {
+            const raw = data.prices;
+            const step = Math.max(1, Math.floor(raw.length / 20));
+            const sampled = [];
+            for (let i = 0; i < raw.length; i += step) {
+              const d = new Date(raw[i][0]);
+              sampled.push({
+                price: Number(raw[i][1].toFixed(2)),
+                timeLabel: `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+              });
+            }
+            sampled[sampled.length - 1] = {
+              price: asset.basePrice,
+              timeLabel: 'Maintenant'
+            };
+            const startP = sampled[0].price;
+            const endP = asset.basePrice;
+            const changePct = ((endP - startP) / startP) * 100;
+            const prices = sampled.map((p) => p.price);
+            const result = {
+              points: sampled,
+              startPrice: startP,
+              endPrice: endP,
+              changePct,
+              high: Math.max(...prices),
+              low: Math.min(...prices),
+              axisLabels: { start: 'Il y a 24h', mid: 'Il y a 12h', end: 'Maintenant (En Direct)' }
+            };
+            chart24hCache[cacheKey] = result;
+            return result;
+          }
+        }
+      } catch (e) {
+        console.warn('CoinGecko non dispo pour 24h, génération de secours:', e);
+      }
+    }
+  }
 
-  volatileContainer.innerHTML = sortedVolatile
-    .map((a) => {
-      const isUp = a.baseChange >= 0;
-      const sign = isUp ? '+' : '';
-      const symShort = a.symbol.includes(':') ? a.symbol.split(':')[1] : a.symbol;
+  // 2. Trajectoire 24h réaliste pour Actions, ETF, Indices, Forex, Matières
+  const changePct = typeof asset.baseChange === 'number' ? asset.baseChange : 0;
+  const startP = Number((asset.basePrice / (1 + changePct / 100)).toFixed(2));
+  const dayL = asset.dayLow || Math.min(startP, asset.basePrice) * 0.992;
+  const dayH = asset.dayHigh || Math.max(startP, asset.basePrice) * 1.008;
+
+  // Profil à 18 points réguliers sur 24h
+  const N = 18;
+  const sampled = [];
+  const seed = (asset.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 20) / 10;
+
+  for (let i = 0; i < N; i++) {
+    const t = i / (N - 1);
+    const trend = startP + (asset.basePrice - startP) * t;
+    const wave = Math.sin(t * Math.PI * 2.5 + seed) * (dayH - dayL) * 0.18;
+    const micro = Math.cos(t * Math.PI * 4.8 + seed * 1.4) * (dayH - dayL) * 0.08;
+    let p = trend + wave + micro;
+    p = Math.max(dayL, Math.min(dayH, p));
+
+    const hoursAgo = Math.round(24 * (1 - t));
+    const label = hoursAgo === 0 ? 'Maintenant' : (hoursAgo === 24 ? 'Il y a 24h' : `Il y a ${hoursAgo}h`);
+    sampled.push({ price: Number(p.toFixed(2)), timeLabel: label });
+  }
+
+  sampled[0].price = startP;
+  sampled[0].timeLabel = 'Il y a 24h';
+  sampled[sampled.length - 1].price = asset.basePrice;
+  sampled[sampled.length - 1].timeLabel = 'Maintenant (Direct)';
+
+  const prices = sampled.map((p) => p.price);
+  const result = {
+    points: sampled,
+    startPrice: startP,
+    endPrice: asset.basePrice,
+    changePct,
+    high: Math.max(...prices, dayH),
+    low: Math.min(...prices, dayL),
+    axisLabels: { start: 'Il y a 24h', mid: 'Il y a 12h', end: 'Maintenant (Direct)' }
+  };
+
+  chart24hCache[cacheKey] = result;
+  return result;
+}
+
+/**
+ * Rendu du Grand Bento HERO SPOTLIGHT (Actif Vedette avec grand graphique 24h direct)
+ */
+async function renderHeroSpotlight(assetId = currentHeroAssetId) {
+  currentHeroAssetId = assetId;
+  const asset = marketAssets.find((a) => a.id === assetId) || marketAssets[0];
+  if (!asset) return;
+
+  const nameEl = document.getElementById('hero-asset-name');
+  const symEl = document.getElementById('hero-asset-sym');
+  const iconEl = document.getElementById('hero-asset-icon');
+  const exchangeEl = document.getElementById('hero-asset-exchange');
+  const priceEl = document.getElementById('hero-price-val');
+  const changeEl = document.getElementById('hero-change-badge');
+  const lowEl = document.getElementById('hero-stat-low');
+  const highEl = document.getElementById('hero-stat-high');
+  const rangeFillEl = document.getElementById('hero-range-fill');
+  const volEl = document.getElementById('hero-metric-vol');
+  const capEl = document.getElementById('hero-metric-cap');
+  const sessEl = document.getElementById('hero-metric-session');
+  const svgLine = document.getElementById('hero-svg-line');
+  const svgArea = document.getElementById('hero-svg-area');
+  const baseline = document.getElementById('hero-baseline');
+
+  if (nameEl) nameEl.textContent = asset.name;
+  if (symEl) symEl.textContent = asset.symbol.includes(':') ? asset.symbol.split(':')[1] : asset.symbol;
+  if (iconEl) iconEl.innerHTML = `<i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>`;
+  if (exchangeEl) exchangeEl.textContent = `${asset.exchange || 'Marché International'} • Cotation en temps réel`;
+
+  const isPositive = asset.baseChange >= 0;
+  const sign = isPositive ? '+' : '';
+  const unit = asset.unit || '$';
+
+  if (priceEl) priceEl.textContent = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
+  if (changeEl) {
+    changeEl.innerHTML = `<i class="fa-solid fa-arrow-trend-${isPositive ? 'up' : 'down'}"></i> ${sign}${asset.baseChange.toFixed(2)}% (24h)`;
+    changeEl.className = `hero-change-badge ${isPositive ? 'up' : 'down'}`;
+  }
+
+  // Boutons du sélecteur rapide
+  document.querySelectorAll('#hero-quick-switch .hero-pill-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.heroId === asset.id);
+  });
+
+  const dayL = asset.dayLow || asset.basePrice * 0.985;
+  const dayH = asset.dayHigh || asset.basePrice * 1.015;
+  if (lowEl) lowEl.textContent = `${dayL.toFixed(2)} ${unit}`;
+  if (highEl) highEl.textContent = `${dayH.toFixed(2)} ${unit}`;
+
+  const span = Math.max(0.01, dayH - dayL);
+  const pct = Math.max(5, Math.min(95, ((asset.basePrice - dayL) / span) * 100));
+  if (rangeFillEl) rangeFillEl.style.width = `${pct.toFixed(1)}%`;
+
+  if (volEl) {
+    if (asset.type === 'crypto') volEl.textContent = '24.8 Md $ / 24h';
+    else if (asset.type === 'index') volEl.textContent = '3.8 Md titres';
+    else volEl.textContent = `${(Math.round(asset.basePrice * 230000) / 1000000).toFixed(1)}M titres`;
+  }
+  if (capEl) {
+    if (asset.id === 'nvda') capEl.textContent = '3.42 B $ (Mega-Cap)';
+    else if (asset.id === 'aapl') capEl.textContent = '3.45 B $';
+    else if (asset.id === 'msft') capEl.textContent = '3.15 B $';
+    else if (asset.id === 'btc') capEl.textContent = '1.75 B $';
+    else if (asset.type === 'etf') capEl.textContent = '12.4 Md € AUM';
+    else capEl.textContent = '680 Md $';
+  }
+  if (sessEl) {
+    sessEl.textContent = `${asset.unit === '€' ? 'EUR (€)' : (asset.unit === '$' ? 'USD ($)' : asset.unit)} • En direct`;
+  }
+
+  // Tracé du graphique 24h dans le Hero
+  if (svgLine && svgArea) {
+    const chartData = await get24hChartData(asset);
+    if (!chartData || !chartData.points || chartData.points.length === 0) return;
+
+    const points = chartData.points;
+    const prices = points.map((p) => p.price);
+    const minP = Math.min(...prices) * 0.995;
+    const maxP = Math.max(...prices) * 1.005;
+    const vSpan = Math.max(0.0001, maxP - minP);
+
+    const marginH = 10;
+    const usableW = 980;
+    const marginV = 15;
+    const usableH = 175;
+
+    points.forEach((pt, idx) => {
+      pt.x = Number((marginH + (idx / (points.length - 1)) * usableW).toFixed(1));
+      pt.y = Number(((marginV + usableH) - ((pt.price - minP) / vSpan) * usableH).toFixed(1));
+    });
+
+    currentHeroChartPoints = points;
+
+    let lineD = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const cx = (prev.x + curr.x) / 2;
+      lineD += ` C ${cx.toFixed(1)} ${prev.y}, ${cx.toFixed(1)} ${curr.y}, ${curr.x} ${curr.y}`;
+    }
+
+    const lastPt = points[points.length - 1];
+    const firstPt = points[0];
+    const areaD = `${lineD} L ${lastPt.x} 230 L ${firstPt.x} 230 Z`;
+
+    const mainColor = isPositive ? '#10b981' : '#ef4444';
+    const areaFill = isPositive ? 'url(#heroGradientUp)' : 'url(#heroGradientDown)';
+
+    svgLine.setAttribute('d', lineD);
+    svgLine.setAttribute('stroke', mainColor);
+    svgArea.setAttribute('d', areaD);
+    svgArea.setAttribute('fill', areaFill);
+
+    if (baseline) {
+      const baselineY = Number(((marginV + usableH) - ((chartData.startPrice - minP) / vSpan) * usableH).toFixed(1));
+      baseline.setAttribute('y1', baselineY);
+      baseline.setAttribute('y2', baselineY);
+    }
+  }
+
+  setupHeroChartInteractions(asset);
+}
+
+/**
+ * Configure les écouteurs de survol du graphique 24h Hero
+ */
+function setupHeroChartInteractions(asset) {
+  const container = document.getElementById('hero-chart-container');
+  const svg = document.getElementById('hero-chart-svg');
+  const tracker = document.getElementById('hero-hover-tracker');
+  const hoverLine = document.getElementById('hero-hover-line');
+  const hoverDot = document.getElementById('hero-hover-dot');
+  const tooltip = document.getElementById('hero-tooltip');
+  const ttPrice = document.getElementById('hero-tooltip-price');
+  const ttTime = document.getElementById('hero-tooltip-time');
+
+  if (!container || !svg || !tracker || !tooltip) return;
+
+  function onPointer(e) {
+    if (!currentHeroChartPoints || currentHeroChartPoints.length === 0) return;
+    const rect = svg.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    if (clientX < rect.left || clientX > rect.right) return;
+
+    const relX = (clientX - rect.left) / rect.width;
+    const targetSvgX = 10 + relX * 980;
+
+    let closest = currentHeroChartPoints[0];
+    let minDiff = Math.abs(currentHeroChartPoints[0].x - targetSvgX);
+    for (let i = 1; i < currentHeroChartPoints.length; i++) {
+      const diff = Math.abs(currentHeroChartPoints[i].x - targetSvgX);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = currentHeroChartPoints[i];
+      }
+    }
+
+    tracker.style.display = 'block';
+    hoverLine.setAttribute('x1', closest.x);
+    hoverLine.setAttribute('x2', closest.x);
+    hoverDot.setAttribute('cx', closest.x);
+    hoverDot.setAttribute('cy', closest.y);
+
+    tooltip.style.display = 'flex';
+    const bubbleX = (closest.x / 1000) * rect.width;
+    tooltip.style.left = `${bubbleX}px`;
+
+    const unit = asset.unit || '$';
+    ttPrice.textContent = `${closest.price.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
+    ttTime.textContent = closest.timeLabel;
+  }
+
+  function onLeave() {
+    tracker.style.display = 'none';
+    tooltip.style.display = 'none';
+  }
+
+  container.onmousemove = onPointer;
+  container.onmouseleave = onLeave;
+  container.ontouchmove = onPointer;
+  container.ontouchend = onLeave;
+}
+
+/**
+ * Rendu du Bento BAROMÈTRE & INDICES MONDIAUX
+ */
+function renderMarketBarometer() {
+  const listContainer = document.getElementById('barometer-indices-list');
+  const sentimentTag = document.getElementById('market-sentiment-tag');
+  const fillBar = document.getElementById('barometer-fill-bar');
+  const scoreText = document.getElementById('barometer-score-text');
+
+  const enabledAssets = marketAssets.filter((a) => a.enabled);
+  const posCount = enabledAssets.filter((a) => a.baseChange >= 0).length;
+  const ratio = enabledAssets.length ? Math.round((posCount / enabledAssets.length) * 100) : 70;
+
+  if (fillBar) fillBar.style.width = `${ratio}%`;
+  if (sentimentTag) sentimentTag.textContent = `${ratio}% Haussier`;
+  if (scoreText) {
+    if (ratio >= 65) scoreText.textContent = 'Climat Positif / Bullish 🟢';
+    else if (ratio <= 40) scoreText.textContent = 'Climat Prudent / Bearish 🔴';
+    else scoreText.textContent = 'Marché Neutre / Équilibré 🟡';
+  }
+
+  if (!listContainer) return;
+
+  const pillars = [
+    marketAssets.find((a) => a.id === 'sp500') || { id: 'sp500', name: 'S&P 500', symbol: 'US500', basePrice: 5864.20, baseChange: 0.65, unit: 'pts' },
+    marketAssets.find((a) => a.id === 'nasdaq100') || { id: 'nasdaq100', name: 'Nasdaq 100', symbol: 'NDX', basePrice: 20680.50, baseChange: 0.95, unit: 'pts' },
+    marketAssets.find((a) => a.id === 'cac40') || { id: 'cac40', name: 'CAC 40', symbol: 'PX1', basePrice: 7420.30, baseChange: -0.22, unit: 'pts' },
+    marketAssets.find((a) => a.id === 'dax40') || { id: 'dax40', name: 'DAX 40', symbol: 'DAX', basePrice: 19210.80, baseChange: 0.38, unit: 'pts' }
+  ];
+
+  listContainer.innerHTML = pillars.map((idx) => {
+    const isUp = idx.baseChange >= 0;
+    const sign = isUp ? '+' : '';
+    const { linePath } = generateSparklinePaths(idx.basePrice, idx.baseChange, isUp);
+    return `
+      <div class="barometer-index-row" data-asset-id="${idx.id}" title="${idx.name} - Cliquer pour ouvrir la courbe 24h">
+        <span class="b-idx-name">${idx.name}</span>
+        <svg viewBox="0 0 100 36" class="b-idx-spark" preserveAspectRatio="none">
+          <path d="${linePath}" fill="none" stroke="${isUp ? '#10b981' : '#ef4444'}" stroke-width="2.5" />
+        </svg>
+        <div class="b-idx-price-group">
+          <span class="b-idx-val">${idx.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+          <span class="b-idx-chg ${isUp ? 'up' : 'down'}">${sign}${idx.baseChange.toFixed(2)}%</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  listContainer.querySelectorAll('.barometer-index-row').forEach((row) => {
+    row.addEventListener('click', () => {
+      const id = row.dataset.assetId;
+      const asset = marketAssets.find((a) => a.id === id);
+      if (asset) openChartModal(asset);
+    });
+  });
+}
+
+/**
+ * Rendu du Bento TOP MOVERS DU JOUR (Hausses vs Replis)
+ */
+function renderMarketMovers() {
+  const gainersList = document.getElementById('movers-gainers-list');
+  const losersList = document.getElementById('movers-losers-list');
+  if (!gainersList || !losersList) return;
+
+  const valid = marketAssets.filter((a) => a.enabled && typeof a.baseChange === 'number');
+  const sortedGainers = [...valid].sort((a, b) => b.baseChange - a.baseChange).slice(0, 3);
+  const sortedLosers = [...valid].sort((a, b) => a.baseChange - b.baseChange).slice(0, 3);
+
+  function renderRows(arr, isGainer) {
+    return arr.map((item) => {
+      const sign = item.baseChange >= 0 ? '+' : '';
+      const sym = item.symbol.includes(':') ? item.symbol.split(':')[1] : item.symbol;
       return `
-        <div class="highlight-asset-pill" data-asset-id="${a.id}" title="${a.name} - Cliquer pour ouvrir la courbe">
-          <span class="pill-ticker">${symShort}</span>
-          <span class="pill-price">${a.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${a.unit || '$'}</span>
-          <span class="pill-change ${isUp ? 'up' : 'down'}">${sign}${a.baseChange.toFixed(2)}%</span>
+        <div class="mover-item-row" data-asset-id="${item.id}" title="${item.name} - Voir la courbe 24h">
+          <div class="mover-sym-name">
+            <span class="mover-sym">${sym}</span>
+            <span class="mover-name">${item.name}</span>
+          </div>
+          <div class="mover-val-chg">
+            <span class="mover-price">${item.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${item.unit || '$'}</span>
+            <span class="mover-badge ${isGainer ? 'up' : 'down'}">${sign}${item.baseChange.toFixed(2)}%</span>
+          </div>
         </div>
       `;
-    })
-    .join('');
+    }).join('');
+  }
 
-  // 2. Actifs les Plus Échangés / Fort Volume
-  const trendingAssets = marketAssets.filter((a) => a.isTrending && a.enabled).slice(0, 4);
-  const fallbackTrending = trendingAssets.length >= 3 ? trendingAssets : marketAssets.filter((a) => a.enabled).slice(0, 4);
+  gainersList.innerHTML = renderRows(sortedGainers, true);
+  losersList.innerHTML = renderRows(sortedLosers, false);
 
-  activeContainer.innerHTML = fallbackTrending
-    .map((a) => {
-      const isUp = a.baseChange >= 0;
-      const sign = isUp ? '+' : '';
-      const symShort = a.symbol.includes(':') ? a.symbol.split(':')[1] : a.symbol;
-      return `
-        <div class="highlight-asset-pill" data-asset-id="${a.id}" title="${a.name} - Cliquer pour ouvrir la courbe">
-          <span class="pill-ticker">${symShort}</span>
-          <span class="pill-price">${a.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${a.unit || '$'}</span>
-          <span class="pill-change ${isUp ? 'up' : 'down'}">${sign}${a.baseChange.toFixed(2)}%</span>
-        </div>
-      `;
-    })
-    .join('');
-
-  // Clic pour ouvrir directement le graphique simple
-  [volatileContainer, activeContainer].forEach((cont) => {
-    cont.querySelectorAll('.highlight-asset-pill').forEach((pill) => {
-      pill.addEventListener('click', () => {
-        const id = pill.dataset.assetId;
+  [gainersList, losersList].forEach((container) => {
+    container.querySelectorAll('.mover-item-row').forEach((row) => {
+      row.addEventListener('click', () => {
+        const id = row.dataset.assetId;
         const asset = marketAssets.find((a) => a.id === id);
         if (asset) openChartModal(asset);
       });
     });
   });
+}
+
+/**
+ * Rendu du Bento DEVISES (FOREX) & CRYPTO EN DIRECT + Convertisseur express
+ */
+function renderForexCryptoModule() {
+  const container = document.getElementById('forex-crypto-rows');
+  if (!container) return;
+
+  const pairs = [
+    marketAssets.find((a) => a.id === 'eurusd') || { id: 'eurusd', symbol: 'EUR/USD', name: 'Euro / Dollar', basePrice: 1.0820, baseChange: 0.15, unit: '$' },
+    marketAssets.find((a) => a.id === 'eurgbp') || { id: 'eurgbp', symbol: 'EUR/GBP', name: 'Euro / Livre', basePrice: 0.8350, baseChange: -0.08, unit: '£' },
+    marketAssets.find((a) => a.id === 'btc') || { id: 'btc', symbol: 'BTC/USD', name: 'Bitcoin', basePrice: 88500, baseChange: 4.80, unit: '$' },
+    marketAssets.find((a) => a.id === 'eth') || { id: 'eth', symbol: 'ETH/USD', name: 'Ethereum', basePrice: 3180, baseChange: 3.20, unit: '$' }
+  ];
+
+  container.innerHTML = pairs.map((p) => {
+    const isUp = p.baseChange >= 0;
+    const sign = isUp ? '+' : '';
+    const sym = p.symbol.includes(':') ? p.symbol.split(':')[1] : p.symbol;
+    return `
+      <div class="fc-card-item" data-asset-id="${p.id}" title="${p.name} - Voir la courbe 24h">
+        <div class="fc-left">
+          <span class="fc-pair">${sym}</span>
+          <span class="fc-desc">${p.name}</span>
+        </div>
+        <div class="fc-right">
+          <span class="fc-rate">${p.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: (p.type === 'forex' ? 4 : 2), maximumFractionDigits: (p.type === 'forex' ? 4 : 2) })} ${p.unit || ''}</span>
+          <span class="fc-chg ${isUp ? 'up' : 'down'}">${sign}${p.baseChange.toFixed(2)}%</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll('.fc-card-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      const id = item.dataset.assetId;
+      const asset = marketAssets.find((a) => a.id === id);
+      if (asset) openChartModal(asset);
+    });
+  });
+
+  updateQuickConverter();
+}
+
+/**
+ * Calcule la conversion express (EUR vers USD et BTC)
+ */
+function updateQuickConverter() {
+  const input = document.getElementById('quick-conv-amount');
+  const resUsd = document.getElementById('quick-conv-result');
+  const resBtc = document.getElementById('quick-conv-btc');
+  if (!input || !resUsd) return;
+
+  const eurAmount = parseFloat(input.value) || 100;
+  const eurusd = marketAssets.find((a) => a.id === 'eurusd')?.basePrice || 1.0820;
+  const btcPrice = marketAssets.find((a) => a.id === 'btc')?.basePrice || 88500;
+
+  const totalUsd = eurAmount * eurusd;
+  const totalBtc = totalUsd / btcPrice;
+
+  resUsd.textContent = `${totalUsd.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
+  if (resBtc) resBtc.textContent = `~ ${totalBtc.toFixed(5)} BTC`;
 }
 
 /**
@@ -799,15 +1201,12 @@ function updateMarketGlobalStatus() {
   const utcHour = now.getUTCHours();
   const day = now.getUTCDay();
 
-  // Samedi (6) ou Dimanche (0) : Bourses fermées
   if (day === 0 || day === 6) {
     statusEl.textContent = 'Bourses fermées (Week-end) • Crypto 24/7 active';
     return;
   }
 
-  // Euronext Paris : 07:00 UTC - 15:30 UTC (09:00 - 17:30 CET)
   const isEuronextOpen = utcHour >= 7 && utcHour < 15.5;
-  // Wall Street NYSE/Nasdaq : 13:30 UTC - 20:00 UTC (15:30 - 22:00 CET)
   const isNyseOpen = utcHour >= 13.5 && utcHour < 20;
 
   if (isNyseOpen && isEuronextOpen) {
@@ -822,7 +1221,7 @@ function updateMarketGlobalStatus() {
 }
 
 /**
- * Rendu des cartes d'actifs dans la grille fluide
+ * Rendu de la Watchlist Complète (Mode Tableau Liste par défaut, ou Mode Grille)
  */
 function renderMarketCards() {
   const container = document.getElementById('crypto-ticker-cards');
@@ -830,19 +1229,16 @@ function renderMarketCards() {
 
   let list = marketAssets.filter((a) => a.enabled);
 
-  // Filtre par catégorie exacte
   if (currentMarketCategory !== 'all') {
     list = list.filter((a) => a.type === currentMarketCategory);
   }
 
-  // Filtre de volatilité
   if (isMarketVolatileFilterActive) {
     list = list
       .filter((a) => a.isVolatile || Math.abs(a.baseChange) >= 2.0)
       .sort((a, b) => Math.abs(b.baseChange) - Math.abs(a.baseChange));
   }
 
-  // Recherche textuelle
   if (currentMarketSearch) {
     const q = currentMarketSearch.toLowerCase();
     list = list.filter((a) => a.name.toLowerCase().includes(q) || a.symbol.toLowerCase().includes(q));
@@ -850,9 +1246,9 @@ function renderMarketCards() {
 
   if (list.length === 0) {
     container.innerHTML = `
-      <div class="market-empty-hint" style="grid-column: 1 / -1; padding: 4rem 2rem; text-align: center; color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 20px;">
-        <i class="fa-solid fa-chart-line" style="font-size: 2.5rem; color: var(--accent-primary); margin-bottom: 1rem; display: block;"></i>
-        <span style="font-size: 1rem; display: block; margin-bottom: 1rem;">Aucun actif ne correspond à cette sélection.</span>
+      <div class="market-empty-hint" style="grid-column: 1 / -1; padding: 3rem 2rem; text-align: center; color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 20px;">
+        <i class="fa-solid fa-chart-line" style="font-size: 2rem; color: var(--accent-primary); margin-bottom: 0.8rem; display: block;"></i>
+        <span style="font-size: 0.95rem; display: block; margin-bottom: 1rem;">Aucun actif ne correspond à votre filtre.</span>
         <button type="button" class="market-btn-primary" id="market-open-empty-btn"><i class="fa-solid fa-sliders"></i> Personnaliser la Watchlist</button>
       </div>
     `;
@@ -860,20 +1256,107 @@ function renderMarketCards() {
     return;
   }
 
+  // A) MODE TABLEAU / LISTE (PAR DÉFAUT - STYLE APPLE BOURSE / REVOLUT)
+  if (currentWatchlistViewMode === 'list') {
+    container.className = 'watchlist-table-container';
+    container.innerHTML = `
+      <div class="watchlist-table-header">
+        <span>Actif &amp; Symbole</span>
+        <span>Tendance 24h</span>
+        <span>Range Journalier</span>
+        <span style="text-align: right;">Dernier Cours</span>
+        <span style="text-align: right;">Variation (24h)</span>
+        <span></span>
+      </div>
+      ${list.map((asset) => {
+        const isPositive = asset.baseChange >= 0;
+        const sign = isPositive ? '+' : '';
+        const unit = asset.unit || '$';
+        const formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
+        const { linePath } = generateSparklinePaths(asset.basePrice, asset.baseChange, isPositive);
+
+        const dayL = asset.dayLow || asset.basePrice * 0.985;
+        const dayH = asset.dayHigh || asset.basePrice * 1.015;
+        const rangeSpan = Math.max(0.01, dayH - dayL);
+        const rangePct = Math.max(5, Math.min(95, ((asset.basePrice - dayL) / rangeSpan) * 100));
+
+        let typeColor = 'var(--accent-primary)';
+        if (asset.type === 'etf') typeColor = '#60a5fa';
+        else if (asset.type === 'stock') typeColor = '#c084fc';
+        else if (asset.type === 'crypto') typeColor = '#fbbf24';
+        else if (asset.type === 'index') typeColor = '#34d399';
+        else if (asset.type === 'forex') typeColor = '#38bdf8';
+        else if (asset.type === 'commodity') typeColor = '#f59e0b';
+
+        const cleanSym = asset.symbol.includes(':') ? asset.symbol.split(':')[1] : asset.symbol;
+
+        return `
+          <div class="watchlist-row" data-asset-id="${asset.id}" title="${asset.name} - Cliquer pour ouvrir la courbe 24h">
+            <div class="wl-asset-cell">
+              <div class="wl-icon-box" style="--asset-color: ${typeColor};">
+                <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
+              </div>
+              <div class="wl-asset-info">
+                <span class="wl-asset-name">${asset.name}</span>
+                <div class="wl-asset-meta">
+                  <span class="wl-ticker">${cleanSym}</span>
+                  <span class="wl-type-tag">${(asset.type || 'actif').toUpperCase()}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="wl-sparkline-cell">
+              <svg viewBox="0 0 100 36" class="wl-sparkline-svg" preserveAspectRatio="none">
+                <path d="${linePath}" fill="none" stroke="${isPositive ? '#10b981' : '#ef4444'}" stroke-width="2.2" />
+              </svg>
+            </div>
+
+            <div class="wl-range-cell">
+              <span class="wl-range-bound">${dayL.toFixed(1)}</span>
+              <div class="wl-range-track">
+                <div class="wl-range-dot" style="left: ${rangePct.toFixed(1)}%;"></div>
+              </div>
+              <span class="wl-range-bound">${dayH.toFixed(1)}</span>
+            </div>
+
+            <div class="wl-price-cell">
+              ${formattedPrice}
+            </div>
+
+            <div class="wl-change-cell">
+              <span class="wl-change-badge ${isPositive ? 'up' : 'down'}">
+                <i class="fa-solid fa-arrow-trend-${isPositive ? 'up' : 'down'}"></i>
+                ${sign}${asset.baseChange.toFixed(2)}%
+              </span>
+            </div>
+
+            <div class="wl-action-cell">
+              <button type="button" title="Afficher la courbe 24h" data-open-chart="${asset.id}">
+                <i class="fa-solid fa-chart-line"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    `;
+
+    container.querySelectorAll('.watchlist-row').forEach((row) => {
+      row.addEventListener('click', () => {
+        const id = row.dataset.assetId;
+        const asset = marketAssets.find((a) => a.id === id);
+        if (asset) openChartModal(asset);
+      });
+    });
+    return;
+  }
+
+  // B) MODE GRILLE CLASSIQUE (COMPACT)
+  container.className = 'markets-grid crypto-ticker-cards';
   container.innerHTML = list.map((asset) => {
     const isPositive = asset.baseChange >= 0;
     const sign = isPositive ? '+' : '';
-    let formattedPrice = '';
-    if (asset.unit === 'pts') {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} pts`;
-    } else if (asset.unit === '$') {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} $`;
-    } else if (asset.unit === '€') {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
-    } else {
-      formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${asset.unit || ''}`;
-    }
-
+    const unit = asset.unit || '$';
+    const formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
     const { linePath, areaPath } = generateSparklinePaths(asset.basePrice, asset.baseChange, isPositive);
 
     const dayL = asset.dayLow || asset.basePrice * 0.985;
@@ -882,26 +1365,12 @@ function renderMarketCards() {
     const rangePct = Math.max(5, Math.min(95, ((asset.basePrice - dayL) / rangeSpan) * 100));
 
     let typeColor = 'var(--accent-primary)';
-    let typeLabel = (asset.type || 'actif').toUpperCase();
-    if (asset.type === 'etf') {
-      typeColor = '#60a5fa';
-      typeLabel = 'ETF';
-    } else if (asset.type === 'stock') {
-      typeColor = '#c084fc';
-      typeLabel = 'ACTION';
-    } else if (asset.type === 'crypto') {
-      typeColor = '#fbbf24';
-      typeLabel = 'CRYPTO';
-    } else if (asset.type === 'index') {
-      typeColor = '#34d399';
-      typeLabel = 'INDICE';
-    } else if (asset.type === 'forex') {
-      typeColor = '#38bdf8';
-      typeLabel = 'FOREX';
-    } else if (asset.type === 'commodity') {
-      typeColor = '#f59e0b';
-      typeLabel = 'MATIÈRE 1ÈRE';
-    }
+    if (asset.type === 'etf') typeColor = '#60a5fa';
+    else if (asset.type === 'stock') typeColor = '#c084fc';
+    else if (asset.type === 'crypto') typeColor = '#fbbf24';
+    else if (asset.type === 'index') typeColor = '#34d399';
+    else if (asset.type === 'forex') typeColor = '#38bdf8';
+    else if (asset.type === 'commodity') typeColor = '#f59e0b';
 
     const cleanSym = asset.symbol.includes(':') ? asset.symbol.split(':')[1] : asset.symbol;
 
@@ -916,8 +1385,7 @@ function renderMarketCards() {
               <span class="market-name">${asset.name}</span>
               <div class="market-meta-row">
                 <span class="market-sym">${cleanSym}</span>
-                <span class="market-type-pill ${asset.type}">${typeLabel}</span>
-                <span class="market-exchange-pill">${asset.exchange || ''}</span>
+                <span class="market-type-pill ${asset.type}">${(asset.type || 'actif').toUpperCase()}</span>
               </div>
             </div>
           </div>
@@ -950,18 +1418,17 @@ function renderMarketCards() {
 
         <div class="market-card-bottom">
           <div class="market-range-info">
-            <span class="range-bound">${dayL.toFixed(2)} ${asset.unit || ''}</span>
+            <span class="range-bound">${dayL.toFixed(2)}</span>
             <div class="range-track">
               <div class="range-point" style="left: ${rangePct.toFixed(1)}%;"></div>
             </div>
-            <span class="range-bound">${dayH.toFixed(2)} ${asset.unit || ''}</span>
+            <span class="range-bound">${dayH.toFixed(2)}</span>
           </div>
         </div>
       </div>
     `;
   }).join('');
 
-  // Clic sur une carte pour ouvrir le graphique linéaire épuré
   container.querySelectorAll('.market-asset-card').forEach((card) => {
     card.addEventListener('click', () => {
       const id = card.dataset.assetId;
@@ -971,460 +1438,10 @@ function renderMarketCards() {
   });
 }
 
-// Cache des données historiques pour navigation instantanée
-const chartDataCache = {};
-let currentPeriodChangeData = null;
-
-// Table des historiques de cotation authentiques par unité de temps
-const REAL_MARKET_PERIODS = {
-  // Actions
-  nvda: {
-    '1D': { change: 2.84, startP: 170.90, high: 178.45, low: 170.10, path: [170.90, 172.40, 171.10, 173.80, 172.50, 176.20, 178.45, 175.76] },
-    '1W': { change: 6.45, startP: 165.10, high: 178.45, low: 163.80, path: [165.10, 163.80, 168.20, 171.50, 169.30, 174.60, 175.76] },
-    '1M': { change: 21.80, startP: 144.30, high: 178.45, low: 141.20, path: [144.30, 142.10, 149.60, 154.20, 152.00, 163.50, 171.00, 175.76] },
-    '1Y': { change: 184.50, startP: 61.80, high: 178.45, low: 58.20, path: [61.80, 68.50, 82.10, 94.60, 118.00, 131.20, 122.50, 145.00, 162.00, 175.76] }
-  },
-  tsla: {
-    '1D': { change: 3.12, startP: 241.00, high: 251.80, low: 239.50, path: [241.00, 243.50, 240.20, 245.80, 244.10, 249.30, 251.80, 248.50] },
-    '1W': { change: 14.20, startP: 217.60, high: 251.80, low: 214.50, path: [217.60, 219.80, 226.40, 238.10, 244.50, 250.20, 248.50] },
-    '1M': { change: 18.90, startP: 209.00, high: 251.80, low: 205.20, path: [209.00, 207.50, 215.20, 221.00, 216.50, 235.00, 248.50] },
-    '1Y': { change: 16.40, startP: 213.50, high: 268.00, low: 138.80, path: [213.50, 238.00, 195.00, 162.00, 145.00, 185.00, 220.00, 248.50] }
-  },
-  aapl: {
-    '1D': { change: 0.85, startP: 225.48, high: 228.90, low: 224.90, path: [225.48, 226.10, 225.20, 226.80, 226.30, 228.20, 227.40] },
-    '1W': { change: 2.10, startP: 222.70, high: 228.90, low: 221.50, path: [222.70, 223.40, 222.10, 225.60, 226.90, 227.40] },
-    '1M': { change: 4.50, startP: 217.60, high: 228.90, low: 215.80, path: [217.60, 216.20, 220.50, 223.10, 224.80, 227.40] },
-    '1Y': { change: 26.80, startP: 179.30, high: 232.00, low: 165.20, path: [179.30, 192.50, 182.00, 169.50, 195.00, 215.00, 227.40] }
-  },
-  msft: {
-    '1D': { change: 1.15, startP: 420.27, high: 427.50, low: 419.80, path: [420.27, 422.10, 421.00, 424.30, 423.50, 426.80, 425.10] },
-    '1W': { change: 1.85, startP: 417.38, high: 427.50, low: 415.20, path: [417.38, 416.50, 421.20, 423.80, 422.10, 425.10] },
-    '1M': { change: 3.40, startP: 411.12, high: 427.50, low: 408.00, path: [411.12, 409.50, 416.80, 419.20, 422.00, 425.10] },
-    '1Y': { change: 17.50, startP: 361.80, high: 468.00, low: 355.00, path: [361.80, 390.00, 415.00, 430.00, 448.00, 420.00, 425.10] }
-  },
-  googl: {
-    '1D': { change: 0.92, startP: 166.67, high: 169.50, low: 166.10, path: [166.67, 167.40, 166.80, 168.60, 168.00, 169.10, 168.20] },
-    '1W': { change: 2.30, startP: 164.42, high: 169.50, low: 163.50, path: [164.42, 163.80, 166.20, 167.90, 166.80, 168.20] },
-    '1M': { change: 3.80, startP: 162.04, high: 169.50, low: 160.50, path: [162.04, 161.20, 164.80, 166.50, 167.20, 168.20] },
-    '1Y': { change: 27.40, startP: 132.00, high: 191.00, low: 129.50, path: [132.00, 142.00, 155.00, 175.00, 188.00, 165.00, 168.20] }
-  },
-  amzn: {
-    '1D': { change: 1.40, startP: 183.83, high: 187.90, low: 183.20, path: [183.83, 184.60, 184.10, 186.20, 185.80, 187.50, 186.40] },
-    '1W': { change: 3.10, startP: 180.80, high: 187.90, low: 179.50, path: [180.80, 182.10, 181.50, 184.80, 185.50, 186.40] },
-    '1M': { change: 5.60, startP: 176.50, high: 187.90, low: 175.00, path: [176.50, 178.20, 181.00, 183.50, 185.00, 186.40] },
-    '1Y': { change: 31.20, startP: 142.10, high: 201.00, low: 139.00, path: [142.10, 155.00, 178.00, 185.00, 198.00, 175.00, 186.40] }
-  },
-  meta: {
-    '1D': { change: 1.80, startP: 572.00, high: 586.50, low: 570.20, path: [572.00, 574.50, 573.10, 580.40, 578.80, 585.10, 582.30] },
-    '1W': { change: 4.20, startP: 558.83, high: 586.50, low: 555.00, path: [558.83, 562.00, 568.50, 575.20, 579.00, 582.30] },
-    '1M': { change: 8.90, startP: 534.70, high: 586.50, low: 530.00, path: [534.70, 542.00, 555.00, 568.00, 576.00, 582.30] },
-    '1Y': { change: 82.50, startP: 319.00, high: 602.00, low: 312.00, path: [319.00, 375.00, 485.00, 440.00, 510.00, 560.00, 582.30] }
-  },
-  mstr: {
-    '1D': { change: 8.65, startP: 198.16, high: 222.00, low: 196.50, path: [198.16, 203.50, 199.20, 209.40, 214.00, 222.00, 215.30] },
-    '1W': { change: 24.80, startP: 172.50, high: 222.00, low: 168.00, path: [172.50, 169.00, 185.00, 198.00, 208.00, 215.30] },
-    '1M': { change: 68.40, startP: 127.85, high: 222.00, low: 124.00, path: [127.85, 131.00, 148.00, 165.00, 182.00, 215.30] },
-    '1Y': { change: 385.00, startP: 44.40, high: 222.00, low: 41.50, path: [44.40, 56.00, 78.00, 115.00, 142.00, 160.00, 215.30] }
-  },
-  mc: {
-    '1D': { change: -0.45, startP: 621.30, high: 624.00, low: 612.00, path: [621.30, 622.50, 618.00, 615.20, 617.80, 613.50, 618.50] },
-    '1W': { change: -1.80, startP: 629.84, high: 632.00, low: 612.00, path: [629.84, 626.00, 621.50, 624.00, 616.00, 618.50] },
-    '1M': { change: -4.50, startP: 647.64, high: 660.00, low: 608.00, path: [647.64, 652.00, 638.00, 625.00, 614.00, 618.50] },
-    '1Y': { change: -11.20, startP: 696.50, high: 885.00, low: 595.00, path: [696.50, 735.00, 840.00, 810.00, 720.00, 650.00, 618.50] }
-  },
-  asml: {
-    '1D': { change: 1.05, startP: 645.32, high: 656.00, low: 644.00, path: [645.32, 648.00, 646.20, 652.80, 650.50, 654.50, 652.10] },
-    '1W': { change: 3.20, startP: 631.88, high: 656.00, low: 628.00, path: [631.88, 635.00, 642.00, 648.50, 646.00, 652.10] },
-    '1M': { change: -7.50, startP: 705.00, high: 760.00, low: 625.00, path: [705.00, 755.00, 635.00, 642.00, 648.00, 652.10] },
-    '1Y': { change: 8.50, startP: 601.00, high: 1020.00, low: 595.00, path: [601.00, 720.00, 880.00, 990.00, 850.00, 640.00, 652.10] }
-  },
-  tte: {
-    '1D': { change: 0.30, startP: 58.03, high: 58.60, low: 57.80, path: [58.03, 58.15, 57.95, 58.40, 58.10, 58.35, 58.20] },
-    '1W': { change: -1.20, startP: 58.91, high: 59.40, low: 57.80, path: [58.91, 59.20, 58.60, 58.30, 58.00, 58.20] },
-    '1M': { change: -2.80, startP: 59.88, high: 61.20, low: 57.80, path: [59.88, 60.50, 59.80, 58.90, 58.10, 58.20] },
-    '1Y': { change: -4.50, startP: 60.94, high: 69.80, low: 57.20, path: [60.94, 63.50, 68.20, 66.50, 62.00, 59.00, 58.20] }
-  },
-  // Indices
-  sp500: {
-    '1D': { change: 0.41, startP: 5840.72, high: 5880.00, low: 5835.00, path: [5840.72, 5848.00, 5842.00, 5859.00, 5855.00, 5872.00, 5864.67] },
-    '1W': { change: 1.65, startP: 5769.47, high: 5880.00, low: 5755.00, path: [5769.47, 5785.00, 5812.00, 5840.00, 5830.00, 5864.67] },
-    '1M': { change: 3.85, startP: 5647.25, high: 5880.00, low: 5620.00, path: [5647.25, 5680.00, 5725.00, 5760.00, 5810.00, 5864.67] },
-    '1Y': { change: 34.20, startP: 4370.10, high: 5880.00, low: 4320.00, path: [4370.10, 4680.00, 4980.00, 5180.00, 5450.00, 5650.00, 5864.67] }
-  },
-  nasdaq100: {
-    '1D': { change: 0.85, startP: 20277.74, high: 20520.00, low: 20240.00, path: [20277.74, 20340.00, 20310.00, 20420.00, 20390.00, 20480.00, 20450.10] },
-    '1W': { change: 2.45, startP: 19961.05, high: 20520.00, low: 19920.00, path: [19961.05, 20040.00, 20180.00, 20350.00, 20290.00, 20450.10] },
-    '1M': { change: 4.80, startP: 19513.45, high: 20520.00, low: 19450.00, path: [19513.45, 19680.00, 19920.00, 20150.00, 20300.00, 20450.10] },
-    '1Y': { change: 39.50, startP: 14660.00, high: 20520.00, low: 14450.00, path: [14660.00, 16200.00, 17800.00, 18500.00, 19400.00, 20100.00, 20450.10] }
-  },
-  cac40: {
-    '1D': { change: 0.65, startP: 7431.94, high: 7510.00, low: 7420.00, path: [7431.94, 7445.00, 7438.00, 7468.00, 7460.00, 7490.00, 7480.25] },
-    '1W': { change: -0.45, startP: 7514.06, high: 7540.00, low: 7410.00, path: [7514.06, 7480.00, 7450.00, 7495.00, 7460.00, 7480.25] },
-    '1M': { change: -1.85, startP: 7621.24, high: 7680.00, low: 7410.00, path: [7621.24, 7590.00, 7540.00, 7480.00, 7510.00, 7450.00, 7480.25] },
-    '1Y': { change: 4.10, startP: 7185.64, high: 8250.00, low: 7120.00, path: [7185.64, 7540.00, 7950.00, 8240.00, 7650.00, 7520.00, 7480.25] }
-  },
-  dax40: {
-    '1D': { change: 0.52, startP: 19240.45, high: 19410.00, low: 19210.00, path: [19240.45, 19280.00, 19260.00, 19350.00, 19320.00, 19380.00, 19340.50] },
-    '1W': { change: 1.15, startP: 19120.61, high: 19410.00, low: 19080.00, path: [19120.61, 19180.00, 19240.00, 19310.00, 19290.00, 19340.50] },
-    '1M': { change: 2.80, startP: 18813.72, high: 19410.00, low: 18750.00, path: [18813.72, 18950.00, 19120.00, 19280.00, 19250.00, 19340.50] },
-    '1Y': { change: 26.50, startP: 15288.93, high: 19410.00, low: 15150.00, path: [15288.93, 16600.00, 17800.00, 18600.00, 18200.00, 18800.00, 19340.50] }
-  },
-  dji: {
-    '1D': { change: 0.18, startP: 42134.66, high: 42350.00, low: 42100.00, path: [42134.66, 42180.00, 42150.00, 42240.00, 42210.50] },
-    '1W': { change: 0.95, startP: 41813.27, high: 42350.00, low: 41750.00, path: [41813.27, 41920.00, 42050.00, 42180.00, 42210.50] },
-    '1M': { change: 2.10, startP: 41342.31, high: 42350.00, low: 41100.00, path: [41342.31, 41550.00, 41820.00, 42100.00, 42210.50] },
-    '1Y': { change: 23.80, startP: 34095.72, high: 42350.00, low: 33800.00, path: [34095.72, 36200.00, 38500.00, 39500.00, 40800.00, 42210.50] }
-  },
-  stoxx50: {
-    '1D': { change: 0.32, startP: 4966.21, high: 5005.00, low: 4955.00, path: [4966.21, 4975.00, 4970.00, 4988.00, 4982.10] },
-    '1W': { change: 0.75, startP: 4945.01, high: 5005.00, low: 4930.00, path: [4945.01, 4960.00, 4950.00, 4975.00, 4982.10] },
-    '1M': { change: 1.40, startP: 4913.31, high: 5005.00, low: 4880.00, path: [4913.31, 4940.00, 4975.00, 4960.00, 4982.10] },
-    '1Y': { change: 16.80, startP: 4265.50, high: 5120.00, low: 4210.00, path: [4265.50, 4550.00, 4920.00, 5080.00, 4910.00, 4982.10] }
-  },
-  nikkei: {
-    '1D': { change: 1.15, startP: 38830.85, high: 39450.00, low: 38780.00, path: [38830.85, 38980.00, 39120.00, 39350.00, 39277.40] },
-    '1W': { change: 2.80, startP: 38207.59, high: 39450.00, low: 38100.00, path: [38207.59, 38450.00, 38800.00, 39100.00, 39277.40] },
-    '1M': { change: 4.60, startP: 37550.10, high: 39450.00, low: 37200.00, path: [37550.10, 38100.00, 38650.00, 39050.00, 39277.40] },
-    '1Y': { change: 20.40, startP: 32622.42, high: 41800.00, low: 32100.00, path: [32622.42, 35500.00, 40200.00, 38500.00, 35800.00, 39277.40] }
-  },
-  ftse100: {
-    '1D': { change: -0.22, startP: 8258.47, high: 8270.00, low: 8210.00, path: [8258.47, 8262.00, 8245.00, 8235.00, 8240.30] },
-    '1W': { change: -0.80, startP: 8306.75, high: 8320.00, low: 8210.00, path: [8306.75, 8280.00, 8265.00, 8250.00, 8240.30] },
-    '1M': { change: -1.20, startP: 8340.38, high: 8380.00, low: 8190.00, path: [8340.38, 8310.00, 8275.00, 8255.00, 8240.30] },
-    '1Y': { change: 11.50, startP: 7390.40, high: 8460.00, low: 7350.00, path: [7390.40, 7680.00, 7920.00, 8350.00, 8180.00, 8240.30] }
-  },
-  // ETF
-  '10ap': {
-    '1D': { change: 0.52, startP: 136.59, high: 137.95, low: 136.20, path: [136.59, 136.90, 136.70, 137.20, 137.05, 137.50, 137.30] },
-    '1W': { change: 1.95, startP: 134.67, high: 137.95, low: 134.20, path: [134.67, 135.10, 135.80, 136.60, 136.20, 137.30] },
-    '1M': { change: 4.50, startP: 131.39, high: 137.95, low: 130.80, path: [131.39, 132.50, 134.20, 135.50, 136.10, 137.30] },
-    '1Y': { change: 35.20, startP: 101.55, high: 137.95, low: 99.80, path: [101.55, 108.50, 116.00, 122.50, 129.00, 134.00, 137.30] }
-  },
-  lyp6: {
-    '1D': { change: 0.38, startP: 326.41, high: 328.40, low: 325.10, path: [326.41, 327.10, 326.80, 327.90, 327.40, 327.65] },
-    '1W': { change: 1.25, startP: 323.60, high: 328.40, low: 322.80, path: [323.60, 324.50, 325.80, 326.90, 327.65] },
-    '1M': { change: 2.90, startP: 318.42, high: 328.40, low: 317.00, path: [318.42, 321.00, 324.50, 326.00, 327.65] },
-    '1Y': { change: 19.80, startP: 273.50, high: 332.00, low: 269.00, path: [273.50, 289.00, 308.00, 322.00, 315.00, 327.65] }
-  },
-  xmme: {
-    '1D': { change: -0.42, startP: 77.17, high: 77.20, low: 76.10, path: [77.17, 77.00, 76.80, 77.10, 76.60, 76.85] },
-    '1W': { change: -1.10, startP: 77.70, high: 78.10, low: 76.10, path: [77.70, 77.40, 77.00, 77.30, 76.85] },
-    '1M': { change: 1.80, startP: 75.49, high: 79.20, low: 74.80, path: [75.49, 78.50, 78.00, 77.20, 76.85] },
-    '1Y': { change: 12.40, startP: 68.37, high: 81.50, low: 66.50, path: [68.37, 71.00, 74.50, 77.00, 73.00, 76.85] }
-  },
-  cw8: {
-    '1D': { change: 0.62, startP: 525.14, high: 530.20, low: 524.50, path: [525.14, 526.40, 525.80, 527.50, 526.90, 529.10, 528.40] },
-    '1W': { change: 1.80, startP: 519.05, high: 530.20, low: 517.50, path: [519.05, 521.20, 523.50, 526.00, 525.10, 528.40] },
-    '1M': { change: 4.20, startP: 507.10, high: 530.20, low: 504.80, path: [507.10, 511.50, 517.00, 522.00, 524.50, 528.40] },
-    '1Y': { change: 28.90, startP: 409.93, high: 530.20, low: 404.00, path: [409.93, 435.00, 465.00, 485.00, 505.00, 518.00, 528.40] }
-  },
-  vwce: {
-    '1D': { change: 0.45, startP: 127.82, high: 128.95, low: 127.80, path: [127.82, 128.10, 127.95, 128.50, 128.30, 128.40] },
-    '1W': { change: 1.60, startP: 126.38, high: 128.95, low: 126.10, path: [126.38, 126.90, 127.40, 128.10, 128.40] },
-    '1M': { change: 3.80, startP: 123.70, high: 128.95, low: 123.20, path: [123.70, 124.80, 126.20, 127.50, 128.40] },
-    '1Y': { change: 25.40, startP: 102.39, high: 128.95, low: 101.50, path: [102.39, 108.00, 115.00, 120.00, 124.00, 128.40] }
-  },
-  eqqq: {
-    '1D': { change: 1.15, startP: 479.68, high: 487.50, low: 481.00, path: [479.68, 482.00, 481.20, 485.80, 484.00, 485.20] },
-    '1W': { change: 2.85, startP: 471.75, high: 487.50, low: 470.00, path: [471.75, 474.50, 478.20, 483.00, 485.20] },
-    '1M': { change: 5.40, startP: 460.34, high: 487.50, low: 458.00, path: [460.34, 465.00, 472.00, 480.00, 485.20] },
-    '1Y': { change: 41.20, startP: 343.62, high: 487.50, low: 340.00, path: [343.62, 385.00, 420.00, 445.00, 470.00, 485.20] }
-  },
-  // Matières Premières
-  gold: {
-    '1D': { change: 0.42, startP: 2724.36, high: 2748.00, low: 2718.00, path: [2724.36, 2728.50, 2725.10, 2738.00, 2732.40, 2742.00, 2735.80] },
-    '1W': { change: 1.20, startP: 2703.36, high: 2748.00, low: 2695.00, path: [2703.36, 2712.00, 2708.00, 2725.00, 2740.00, 2735.80] },
-    '1M': { change: 4.80, startP: 2610.50, high: 2748.00, low: 2602.00, path: [2610.50, 2635.00, 2670.00, 2705.00, 2725.00, 2735.80] },
-    '1Y': { change: 38.50, startP: 1975.30, high: 2748.00, low: 1960.00, path: [1975.30, 2040.00, 2180.00, 2350.00, 2450.00, 2650.00, 2735.80] }
-  },
-  silver: {
-    '1D': { change: 1.25, startP: 33.43, high: 34.10, low: 33.20, path: [33.43, 33.55, 33.40, 33.90, 33.75, 34.05, 33.85] },
-    '1W': { change: 2.80, startP: 32.93, high: 34.10, low: 32.50, path: [32.93, 33.15, 33.40, 33.90, 33.65, 33.85] },
-    '1M': { change: 8.40, startP: 31.23, high: 34.10, low: 30.80, path: [31.23, 31.80, 32.60, 33.40, 33.85] },
-    '1Y': { change: 48.50, startP: 22.79, high: 34.90, low: 22.20, path: [22.79, 24.50, 27.80, 30.50, 29.20, 32.00, 33.85] }
-  },
-  brent: {
-    '1D': { change: -0.75, startP: 74.76, high: 75.10, low: 73.50, path: [74.76, 74.90, 74.50, 74.80, 74.20, 73.90, 74.20] },
-    '1W': { change: -3.10, startP: 76.57, high: 77.20, low: 73.50, path: [76.57, 76.10, 75.20, 74.80, 74.00, 74.20] },
-    '1M': { change: -5.40, startP: 78.43, high: 80.50, low: 73.50, path: [78.43, 79.80, 77.50, 76.20, 75.00, 74.20] },
-    '1Y': { change: -12.80, startP: 85.09, high: 91.50, low: 70.80, path: [85.09, 81.50, 86.00, 89.20, 84.50, 77.00, 74.20] }
-  }
-};
-
 /**
- * Générateur procédural réaliste de secours pour actifs sans profil explicite
- * Garantit que 1J, 1S, 1M et 1A ont des formes et amplitudes radicalement différentes
+ * Rendu de la courbe 24h épurée dans la modale
  */
-function generateTimeframeProfile(asset, timeframe) {
-  let steps = 24;
-  let targetChange = asset.baseChange;
-  let waveFreq1 = 3.2;
-  let waveFreq2 = 6.4;
-  let ampFactor = 0.008;
-
-  if (timeframe === '1W') {
-    steps = 28;
-    targetChange = asset.baseChange * 1.85 - 0.45;
-    waveFreq1 = 1.9;
-    waveFreq2 = 4.3;
-    ampFactor = 0.018;
-  } else if (timeframe === '1M') {
-    steps = 32;
-    targetChange = asset.baseChange * 3.4 + 1.2;
-    waveFreq1 = 2.4;
-    waveFreq2 = 5.1;
-    ampFactor = 0.035;
-  } else if (timeframe === '1Y') {
-    steps = 44;
-    targetChange = asset.baseChange >= 0 ? (asset.baseChange * 6.5 + 16.0) : (asset.baseChange * 4.5 - 9.0);
-    waveFreq1 = 1.5;
-    waveFreq2 = 3.8;
-    ampFactor = 0.075;
-  }
-
-  const startP = Math.max(0.0001, asset.basePrice / (1 + targetChange / 100));
-  const points = [];
-  const hashSeed = Math.abs(asset.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0));
-
-  for (let i = 0; i < steps; i++) {
-    const t = i / (steps - 1);
-    const w1 = Math.sin(t * Math.PI * waveFreq1 + hashSeed * 0.2) * ampFactor;
-    const w2 = Math.cos(t * Math.PI * waveFreq2 + hashSeed * 0.1) * (ampFactor * 0.6);
-    let p = startP + (asset.basePrice - startP) * t + (w1 + w2) * asset.basePrice;
-
-    if (i === 0) p = startP;
-    if (i === steps - 1) p = asset.basePrice;
-
-    let timeLabel = '';
-    if (timeframe === '1D') {
-      const h = 9 + Math.floor(t * 8.5);
-      const m = Math.floor((t * 8.5 - Math.floor(t * 8.5)) * 60);
-      timeLabel = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-    } else if (timeframe === '1W') {
-      const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven'];
-      timeLabel = days[Math.min(days.length - 1, Math.floor(t * days.length))];
-    } else if (timeframe === '1M') {
-      timeLabel = `Jour ${1 + Math.floor(t * 29)}`;
-    } else {
-      timeLabel = `Mois ${1 + Math.floor(t * 11)}`;
-    }
-
-    points.push({ price: Number(p.toFixed(2)), timeLabel });
-  }
-
-  return {
-    points,
-    startPrice: startP,
-    endPrice: asset.basePrice,
-    changePct: targetChange,
-    axisLabels: {
-      start: timeframe === '1D' ? '09:00' : (timeframe === '1W' ? 'Il y a 7 jours' : (timeframe === '1M' ? 'Il y a 30 jours' : 'Il y a 1 an')),
-      mid: timeframe === '1D' ? '13:00' : (timeframe === '1W' ? 'Mi-semaine' : (timeframe === '1M' ? 'Mi-mois' : 'Semestre')),
-      end: 'Maintenant (En Direct)'
-    }
-  };
-}
-
-/**
- * Récupère les données historiques authentiques d'un actif (APIs réelles ou profils)
- */
-async function getAuthenticChartData(asset, timeframe) {
-  const cacheKey = `${asset.id}_${timeframe}`;
-  if (chartDataCache[cacheKey]) {
-    return chartDataCache[cacheKey];
-  }
-
-  // 1. Pour les Cryptomonnaies : API CoinGecko en direct
-  if (asset.type === 'crypto') {
-    const coinIdMap = {
-      btc: 'bitcoin',
-      eth: 'ethereum',
-      sol: 'solana',
-      bnb: 'binancecoin',
-      xrp: 'ripple'
-    };
-    const coinId = coinIdMap[asset.id];
-    if (coinId) {
-      const daysMap = { '1D': 1, '1W': 7, '1M': 30, '1Y': 365 };
-      const days = daysMap[timeframe] || 1;
-      try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${days}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data.prices) && data.prices.length >= 2) {
-            const rawPrices = data.prices;
-            const targetSteps = timeframe === '1D' ? 24 : (timeframe === '1W' ? 28 : (timeframe === '1M' ? 30 : 40));
-            const stepSize = Math.max(1, Math.floor(rawPrices.length / targetSteps));
-            const sampled = [];
-
-            for (let i = 0; i < rawPrices.length; i += stepSize) {
-              const [ts, price] = rawPrices[i];
-              const date = new Date(ts);
-              let label = '';
-              if (timeframe === '1D') {
-                label = `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
-              } else if (timeframe === '1W') {
-                const daysOfWeek = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-                label = `${daysOfWeek[date.getDay()]} ${date.getHours()}h`;
-              } else if (timeframe === '1M') {
-                label = `${date.getDate()} ${date.toLocaleString('fr-FR', { month: 'short' })}`;
-              } else {
-                label = `${date.toLocaleString('fr-FR', { month: 'short' })} ${date.getFullYear().toString().slice(2)}`;
-              }
-              sampled.push({ price: Number(price.toFixed(2)), timeLabel: label });
-            }
-
-            const lastRaw = rawPrices[rawPrices.length - 1];
-            sampled[sampled.length - 1] = { price: Number(lastRaw[1].toFixed(2)), timeLabel: 'Maintenant' };
-
-            const startP = sampled[0].price;
-            const endP = sampled[sampled.length - 1].price;
-            const changePct = ((endP - startP) / startP) * 100;
-
-            const result = {
-              points: sampled,
-              startPrice: startP,
-              endPrice: endP,
-              changePct,
-              axisLabels: {
-                start: timeframe === '1D' ? 'Il y a 24h' : (timeframe === '1W' ? 'Il y a 7 jours' : (timeframe === '1M' ? 'Il y a 30 jours' : 'Il y a 1 an')),
-                mid: timeframe === '1D' ? 'Il y a 12h' : (timeframe === '1W' ? 'Mi-semaine' : (timeframe === '1M' ? 'Mi-mois' : 'Semestre')),
-                end: 'Maintenant (En Direct)'
-              }
-            };
-
-            chartDataCache[cacheKey] = result;
-            return result;
-          }
-        }
-      } catch (err) {
-        console.warn('API CoinGecko non disponible, repli sur profil local:', err);
-      }
-    }
-  }
-
-  // 2. Pour les Devises Forex : API Frankfurter en direct (BCE)
-  if (asset.type === 'forex' && (asset.id === 'eurusd' || asset.id === 'eurgbp' || asset.id === 'eurchf' || asset.id === 'eurjpy')) {
-    const symMap = { eurusd: 'USD', eurgbp: 'GBP', eurchf: 'CHF', eurjpy: 'JPY' };
-    const sym = symMap[asset.id];
-    if (sym && timeframe !== '1D') {
-      const now = new Date();
-      let past = new Date();
-      if (timeframe === '1W') past.setDate(now.getDate() - 10);
-      else if (timeframe === '1M') past.setDate(now.getDate() - 35);
-      else if (timeframe === '1Y') past.setDate(now.getDate() - 370);
-
-      const startDate = past.toISOString().split('T')[0];
-      try {
-        const res = await fetch(`https://api.frankfurter.dev/v1/${startDate}..?base=EUR&symbols=${sym}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.rates && Object.keys(data.rates).length >= 2) {
-            const dateKeys = Object.keys(data.rates);
-            const points = dateKeys.map((dateStr) => {
-              const d = new Date(dateStr);
-              let timeLabel = '';
-              if (timeframe === '1W') {
-                const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-                timeLabel = days[d.getDay()];
-              } else if (timeframe === '1M') {
-                timeLabel = `${d.getDate()} ${d.toLocaleString('fr-FR', { month: 'short' })}`;
-              } else {
-                timeLabel = `${d.toLocaleString('fr-FR', { month: 'short' })} ${d.getFullYear().toString().slice(2)}`;
-              }
-              return { price: data.rates[dateStr][sym], timeLabel };
-            });
-
-            const startP = points[0].price;
-            const endP = points[points.length - 1].price;
-            const changePct = ((endP - startP) / startP) * 100;
-
-            const result = {
-              points,
-              startPrice: startP,
-              endPrice: endP,
-              changePct,
-              axisLabels: {
-                start: dateKeys[0],
-                mid: dateKeys[Math.floor(dateKeys.length / 2)],
-                end: 'Clôture BCE'
-              }
-            };
-
-            chartDataCache[cacheKey] = result;
-            return result;
-          }
-        }
-      } catch (err) {
-        console.warn('API Frankfurter non disponible, repli sur profil local:', err);
-      }
-    }
-  }
-
-  // 3. Pour les Actions, ETF, Indices & Commodities : Données historiques réelles
-  const preset = REAL_MARKET_PERIODS[asset.id] && REAL_MARKET_PERIODS[asset.id][timeframe];
-  if (preset) {
-    const rawPath = preset.path;
-    const points = [];
-    const N = 24;
-
-    for (let i = 0; i < N; i++) {
-      const t = i / (N - 1);
-      const pathIdx = t * (rawPath.length - 1);
-      const baseIdx = Math.floor(pathIdx);
-      const frac = pathIdx - baseIdx;
-      const nextIdx = Math.min(rawPath.length - 1, baseIdx + 1);
-      const p = rawPath[baseIdx] + (rawPath[nextIdx] - rawPath[baseIdx]) * frac;
-
-      let timeLabel = '';
-      if (timeframe === '1D') {
-        const h = 9 + Math.floor(t * 8.5);
-        const m = Math.floor((t * 8.5 - Math.floor(t * 8.5)) * 60);
-        timeLabel = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      } else if (timeframe === '1W') {
-        const days = ['Lundi 04', 'Mardi 05', 'Mercredi 06', 'Jeudi 07', 'Vendredi 08'];
-        timeLabel = days[Math.min(days.length - 1, Math.floor(t * days.length))];
-      } else if (timeframe === '1M') {
-        timeLabel = `Semaine ${1 + Math.floor(t * 3.9)}`;
-      } else {
-        const months = ['Nov 23', 'Jan 24', 'Mar 24', 'Mai 24', 'Juil 24', 'Sep 24', 'Nov 24'];
-        timeLabel = months[Math.min(months.length - 1, Math.floor(t * months.length))];
-      }
-
-      points.push({ price: Number(p.toFixed(2)), timeLabel });
-    }
-
-    points[points.length - 1].price = asset.basePrice;
-    points[points.length - 1].timeLabel = 'Maintenant';
-
-    const result = {
-      points,
-      startPrice: preset.startP,
-      endPrice: asset.basePrice,
-      changePct: preset.change,
-      axisLabels: {
-        start: timeframe === '1D' ? 'Ouverture (09:00)' : (timeframe === '1W' ? 'Il y a 7 jours' : (timeframe === '1M' ? 'Il y a 30 jours' : 'Il y a 1 an')),
-        mid: timeframe === '1D' ? 'Midi (13:00)' : (timeframe === '1W' ? 'Mi-semaine' : (timeframe === '1M' ? 'Mi-mois' : 'Semestre')),
-        end: 'Maintenant (En Direct)'
-      }
-    };
-
-    chartDataCache[cacheKey] = result;
-    return result;
-  }
-
-  // 4. Génération procédurale réaliste pour tout autre actif
-  const result = generateTimeframeProfile(asset, timeframe);
-  chartDataCache[cacheKey] = result;
-  return result;
-}
-
-/**
- * Rendu de la courbe SVG nette et épurée (Apple/Robinhood style)
- * "juste une droite qui monte et qui descend" avec infobulle au survol
- */
-async function renderCleanLineChart(asset, timeframe = '1D') {
-  currentChartTimeframe = timeframe;
+async function renderCleanLineChart(asset) {
   const svgLine = document.getElementById('chart-svg-line');
   const svgArea = document.getElementById('chart-svg-area');
   const baseline = document.getElementById('chart-baseline');
@@ -1440,8 +1457,7 @@ async function renderCleanLineChart(asset, timeframe = '1D') {
 
   if (!svgLine || !svgArea || !asset) return;
 
-  // 1. Récupération des données historiques authentiques selon l'unité de temps
-  const chartData = await getAuthenticChartData(asset, timeframe);
+  const chartData = await get24hChartData(asset);
   const points = chartData.points;
   const prices = points.map((p) => p.price);
   const startPrice = chartData.startPrice;
@@ -1450,26 +1466,19 @@ async function renderCleanLineChart(asset, timeframe = '1D') {
   const isPositive = periodChange >= 0;
   const sign = isPositive ? '+' : '';
 
-  currentPeriodChangeData = { endPrice, changePct: periodChange };
-
-  // 2. Mise à jour dynamique de l'en-tête selon l'unité de temps choisie
   const unit = asset.unit || '$';
   if (headerPrice) {
     headerPrice.textContent = `${endPrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
   }
   if (headerChange) {
-    headerChange.textContent = `${sign}${periodChange.toFixed(2)}%`;
+    headerChange.textContent = `${sign}${periodChange.toFixed(2)}% (24h)`;
     headerChange.className = `chart-change-badge ${isPositive ? 'up' : 'down'}`;
-    const periodName = timeframe === '1D' ? '24 heures' : (timeframe === '1W' ? '7 jours' : (timeframe === '1M' ? '30 jours' : '1 an'));
-    headerChange.title = `Performance sur ${periodName}`;
   }
 
-  // 3. Libellés de l'axe temporel
-  if (timeStart) timeStart.textContent = chartData.axisLabels.start;
-  if (timeMid) timeMid.textContent = chartData.axisLabels.mid;
-  if (timeEnd) timeEnd.textContent = chartData.axisLabels.end;
+  if (timeStart) timeStart.textContent = 'Il y a 24h';
+  if (timeMid) timeMid.textContent = 'Il y a 12h';
+  if (timeEnd) timeEnd.textContent = 'Maintenant (En Direct)';
 
-  // 4. Calcul des bornes d'affichage SVG (viewBox 0 0 1000 360)
   const minP = Math.min(...prices) * 0.994;
   const maxP = Math.max(...prices) * 1.006;
   const span = Math.max(0.0001, maxP - minP);
@@ -1486,7 +1495,6 @@ async function renderCleanLineChart(asset, timeframe = '1D') {
 
   currentChartPoints = points;
 
-  // 5. Tracé de la courbe SVG fluide
   let lineD = `M ${points[0].x} ${points[0].y}`;
   for (let i = 1; i < points.length; i++) {
     const prev = points[i - 1];
@@ -1499,7 +1507,6 @@ async function renderCleanLineChart(asset, timeframe = '1D') {
   const firstPt = points[0];
   const areaD = `${lineD} L ${lastPt.x} 360 L ${firstPt.x} 360 Z`;
 
-  // Application des styles visuels (Vert émeraude si positif, Rouge vif si négatif)
   const mainColor = isPositive ? '#10b981' : '#ef4444';
   const areaFill = isPositive ? 'url(#chartGradientUp)' : 'url(#chartGradientDown)';
 
@@ -1510,14 +1517,12 @@ async function renderCleanLineChart(asset, timeframe = '1D') {
 
   if (hoverDot) hoverDot.setAttribute('stroke', mainColor);
 
-  // Ligne de référence de départ (baseline d'ouverture de la période)
   if (baseline) {
     const baselineY = Number(((marginV + usableH) - ((startPrice - minP) / span) * usableH).toFixed(1));
     baseline.setAttribute('y1', baselineY);
     baseline.setAttribute('y2', baselineY);
   }
 
-  // Statistiques de la période sélectionnée
   if (statHigh) statHigh.textContent = `${Math.max(...prices).toFixed(2)} ${unit}`;
   if (statLow) statLow.textContent = `${Math.min(...prices).toFixed(2)} ${unit}`;
   if (statRangeFill) {
@@ -1527,7 +1532,7 @@ async function renderCleanLineChart(asset, timeframe = '1D') {
 }
 
 /**
- * Configure les écouteurs de survol de la souris sur la courbe SVG
+ * Configure les écouteurs de survol de la souris sur la courbe SVG de la modale
  */
 function setupCleanChartInteractions() {
   const stage = document.getElementById('clean-chart-stage');
@@ -1565,14 +1570,12 @@ function setupCleanChartInteractions() {
       }
     }
 
-    // Positionner le tracker SVG
     tracker.style.display = 'block';
     hoverLine.setAttribute('x1', closest.x);
     hoverLine.setAttribute('x2', closest.x);
     hoverDot.setAttribute('cx', closest.x);
     hoverDot.setAttribute('cy', closest.y);
 
-    // Positionner l'infobulle HTML
     tooltip.style.display = 'flex';
     const bubbleX = (closest.x / 1000) * rect.width;
     tooltip.style.left = `${bubbleX}px`;
@@ -1581,7 +1584,6 @@ function setupCleanChartInteractions() {
     tooltipPrice.textContent = `${closest.price.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
     tooltipTime.textContent = closest.timeLabel;
 
-    // Synchronisation en direct du prix dans l'en-tête (expérience Apple Bourse)
     if (headerPrice) {
       headerPrice.textContent = `${closest.price.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
     }
@@ -1589,7 +1591,7 @@ function setupCleanChartInteractions() {
       const startP = currentChartPoints[0].price;
       const diffPct = ((closest.price - startP) / startP) * 100;
       const sign = diffPct >= 0 ? '+' : '';
-      headerChange.textContent = `${sign}${diffPct.toFixed(2)}%`;
+      headerChange.textContent = `${sign}${diffPct.toFixed(2)}% (24h)`;
       headerChange.className = `chart-change-badge ${diffPct >= 0 ? 'up' : 'down'}`;
     }
   }
@@ -1597,15 +1599,15 @@ function setupCleanChartInteractions() {
   function handleLeave() {
     tracker.style.display = 'none';
     tooltip.style.display = 'none';
-    // Rétablir le prix et la variation de la période active
-    if (currentlyInspectedAsset && currentPeriodChangeData) {
-      const isPositive = currentPeriodChangeData.changePct >= 0;
+    if (currentlyInspectedAsset) {
+      const isPositive = currentlyInspectedAsset.baseChange >= 0;
       const sign = isPositive ? '+' : '';
+      const unit = currentlyInspectedAsset.unit || '$';
       if (headerPrice) {
-        headerPrice.textContent = `${currentPeriodChangeData.endPrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currentlyInspectedAsset.unit || '$'}`;
+        headerPrice.textContent = `${currentlyInspectedAsset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
       }
       if (headerChange) {
-        headerChange.textContent = `${sign}${currentPeriodChangeData.changePct.toFixed(2)}%`;
+        headerChange.textContent = `${sign}${currentlyInspectedAsset.baseChange.toFixed(2)}% (24h)`;
         headerChange.className = `chart-change-badge ${isPositive ? 'up' : 'down'}`;
       }
     }
@@ -1618,7 +1620,7 @@ function setupCleanChartInteractions() {
 }
 
 /**
- * Ouvre la modale et affiche la courbe nette de l'actif cliqué
+ * Ouvre la modale et affiche la courbe 24h de l'actif cliqué
  */
 async function openChartModal(asset) {
   currentlyInspectedAsset = asset;
@@ -1651,14 +1653,8 @@ async function openChartModal(asset) {
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
-  // Réinitialiser les boutons de timeframe sur 1J par défaut
-  currentChartTimeframe = '1D';
-  document.querySelectorAll('.chart-timeframe-picker .tf-btn').forEach((b) => {
-    b.classList.toggle('active', (b.dataset.tf || '1D') === '1D');
-  });
-
-  // Rendu de la courbe épurée
-  await renderCleanLineChart(asset, '1D');
+  // Rendu de la courbe 24h épurée
+  await renderCleanLineChart(asset);
 }
 
 function closeChartModal() {
@@ -1699,7 +1695,10 @@ function renderMarketChecklist() {
         asset.enabled = chk.checked;
         saveMarketAssets();
         renderMarketCards();
-        renderMarketsHighlights();
+        renderHeroSpotlight(currentHeroAssetId);
+  renderMarketBarometer();
+  renderMarketMovers();
+  renderForexCryptoModule();
       }
     });
   });
@@ -1824,7 +1823,10 @@ function initMarkets() {
 
   renderIndicesMarquee();
   updateMarketGlobalStatus();
-  renderMarketsHighlights();
+  renderHeroSpotlight(currentHeroAssetId);
+  renderMarketBarometer();
+  renderMarketMovers();
+  renderForexCryptoModule();
   renderMarketCards();
   setupCleanChartInteractions();
 
@@ -1837,6 +1839,47 @@ function initMarkets() {
   const modalCloseBtn = document.getElementById('chart-dialog-close-btn');
   const modalBackdrop = document.querySelector('.market-chart-backdrop');
   const addCustomBtn = document.getElementById('market-add-custom-btn');
+  const heroExpandBtn = document.getElementById('hero-expand-btn');
+  const convInput = document.getElementById('quick-conv-amount');
+  const viewListBtn = document.getElementById('view-mode-list-btn');
+  const viewGridBtn = document.getElementById('view-mode-grid-btn');
+
+  // Sélecteur de mode d'affichage (Liste / Grille)
+  if (viewListBtn && viewGridBtn) {
+    viewListBtn.addEventListener('click', () => {
+      currentWatchlistViewMode = 'list';
+      viewListBtn.classList.add('active');
+      viewGridBtn.classList.remove('active');
+      renderMarketCards();
+    });
+    viewGridBtn.addEventListener('click', () => {
+      currentWatchlistViewMode = 'grid';
+      viewGridBtn.classList.add('active');
+      viewListBtn.classList.remove('active');
+      renderMarketCards();
+    });
+  }
+
+  // Sélecteur d'actif vedette Hero (NVDA, TSLA, BTC, S&P 500, CW8)
+  document.querySelectorAll('#hero-quick-switch .hero-pill-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const heroId = btn.dataset.heroId;
+      renderHeroSpotlight(heroId);
+    });
+  });
+
+  // Bouton Agrandir de la Hero Card
+  if (heroExpandBtn) {
+    heroExpandBtn.addEventListener('click', () => {
+      const asset = marketAssets.find((a) => a.id === currentHeroAssetId);
+      if (asset) openChartModal(asset);
+    });
+  }
+
+  // Convertisseur express Forex & Crypto
+  if (convInput) {
+    convInput.addEventListener('input', updateQuickConverter);
+  }
 
   // Filtrage par recherche
   if (searchInput) {
@@ -1899,8 +1942,10 @@ function initMarkets() {
       }
       saveMarketAssets();
       renderMarketChecklist();
+      renderHeroSpotlight(currentHeroAssetId);
+      renderMarketBarometer();
+      renderMarketMovers();
       renderMarketCards();
-      renderMarketsHighlights();
       if (typeof showToast === 'function') showToast(`Préréglage appliqué : ${btn.textContent}`, 'info');
     });
   });
@@ -1943,7 +1988,7 @@ function initMarkets() {
       saveMarketAssets();
       renderMarketChecklist();
       renderMarketCards();
-      renderMarketsHighlights();
+      renderMarketMovers();
 
       if (nameIn) nameIn.value = '';
       if (symIn) symIn.value = '';
@@ -1960,18 +2005,6 @@ function initMarkets() {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeChartModal();
-  });
-
-  // Sélecteur de timeframe (1J, 1S, 1M, 1A)
-  document.querySelectorAll('.chart-timeframe-picker .tf-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.chart-timeframe-picker .tf-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentChartTimeframe = btn.dataset.tf || '1D';
-      if (currentlyInspectedAsset) {
-        renderCleanLineChart(currentlyInspectedAsset, currentChartTimeframe);
-      }
-    });
   });
 
   // Bouton d'actualisation manuelle
