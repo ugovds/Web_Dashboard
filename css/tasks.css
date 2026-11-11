@@ -423,7 +423,161 @@
   color: var(--text-muted);
 }
 
-/* --- AJOUTEUR DE TÂCHES (PLACÉ EN BAS) --- */
+/* --- FORMULAIRE D'AJOUT RAPIDE HAUTE VISIBILITÉ (PLACÉ EN HAUT) --- */
+.todo-input-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  margin-bottom: 0.7rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.28);
+  border-radius: 13px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.todo-input-card:focus-within {
+  border-color: var(--accent-primary);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), 0 0 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.todo-input-main-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.todo-input-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  flex-shrink: 0;
+}
+
+.todo-input-card input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  padding: 0.52rem 0.72rem;
+  background: rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.78rem;
+  transition: all 0.2s ease;
+}
+
+.todo-input-card input[type="text"]:focus {
+  outline: none;
+  background: rgba(0, 0, 0, 0.55);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+.todo-input-card input[type="text"]::placeholder {
+  color: var(--text-muted);
+  opacity: 0.75;
+}
+
+.todo-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.82) 100%);
+  color: #0b0c10;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.76rem;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.32);
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+  flex-shrink: 0;
+}
+
+.todo-add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.5);
+  filter: brightness(1.08);
+}
+
+.todo-add-btn:active {
+  transform: translateY(0);
+}
+
+.todo-input-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-top: 0.2rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.07);
+}
+
+.todo-priority-picker,
+.todo-date-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.todo-priority-picker label,
+.todo-date-picker label {
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.todo-input-card select.todo-priority-select {
+  padding: 0.28rem 0.45rem;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.68rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.todo-input-card select.todo-priority-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.todo-input-card input[type="date"] {
+  padding: 0.25rem 0.45rem;
+  background: rgba(0, 0, 0, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 7px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.68rem;
+  color-scheme: dark;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.todo-input-card input[type="date"]:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+/* Rétrocompatibilité / Fallback */
 .todo-input-row {
   display: flex;
   gap: 0.35rem;
@@ -431,52 +585,5 @@
   margin-top: auto;
   border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
-}
-
-.todo-input-row input[type="text"] {
-  flex: 1;
-  min-width: 0;
-  padding: 0.42rem 0.6rem;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  color: var(--text-main);
-  font-family: inherit;
-  font-size: 0.74rem;
-  transition: border-color 0.2s ease;
-}
-
-.todo-input-row input[type="date"] {
-  width: 112px;
-  padding: 0.35rem 0.4rem;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  color: var(--text-muted);
-  font-family: inherit;
-  font-size: 0.68rem;
-  color-scheme: dark;
-}
-
-.todo-input-row input:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-}
-
-.todo-add-btn {
-  padding: 0 0.65rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-highlight);
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--accent-primary);
-  font-family: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.todo-add-btn:hover {
-  background: var(--accent-primary);
-  color: #0b0c10;
 }
 

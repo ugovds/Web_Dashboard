@@ -43,24 +43,24 @@
     </noscript>
 
     <!-- Stylesheets modulaires critiques (Above-The-Fold) -->
-    <link rel="stylesheet" href="css/base.css?v=2.9" />
-    <link rel="stylesheet" href="css/deck.css?v=2.9" />
-    <link rel="stylesheet" href="css/sidebar.css?v=2.9" />
-    <link rel="stylesheet" href="css/dashboard.css?v=2.9" />
-    <link rel="stylesheet" href="css/clock.css?v=2.9" />
-    <link rel="stylesheet" href="css/search.css?v=2.9" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=2.9" />
-    <link rel="stylesheet" href="css/calendar.css?v=2.9" />
-    <link rel="stylesheet" href="css/tasks.css?v=2.9" />
-    <link rel="stylesheet" href="css/responsive.css?v=2.9" />
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.9" />
+    <link rel="stylesheet" href="css/base.css?v=3.0" />
+    <link rel="stylesheet" href="css/deck.css?v=3.0" />
+    <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
+    <link rel="stylesheet" href="css/dashboard.css?v=3.0" />
+    <link rel="stylesheet" href="css/clock.css?v=3.0" />
+    <link rel="stylesheet" href="css/search.css?v=3.0" />
+    <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
+    <link rel="stylesheet" href="css/calendar.css?v=3.0" />
+    <link rel="stylesheet" href="css/tasks.css?v=3.0" />
+    <link rel="stylesheet" href="css/responsive.css?v=3.0" />
+    <link rel="stylesheet" href="css/themes/kanagawa.css?v=3.0" />
 
     <!-- Stylesheets secondaires différées (Widgets hors-écran, Modales, Thèmes inactifs) -->
-    <link rel="stylesheet" href="css/widgets.css?v=2.9" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/modals.css?v=2.9" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/sakura.css?v=2.9" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.9" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/retrowave.css?v=2.9" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/widgets.css?v=3.0" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/modals.css?v=3.0" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/sakura.css?v=3.0" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=3.0" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/retrowave.css?v=3.0" media="print" onload="this.media='all'" />
   </head>
 
   <body data-theme="4">
@@ -356,78 +356,92 @@
             </div>
           </div>
 
-          <!-- VUE 2 : CALENDRIER & TÂCHES FUSIONNÉS -->
+          <!-- VUE 2 : CALENDRIER & TÂCHES FUSIONNÉS (70% AGENDA / 30% TÂCHES) -->
           <div id="deck-view-agenda" class="deck-slide-view agenda-full-view" hidden>
-                <div class="merged-calendar-section">
-                  <div class="cal-controls-row">
-                    <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
-                      <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <span id="cal-title" class="cal-title">Oct 2026</span>
-                    <button id="cal-next" class="cal-nav-btn" title="Mois suivant">
-                      <i class="fa-solid fa-chevron-right"></i>
-                    </button>
-                    <button id="cal-today" class="cal-today-btn" title="Revenir à aujourd'hui">auj</button>
-                  </div>
-                  <div class="cal-weekdays">
-                    <span>Lu</span><span>Ma</span><span>Me</span><span>Je</span><span>Ve</span><span>Sa</span><span>Di</span>
-                  </div>
-                  <div id="cal-days" class="cal-days"></div>
+            <div class="merged-calendar-section">
+              <div class="cal-controls-row">
+                <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <span id="cal-title" class="cal-title">Oct 2026</span>
+                <button id="cal-next" class="cal-nav-btn" title="Mois suivant">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button id="cal-today" class="cal-today-btn" title="Revenir à aujourd'hui">Aujourd'hui</button>
+              </div>
+              <div class="cal-weekdays">
+                <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+              </div>
+              <div id="cal-days" class="cal-days"></div>
+            </div>
+
+            <div class="merged-tasks-section">
+              <div class="tasks-header-row">
+                <div class="tasks-title-group">
+                  <span class="tasks-label"><i class="fa-solid fa-list-check"></i> Tâches</span>
+                  <span id="tasks-stats-badge" class="tasks-stats-badge">0 / 0</span>
                 </div>
+                <div class="tasks-filters-group">
+                  <button type="button" class="task-filter-btn active" data-filter="all">Toutes</button>
+                  <button type="button" class="task-filter-btn" data-filter="pending">À faire</button>
+                  <button type="button" class="task-filter-btn" data-filter="done">Faites</button>
+                  <button type="button" class="task-filter-btn" data-filter="today" title="Afficher uniquement les tâches du jour">Auj.</button>
+                  <button type="button" id="task-sort-btn" class="task-filter-btn task-action-chip" title="Changer l'ordre de tri : Normal / Priorité / Échéance">
+                    <i class="fa-solid fa-arrow-down-short-wide"></i> <span id="task-sort-label">Tri</span>
+                  </button>
+                  <button type="button" id="task-export-ics-btn" class="task-filter-btn task-action-chip" title="Exporter l'agenda vers votre calendrier (.ics)">
+                    <i class="fa-solid fa-calendar-arrow-down"></i> .ics
+                  </button>
+                  <button id="clear-date-filter" class="filter-chip" hidden title="Afficher toutes les dates">
+                    <span id="filter-date-label"></span> &times;
+                  </button>
+                </div>
+              </div>
 
-                <div class="merged-tasks-section">
-                  <div class="tasks-header-row">
-                    <div class="tasks-title-group">
-                      <span class="tasks-label"><i class="fa-solid fa-list-check"></i> Tâches</span>
-                      <span id="tasks-stats-badge" class="tasks-stats-badge">0 / 0</span>
-                    </div>
-                    <div class="tasks-filters-group">
-                      <button type="button" class="task-filter-btn active" data-filter="all">Toutes</button>
-                      <button type="button" class="task-filter-btn" data-filter="pending">À faire</button>
-                      <button type="button" class="task-filter-btn" data-filter="done">Faites</button>
-                      <button type="button" class="task-filter-btn" data-filter="today" title="Afficher uniquement les tâches du jour">Auj.</button>
-                      <button type="button" id="task-sort-btn" class="task-filter-btn task-action-chip" title="Changer l'ordre de tri : Normal / Priorité / Échéance">
-                        <i class="fa-solid fa-arrow-down-short-wide"></i> <span id="task-sort-label">Tri</span>
-                      </button>
-                      <button type="button" id="task-export-ics-btn" class="task-filter-btn task-action-chip" title="Exporter l'agenda vers votre calendrier (.ics)">
-                        <i class="fa-solid fa-calendar-arrow-down"></i> .ics
-                      </button>
-                      <button id="clear-date-filter" class="filter-chip" hidden title="Afficher toutes les dates">
-                        <span id="filter-date-label"></span> &times;
-                      </button>
-                    </div>
-                  </div>
+              <!-- Mini barre de progression d'accomplissement des tâches -->
+              <div class="tasks-progress-mini-wrap">
+                <div id="tasks-progress-mini-fill" class="tasks-progress-mini-fill" style="width: 0%;"></div>
+              </div>
 
-                  <!-- Mini barre de progression d'accomplissement des tâches -->
-                  <div class="tasks-progress-mini-wrap">
-                    <div id="tasks-progress-mini-fill" class="tasks-progress-mini-fill" style="width: 0%;"></div>
-                  </div>
-
-                  <!-- Liste défilante des tâches -->
-                  <ul id="todo-list" class="todo-list merged-todo-list"></ul>
-
-                  <!-- Ajouteur de tâches positionné en bas -->
-                  <form id="todo-form" class="todo-input-row">
-                    <input
-                      id="todo-input"
-                      type="text"
-                      placeholder="+ Ajouter une tâche... (Touche T pour cibler)"
-                      autocomplete="off"
-                    />
+              <!-- Formulaire d'ajout rapide de tâche HAUTE VISIBILITÉ (en haut) -->
+              <form id="todo-form" class="todo-input-card">
+                <div class="todo-input-main-row">
+                  <div class="todo-input-icon-wrap"><i class="fa-solid fa-pen-nib"></i></div>
+                  <input
+                    id="todo-input"
+                    type="text"
+                    placeholder="Ajouter une tâche... (Touche T pour cibler)"
+                    autocomplete="off"
+                  />
+                  <button type="submit" class="todo-add-btn" title="Ajouter la tâche">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Ajouter</span>
+                  </button>
+                </div>
+                <div class="todo-input-meta-row">
+                  <div class="todo-priority-picker">
+                    <label for="todo-priority"><i class="fa-solid fa-flag"></i> Priorité :</label>
                     <select id="todo-priority" class="todo-priority-select" title="Niveau de priorité">
-                      <option value="urgent">🔴 Urgent</option>
-                      <option value="normal" selected>🟡 Normal</option>
-                      <option value="low">🟢 Faible</option>
+                      <option value="urgent">🔴 Haute (Urgent)</option>
+                      <option value="normal" selected>🟡 Moyenne (Normal)</option>
+                      <option value="low">🟢 Basse (Faible)</option>
                     </select>
+                  </div>
+                  <div class="todo-date-picker">
+                    <label for="todo-date"><i class="fa-regular fa-calendar"></i> Échéance :</label>
                     <input
                       id="todo-date"
                       type="date"
                       title="Assigner une date d'échéance (optionnel)"
                     />
-                    <button type="submit" class="todo-add-btn" title="Ajouter"><i class="fa-solid fa-plus"></i></button>
-                  </form>
+                  </div>
                 </div>
-              </div>
+              </form>
+
+              <!-- Liste défilante des tâches -->
+              <ul id="todo-list" class="todo-list merged-todo-list"></ul>
+            </div>
+          </div>
 
               <!-- VUE 2 : MÉTÉO COMPLÈTE & PRÉVISIONS -->
               <div id="deck-view-weather" class="deck-slide-view weather-full-view" hidden>
@@ -1751,20 +1765,20 @@
     </div>
 
     <!-- Scripts JavaScript modulaires différés (téléchargement parallèle sans bloquer le parsing DOM) -->
-    <script defer src="js/themes.js?v=2.9"></script>
-    <script defer src="js/appearance.js?v=2.9"></script>
-    <script defer src="js/clock.js?v=2.9"></script>
-    <script defer src="js/weather-fx.js?v=2.9"></script>
-    <script defer src="js/weather.js?v=2.9"></script>
-    <script defer src="js/calendar.js?v=2.9"></script>
-    <script defer src="js/tasks.js?v=2.9"></script>
-    <script defer src="js/search.js?v=2.9"></script>
-    <script defer src="js/feeds.js?v=2.9"></script>
-    <script defer src="js/bookmarks.js?v=2.9"></script>
-    <script defer src="js/widgets.js?v=2.9"></script>
-    <script defer src="js/custom-hub.js?v=2.9"></script>
-    <script defer src="js/command-palette.js?v=2.9"></script>
-    <script defer src="js/shortcuts.js?v=2.9"></script>
-    <script defer src="js/app.js?v=2.9"></script>
+    <script defer src="js/themes.js?v=3.0"></script>
+    <script defer src="js/appearance.js?v=3.0"></script>
+    <script defer src="js/clock.js?v=3.0"></script>
+    <script defer src="js/weather-fx.js?v=3.0"></script>
+    <script defer src="js/weather.js?v=3.0"></script>
+    <script defer src="js/calendar.js?v=3.0"></script>
+    <script defer src="js/tasks.js?v=3.0"></script>
+    <script defer src="js/search.js?v=3.0"></script>
+    <script defer src="js/feeds.js?v=3.0"></script>
+    <script defer src="js/bookmarks.js?v=3.0"></script>
+    <script defer src="js/widgets.js?v=3.0"></script>
+    <script defer src="js/custom-hub.js?v=3.0"></script>
+    <script defer src="js/command-palette.js?v=3.0"></script>
+    <script defer src="js/shortcuts.js?v=3.0"></script>
+    <script defer src="js/app.js?v=3.0"></script>
   </body>
 </html>

@@ -343,51 +343,74 @@
 }
 
 /* ========================================================
-   VUE 2 : AGENDA & TÂCHES (Spacieux en 2 colonnes)
+   VUE 2 : AGENDA & TÂCHES (Spacieux 70% Agenda / 30% Tâches)
    ======================================================== */
-.agenda-full-view {
+.agenda-full-view,
+.deck-slide-view.agenda-full-view.active {
   display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 1.5rem;
+  grid-template-columns: minmax(0, 2.33fr) minmax(360px, 1fr); /* 70% pour l'agenda, 30% pour les tâches */
+  gap: clamp(16px, 1.8vw, 28px);
   height: 100%;
   min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.agenda-cal-col {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.agenda-tasks-col {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
+@media (max-width: 950px) {
+  .agenda-full-view,
+  .deck-slide-view.agenda-full-view.active {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(420px, auto) auto;
+    overflow-y: auto;
+  }
 }
 
 .agenda-full-view .merged-calendar-section,
 .agenda-full-view .merged-tasks-section {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 18px;
-  padding: 1.25rem;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  background: rgba(12, 16, 26, 0.74);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(18px, 2.2vh, 26px);
+  padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.8vw, 24px);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.agenda-full-view .merged-calendar-section {
+  max-height: none;
 }
 
 .agenda-full-view .merged-tasks-section {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  height: 100%;
 }
 
 .agenda-full-view .merged-todo-list {
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
+  height: 100%;
   overflow-y: auto;
+}
+
+@media (max-width: 950px) {
+  .agenda-full-view {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    overflow-y: auto;
+  }
+  .agenda-full-view .merged-calendar-section {
+    min-height: 480px;
+    height: auto;
+  }
+  .agenda-full-view .merged-tasks-section {
+    min-height: 420px;
+    height: auto;
+  }
 }
 
 /* ========================================================

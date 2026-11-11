@@ -61,23 +61,28 @@ function renderCalendar() {
 
     const totalTasks = stats ? (stats.pending + stats.done) : 0;
 
-    // Puces épurées et lisibles : pastilles de priorité sans texte tronqué
+    // Affichage direct des tâches dans l'agenda avec badge de priorité et état
     let tasksHtml = '';
     let tasksSummary = '';
     if (stats && stats.tasks && stats.tasks.length > 0) {
       tasksSummary = stats.tasks.map((t) => `\n • [${t.priority || 'normal'}] ${t.text}`).join('');
-      const maxVisibleDots = 3;
-      const visibleTasks = stats.tasks.slice(0, maxVisibleDots);
-      const remainingCount = stats.tasks.length - maxVisibleDots;
+      const maxVisibleTasks = 2;
+      const visibleTasks = stats.tasks.slice(0, maxVisibleTasks);
+      const remainingCount = stats.tasks.length - maxVisibleTasks;
 
-      const dots = visibleTasks.map((t) => {
+      const taskPills = visibleTasks.map((t) => {
         const priorityCls = `priority-${t.priority || 'normal'}`;
-        const doneCls = t.done ? 'done' : '';
-        return `<span class="cal-dot ${priorityCls} ${doneCls}"></span>`;
+        const doneCls = t.done ? 'is-done' : '';
+        return `
+          <div class="cal-task-pill ${priorityCls} ${doneCls}" title="${safeEscape(t.text)} (${t.priority || 'normal'})">
+            <span class="cal-task-pip"></span>
+            <span class="cal-task-title">${safeEscape(t.text)}</span>
+          </div>
+        `;
       }).join('');
 
-      const countBadge = remainingCount > 0 ? `<span class="cal-dot-count">+${remainingCount}</span>` : '';
-      tasksHtml = `<div class="cal-day-dots">${dots}${countBadge}</div>`;
+      const countBadge = remainingCount > 0 ? `<div class="cal-task-more">+${remainingCount} autre${remainingCount > 1 ? 's' : ''}</div>` : '';
+      tasksHtml = `<div class="cal-day-tasks-list">${taskPills}${countBadge}</div>`;
     }
 
     const dayTitle = `${d} ${monthName} • ${totalTasks} tâche(s)${tasksSummary}`;
@@ -86,7 +91,7 @@ function renderCalendar() {
       <div class="${classes}" data-date="${iso}" title="${safeEscape(dayTitle)}" role="button" tabindex="0">
         <div class="cal-day-top">
           <span class="cal-day-num">${d}</span>
-          ${isToday ? '<span class="cal-day-dot" title="Aujourd\'hui"></span>' : ''}
+          ${isToday ? '<span class="cal-today-pill" title="Aujourd\'hui">Auj.</span>' : ''}
         </div>
         ${tasksHtml}
       </div>
