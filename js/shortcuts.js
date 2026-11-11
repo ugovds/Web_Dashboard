@@ -105,7 +105,7 @@ function initShortcuts() {
           e.preventDefault();
           const targetViewKey = DECK_VIEWS_ORDER[targetIdx];
           const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${targetViewKey}"]`);
-          if (navBtn) {
+          if (navBtn && !navBtn.classList.contains('tab-hidden') && navBtn.style.display !== 'none') {
             navBtn.click();
             if (typeof showToast === 'function') {
               const label = navBtn.querySelector('.nav-label')?.textContent || navBtn.querySelector('span')?.textContent || targetViewKey;
@@ -134,7 +134,7 @@ function initShortcuts() {
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isNotTyping) {
       e.preventDefault();
       const visibleBtns = Array.from(document.querySelectorAll('.deck-nav-btn')).filter(
-        (b) => b.offsetParent !== null && b.style.display !== 'none'
+        (b) => b.offsetParent !== null && !b.classList.contains('tab-hidden') && b.style.display !== 'none'
       );
       if (visibleBtns.length) {
         const activeIdx = visibleBtns.findIndex((b) => b.classList.contains('active'));

@@ -2355,3 +2355,144 @@
   border: 1px solid rgba(255, 255, 255, 0.5) !important;
 }
 
+/* ========================================================
+   SECTION PERSONNALISATION DE LA BARRE LATÉRALE (SIDEBAR DOCK)
+   ======================================================== */
+.sidebar-custom-section {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  padding: 1.2rem !important;
+  margin-top: 1.2rem !important;
+  margin-bottom: 1.2rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.2rem !important;
+}
+
+.custom-section-title {
+  margin: 0 !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.55rem !important;
+  letter-spacing: 0.5px !important;
+}
+
+.custom-section-title i {
+  color: var(--accent-primary) !important;
+}
+
+.custom-section-desc {
+  margin: -0.5rem 0 0.3rem 0 !important;
+  font-size: 0.78rem !important;
+  color: var(--text-muted) !important;
+  line-height: 1.4 !important;
+}
+
+.sidebar-custom-group {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.55rem !important;
+}
+
+.sidebar-group-label {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.sidebar-group-label .badge-hint {
+  font-size: 0.72rem !important;
+  color: var(--accent-primary) !important;
+  font-family: "JetBrains Mono", monospace !important;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12) !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25) !important;
+}
+
+.sidebar-pill-selector {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 0.65rem !important;
+}
+
+.sidebar-pref-btn {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 12px !important;
+  padding: 0.8rem 0.6rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  gap: 0.35rem !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+  color: var(--text-main) !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
+  position: relative !important;
+  outline: none !important;
+}
+
+.sidebar-pref-btn i {
+  font-size: 1.15rem !important;
+  color: var(--text-muted) !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
+}
+
+.sidebar-pref-btn span {
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.sidebar-pref-btn small {
+  font-size: 0.68rem !important;
+  color: var(--text-muted) !important;
+}
+
+.sidebar-pref-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-2px) !important;
+}
+
+.sidebar-pref-btn:hover i {
+  color: #fff !important;
+  transform: scale(1.1) !important;
+}
+
+.sidebar-pref-btn.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25) !important;
+}
+
+.sidebar-pref-btn.active i {
+  color: var(--accent-primary) !important;
+  transform: scale(1.1) !important;
+}
+
+.sidebar-pref-btn.active span {
+  color: #fff !important;
+}
+
+.sidebar-pref-btn.active small {
+  color: var(--accent-primary) !important;
+  opacity: 0.9 !important;
+}
+
+@media (max-width: 650px) {
+  .sidebar-pill-selector {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+

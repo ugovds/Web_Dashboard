@@ -49,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initTasks === 'function') initTasks();
   if (typeof initCalendar === 'function') initCalendar();
   if (typeof initSearch === 'function') initSearch();
+  if (typeof loadWidgetSettings === 'function') loadWidgetSettings();
+  if (typeof applyWidgetVisibility === 'function') applyWidgetVisibility();
   if (typeof initCustomHub === 'function') initCustomHub();
   if (typeof initShortcuts === 'function') initShortcuts();
 

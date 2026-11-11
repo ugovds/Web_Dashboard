@@ -15,7 +15,7 @@
 /* --- CONTENEUR DOCK FLOTTANT --- */
 .dashboard-sidebar {
   position: relative;
-  width: 66px; /* Format compact élégant */
+  width: 68px; /* Format standard équilibré */
   height: calc(100vh - 24px);
   margin: 12px 0 12px 14px;
   border-radius: 20px;
@@ -26,8 +26,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 12px 6px;
-  transition: width 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.28s ease;
+  padding: 10px 8px; /* Padding équilibré et symétrique */
+  transition: width 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.28s ease, border-radius 0.25s ease, background 0.25s ease;
   z-index: 50;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   user-select: none;
@@ -38,9 +38,136 @@
 /* État déplié / expanded */
 .dashboard-sidebar.expanded,
 .dashboard-sidebar.locked-expanded {
-  width: 224px;
-  padding: 12px 8px;
+  width: 236px;
+  padding: 12px 10px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* --- DENSITÉS / LARGEURS DE LA SIDEBAR --- */
+/* Compact (56px) */
+.dashboard-sidebar.sidebar-density-compact {
+  width: 56px;
+  padding: 8px 6px;
+}
+.dashboard-sidebar.sidebar-density-compact.expanded,
+.dashboard-sidebar.sidebar-density-compact.locked-expanded {
+  width: 210px;
+  padding: 10px 8px;
+}
+.dashboard-sidebar.sidebar-density-compact .sidebar-brand-avatar {
+  width: 36px;
+  height: 36px;
+}
+.dashboard-sidebar.sidebar-density-compact .sidebar-nav-item,
+.dashboard-sidebar.sidebar-density-compact .deck-nav-btn {
+  min-height: 38px !important;
+  max-height: 72px !important;
+}
+.dashboard-sidebar.sidebar-density-compact .sidebar-nav-item .nav-icon-wrap i,
+.dashboard-sidebar.sidebar-density-compact .deck-nav-btn .nav-icon-wrap i {
+  font-size: 1.1rem !important;
+}
+
+/* Normal / Standard (68px) */
+.dashboard-sidebar.sidebar-density-normal {
+  width: 68px;
+  padding: 10px 8px;
+}
+.dashboard-sidebar.sidebar-density-normal.expanded,
+.dashboard-sidebar.sidebar-density-normal.locked-expanded {
+  width: 236px;
+  padding: 12px 10px;
+}
+
+/* Spacieux (82px) pour grand écran 34" Ultrawide */
+.dashboard-sidebar.sidebar-density-spacious {
+  width: 82px;
+  padding: 14px 10px;
+}
+.dashboard-sidebar.sidebar-density-spacious.expanded,
+.dashboard-sidebar.sidebar-density-spacious.locked-expanded {
+  width: 268px;
+  padding: 14px 12px;
+}
+.dashboard-sidebar.sidebar-density-spacious .sidebar-brand-avatar {
+  width: 46px;
+  height: 46px;
+}
+.dashboard-sidebar.sidebar-density-spacious .sidebar-nav-item,
+.dashboard-sidebar.sidebar-density-spacious .deck-nav-btn {
+  min-height: 50px !important;
+  max-height: 96px !important;
+}
+.dashboard-sidebar.sidebar-density-spacious .sidebar-nav-item .nav-icon-wrap i,
+.dashboard-sidebar.sidebar-density-spacious .deck-nav-btn .nav-icon-wrap i {
+  font-size: 1.35rem !important;
+}
+
+/* --- COURBURES DES ANGLES (BORDER-RADIUS) --- */
+/* Discret (12px) */
+.dashboard-sidebar.sidebar-radius-subtle {
+  border-radius: 12px;
+}
+.dashboard-sidebar.sidebar-radius-subtle .sidebar-nav-item,
+.dashboard-sidebar.sidebar-radius-subtle .deck-nav-btn,
+.dashboard-sidebar.sidebar-radius-subtle .sidebar-indicator {
+  border-radius: 8px !important;
+}
+.dashboard-sidebar.sidebar-radius-subtle .sidebar-brand-avatar {
+  border-radius: 9px;
+}
+
+/* Moderne (20px - Par défaut) */
+.dashboard-sidebar.sidebar-radius-normal {
+  border-radius: 20px;
+}
+.dashboard-sidebar.sidebar-radius-normal .sidebar-nav-item,
+.dashboard-sidebar.sidebar-radius-normal .deck-nav-btn,
+.dashboard-sidebar.sidebar-radius-normal .sidebar-indicator {
+  border-radius: 16px !important;
+}
+.dashboard-sidebar.sidebar-radius-normal .sidebar-brand-avatar {
+  border-radius: 14px;
+}
+
+/* Pilule (28px) */
+.dashboard-sidebar.sidebar-radius-pill {
+  border-radius: 32px;
+}
+.dashboard-sidebar.sidebar-radius-pill .sidebar-nav-item,
+.dashboard-sidebar.sidebar-radius-pill .deck-nav-btn,
+.dashboard-sidebar.sidebar-radius-pill .sidebar-indicator {
+  border-radius: 24px !important;
+}
+.dashboard-sidebar.sidebar-radius-pill .sidebar-brand-avatar {
+  border-radius: 20px;
+}
+
+/* --- FINITIONS DU VERRE (GLASS FINISH) --- */
+/* Verre Sombre (Par défaut) */
+.dashboard-sidebar.sidebar-glass-deep {
+  background: rgba(12, 14, 22, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+}
+
+/* Crystal Neo-Frost (lumineux & vaporeux) */
+.dashboard-sidebar.sidebar-glass-crystal {
+  background: rgba(18, 22, 38, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(40px) saturate(220%);
+  -webkit-backdrop-filter: blur(40px) saturate(220%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.25), 0 0 22px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.15);
+}
+
+/* Noir Mat Pur Opaque (contrasté, minimaliste) */
+.dashboard-sidebar.sidebar-glass-opaque {
+  background: #090b12;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.85);
 }
 
 /* --- HEADER DU DOCK (AVATAR THÈME & TITRE) --- */
@@ -158,6 +285,16 @@
   display: flex;
 }
 
+/* --- MASQUAGE STRICT DES ONGLETS DÉSACTIVÉS DANS LA SIDEBAR --- */
+.sidebar-nav-item.tab-hidden,
+.deck-nav-btn.tab-hidden,
+.sidebar-nav-item[style*="display: none"],
+.deck-nav-btn[style*="display: none"],
+.sidebar-nav-item[style*="display:none"],
+.deck-nav-btn[style*="display:none"] {
+  display: none !important;
+}
+
 /* --- LISTE DE NAVIGATION : RÉPARTITION VERTICALE 100% --- */
 .sidebar-nav {
   flex: 1 1 auto;
@@ -165,11 +302,13 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Distribue les 10 onglets sur TOUTE la hauteur du dock */
+  justify-content: space-between; /* Distribue les onglets actifs sur TOUTE la hauteur du dock */
   gap: clamp(6px, 1.8vh, 26px);
   overflow: visible; /* Pas de scrollbar qui casse le space-between */
   padding: 4px 0;
   position: relative;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .sidebar-nav::-webkit-scrollbar {
@@ -180,8 +319,8 @@
 .sidebar-indicator {
   position: absolute;
   top: 0;
-  left: 6px;
-  width: calc(100% - 12px);
+  left: 0;
+  width: 100%;
   border-radius: clamp(12px, 1.5vh, 18px);
   background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16);
   border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
@@ -192,15 +331,16 @@
   -webkit-backdrop-filter: blur(8px);
   transition: transform var(--anim-sidebar-duration, 0.42s) var(--anim-sidebar-easing, cubic-bezier(0.22, 1, 0.36, 1)),
               height var(--anim-sidebar-duration, 0.42s) ease,
-              width 0.28s ease,
               opacity 0.25s ease;
   will-change: transform, height;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .dashboard-sidebar.expanded .sidebar-indicator,
 .dashboard-sidebar.locked-expanded .sidebar-indicator {
-  left: 8px;
-  width: calc(100% - 16px);
+  left: 0;
+  width: 100%;
 }
 
 /* Variantes de style d'indicateur configurables */
@@ -233,10 +373,11 @@ body.indicator-style-clean .sidebar-indicator {
   cursor: pointer !important;
   text-decoration: none !important;
   font-family: inherit !important;
-  transition: color 0.2s ease, transform 0.2s ease !important;
+  transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease !important;
   position: relative !important;
   z-index: 2 !important;
   box-sizing: border-box !important;
+  margin: 0 !important;
   overflow: visible;
 }
 
@@ -310,7 +451,7 @@ body.indicator-style-clean .sidebar-indicator {
   display: none !important;
 }
 
-/* En mode déplié : affichage des libellés */
+/* En mode déplié : affichage des libellés avec troncature propre anti-débordement */
 .dashboard-sidebar.expanded .nav-label,
 .dashboard-sidebar.locked-expanded .nav-label {
   display: block !important;
@@ -318,6 +459,9 @@ body.indicator-style-clean .sidebar-indicator {
   font-size: 0.84rem;
   font-weight: 500;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
   color: inherit;
   flex: 1;
   text-align: left;
@@ -334,6 +478,7 @@ body.indicator-style-clean .sidebar-indicator {
   padding: 2px 5px;
   border-radius: 4px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* --- TOOLTIP EN MODE RÉDUIT (ÉLÉGANT, SOFT FLOU) --- */

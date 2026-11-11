@@ -43,24 +43,24 @@
     </noscript>
 
     <!-- Stylesheets modulaires critiques (Above-The-Fold) -->
-    <link rel="stylesheet" href="css/base.css?v=2.7" />
-    <link rel="stylesheet" href="css/deck.css?v=2.7" />
-    <link rel="stylesheet" href="css/sidebar.css?v=2.7" />
-    <link rel="stylesheet" href="css/dashboard.css?v=2.7" />
-    <link rel="stylesheet" href="css/clock.css?v=2.7" />
-    <link rel="stylesheet" href="css/search.css?v=2.7" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=2.7" />
-    <link rel="stylesheet" href="css/calendar.css?v=2.7" />
-    <link rel="stylesheet" href="css/tasks.css?v=2.7" />
-    <link rel="stylesheet" href="css/responsive.css?v=2.7" />
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.7" />
+    <link rel="stylesheet" href="css/base.css?v=2.8" />
+    <link rel="stylesheet" href="css/deck.css?v=2.8" />
+    <link rel="stylesheet" href="css/sidebar.css?v=2.8" />
+    <link rel="stylesheet" href="css/dashboard.css?v=2.8" />
+    <link rel="stylesheet" href="css/clock.css?v=2.8" />
+    <link rel="stylesheet" href="css/search.css?v=2.8" />
+    <link rel="stylesheet" href="css/bookmarks.css?v=2.8" />
+    <link rel="stylesheet" href="css/calendar.css?v=2.8" />
+    <link rel="stylesheet" href="css/tasks.css?v=2.8" />
+    <link rel="stylesheet" href="css/responsive.css?v=2.8" />
+    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.8" />
 
     <!-- Stylesheets secondaires différées (Widgets hors-écran, Modales, Thèmes inactifs) -->
-    <link rel="stylesheet" href="css/widgets.css?v=2.7" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/modals.css?v=2.7" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/sakura.css?v=2.7" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.7" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/retrowave.css?v=2.7" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/widgets.css?v=2.8" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/modals.css?v=2.8" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/sakura.css?v=2.8" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.8" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/retrowave.css?v=2.8" media="print" onload="this.media='all'" />
   </head>
 
   <body data-theme="4">
@@ -985,6 +985,87 @@
                       </div>
                     </div>
 
+                    <!-- Personnalisation de la Barre Latérale (Cockpit Dock) -->
+                    <div class="appearance-section sidebar-custom-section">
+                      <h5 class="custom-section-title"><i class="fa-solid fa-bars-staggered"></i> Personnalisation de la Barre Latérale</h5>
+                      <p class="custom-section-desc">Ajustez la largeur, les arrondis et le style de verre du dock latéral pour votre écran.</p>
+
+                      <!-- Densité / Taille du Dock -->
+                      <div class="sidebar-custom-group">
+                        <label class="sidebar-group-label">
+                          <span>Largeur & Densité du Dock :</span>
+                          <span class="badge-hint" id="sidebar-density-badge">Standard (68px)</span>
+                        </label>
+                        <div class="sidebar-pill-selector">
+                          <button type="button" class="sidebar-pref-btn sidebar-density-btn" data-density="compact">
+                            <i class="fa-solid fa-compress"></i>
+                            <span>Compact</span>
+                            <small>56px - Épuré</small>
+                          </button>
+                          <button type="button" class="sidebar-pref-btn sidebar-density-btn active" data-density="normal">
+                            <i class="fa-solid fa-grip-vertical"></i>
+                            <span>Standard</span>
+                            <small>68px - Équilibré</small>
+                          </button>
+                          <button type="button" class="sidebar-pref-btn sidebar-density-btn" data-density="spacious">
+                            <i class="fa-solid fa-expand"></i>
+                            <span>Spacieux</span>
+                            <small>82px - Écran 34"</small>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Courbure des angles (Border Radius) -->
+                      <div class="sidebar-custom-group">
+                        <label class="sidebar-group-label">
+                          <span>Courbure des Angles (Arrondis) :</span>
+                          <span class="badge-hint" id="sidebar-radius-badge">Moderne (20px)</span>
+                        </label>
+                        <div class="sidebar-pill-selector">
+                          <button type="button" class="sidebar-pref-btn sidebar-radius-btn" data-radius="subtle">
+                            <i class="fa-regular fa-square"></i>
+                            <span>Discret</span>
+                            <small>12px - Technique</small>
+                          </button>
+                          <button type="button" class="sidebar-pref-btn sidebar-radius-btn active" data-radius="normal">
+                            <i class="fa-solid fa-vector-square"></i>
+                            <span>Moderne</span>
+                            <small>20px - Doux</small>
+                          </button>
+                          <button type="button" class="sidebar-pref-btn sidebar-radius-btn" data-radius="pill">
+                            <i class="fa-solid fa-capsules"></i>
+                            <span>Pilule</span>
+                            <small>28px - Rond</small>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Finition Glassmorphism -->
+                      <div class="sidebar-custom-group">
+                        <label class="sidebar-group-label">
+                          <span>Finition du Verre & Translucidité :</span>
+                          <span class="badge-hint" id="sidebar-glass-badge">Verre Teinté</span>
+                        </label>
+                        <div class="sidebar-pill-selector">
+                          <button type="button" class="sidebar-pref-btn sidebar-glass-btn active" data-glass="deep">
+                            <i class="fa-solid fa-moon"></i>
+                            <span>Verre Teinté</span>
+                            <small>Sombre & Flou doux</small>
+                          </button>
+                          <button type="button" class="sidebar-pref-btn sidebar-glass-btn" data-glass="crystal">
+                            <i class="fa-solid fa-gem"></i>
+                            <span>Crystal Neo-Frost</span>
+                            <small>Lumineux & Reflets</small>
+                          </button>
+                          <button type="button" class="sidebar-pref-btn sidebar-glass-btn" data-glass="opaque">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Noir Mat Pur</span>
+                            <small>Opaque & Contraste</small>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                     <div class="hub-panel-footer">
                       <button type="button" id="appearance-reset-btn" class="modal-btn danger">
                         Réinitialiser l'apparence par défaut
@@ -1188,6 +1269,24 @@
                     </div>
 
                     <div class="hub-widgets-grid">
+                      <!-- Widget Agenda & Tâches -->
+                      <div class="widget-config-card" data-widget-key="agenda">
+                        <div class="widget-card-top">
+                          <div class="widget-icon-box"><i class="fa-regular fa-calendar-check"></i></div>
+                          <div class="widget-meta">
+                            <h5>Agenda & Gestionnaire de Tâches</h5>
+                            <p>Calendrier interactif, échéances, to-do list avec priorités et synchronisation locale.</p>
+                          </div>
+                          <label class="fx-toggle-label switch-only">
+                            <input type="checkbox" id="widget-toggle-agenda" checked />
+                            <span class="switch-slider"></span>
+                          </label>
+                        </div>
+                        <div class="widget-config-body">
+                          <div class="widget-pill-badge"><i class="fa-solid fa-list-check"></i> Organisation & Rappels</div>
+                        </div>
+                      </div>
+
                       <!-- Widget Météo -->
                       <div class="widget-config-card" data-widget-key="weather">
                         <div class="widget-card-top">
@@ -1203,6 +1302,24 @@
                         </div>
                         <div class="widget-config-body">
                           <div class="widget-pill-badge"><i class="fa-solid fa-location-dot"></i> Détection automatique & recherche</div>
+                        </div>
+                      </div>
+
+                      <!-- Widget Actualités / Flux RSS -->
+                      <div class="widget-config-card" data-widget-key="feeds">
+                        <div class="widget-card-top">
+                          <div class="widget-icon-box"><i class="fa-solid fa-newspaper"></i></div>
+                          <div class="widget-meta">
+                            <h5>Flux d'Actualités & Veille Tech</h5>
+                            <p>Agrégateur de flux RSS en temps réel, articles récents, filtrage par source et lecture rapide.</p>
+                          </div>
+                          <label class="fx-toggle-label switch-only">
+                            <input type="checkbox" id="widget-toggle-feeds" checked />
+                            <span class="switch-slider"></span>
+                          </label>
+                        </div>
+                        <div class="widget-config-body">
+                          <div class="widget-pill-badge"><i class="fa-solid fa-rss"></i> Lecteur RSS multi-sources</div>
                         </div>
                       </div>
 
@@ -1603,20 +1720,20 @@
     </div>
 
     <!-- Scripts JavaScript modulaires différés (téléchargement parallèle sans bloquer le parsing DOM) -->
-    <script defer src="js/themes.js?v=2.4"></script>
-    <script defer src="js/appearance.js?v=2.4"></script>
-    <script defer src="js/clock.js?v=2.4"></script>
-    <script defer src="js/weather-fx.js?v=2.4"></script>
-    <script defer src="js/weather.js?v=2.4"></script>
-    <script defer src="js/calendar.js?v=2.4"></script>
-    <script defer src="js/tasks.js?v=2.4"></script>
-    <script defer src="js/search.js?v=2.4"></script>
-    <script defer src="js/feeds.js?v=2.4"></script>
-    <script defer src="js/bookmarks.js?v=2.4"></script>
-    <script defer src="js/widgets.js?v=2.4"></script>
-    <script defer src="js/custom-hub.js?v=2.4"></script>
-    <script defer src="js/command-palette.js?v=2.4"></script>
-    <script defer src="js/shortcuts.js?v=2.4"></script>
-    <script defer src="js/app.js?v=2.4"></script>
+    <script defer src="js/themes.js?v=2.8"></script>
+    <script defer src="js/appearance.js?v=2.8"></script>
+    <script defer src="js/clock.js?v=2.8"></script>
+    <script defer src="js/weather-fx.js?v=2.8"></script>
+    <script defer src="js/weather.js?v=2.8"></script>
+    <script defer src="js/calendar.js?v=2.8"></script>
+    <script defer src="js/tasks.js?v=2.8"></script>
+    <script defer src="js/search.js?v=2.8"></script>
+    <script defer src="js/feeds.js?v=2.8"></script>
+    <script defer src="js/bookmarks.js?v=2.8"></script>
+    <script defer src="js/widgets.js?v=2.8"></script>
+    <script defer src="js/custom-hub.js?v=2.8"></script>
+    <script defer src="js/command-palette.js?v=2.8"></script>
+    <script defer src="js/shortcuts.js?v=2.8"></script>
+    <script defer src="js/app.js?v=2.8"></script>
   </body>
 </html>

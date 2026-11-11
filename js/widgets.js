@@ -8,11 +8,13 @@
  */
 
 const defaultWidgetSettings = {
+  agenda: true,
   weather: true,
+  feeds: true,
+  system: true,
   pomodoro: true,
   notes: true,
   ambient: true,
-  system: true,
   quotes: true
 };
 
@@ -35,13 +37,19 @@ function saveWidgetSettings() {
 }
 
 function applyWidgetVisibility() {
-  // Synchroniser les boutons de navigation du deck
-  const keys = ['weather', 'pomodoro', 'notes', 'ambient', 'system', 'quotes'];
+  // Synchroniser les boutons de navigation du deck (sidebar cockpit)
+  const keys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'ambient', 'quotes'];
   keys.forEach((key) => {
     const isEnabled = currentWidgetSettings[key] !== false;
     const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${key}"]`);
     if (navBtn) {
-      navBtn.style.display = isEnabled ? '' : 'none';
+      if (isEnabled) {
+        navBtn.classList.remove('tab-hidden');
+        navBtn.style.removeProperty('display');
+      } else {
+        navBtn.classList.add('tab-hidden');
+        navBtn.style.setProperty('display', 'none', 'important');
+      }
     }
 
     const check = document.getElementById(`widget-toggle-${key}`);
@@ -50,11 +58,16 @@ function applyWidgetVisibility() {
     }
   });
 
-  // Si la vue active actuelle a été désactivée, revenir à l'accueil
+  // Si la vue active actuelle a été désactivée, revenir immédiatement à l'accueil
   const activeNavBtn = document.querySelector('.deck-nav-btn.active');
-  if (activeNavBtn && activeNavBtn.style.display === 'none') {
-    const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]') || document.querySelector('.deck-nav-btn[data-deck-view="agenda"]');
-    if (homeBtn) homeBtn.click();
+  if (activeNavBtn && (activeNavBtn.classList.contains('tab-hidden') || activeNavBtn.style.display === 'none')) {
+    const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]');
+    if (homeBtn) {
+      homeBtn.click();
+    }
+  } else if (activeNavBtn && typeof updateDeckIndicator === 'function') {
+    // Recalculer l'indicateur glissant pour qu'il s'aligne immédiatement avec la nouvelle répartition
+    setTimeout(() => updateDeckIndicator(activeNavBtn), 60);
   }
 }
 
@@ -1441,14 +1454,27 @@ function initWidgets() {
   initQuotesWidget();
 
   // Écouteurs dans le centre de personnalisation (onglet Widgets)
-  ['weather', 'pomodoro', 'notes', 'ambient', 'system', 'quotes'].forEach((key) => {
+  const allWidgetKeys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'ambient', 'quotes'];
+  const widgetLabels = {
+    agenda: 'Agenda & Tâches',
+    weather: 'Météo & Radar',
+    feeds: 'Actualités',
+    system: 'Système & Bourse',
+    pomodoro: 'Focus Pomodoro',
+    notes: 'Bloc-Notes',
+    ambient: 'Ambiance Lo-Fi',
+    quotes: 'Citations'
+  };
+
+  allWidgetKeys.forEach((key) => {
     const toggle = document.getElementById(`widget-toggle-${key}`);
     if (toggle) {
       toggle.addEventListener('change', () => {
         currentWidgetSettings[key] = toggle.checked;
         saveWidgetSettings();
         if (typeof showToast === 'function') {
-          showToast(`Widget "${key}" ${toggle.checked ? 'activé' : 'désactivé'}`, 'info');
+          const name = widgetLabels[key] || key;
+          showToast(`Onglet "${name}" ${toggle.checked ? 'affiché dans la barre latérale' : 'masqué de la barre latérale'}`, toggle.checked ? 'success' : 'info');
         }
       });
     }

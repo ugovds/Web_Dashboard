@@ -564,8 +564,128 @@ function initAnimationHubControls() {
   }
 }
 
+/* ========================================================
+   PERSONNALISATION DE LA BARRE LATÉRALE (DENSITÉ, COURBURE, FINITION)
+   ======================================================== */
+const defaultSidebarSettings = {
+  density: 'normal',
+  radius: 'normal',
+  glass: 'deep'
+};
+
+function getSidebarSettings() {
+  try {
+    const raw = localStorage.getItem('startpage_sidebar_custom_settings');
+    if (raw) return { ...defaultSidebarSettings, ...JSON.parse(raw) };
+  } catch {}
+  return { ...defaultSidebarSettings };
+}
+
+function saveSidebarSettings(settings) {
+  localStorage.setItem('startpage_sidebar_custom_settings', JSON.stringify(settings));
+  applySidebarSettings(settings);
+}
+
+function applySidebarSettings(settings = getSidebarSettings()) {
+  const sidebar = document.getElementById('dashboard-sidebar');
+  if (!sidebar) return;
+
+  const density = settings.density || 'normal';
+  const radius = settings.radius || 'normal';
+  const glass = settings.glass || 'deep';
+
+  sidebar.classList.remove('sidebar-density-compact', 'sidebar-density-normal', 'sidebar-density-spacious');
+  sidebar.classList.add(`sidebar-density-${density}`);
+
+  sidebar.classList.remove('sidebar-radius-subtle', 'sidebar-radius-normal', 'sidebar-radius-pill');
+  sidebar.classList.add(`sidebar-radius-${radius}`);
+
+  sidebar.classList.remove('sidebar-glass-deep', 'sidebar-glass-crystal', 'sidebar-glass-opaque');
+  sidebar.classList.add(`sidebar-glass-${glass}`);
+
+  const densityBadge = document.getElementById('sidebar-density-badge');
+  const radiusBadge = document.getElementById('sidebar-radius-badge');
+  const glassBadge = document.getElementById('sidebar-glass-badge');
+
+  const densityLabels = {
+    compact: 'Compact (56px)',
+    normal: 'Standard (68px)',
+    spacious: 'Spacieux (82px)'
+  };
+  const radiusLabels = {
+    subtle: 'Discret (12px)',
+    normal: 'Moderne (20px)',
+    pill: 'Pilule (28px)'
+  };
+  const glassLabels = {
+    deep: 'Verre Teinté Sombre',
+    crystal: 'Crystal Neo-Frost',
+    opaque: 'Noir Mat Pur'
+  };
+
+  if (densityBadge) densityBadge.textContent = densityLabels[density] || density;
+  if (radiusBadge) radiusBadge.textContent = radiusLabels[radius] || radius;
+  if (glassBadge) glassBadge.textContent = glassLabels[glass] || glass;
+
+  document.querySelectorAll('.sidebar-density-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.density === density);
+  });
+  document.querySelectorAll('.sidebar-radius-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.radius === radius);
+  });
+  document.querySelectorAll('.sidebar-glass-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.glass === glass);
+  });
+
+  const curr = document.querySelector('.deck-nav-btn.active');
+  if (curr && typeof updateDeckIndicator === 'function') {
+    setTimeout(() => updateDeckIndicator(curr), 60);
+  }
+}
+
+function initSidebarCustomizationControls() {
+  applySidebarSettings();
+
+  document.querySelectorAll('.sidebar-density-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getSidebarSettings();
+      cur.density = btn.dataset.density;
+      saveSidebarSettings(cur);
+      if (typeof showToast === 'function') {
+        const name = btn.querySelector('span')?.textContent || cur.density;
+        showToast(`Taille Sidebar : ${name}`, 'info');
+      }
+    });
+  });
+
+  document.querySelectorAll('.sidebar-radius-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getSidebarSettings();
+      cur.radius = btn.dataset.radius;
+      saveSidebarSettings(cur);
+      if (typeof showToast === 'function') {
+        const name = btn.querySelector('span')?.textContent || cur.radius;
+        showToast(`Courbure : ${name}`, 'info');
+      }
+    });
+  });
+
+  document.querySelectorAll('.sidebar-glass-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getSidebarSettings();
+      cur.glass = btn.dataset.glass;
+      saveSidebarSettings(cur);
+      if (typeof showToast === 'function') {
+        const name = btn.querySelector('span')?.textContent || cur.glass;
+        showToast(`Finition Verre : ${name}`, 'info');
+      }
+    });
+  });
+}
+
 function initCustomHub() {
   initAnimationHubControls();
+  initSidebarCustomizationControls();
   initDeckViewSlider();
   initSidebarControls();
 
