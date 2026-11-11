@@ -160,40 +160,79 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  justify-content: space-between; /* Répartition verticale adaptative pour combler la hauteur harmonieusement */
+  gap: clamp(4px, 1.4vh, 18px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 2px 0;
+  padding: 4px 0;
   scrollbar-width: none;
+  position: relative;
 }
 
 .sidebar-nav::-webkit-scrollbar {
   display: none;
 }
 
-/* On désactive l'ancien indicator externe qui provoquait le décalage de largeur */
-.sidebar-indicator,
-.deck-nav-indicator {
-  display: none !important;
+/* --- INDICATEUR GLISSANT FLUIDE (SURBRILLANCE PLEINE LARGEUR ANIMÉE) --- */
+.sidebar-indicator {
+  position: absolute;
+  top: 0;
+  left: 6px;
+  width: calc(100% - 12px);
+  border-radius: clamp(12px, 1.4vh, 18px);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.32), 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
+  pointer-events: none;
+  z-index: 1;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform var(--anim-sidebar-duration, 0.42s) var(--anim-sidebar-easing, cubic-bezier(0.22, 1, 0.36, 1)),
+              height var(--anim-sidebar-duration, 0.42s) ease,
+              width 0.28s ease,
+              opacity 0.25s ease;
+  will-change: transform, height;
 }
 
-/* --- ÉLÉMENT BOUTON DE NAVIGATION UNIFIÉ (SURBRILLANCE PLEINE LARGEUR) --- */
+.dashboard-sidebar.expanded .sidebar-indicator,
+.dashboard-sidebar.locked-expanded .sidebar-indicator {
+  left: 8px;
+  width: calc(100% - 16px);
+}
+
+/* Variantes de style d'indicateur configurables */
+body.indicator-style-neon .sidebar-indicator {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.24);
+  border: 1.5px solid var(--accent-primary);
+  box-shadow: 0 0 24px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.55), inset 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+body.indicator-style-clean .sidebar-indicator {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* --- ÉLÉMENT BOUTON DE NAVIGATION UNIFIÉ (TAILLE ADAPTATIVE VERTICALE) --- */
 .sidebar-nav-item,
 .sidebar-nav .deck-nav-btn {
-  flex: none !important;
+  flex: 1 1 auto !important;
+  min-height: 38px !important;
+  max-height: 64px !important;
+  height: clamp(42px, 5.8vh, 62px) !important;
+  border-radius: clamp(12px, 1.4vh, 18px) !important;
   width: 100% !important;
-  height: 42px !important;
-  border-radius: 12px !important;
   display: flex !important;
   align-items: center !important;
   border: 1px solid transparent !important;
-  background: transparent !important;
+  background: transparent !important; /* Le fond actif est assuré par .sidebar-indicator glissant */
   color: rgba(225, 235, 255, 0.72) !important;
   cursor: pointer !important;
   text-decoration: none !important;
   font-family: inherit !important;
-  transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  transition: color 0.2s ease, transform 0.2s ease !important;
   position: relative !important;
+  z-index: 2 !important;
   box-sizing: border-box !important;
   overflow: visible;
 }
@@ -214,30 +253,21 @@
   padding: 0 12px !important;
 }
 
-/* Survol moderne avec micro-flou et éclairage subtil */
-.sidebar-nav-item:hover,
-.sidebar-nav .deck-nav-btn:hover {
+/* Survol moderne pour boutons non-actifs */
+.sidebar-nav-item:not(.active):hover,
+.sidebar-nav .deck-nav-btn:not(.active):hover {
   color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
   transform: translateY(-1px);
 }
 
-/* SURBRILLANCE ACTIVE : PLEINE LARGEUR, UNIFORME, SANS BANDE GAUCHE AGGRESSIVE */
+/* ÉTAT ACTIF : Couleur lumineuse, fond pris en charge par l'indicateur glissant */
 .sidebar-nav-item.active,
 .sidebar-nav .deck-nav-btn.active {
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16) !important;
-  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35) !important;
   color: var(--accent-primary) !important;
   font-weight: 600 !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28), 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.15) !important;
-}
-
-.sidebar-nav-item.active:hover,
-.sidebar-nav .deck-nav-btn.active:hover {
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22) !important;
-  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.45) !important;
-  color: var(--accent-primary) !important;
+  background: transparent !important;
+  border-color: transparent !important;
 }
 
 /* Encadré d'icône & rendu ultra net */
@@ -249,12 +279,12 @@
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-nav-item .nav-icon-wrap i,
 .sidebar-nav .deck-nav-btn .nav-icon-wrap i {
-  font-size: 1.15rem !important;
+  font-size: clamp(1.15rem, 1.6vh, 1.35rem) !important;
   line-height: 1 !important;
   color: inherit !important;
 }
@@ -267,6 +297,7 @@
 .sidebar-nav-item.active .nav-icon-wrap,
 .sidebar-nav .deck-nav-btn.active .nav-icon-wrap {
   color: var(--accent-primary) !important;
+  transform: scale(1.08);
 }
 
 /* --- TEXTE ET BADGES EN MODE RÉDUIT : STRICTEMENT MASQUÉS --- */
@@ -350,22 +381,36 @@
 }
 
 /* ========================================================
-   RESPONSIVE : 34" ULTRAWIDE & MOBILE
+   RESPONSIVE : 34" ULTRAWIDE, GRANDS ÉCRANS & MOBILE
    ======================================================== */
-@media (min-width: 2200px) {
+@media (min-width: 2200px), (min-height: 950px) {
   .dashboard-sidebar {
-    width: 72px;
-    margin: 14px 0 14px 16px;
+    width: 76px;
+    margin: 14px 0 14px 18px;
     height: calc(100vh - 28px);
     border-radius: 24px;
-    padding: 12px 7px;
+    padding: 14px 8px;
   }
   .dashboard-sidebar.expanded,
   .dashboard-sidebar.locked-expanded {
-    width: 236px;
+    width: 248px;
+    padding: 14px 10px;
   }
-  .sidebar-nav-item {
-    height: 44px;
+  .sidebar-nav-item,
+  .sidebar-nav .deck-nav-btn {
+    height: clamp(48px, 6.2vh, 68px) !important;
+    border-radius: 16px !important;
+  }
+  .sidebar-nav-item .nav-icon-wrap i,
+  .sidebar-nav .deck-nav-btn .nav-icon-wrap i {
+    font-size: clamp(1.2rem, 1.8vh, 1.45rem) !important;
+  }
+  .dashboard-sidebar.expanded .nav-label,
+  .dashboard-sidebar.locked-expanded .nav-label {
+    font-size: clamp(0.88rem, 1.3vh, 1.05rem) !important;
+  }
+  .sidebar-indicator {
+    border-radius: 16px;
   }
 }
 
@@ -389,6 +434,9 @@
   .sidebar-header {
     display: none !important;
   }
+  .sidebar-indicator {
+    display: none !important; /* Simplification en vue mobile tactile */
+  }
   .sidebar-nav {
     flex-direction: row;
     overflow-x: auto;
@@ -399,9 +447,15 @@
     width: 100%;
     padding: 0;
   }
-  .sidebar-nav-item {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
+  .sidebar-nav-item,
+  .sidebar-nav .deck-nav-btn {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+  }
+  .sidebar-nav-item.active,
+  .sidebar-nav .deck-nav-btn.active {
+    background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22) !important;
+    border: 1px solid var(--accent-primary) !important;
   }
 }

@@ -249,6 +249,27 @@
   display: block;
 }
 
+/* Centrage harmonieux adaptatif du groupe temps sur écrans larges */
+.left-clock-card .clock-greeting {
+  margin-top: auto;
+  text-align: center;
+}
+
+.left-clock-card .left-clock-display {
+  align-items: center;
+  text-align: center;
+}
+
+.left-clock-card .left-clock-telemetry {
+  margin-bottom: auto;
+  align-items: center;
+  text-align: center;
+}
+
+.left-clock-card .clock-telemetry-chips {
+  justify-content: center;
+}
+
 /* ========================================================
    STYLES DESIGN & PERSONNALISATION DE L'HORLOGE
    ======================================================== */

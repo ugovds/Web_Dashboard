@@ -154,17 +154,80 @@
 }
 
 /* Animation moderne avec flou subtil et translation */
-@keyframes viewFadeIn {
-  from {
+/* ========================================================
+   BIBLIOTHÈQUE DE TRANSITIONS DE PAGES ("PAGE QUI DÉFILE")
+   ======================================================== */
+:root {
+  --page-anim-duration: 0.42s;
+  --page-anim-easing: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-blur-amount: 3.5px;
+  --anim-sidebar-duration: 0.42s;
+  --anim-sidebar-easing: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 1. Glissement Directionnel ("Deck Slide") */
+@keyframes deckSlideFromBottom {
+  0% {
     opacity: 0;
-    transform: translateY(10px) scale(0.995);
-    filter: blur(4px);
+    transform: translateY(clamp(36px, 7vh, 70px)) scale(0.985);
+    filter: blur(var(--motion-blur-amount, 3.5px));
   }
-  to {
+  100% {
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0px);
   }
+}
+
+@keyframes deckSlideFromTop {
+  0% {
+    opacity: 0;
+    transform: translateY(clamp(-70px, -7vh, -36px)) scale(0.985);
+    filter: blur(var(--motion-blur-amount, 3.5px));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+/* 2. Zoom Éthéré */
+@keyframes deckZoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+    filter: blur(var(--motion-blur-amount, 4px));
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0px);
+  }
+}
+
+/* 3. Cyber Scan / Glitch */
+@keyframes cyberScanIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-16px) skewX(-1.5deg);
+    filter: contrast(130%) brightness(1.15);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translateX(5px) skewX(0.7deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) skewX(0);
+    filter: none;
+  }
+}
+
+/* 4. Fondu Soyeux */
+@keyframes deckCrossfade {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 .deck-slide-view {
@@ -177,7 +240,27 @@
 .deck-slide-view.active {
   display: flex;
   flex-direction: column;
-  animation: viewFadeIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+/* Classes d'animation dynamiques pilotées par JavaScript */
+.deck-slide-view.slide-enter-down {
+  animation: deckSlideFromBottom var(--page-anim-duration) var(--page-anim-easing) both;
+}
+
+.deck-slide-view.slide-enter-up {
+  animation: deckSlideFromTop var(--page-anim-duration) var(--page-anim-easing) both;
+}
+
+.deck-slide-view.zoom-enter {
+  animation: deckZoomIn var(--page-anim-duration) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.deck-slide-view.glitch-enter {
+  animation: cyberScanIn calc(var(--page-anim-duration) * 0.85) ease-out both;
+}
+
+.deck-slide-view.crossfade-enter {
+  animation: deckCrossfade var(--page-anim-duration) ease both;
 }
 
 /* ========================================================
@@ -569,4 +652,162 @@
   .overview-right-col .categories-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ========================================================
+   STYLES DU PANNEAU PERSONNALISATION : ANIMATIONS & EFFETS
+   ======================================================== */
+.hub-anim-styles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.hub-anim-card-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: all 0.22s cubic-bezier(0.2, 0.9, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.hub-anim-card-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-highlight);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.hub-anim-card-btn.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
+  border-color: var(--accent-primary);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+}
+
+.hub-anim-card-btn .anim-card-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--accent-primary);
+  margin-bottom: 0.2rem;
+  transition: transform 0.2s ease;
+}
+
+.hub-anim-card-btn:hover .anim-card-icon {
+  transform: scale(1.12);
+}
+
+.hub-anim-card-btn .anim-card-title {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.hub-anim-card-btn .anim-card-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.section-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.anim-speed-badge {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  padding: 0.15rem 0.5rem;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  border: 1px solid var(--border-highlight);
+  border-radius: 6px;
+}
+
+.hub-speed-presets,
+.hub-blur-presets,
+.hub-indicator-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.speed-preset-pill,
+.blur-preset-pill,
+.indicator-style-btn {
+  padding: 0.45rem 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  transition: all 0.2s ease;
+}
+
+.speed-preset-pill:hover,
+.blur-preset-pill:hover,
+.indicator-style-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-highlight);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.speed-preset-pill.active,
+.blur-preset-pill.active,
+.indicator-style-btn.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.2);
+}
+
+.indicator-preview {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.glass-preview {
+  background: rgba(167, 139, 250, 0.25);
+  border: 1px solid rgba(167, 139, 250, 0.6);
+  box-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
+}
+
+.neon-preview {
+  background: #a78bfa;
+  border: 1px solid #c4b5fd;
+  box-shadow: 0 0 12px #a78bfa;
+}
+
+.clean-preview {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }

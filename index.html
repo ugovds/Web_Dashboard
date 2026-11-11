@@ -95,6 +95,8 @@
 
         <!-- Navigation Verticale des Onglets -->
         <nav class="sidebar-nav" id="sidebar-nav">
+          <div class="sidebar-indicator" id="sidebar-indicator"></div>
+
           <!-- 1. ACCUEIL (Tableau de bord / Omnibox & Signets) -->
           <button type="button" class="deck-nav-btn sidebar-nav-item active" data-deck-view="dashboard" title="Accueil & Signets (Alt+1)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
@@ -868,6 +870,9 @@
                     <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="feeds">
                       <i class="fa-solid fa-rss"></i> Flux RSS
                     </button>
+                    <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="animations">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i> Animations
+                    </button>
                     <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="backup">
                       <i class="fa-solid fa-cloud-arrow-down"></i> Sauvegarde
                     </button>
@@ -1320,7 +1325,113 @@
                     </div>
                   </div>
 
-                  <!-- 6. SOUS-ONGLET : SAUVEGARDE & RESTAURATION -->
+                  <!-- 6. SOUS-ONGLET : BIBLIOTHÈQUE D'ANIMATIONS & DÉFILEMENT -->
+                  <div id="hub-tab-animations" class="hub-tab-panel" hidden>
+                    <div class="hub-panel-header">
+                      <div>
+                        <h4>Bibliothèque d'Animations & Défilement</h4>
+                        <p class="panel-hint">Personnalisez les transitions entre les onglets, la vitesse de défilement, le flou cinétique et la surbrillance de la sidebar.</p>
+                      </div>
+                      <button type="button" id="anim-test-preview-btn" class="modal-btn primary" title="Tester l'effet en direct">
+                        <i class="fa-solid fa-play"></i> Tester la transition
+                      </button>
+                    </div>
+
+                    <!-- 1. Style de transition de page -->
+                    <div class="appearance-section">
+                      <label class="section-label">Style de Défilement des Pages (Transitions entre onglets) :</label>
+                      <div class="hub-anim-styles-grid">
+                        <button type="button" class="hub-anim-card-btn active" data-anim-style="deck-slide">
+                          <span class="anim-card-icon"><i class="fa-solid fa-arrows-up-down"></i></span>
+                          <span class="anim-card-title">Glissement Deck</span>
+                          <span class="anim-card-desc">Défilement vertical fluide avec flou directionnel</span>
+                        </button>
+
+                        <button type="button" class="hub-anim-card-btn" data-anim-style="page-zoom">
+                          <span class="anim-card-icon"><i class="fa-solid fa-magnifying-glass-plus"></i></span>
+                          <span class="anim-card-title">Zoom Éthéré</span>
+                          <span class="anim-card-desc">Agrandissement doux avec flou d'ambiance</span>
+                        </button>
+
+                        <button type="button" class="hub-anim-card-btn" data-anim-style="cyber-glitch">
+                          <span class="anim-card-icon"><i class="fa-solid fa-bolt-lightning"></i></span>
+                          <span class="anim-card-title">Cyber Scan</span>
+                          <span class="anim-card-desc">Effet technologique avec micro-décalage</span>
+                        </button>
+
+                        <button type="button" class="hub-anim-card-btn" data-anim-style="crossfade">
+                          <span class="anim-card-icon"><i class="fa-solid fa-circle-half-stroke"></i></span>
+                          <span class="anim-card-title">Fondu Soyeux</span>
+                          <span class="anim-card-desc">Transition subtile en opacité continue</span>
+                        </button>
+
+                        <button type="button" class="hub-anim-card-btn" data-anim-style="none">
+                          <span class="anim-card-icon"><i class="fa-solid fa-forward"></i></span>
+                          <span class="anim-card-title">Instantané</span>
+                          <span class="anim-card-desc">Sans transition (réactivité brute)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- 2. Vitesse des animations -->
+                    <div class="appearance-section">
+                      <div class="section-label-row">
+                        <label class="section-label">Vitesse des Animations (Sidebar & Défilement) :</label>
+                        <span class="anim-speed-badge" id="anim-speed-val-badge">420ms (Normale / Fluide)</span>
+                      </div>
+                      <div class="hub-speed-presets">
+                        <button type="button" class="speed-preset-pill" data-speed="slow">
+                          <i class="fa-solid fa-film"></i> Lente / Cinématique (550ms)
+                        </button>
+                        <button type="button" class="speed-preset-pill active" data-speed="normal">
+                          <i class="fa-solid fa-gauge"></i> Normale / Fluide (420ms)
+                        </button>
+                        <button type="button" class="speed-preset-pill" data-speed="fast">
+                          <i class="fa-solid fa-bolt"></i> Rapide / Snappy (240ms)
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- 3. Flou cinétique -->
+                    <div class="appearance-section">
+                      <label class="section-label">Intensité du Flou Cinétique (Motion Blur) :</label>
+                      <div class="hub-blur-presets">
+                        <button type="button" class="blur-preset-pill" data-blur="high">
+                          Élevé (6px)
+                        </button>
+                        <button type="button" class="blur-preset-pill active" data-blur="medium">
+                          Moyen (3.5px)
+                        </button>
+                        <button type="button" class="blur-preset-pill" data-blur="subtle">
+                          Subtil (1.5px)
+                        </button>
+                        <button type="button" class="blur-preset-pill" data-blur="none">
+                          Désactivé (Net)
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- 4. Style de Surbrillance Sidebar -->
+                    <div class="appearance-section">
+                      <label class="section-label">Style de Surbrillance Glissante (Sidebar) :</label>
+                      <div class="hub-indicator-presets">
+                        <button type="button" class="indicator-style-btn active" data-indicator-style="glass">
+                          <span class="indicator-preview glass-preview"></span>
+                          <span>Verre Dépoli (Glass Glow)</span>
+                        </button>
+                        <button type="button" class="indicator-style-btn" data-indicator-style="neon">
+                          <span class="indicator-preview neon-preview"></span>
+                          <span>Néon Pulsé (Cyber Neon)</span>
+                        </button>
+                        <button type="button" class="indicator-style-btn" data-indicator-style="clean">
+                          <span class="indicator-preview clean-preview"></span>
+                          <span>Minimaliste (Discret)</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 7. SOUS-ONGLET : SAUVEGARDE & RESTAURATION -->
                   <div id="hub-tab-backup" class="hub-tab-panel" hidden>
                     <div class="hub-panel-header">
                       <div>

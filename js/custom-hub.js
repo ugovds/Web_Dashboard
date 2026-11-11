@@ -15,28 +15,39 @@ const VIEW_TITLES = {
   customize: { title: 'Paramètres & Hub', sub: 'Thèmes, Couleurs, Horloge & Sauvegarde', icon: 'fa-solid fa-sliders' }
 };
 
+const VIEW_KEYS = [
+  'dashboard',
+  'agenda',
+  'weather',
+  'feeds',
+  'system',
+  'pomodoro',
+  'notes',
+  'ambient',
+  'quotes',
+  'customize'
+];
+
+let currentDeckTarget = 'dashboard';
 let updateDeckIndicator = null;
 
 function initDeckViewSlider() {
   const navBtns = document.querySelectorAll('.deck-nav-btn');
   const allViews = document.querySelectorAll('.deck-slide-view');
-  const indicator = document.querySelector('.deck-nav-indicator') || document.querySelector('.sidebar-indicator');
+  const indicator = document.querySelector('.sidebar-indicator') || document.querySelector('.deck-nav-indicator');
 
   function updateIndicator(activeBtn) {
     if (!indicator || !activeBtn) return;
     const isVertical = activeBtn.classList.contains('sidebar-nav-item') || activeBtn.closest('.sidebar-nav');
     if (isVertical) {
-      const sidebar = document.getElementById('dashboard-sidebar');
-      const isExpanded = sidebar && (sidebar.classList.contains('expanded') || sidebar.classList.contains('locked-expanded'));
       indicator.style.height = `${activeBtn.offsetHeight}px`;
-      indicator.style.transform = isExpanded
-        ? `translateY(${activeBtn.offsetTop}px)`
-        : `translateX(-50%) translateY(${activeBtn.offsetTop}px)`;
-      indicator.style.width = '';
+      indicator.style.transform = `translateY(${activeBtn.offsetTop}px)`;
+      indicator.style.opacity = '1';
     } else {
       indicator.style.width = `${activeBtn.offsetWidth}px`;
       indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
       indicator.style.height = '';
+      indicator.style.opacity = '1';
     }
     try {
       activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
@@ -57,14 +68,40 @@ function initDeckViewSlider() {
 
   navBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
+      const target = btn.dataset.deckView;
+      const prevIdx = VIEW_KEYS.indexOf(currentDeckTarget);
+      const nextIdx = VIEW_KEYS.indexOf(target);
+      const direction = (nextIdx !== -1 && prevIdx !== -1 && nextIdx >= prevIdx) ? 'down' : 'up';
+      currentDeckTarget = target;
+
       navBtns.forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const target = btn.dataset.deckView;
+      const animSettings = getAnimationSettings();
+      const animStyle = animSettings.style || 'deck-slide';
+
       allViews.forEach((view) => {
         const isTarget = view.id === `deck-view-${target}`;
-        view.hidden = !isTarget;
-        view.classList.toggle('active', isTarget);
+        if (isTarget) {
+          view.hidden = false;
+          view.classList.add('active');
+
+          view.classList.remove('slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
+          void view.offsetWidth; // Force reflow pour relancer l'animation de défilement
+
+          if (animStyle === 'deck-slide') {
+            view.classList.add(direction === 'down' ? 'slide-enter-down' : 'slide-enter-up');
+          } else if (animStyle === 'page-zoom') {
+            view.classList.add('zoom-enter');
+          } else if (animStyle === 'cyber-glitch') {
+            view.classList.add('glitch-enter');
+          } else if (animStyle === 'crossfade') {
+            view.classList.add('crossfade-enter');
+          }
+        } else {
+          view.hidden = true;
+          view.classList.remove('active', 'slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
+        }
       });
 
       updateTopbarInfo(target);
@@ -81,6 +118,7 @@ function initDeckViewSlider() {
   const initialActive = document.querySelector('.deck-nav-btn.active');
   if (initialActive) {
     const initialTarget = initialActive.dataset.deckView || 'dashboard';
+    currentDeckTarget = initialTarget;
     updateTopbarInfo(initialTarget);
     setTimeout(() => updateIndicator(initialActive), 80);
   }
@@ -381,7 +419,149 @@ function renderHubShortcuts() {
   });
 }
 
+// ========================================================
+// GESTIONNAIRE D'ANIMATIONS & DÉFILEMENT (BIBLIOTHÈQUE DU HUB)
+// ========================================================
+const ANIM_STORAGE_KEY = 'startpage_anim_settings';
+const ANIM_DEFAULTS = {
+  style: 'deck-slide',
+  speed: 'normal',
+  blur: 'medium',
+  indicatorStyle: 'glass'
+};
+
+const SPEED_DURATIONS = {
+  slow: { duration: '0.55s', label: '550ms (Lente / Cinématique)' },
+  normal: { duration: '0.42s', label: '420ms (Normale / Fluide)' },
+  fast: { duration: '0.24s', label: '240ms (Rapide / Snappy)' }
+};
+
+const BLUR_VALUES = {
+  high: '6px',
+  medium: '3.5px',
+  subtle: '1.5px',
+  none: '0px'
+};
+
+function getAnimationSettings() {
+  try {
+    const raw = localStorage.getItem(ANIM_STORAGE_KEY);
+    return raw ? { ...ANIM_DEFAULTS, ...JSON.parse(raw) } : { ...ANIM_DEFAULTS };
+  } catch {
+    return { ...ANIM_DEFAULTS };
+  }
+}
+
+function saveAnimationSettings(settings) {
+  try {
+    localStorage.setItem(ANIM_STORAGE_KEY, JSON.stringify(settings));
+  } catch {}
+  applyAnimationSettings(settings);
+}
+
+function applyAnimationSettings(settings) {
+  const root = document.documentElement;
+  const speedInfo = SPEED_DURATIONS[settings.speed] || SPEED_DURATIONS.normal;
+  const blurValue = BLUR_VALUES[settings.blur] || BLUR_VALUES.medium;
+
+  root.style.setProperty('--page-anim-duration', speedInfo.duration);
+  root.style.setProperty('--anim-sidebar-duration', speedInfo.duration);
+  root.style.setProperty('--motion-blur-amount', blurValue);
+
+  document.body.classList.remove('indicator-style-glass', 'indicator-style-neon', 'indicator-style-clean');
+  document.body.classList.add(`indicator-style-${settings.indicatorStyle || 'glass'}`);
+
+  const badge = document.getElementById('anim-speed-val-badge');
+  if (badge) badge.textContent = speedInfo.label;
+
+  document.querySelectorAll('.hub-anim-card-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.animStyle === settings.style);
+  });
+  document.querySelectorAll('.speed-preset-pill').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.speed === settings.speed);
+  });
+  document.querySelectorAll('.blur-preset-pill').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.blur === settings.blur);
+  });
+  document.querySelectorAll('.indicator-style-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.indicatorStyle === settings.indicatorStyle);
+  });
+}
+
+function initAnimationHubControls() {
+  const settings = getAnimationSettings();
+  applyAnimationSettings(settings);
+
+  document.querySelectorAll('.hub-anim-card-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getAnimationSettings();
+      cur.style = btn.dataset.animStyle;
+      saveAnimationSettings(cur);
+      if (typeof showToast === 'function') {
+        const title = btn.querySelector('.anim-card-title')?.textContent || cur.style;
+        showToast(`Animation : ${title}`, 'success');
+      }
+    });
+  });
+
+  document.querySelectorAll('.speed-preset-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getAnimationSettings();
+      cur.speed = btn.dataset.speed;
+      saveAnimationSettings(cur);
+      if (typeof showToast === 'function') showToast(`Vitesse : ${btn.textContent.trim()}`, 'info');
+    });
+  });
+
+  document.querySelectorAll('.blur-preset-pill').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getAnimationSettings();
+      cur.blur = btn.dataset.blur;
+      saveAnimationSettings(cur);
+      if (typeof showToast === 'function') showToast(`Flou cinétique : ${btn.textContent.trim()}`, 'info');
+    });
+  });
+
+  document.querySelectorAll('.indicator-style-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const cur = getAnimationSettings();
+      cur.indicatorStyle = btn.dataset.indicatorStyle;
+      saveAnimationSettings(cur);
+      if (typeof showToast === 'function') {
+        const name = btn.querySelector('span:last-child')?.textContent || cur.indicatorStyle;
+        showToast(`Surbrillance : ${name}`, 'info');
+      }
+    });
+  });
+
+  const testBtn = document.getElementById('anim-test-preview-btn');
+  if (testBtn) {
+    testBtn.addEventListener('click', () => {
+      const activeView = document.querySelector('.deck-slide-view.active');
+      const curSettings = getAnimationSettings();
+      if (activeView) {
+        activeView.classList.remove('slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
+        void activeView.offsetWidth;
+        if (curSettings.style === 'deck-slide') {
+          activeView.classList.add('slide-enter-down');
+        } else if (curSettings.style === 'page-zoom') {
+          activeView.classList.add('zoom-enter');
+        } else if (curSettings.style === 'cyber-glitch') {
+          activeView.classList.add('glitch-enter');
+        } else if (curSettings.style === 'crossfade') {
+          activeView.classList.add('crossfade-enter');
+        }
+      }
+      const currBtn = document.querySelector('.deck-nav-btn.active');
+      if (currBtn && typeof updateDeckIndicator === 'function') {
+        updateDeckIndicator(currBtn);
+      }
+    });
+  }
+}
+
 function initCustomHub() {
+  initAnimationHubControls();
   initDeckViewSlider();
   initSidebarControls();
 
