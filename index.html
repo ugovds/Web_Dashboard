@@ -774,14 +774,45 @@
                       </div>
                     </div>
 
+                    <!-- NOUVEAU : Blocs Bento Highlights (Top Volatilité & Actifs les Plus Échangés) -->
+                    <div class="markets-highlights-grid">
+                      <div class="markets-highlight-box highlight-volatile">
+                        <div class="highlight-box-head">
+                          <div class="highlight-box-title">
+                            <i class="fa-solid fa-fire text-orange"></i>
+                            <span>Top Volatilité (Movers du Jour)</span>
+                          </div>
+                          <span class="highlight-box-tag">Fortes variations</span>
+                        </div>
+                        <div class="highlight-pills-row" id="highlight-volatile-pills">
+                          <!-- Rempli dynamiquement par renderMarketsHighlights() -->
+                        </div>
+                      </div>
+
+                      <div class="markets-highlight-box highlight-active">
+                        <div class="highlight-box-head">
+                          <div class="highlight-box-title">
+                            <i class="fa-solid fa-bolt text-yellow"></i>
+                            <span>Les Plus Échangés (Volume &amp; Mega-Caps)</span>
+                          </div>
+                          <span class="highlight-box-tag">Actifs Phares</span>
+                        </div>
+                        <div class="highlight-pills-row" id="highlight-active-pills">
+                          <!-- Rempli dynamiquement par renderMarketsHighlights() -->
+                        </div>
+                      </div>
+                    </div>
+
                     <!-- Barre des filtres par catégorie -->
                     <nav class="markets-nav-bar" aria-label="Catégories d'actifs">
                       <div class="tab-group" id="markets-tab-group">
-                        <button type="button" class="tab-btn active" data-market-category="all"><i class="fa-solid fa-layer-group"></i> Tous les Actifs</button>
-                        <button type="button" class="tab-btn" data-market-category="etf"><i class="fa-solid fa-landmark"></i> ETF &amp; Fonds</button>
+                        <button type="button" class="tab-btn active" data-market-category="all"><i class="fa-solid fa-layer-group"></i> Tous</button>
                         <button type="button" class="tab-btn" data-market-category="stock"><i class="fa-solid fa-building"></i> Actions</button>
-                        <button type="button" class="tab-btn" data-market-category="crypto"><i class="fa-brands fa-bitcoin"></i> Cryptomonnaies</button>
-                        <button type="button" class="tab-btn" data-market-category="index"><i class="fa-solid fa-chart-line"></i> Indices &amp; Forex</button>
+                        <button type="button" class="tab-btn" data-market-category="etf"><i class="fa-solid fa-landmark"></i> ETF &amp; Fonds</button>
+                        <button type="button" class="tab-btn" data-market-category="index"><i class="fa-solid fa-chart-line"></i> Indices</button>
+                        <button type="button" class="tab-btn" data-market-category="forex"><i class="fa-solid fa-money-bill-transfer"></i> Forex</button>
+                        <button type="button" class="tab-btn" data-market-category="commodity"><i class="fa-solid fa-coins"></i> Matières 1ères</button>
+                        <button type="button" class="tab-btn" data-market-category="crypto"><i class="fa-brands fa-bitcoin"></i> Cryptos</button>
                       </div>
                     </nav>
                   </header>
@@ -825,7 +856,7 @@
                     </div>
                   </main>
 
-                  <!-- 4. MODALE / STUDIO DE GRAPHIQUE INTERACTIF TRADINGVIEW -->
+                  <!-- 4. MODALE / STUDIO DE GRAPHIQUE ÉPURÉ & INSTANTANÉ (DROITE NETTE & INTUITIVE) -->
                   <div id="market-chart-modal" class="market-chart-modal is-hidden" hidden style="display: none;">
                     <div class="market-chart-backdrop"></div>
                     <div class="market-chart-dialog">
@@ -850,30 +881,70 @@
 
                         <div class="chart-dialog-controls">
                           <div class="chart-timeframe-picker">
-                            <button type="button" class="tf-btn" data-tf="1">1m</button>
-                            <button type="button" class="tf-btn" data-tf="5">5m</button>
-                            <button type="button" class="tf-btn" data-tf="60">1h</button>
-                            <button type="button" class="tf-btn active" data-tf="D">1J</button>
-                            <button type="button" class="tf-btn" data-tf="W">1S</button>
-                            <button type="button" class="tf-btn" data-tf="M">1M</button>
+                            <button type="button" class="tf-btn active" data-tf="1D">1J</button>
+                            <button type="button" class="tf-btn" data-tf="1W">1S</button>
+                            <button type="button" class="tf-btn" data-tf="1M">1M</button>
+                            <button type="button" class="tf-btn" data-tf="1Y">1A</button>
                           </div>
-                          <button type="button" id="chart-fullscreen-btn" class="deck-icon-action" title="Plein écran"><i class="fa-solid fa-expand"></i></button>
-                          <button type="button" id="chart-dialog-close-btn" class="deck-icon-action" title="Fermer"><i class="fa-solid fa-xmark"></i></button>
+                          <button type="button" id="chart-dialog-close-btn" class="deck-icon-action" title="Fermer (Échap)"><i class="fa-solid fa-xmark"></i></button>
                         </div>
                       </header>
 
-                      <!-- Statistiques Clés -->
+                      <!-- Zone du Graphique Linéaire Épuré (Courbe SVG Fluide & Interactive) -->
+                      <div class="clean-chart-stage" id="clean-chart-stage">
+                        <div class="clean-chart-wrapper" id="clean-chart-wrapper">
+                          <svg id="interactive-line-chart-svg" class="interactive-line-chart-svg" viewBox="0 0 1000 360" preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="chartGradientUp" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"></stop>
+                                <stop offset="85%" stop-color="#10b981" stop-opacity="0.04"></stop>
+                                <stop offset="100%" stop-color="#10b981" stop-opacity="0"></stop>
+                              </linearGradient>
+                              <linearGradient id="chartGradientDown" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"></stop>
+                                <stop offset="85%" stop-color="#ef4444" stop-opacity="0.04"></stop>
+                                <stop offset="100%" stop-color="#ef4444" stop-opacity="0"></stop>
+                              </linearGradient>
+                            </defs>
+                            <!-- Ligne de départ / Référence d'ouverture -->
+                            <line id="chart-baseline" x1="0" y1="180" x2="1000" y2="180" stroke="rgba(255,255,255,0.12)" stroke-dasharray="4 4" stroke-width="1.5" />
+                            <!-- Surface dégradée lumineuse -->
+                            <path id="chart-svg-area" d="" fill="url(#chartGradientUp)"></path>
+                            <!-- Droite / Courbe nette principale -->
+                            <path id="chart-svg-line" d="" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <!-- Curseur interactif au survol de la souris -->
+                            <g id="chart-hover-tracker" class="chart-hover-tracker" style="display: none;">
+                              <line id="chart-hover-line" x1="0" y1="0" x2="0" y2="360" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+                              <circle id="chart-hover-dot" cx="0" cy="0" r="6" fill="#ffffff" stroke="#10b981" stroke-width="3.5"></circle>
+                            </g>
+                          </svg>
+                          <!-- Infobulle flottante temps réel au survol -->
+                          <div id="chart-tooltip-bubble" class="chart-tooltip-bubble" style="display: none;">
+                            <span id="chart-tooltip-price" class="tooltip-price">--</span>
+                            <span id="chart-tooltip-time" class="tooltip-time">--</span>
+                          </div>
+                        </div>
+
+                        <!-- Axe temporel simplifié -->
+                        <div class="chart-time-axis">
+                          <span id="chart-time-start">Ouverture</span>
+                          <span id="chart-time-mid">Mi-Séance</span>
+                          <span id="chart-time-end">En Direct</span>
+                        </div>
+                      </div>
+
+                      <!-- Statistiques Clés Claires & Synthétiques -->
                       <div class="chart-stats-strip">
                         <div class="chart-stat-item">
-                          <span class="stat-label">Plus Haut Jour</span>
+                          <span class="stat-label">Plus Haut</span>
                           <span class="stat-val" id="chart-stat-high">178.45 $</span>
                         </div>
                         <div class="chart-stat-item">
-                          <span class="stat-label">Plus Bas Jour</span>
+                          <span class="stat-label">Plus Bas</span>
                           <span class="stat-val" id="chart-stat-low">173.10 $</span>
                         </div>
                         <div class="chart-stat-item">
-                          <span class="stat-label">Écart Jour</span>
+                          <span class="stat-label">Écart Période</span>
                           <div class="stat-range-bar">
                             <div class="stat-range-fill" id="chart-stat-range-fill" style="width: 65%;"></div>
                           </div>
@@ -886,11 +957,6 @@
                           <span class="stat-label">Place Boursière</span>
                           <span class="stat-val" id="chart-stat-market">NASDAQ</span>
                         </div>
-                      </div>
-
-                      <!-- Zone du Graphique TradingView en Direct -->
-                      <div class="chart-iframe-container">
-                        <iframe id="tradingview-chart-iframe" class="tradingview-chart-iframe" src="" allowtransparency="true" frameborder="0" scrolling="no" allowfullscreen></iframe>
                       </div>
                     </div>
                   </div>

@@ -1206,7 +1206,7 @@
   padding-right: 0.25rem;
 }
 
-.crypto-ticker-cards {
+.crypto-ticker-cards:not(.markets-grid) {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;

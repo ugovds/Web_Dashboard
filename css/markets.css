@@ -281,6 +281,121 @@
   color: #ef4444;
 }
 
+/* --- 2.5 NOUVEAUX BLOCS HIGHLIGHTS (BENTO TENDANCES & VOLATILITÉ) --- */
+.markets-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: clamp(12px, 1.6vh, 20px);
+  width: 100%;
+}
+
+.markets-highlight-box {
+  background: rgba(18, 22, 34, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: all 0.25s ease;
+}
+
+.markets-highlight-box:hover {
+  background: rgba(22, 28, 44, 0.82);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.highlight-box-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.highlight-box-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.highlight-box-title .text-orange {
+  color: #f97316;
+}
+
+.highlight-box-title .text-yellow {
+  color: #eab308;
+}
+
+.highlight-box-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+}
+
+.highlight-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.highlight-asset-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.highlight-asset-pill:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+.pill-ticker {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.pill-price {
+  font-size: 0.75rem;
+  color: var(--text-main);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.pill-change {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+}
+
+.pill-change.up {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.18);
+}
+
+.pill-change.down {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.18);
+}
+
 /* --- 3. BARRE DES CATÉGORIES D'ACTIFS --- */
 .markets-nav-bar {
   display: flex;
@@ -331,11 +446,16 @@
   width: 100%;
 }
 
-.markets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: clamp(16px, 2vh, 24px);
-  width: 100%;
+.markets-grid,
+.markets-main .markets-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)) !important;
+  gap: clamp(14px, 1.8vh, 22px) !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: auto !important;
+  overflow: visible !important;
 }
 
 /* Carte individuelle d'actif */
@@ -625,8 +745,9 @@
 
 .market-chart-dialog {
   position: relative;
-  width: min(1320px, 95vw);
-  height: min(840px, 90vh);
+  width: min(1080px, 95vw);
+  height: auto;
+  max-height: min(780px, 94vh);
   background: #0b0f19;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
@@ -859,19 +980,80 @@
   border-radius: 99px;
 }
 
-/* Zone du graphique iframe */
-.chart-iframe-container {
-  flex: 1;
-  width: 100%;
-  min-height: 0;
+/* --- 5. ZONE DU GRAPHIQUE ÉPURÉ & MODERNE (COURBE SVG SIMPLE) --- */
+.clean-chart-stage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #090c14;
+  padding: 1.25rem 1.6rem 0.85rem 1.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
-  background: #080c14;
+  overflow: hidden;
 }
 
-.tradingview-chart-iframe {
+.clean-chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(260px, 42vh, 380px);
+  cursor: crosshair;
+}
+
+.interactive-line-chart-svg {
   width: 100%;
   height: 100%;
-  border: none;
+  overflow: visible;
+}
+
+.chart-hover-tracker line {
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-dasharray: 3 3;
+}
+
+.chart-hover-tracker circle {
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.85));
+  transition: r 0.15s ease;
+}
+
+.chart-tooltip-bubble {
+  position: absolute;
+  top: 10px;
+  transform: translateX(-50%);
+  background: rgba(14, 18, 28, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 0.45rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  pointer-events: none;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+  z-index: 20;
+  white-space: nowrap;
+}
+
+.tooltip-price {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.tooltip-time {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.chart-time-axis {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0.5rem 0;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* --- 6. TIROIR DE PERSONNALISATION --- */
