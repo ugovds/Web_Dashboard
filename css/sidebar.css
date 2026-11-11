@@ -25,19 +25,21 @@
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   display: flex;
   flex-direction: column;
-  padding: 10px 6px;
+  justify-content: space-between;
+  padding: 12px 6px;
   transition: width 0.28s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.28s ease;
   z-index: 50;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   user-select: none;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* État déplié / expanded */
 .dashboard-sidebar.expanded,
 .dashboard-sidebar.locked-expanded {
   width: 224px;
-  padding: 10px 8px;
+  padding: 12px 8px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
@@ -51,6 +53,7 @@
   margin-bottom: 0.5rem;
   position: relative;
   min-height: 48px;
+  flex-shrink: 0;
 }
 
 .sidebar-brand-avatar {
@@ -155,17 +158,17 @@
   display: flex;
 }
 
-/* --- LISTE DE NAVIGATION --- */
+/* --- LISTE DE NAVIGATION : RÉPARTITION VERTICALE 100% --- */
 .sidebar-nav {
-  flex: 1;
+  flex: 1 1 auto;
+  height: calc(100% - 60px);
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Répartition verticale adaptative pour combler la hauteur harmonieusement */
-  gap: clamp(4px, 1.4vh, 18px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  justify-content: space-between; /* Distribue les 10 onglets sur TOUTE la hauteur du dock */
+  gap: clamp(6px, 1.8vh, 26px);
+  overflow: visible; /* Pas de scrollbar qui casse le space-between */
   padding: 4px 0;
-  scrollbar-width: none;
   position: relative;
 }
 
@@ -179,7 +182,7 @@
   top: 0;
   left: 6px;
   width: calc(100% - 12px);
-  border-radius: clamp(12px, 1.4vh, 18px);
+  border-radius: clamp(12px, 1.5vh, 18px);
   background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16);
   border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.32), 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
@@ -213,14 +216,14 @@ body.indicator-style-clean .sidebar-indicator {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* --- ÉLÉMENT BOUTON DE NAVIGATION UNIFIÉ (TAILLE ADAPTATIVE VERTICALE) --- */
+/* --- ÉLÉMENT BOUTON DE NAVIGATION UNIFIÉ (DIVISE ÉQUITABLEMENT LA HAUTEUR) --- */
 .sidebar-nav-item,
 .sidebar-nav .deck-nav-btn {
-  flex: 1 1 auto !important;
-  min-height: 38px !important;
-  max-height: 64px !important;
-  height: clamp(42px, 5.8vh, 62px) !important;
-  border-radius: clamp(12px, 1.4vh, 18px) !important;
+  flex: 1 1 0 !important; /* Divise équitablement toute la hauteur disponible sans limite étriquée */
+  min-height: 44px !important;
+  max-height: 88px !important; /* Grandit confortablement sur grand écran */
+  height: auto !important;
+  border-radius: clamp(12px, 1.5vh, 18px) !important;
   width: 100% !important;
   display: flex !important;
   align-items: center !important;
@@ -385,32 +388,42 @@ body.indicator-style-clean .sidebar-indicator {
    ======================================================== */
 @media (min-width: 2200px), (min-height: 950px) {
   .dashboard-sidebar {
-    width: 76px;
+    width: 78px;
     margin: 14px 0 14px 18px;
     height: calc(100vh - 28px);
     border-radius: 24px;
-    padding: 14px 8px;
+    padding: 16px 8px;
   }
   .dashboard-sidebar.expanded,
   .dashboard-sidebar.locked-expanded {
-    width: 248px;
-    padding: 14px 10px;
+    width: 254px;
+    padding: 16px 12px;
+  }
+  .sidebar-nav {
+    gap: clamp(8px, 2.2vh, 34px);
+    height: calc(100% - 68px);
   }
   .sidebar-nav-item,
   .sidebar-nav .deck-nav-btn {
-    height: clamp(48px, 6.2vh, 68px) !important;
-    border-radius: 16px !important;
+    min-height: 52px !important;
+    max-height: 98px !important;
+    border-radius: 18px !important;
+  }
+  .sidebar-nav-item .nav-icon-wrap,
+  .sidebar-nav .deck-nav-btn .nav-icon-wrap {
+    width: 36px !important;
+    height: 36px !important;
   }
   .sidebar-nav-item .nav-icon-wrap i,
   .sidebar-nav .deck-nav-btn .nav-icon-wrap i {
-    font-size: clamp(1.2rem, 1.8vh, 1.45rem) !important;
+    font-size: clamp(1.3rem, 2.2vh, 1.65rem) !important;
   }
   .dashboard-sidebar.expanded .nav-label,
   .dashboard-sidebar.locked-expanded .nav-label {
-    font-size: clamp(0.88rem, 1.3vh, 1.05rem) !important;
+    font-size: clamp(0.95rem, 1.4vh, 1.15rem) !important;
   }
   .sidebar-indicator {
-    border-radius: 16px;
+    border-radius: 18px;
   }
 }
 

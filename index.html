@@ -43,24 +43,24 @@
     </noscript>
 
     <!-- Stylesheets modulaires critiques (Above-The-Fold) -->
-    <link rel="stylesheet" href="css/base.css?v=2.5" />
-    <link rel="stylesheet" href="css/deck.css?v=2.5" />
-    <link rel="stylesheet" href="css/sidebar.css?v=2.5" />
-    <link rel="stylesheet" href="css/dashboard.css?v=2.5" />
-    <link rel="stylesheet" href="css/clock.css?v=2.5" />
-    <link rel="stylesheet" href="css/search.css?v=2.5" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=2.5" />
-    <link rel="stylesheet" href="css/calendar.css?v=2.5" />
-    <link rel="stylesheet" href="css/tasks.css?v=2.5" />
-    <link rel="stylesheet" href="css/responsive.css?v=2.5" />
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.5" />
+    <link rel="stylesheet" href="css/base.css?v=2.7" />
+    <link rel="stylesheet" href="css/deck.css?v=2.7" />
+    <link rel="stylesheet" href="css/sidebar.css?v=2.7" />
+    <link rel="stylesheet" href="css/dashboard.css?v=2.7" />
+    <link rel="stylesheet" href="css/clock.css?v=2.7" />
+    <link rel="stylesheet" href="css/search.css?v=2.7" />
+    <link rel="stylesheet" href="css/bookmarks.css?v=2.7" />
+    <link rel="stylesheet" href="css/calendar.css?v=2.7" />
+    <link rel="stylesheet" href="css/tasks.css?v=2.7" />
+    <link rel="stylesheet" href="css/responsive.css?v=2.7" />
+    <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.7" />
 
     <!-- Stylesheets secondaires différées (Widgets hors-écran, Modales, Thèmes inactifs) -->
-    <link rel="stylesheet" href="css/widgets.css?v=2.4" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/modals.css?v=2.4" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/sakura.css?v=2.4" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.4" media="print" onload="this.media='all'" />
-    <link rel="stylesheet" href="css/themes/retrowave.css?v=2.4" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/widgets.css?v=2.7" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/modals.css?v=2.7" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/sakura.css?v=2.7" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=2.7" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/retrowave.css?v=2.7" media="print" onload="this.media='all'" />
   </head>
 
   <body data-theme="4">
@@ -356,7 +356,7 @@
           </div>
 
           <!-- VUE 2 : CALENDRIER & TÂCHES FUSIONNÉS -->
-          <div id="deck-view-agenda" class="deck-slide-view" hidden>
+          <div id="deck-view-agenda" class="deck-slide-view agenda-full-view" hidden>
                 <div class="merged-calendar-section">
                   <div class="cal-controls-row">
                     <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
@@ -429,7 +429,7 @@
               </div>
 
               <!-- VUE 2 : MÉTÉO COMPLÈTE & PRÉVISIONS -->
-              <div id="deck-view-weather" class="deck-slide-view" hidden>
+              <div id="deck-view-weather" class="deck-slide-view weather-full-view" hidden>
                 <div class="deck-widget-panel weather-deck-panel">
                   <div class="weather-deck-search">
                     <input type="text" id="deck-city-input" placeholder="Changer de ville (Paris, Tokyo...)" />
@@ -546,7 +546,7 @@
               </div>
 
               <!-- VUE 3 : INFOS / ACTUALITÉS (MENU GLISSANT) -->
-              <div id="deck-view-feeds" class="deck-slide-view" hidden>
+              <div id="deck-view-feeds" class="deck-slide-view feeds-full-view" hidden>
                 <div class="feeds-tab-bar">
                   <div class="tab-group">
                     <button class="tab-btn active" data-feed="f1">F1</button>
@@ -560,7 +560,7 @@
               </div>
 
               <!-- VUE 4 : MONITEUR SYSTÈME & MARCHÉS BOURSIERS -->
-              <div id="deck-view-system" class="deck-slide-view" hidden>
+              <div id="deck-view-system" class="deck-slide-view system-full-view" hidden>
                 <div class="deck-widget-panel system-panel">
                   <div class="system-telemetry-grid">
                     <div class="telemetry-card">
@@ -657,7 +657,7 @@
               </div>
 
               <!-- VUE 5 : MINUTEUR FOCUS / POMODORO -->
-              <div id="deck-view-pomodoro" class="deck-slide-view" hidden>
+              <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view" hidden>
                 <div class="deck-widget-panel pomo-panel">
                   <div class="pomo-modes-bar">
                     <button type="button" class="pomo-mode-chip active" data-pomo-mode="work">Focus (25m)</button>
@@ -725,7 +725,7 @@
               </div>
 
               <!-- VUE 6 : BLOC-NOTES RAPIDE (SCRATCHPAD) -->
-              <div id="deck-view-notes" class="deck-slide-view" hidden>
+              <div id="deck-view-notes" class="deck-slide-view notes-full-view" hidden>
                 <div class="deck-widget-panel notes-panel">
                   <div class="notes-panel-header">
                     <span class="notes-stats-info" id="notes-stats-info">0 mot • 0 car.</span>
@@ -748,7 +748,7 @@
               </div>
 
               <!-- VUE 7 : AMBIANCE SONORE LO-FI & GÉNÉRATEUR -->
-              <div id="deck-view-ambient" class="deck-slide-view" hidden>
+              <div id="deck-view-ambient" class="deck-slide-view ambient-full-view" hidden>
                 <div class="deck-widget-panel ambient-panel">
                   <div class="ambient-modes-grid ambient-grid-expanded">
                     <button type="button" class="ambient-mode-card active" data-ambient-mode="rain">
@@ -798,7 +798,7 @@
               </div>
 
               <!-- VUE 8 : CITATIONS CYBERPUNK & MOTIVATION -->
-              <div id="deck-view-quotes" class="deck-slide-view" hidden>
+              <div id="deck-view-quotes" class="deck-slide-view quotes-full-view" hidden>
                 <div class="deck-widget-panel quotes-panel">
                   <div class="quote-card-box">
                     <div class="quote-watermark-icon"><i class="fa-solid fa-quote-left"></i></div>
@@ -851,7 +851,7 @@
               </div>
 
               <!-- VUE 9 : TOUTE LA PERSONNALISATION INTÉGRÉE DANS LA COLONNE DROITE (CONFIG) -->
-              <div id="deck-view-customize" class="deck-slide-view" hidden>
+              <div id="deck-view-customize" class="deck-slide-view customize-full-view" hidden>
                 <div class="deck-widget-panel customize-deck-panel">
                   <!-- Navigation par sous-onglets horizontaux -->
                   <div class="config-subtabs-nav">

@@ -276,6 +276,10 @@ function switchHubTab(tabName) {
     if (typeof applyWidgetVisibility === 'function') applyWidgetVisibility();
   } else if (tabName === 'feeds') {
     if (typeof renderCustomFeedsModalList === 'function') renderCustomFeedsModalList();
+  } else if (tabName === 'animations') {
+    if (typeof applyAnimationSettings === 'function' && typeof getAnimationSettings === 'function') {
+      applyAnimationSettings(getAnimationSettings());
+    }
   }
 }
 
