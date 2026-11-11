@@ -44,6 +44,7 @@
 
     <!-- Stylesheets modulaires critiques (Above-The-Fold) -->
     <link rel="stylesheet" href="css/base.css?v=2.5" />
+    <link rel="stylesheet" href="css/deck.css?v=2.5" />
     <link rel="stylesheet" href="css/sidebar.css?v=2.5" />
     <link rel="stylesheet" href="css/dashboard.css?v=2.5" />
     <link rel="stylesheet" href="css/clock.css?v=2.5" />
@@ -51,7 +52,6 @@
     <link rel="stylesheet" href="css/bookmarks.css?v=2.5" />
     <link rel="stylesheet" href="css/calendar.css?v=2.5" />
     <link rel="stylesheet" href="css/tasks.css?v=2.5" />
-    <link rel="stylesheet" href="css/deck.css?v=2.5" />
     <link rel="stylesheet" href="css/responsive.css?v=2.5" />
     <link rel="stylesheet" href="css/themes/kanagawa.css?v=2.5" />
 
@@ -95,8 +95,6 @@
 
         <!-- Navigation Verticale des Onglets -->
         <nav class="sidebar-nav" id="sidebar-nav">
-          <div class="sidebar-indicator deck-nav-indicator" id="sidebar-indicator"></div>
-
           <!-- 1. ACCUEIL (Tableau de bord / Omnibox & Signets) -->
           <button type="button" class="deck-nav-btn sidebar-nav-item active" data-deck-view="dashboard" title="Accueil & Signets (Alt+1)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
@@ -177,26 +175,6 @@
             <div class="sidebar-tooltip">Paramètres <kbd>0</kbd></div>
           </button>
         </nav>
-
-        <!-- Pied de menu : Aide clavier & Boutons rapides -->
-        <div class="sidebar-footer">
-          <div class="sidebar-kbd-help" title="Utilisez les flèches directionnelles Haut et Bas pour naviguer entre les onglets">
-            <span class="kbd-pill">↑</span>
-            <span class="kbd-pill">↓</span>
-            <span class="kbd-text">Naviguer</span>
-          </div>
-          <div class="sidebar-actions-grid">
-            <button type="button" id="sidebar-dim-btn" class="sidebar-action-btn" title="Mode Nuit / Atténuation HUD (Ctrl+Shift+D)">
-              <i class="fa-solid fa-moon"></i>
-            </button>
-            <button type="button" id="sidebar-theme-cycle-btn" class="sidebar-action-btn" title="Changer de thème (1-4)">
-              <i class="fa-solid fa-palette"></i>
-            </button>
-            <button type="button" id="sidebar-palette-btn" class="sidebar-action-btn" title="Palette de commandes (Ctrl+K)">
-              <i class="fa-solid fa-terminal"></i>
-            </button>
-          </div>
-        </div>
       </aside>
 
       <!-- ==============================================

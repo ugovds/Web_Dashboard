@@ -147,30 +147,6 @@ function initSidebarControls() {
     });
   }
 
-  // Boutons rapides du pied de sidebar
-  const dimBtn = document.getElementById('sidebar-dim-btn');
-  if (dimBtn) {
-    dimBtn.addEventListener('click', () => {
-      if (typeof toggleDimMode === 'function') toggleDimMode();
-    });
-  }
-
-  const themeCycleBtn = document.getElementById('sidebar-theme-cycle-btn');
-  if (themeCycleBtn) {
-    themeCycleBtn.addEventListener('click', () => {
-      const themes = ['1', '2', '3', '4'];
-      const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
-      if (typeof applyTheme === 'function') applyTheme(nextTheme);
-    });
-  }
-
-  const paletteBtn = document.getElementById('sidebar-palette-btn');
-  if (paletteBtn) {
-    paletteBtn.addEventListener('click', () => {
-      if (typeof openCommandPalette === 'function') openCommandPalette();
-    });
-  }
-
   // Topbar : Déclencheur recherche
   const topbarSearchBtn = document.getElementById('topbar-search-btn');
   if (topbarSearchBtn) {
