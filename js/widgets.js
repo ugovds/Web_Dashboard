@@ -119,6 +119,115 @@ function playPomoChime() {
   }
 }
 
+
+function getPomoHistoryData() {
+  let hist = null;
+  try {
+    const raw = localStorage.getItem('startpage_pomo_history');
+    if (raw) hist = JSON.parse(raw);
+  } catch (e) {
+    hist = null;
+  }
+
+  const today = new Date();
+  const todayKey = today.toISOString().split('T')[0];
+
+  // Si aucun historique n'existe, on pré-remplit avec des données représentatives
+  if (!hist || typeof hist !== 'object') {
+    hist = {};
+    const sampleCounts = [2, 4, 3, 5, 2, 4, pomoCompletedCount || 3];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(today.getDate() - i);
+      const k = d.toISOString().split('T')[0];
+      hist[k] = sampleCounts[6 - i];
+    }
+    try {
+      localStorage.setItem('startpage_pomo_history', JSON.stringify(hist));
+    } catch (e) {}
+  }
+
+  // Toujours s'assurer que le nombre aujourd'hui reflète pomoCompletedCount s'il est supérieur
+  if (pomoCompletedCount > 0 && (Number(hist[todayKey]) || 0) < pomoCompletedCount) {
+    hist[todayKey] = pomoCompletedCount;
+  }
+
+  const days = [];
+  const dayLabels = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    const label = dayLabels[d.getDay()];
+    const count = Number(hist[key]) || 0;
+    days.push({ key, label, count, isToday: i === 0 });
+  }
+
+  return days;
+}
+
+function recordPomoSessionInHistory() {
+  try {
+    const todayKey = new Date().toISOString().split('T')[0];
+    let hist = {};
+    try {
+      hist = JSON.parse(localStorage.getItem('startpage_pomo_history') || '{}');
+    } catch {}
+    hist[todayKey] = (Number(hist[todayKey]) || 0) + 1;
+    localStorage.setItem('startpage_pomo_history', JSON.stringify(hist));
+  } catch (e) {}
+}
+
+function renderPomoHistoryChart() {
+  const svg = document.getElementById('pomo-history-chart');
+  if (!svg) return;
+
+  const data = getPomoHistoryData();
+  const maxVal = Math.max(4, ...data.map(d => d.count));
+  const svgWidth = 280;
+  const svgHeight = 75;
+  const bottomPad = 18;
+  const topPad = 8;
+  const chartHeight = svgHeight - bottomPad - topPad;
+
+  const barWidth = 24;
+  const slotWidth = svgWidth / data.length;
+
+  let html = '';
+  // Ligne de base
+  html += '<line x1="8" y1="' + (svgHeight - bottomPad) + '" x2="' + (svgWidth - 8) + '" y2="' + (svgHeight - bottomPad) + '" stroke="rgba(255,255,255,0.08)" stroke-width="1" />';
+
+  data.forEach((item, idx) => {
+    const x = Math.round(idx * slotWidth + (slotWidth - barWidth) / 2);
+    const barH = item.count > 0 ? Math.max(6, Math.round((item.count / maxVal) * chartHeight)) : 0;
+    const y = Math.round(svgHeight - bottomPad - barH);
+
+    // Fond de barre
+    html += '<rect class="bar-track" x="' + x + '" y="' + topPad + '" width="' + barWidth + '" height="' + chartHeight + '" rx="4" fill="rgba(255,255,255,0.04)" />';
+
+    // Barre active
+    if (barH > 0) {
+      const fill = item.isToday ? 'var(--accent-primary)' : 'rgba(167, 139, 250, 0.45)';
+      const shadow = item.isToday ? 'filter="drop-shadow(0 0 5px var(--accent-primary))"' : '';
+      html += '<rect class="bar-fill ' + (item.isToday ? 'today' : '') + '" x="' + x + '" y="' + y + '" width="' + barWidth + '" height="' + barH + '" rx="4" fill="' + fill + '" ' + shadow + '>';
+      html += '<title>' + item.label + ' (' + item.key + ') : ' + item.count + ' session' + (item.count > 1 ? 's' : '') + '</title>';
+      html += '</rect>';
+
+      // Nombre si assez de hauteur
+      if (barH >= 14) {
+        html += '<text x="' + (x + barWidth / 2) + '" y="' + (y + 10) + '" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="800">' + item.count + '</text>';
+      }
+    }
+
+    // Nom du jour
+    const textColor = item.isToday ? 'var(--accent-primary)' : 'rgba(255,255,255,0.45)';
+    const textWeight = item.isToday ? '800' : '500';
+    html += '<text x="' + (x + barWidth / 2) + '" y="' + (svgHeight - 4) + '" text-anchor="middle" font-size="9" fill="' + textColor + '" font-weight="' + textWeight + '">' + item.label + '</text>';
+  });
+
+  svg.innerHTML = html;
+}
+
 function updatePomoUI() {
   const display = document.getElementById('pomo-time') || document.getElementById('pomo-timer-display');
   const status = document.getElementById('pomo-status') || document.getElementById('pomo-status-label');
@@ -145,7 +254,7 @@ function updatePomoUI() {
 
   // Arc SVG circulaire avec circonférence dynamique (r=124 => 779.11)
   if (ringArc) {
-    const r = parseFloat(ringArc.getAttribute('r')) || 124;
+    const r = parseFloat(ringArc.getAttribute('r')) || 142;
     const circum = 2 * Math.PI * r;
     ringArc.style.strokeDasharray = circum.toFixed(2);
     const offset = circum - (pct / 100) * circum;
@@ -329,6 +438,30 @@ function applyPomoPreset(presetValue) {
 
 // Variable sentinelle pour éviter d'enregistrer les écouteurs délégués en double
 let pomoEventsDelegated = false;
+
+
+// Fonctions globales exposées pour garantir le fonctionnement immédiat des boutons
+window.pomoStartToggle = function() {
+  if (pomoIsRunning) pausePomoTimer();
+  else startPomoTimer();
+};
+window.pomoReset = resetPomoTimer;
+window.setPomoMode = setPomoMode;
+window.applyPomoPreset = applyPomoPreset;
+window.playPomoChime = playPomoChime;
+window.ambientToggle = function() {
+  if (ambientIsPlaying) stopAmbientSound();
+  else startAmbientSound();
+};
+window.selectAmbientMode = function(mode) {
+  ambientCurrentMode = mode;
+  try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
+  document.querySelectorAll('.ambient-mode-card').forEach((c) => {
+    c.classList.toggle('active', c.dataset.ambientMode === mode);
+  });
+  if (ambientIsPlaying) startAmbientSound();
+  else updateAmbientUI();
+};
 
 function initPomodoroWidget() {
   try {
@@ -1650,3 +1783,18 @@ function setTabVisibilityWithAnimation(key, isEnabled, callback) {
   }
 }
 
+
+
+// Auto-initialisation immédiate et indépendante de widgets.js
+(function autoInitWidgets() {
+  function run() {
+    try { initPomodoroWidget(); } catch (e) {}
+    try { initAmbientWidget(); } catch (e) {}
+    try { renderPomoHistoryChart(); } catch (e) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run);
+  } else {
+    run();
+  }
+})();

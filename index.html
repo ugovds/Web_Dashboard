@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="css/base.css?v=3.0" />
     <link rel="stylesheet" href="css/deck.css?v=3.0" />
     <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
-    <link rel="stylesheet" href="css/dashboard.css?v=3.6" />
+    <link rel="stylesheet" href="css/dashboard.css?v=3.8" />
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
@@ -1114,260 +1114,216 @@
                 </div>
               </div>
 
-              <!-- VUE 5 : STUDIO FOCUS POMODORO & AMBIANCE LO-FI -->
+              <!-- VUE 5 : STUDIO FOCUS POMODORO & AMBIANCE LO-FI (2 COLONNES COMME L'AGENDA) -->
               <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view" hidden>
-                <div class="pomo-studio-container">
-                  <!-- 1. EN-TÊTE DU STUDIO FOCUS -->
-                  <header class="pomo-studio-header">
-                    <div class="pomo-header-brand">
-                      <div class="pomo-status-pill" id="pomo-header-status-pill">
-                        <span class="status-dot pulse-purple"></span>
-                        <span id="pomo-header-status-text">Session Prête • 25 min</span>
-                      </div>
-                      <h2 class="pomo-title">Studio Focus &amp; Ambiance Lo-Fi</h2>
-                      <span class="pomo-subtitle">Cockpit immersif de productivité, générateur audio procédural &amp; cadran chronomètre grand format</span>
-                    </div>
+                
+                <!-- COLONNE GAUCHE (ÉLÉMENT MAÎTRE ~62%) : MINUTEUR GÉANT XXL -->
+                <div class="pomo-timer-stage">
+                  <!-- Mode actif en discret -->
+                  <div class="pomo-hero-badge-row">
+                    <span class="pomo-active-mode-tag" id="pomo-active-mode-tag">
+                      <i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS • 25 MIN
+                    </span>
+                  </div>
 
-                    <div class="pomo-header-actions">
-                      <button type="button" id="pomo-test-chime-btn" class="pomo-header-btn" title="Tester le carillon zen">
-                        <i class="fa-solid fa-bell"></i>
-                        <span>Carillon Zen</span>
-                      </button>
-                      <div class="pomo-shortcut-hints">
-                        <span class="pomo-hint-item"><kbd>Espace</kbd> Play/Pause</span>
-                        <span class="pomo-hint-item"><kbd>R</kbd> Reset</span>
-                      </div>
-                    </div>
-                  </header>
-
-                  <!-- 2. ARCHITECTURE TRI-POLAIRE HARMONIEUSE (GAUCHE 28% / CENTRE MAÎTRE 44% / DROITE 28%) -->
-                  <div class="pomo-studio-grid">
-                    
-                    <!-- COLONNE GAUCHE (~28%) : RYTHMES, MODES & JALONS DU JOUR -->
-                    <div class="pomo-col pomo-col-left">
-                      <!-- MODULE 1 : SÉLECTEUR DE RYTHMES & PRESETS -->
-                      <div class="pomo-panel-box pomo-modes-box">
-                        <div class="pomo-box-head">
-                          <div class="pomo-box-title">
-                            <i class="fa-solid fa-sliders text-accent"></i>
-                            <span>Rythmes &amp; Intervalles</span>
-                          </div>
-                        </div>
-
-                        <!-- Sélection du mode -->
-                        <div class="pomo-modes-bar">
-                          <button type="button" class="pomo-mode-chip active" data-pomo-mode="work">
-                            <i class="fa-solid fa-brain"></i>
-                            <span>Focus (25m)</span>
-                          </button>
-                          <button type="button" class="pomo-mode-chip" data-pomo-mode="short">
-                            <i class="fa-solid fa-mug-hot"></i>
-                            <span>Pause (5m)</span>
-                          </button>
-                          <button type="button" class="pomo-mode-chip" data-pomo-mode="long">
-                            <i class="fa-solid fa-couch"></i>
-                            <span>Longue (15m)</span>
-                          </button>
-                        </div>
-
-                        <!-- Presets de travail -->
-                        <div class="pomo-presets-grid">
-                          <button type="button" class="pomo-preset-btn active" data-pomo-preset="25">
-                            <strong>25 / 5 min</strong>
-                            <span>Standard</span>
-                          </button>
-                          <button type="button" class="pomo-preset-btn" data-pomo-preset="50">
-                            <strong>50 / 10 min</strong>
-                            <span>Deep Work</span>
-                          </button>
-                          <button type="button" class="pomo-preset-btn" data-pomo-preset="15">
-                            <strong>15 / 3 min</strong>
-                            <span>Sprint</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <!-- MODULE 2 : OBJECTIF JOURNALIER & STATS COGNITIVES -->
-                      <div class="pomo-panel-box pomo-stats-box">
-                        <div class="pomo-box-head">
-                          <div class="pomo-box-title">
-                            <i class="fa-solid fa-trophy text-orange"></i>
-                            <span>Objectif du Jour</span>
-                          </div>
-                          <span class="stats-badge">
-                            <i class="fa-solid fa-circle-check"></i>
-                            <span id="pomo-cycles-count">0</span> / 4 complétées
-                          </span>
-                        </div>
-
-                        <div class="pomo-dots-milestones">
-                          <div class="pomo-dots-wrap" id="pomo-dots-wrap">
-                            <div class="pomo-dot" data-step="1"><span>1</span></div>
-                            <div class="pomo-dot" data-step="2"><span>2</span></div>
-                            <div class="pomo-dot" data-step="3"><span>3</span></div>
-                            <div class="pomo-dot" data-step="4"><span>4</span></div>
-                          </div>
-                          <span class="pomo-dots-sub">Cycle de 4 sessions avant pause longue</span>
-                        </div>
-
-                        <div class="pomo-stats-inline">
-                          <div class="pomo-stat-pill">
-                            <span class="label">Temps focus total</span>
-                            <strong class="val" id="pomo-total-time">0 min</strong>
-                          </div>
-                          <div class="pomo-stat-pill">
-                            <span class="label">Prochaine pause</span>
-                            <strong class="val" id="pomo-next-break">5 min</strong>
-                          </div>
-                        </div>
+                  <!-- Grand cadran circulaire XXL (diamètre 480px - 500px) -->
+                  <div class="pomo-dial-wrap">
+                    <div class="pomo-dial-ring">
+                      <svg class="pomo-svg-ring" viewBox="0 0 320 320">
+                        <circle class="pomo-ring-track" cx="160" cy="160" r="142"></circle>
+                        <circle
+                          id="pomo-ring-arc"
+                          class="pomo-ring-arc"
+                          cx="160"
+                          cy="160"
+                          r="142"
+                          stroke-dasharray="892.21"
+                          stroke-dashoffset="0"
+                        ></circle>
+                      </svg>
+                      <div class="pomo-dial-content">
+                        <span id="pomo-time" class="pomo-digits">25:00</span>
+                        <span id="pomo-status" class="pomo-status">Focus Time</span>
                       </div>
                     </div>
+                  </div>
 
-                    <!-- COLONNE CENTRALE (~44%) : LE MINUTEUR XXL MAJESTUEUX (PIÈCE MAÎTRESSE) -->
-                    <div class="pomo-col pomo-col-center">
-                      <div class="pomo-hero-card">
-                        <!-- Mode actif en discret -->
-                        <div class="pomo-hero-badge-row">
-                          <span class="pomo-active-mode-tag" id="pomo-active-mode-tag">
-                            <i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS
-                          </span>
-                        </div>
+                  <!-- Jauge de progression linéaire -->
+                  <div class="pomo-progress-bar-wrap">
+                    <div id="pomo-progress-fill" class="pomo-progress-fill" style="width: 100%;"></div>
+                  </div>
 
-                        <!-- Grand cadran circulaire SVG haute précision XXL (diamètre 440px) -->
-                        <div class="pomo-dial-wrap">
-                          <div class="pomo-dial-ring">
-                            <svg class="pomo-svg-ring" viewBox="0 0 280 280">
-                              <circle class="pomo-ring-track" cx="140" cy="140" r="124"></circle>
-                              <circle
-                                id="pomo-ring-arc"
-                                class="pomo-ring-arc"
-                                cx="140"
-                                cy="140"
-                                r="124"
-                                stroke-dasharray="779.11"
-                                stroke-dashoffset="0"
-                              ></circle>
-                            </svg>
-                            <div class="pomo-dial-content">
-                              <span id="pomo-time" class="pomo-digits">25:00</span>
-                              <span id="pomo-status" class="pomo-status">Focus Time</span>
-                            </div>
-                          </div>
-                        </div>
+                  <!-- Boutons de commande principaux grand format -->
+                  <div class="pomo-controls-row">
+                    <button type="button" id="pomo-start-btn" class="pomo-start-btn" onclick="window.pomoStartToggle && window.pomoStartToggle()">
+                      <i class="fa-solid fa-play"></i>
+                      <span>Démarrer la session</span>
+                    </button>
+                    <button type="button" id="pomo-reset-btn" class="pomo-reset-btn" onclick="window.pomoReset && window.pomoReset()" title="Réinitialiser (R)">
+                      <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                  </div>
 
-                        <!-- Jauge de progression linéaire -->
-                        <div class="pomo-progress-bar-wrap">
-                          <div id="pomo-progress-fill" class="pomo-progress-fill" style="width: 100%;"></div>
-                        </div>
-
-                        <!-- Boutons de commande principaux grand format -->
-                        <div class="pomo-controls-row">
-                          <button type="button" id="pomo-start-btn" class="pomo-start-btn">
-                            <i class="fa-solid fa-play"></i>
-                            <span>Démarrer la session</span>
-                          </button>
-                          <button type="button" id="pomo-reset-btn" class="pomo-reset-btn" title="Réinitialiser (R)">
-                            <i class="fa-solid fa-rotate-left"></i>
-                          </button>
-                        </div>
-
-                        <!-- Micro bandeau de touches clavier sous le cadran -->
-                        <div class="pomo-hero-keyboard-footer">
-                          <span><kbd>Espace</kbd> Basculer Start / Pause</span>
-                          <span><kbd>R</kbd> Remise à zéro</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- COLONNE DROITE (~28%) : AMBIANCE SONORE LO-FI & INTENTION DE FOCUS -->
-                    <div class="pomo-col pomo-col-right">
-                      <!-- MODULE 3 : STUDIO D'AMBIANCE SONORE LO-FI COMBINÉ -->
-                      <div class="pomo-panel-box pomo-ambient-box">
-                        <div class="pomo-box-head">
-                          <div class="pomo-box-title">
-                            <i class="fa-solid fa-headphones text-purple"></i>
-                            <span>Ambiance Sonore &amp; Lo-Fi</span>
-                          </div>
-                          <span class="pomo-ambient-badge" id="pomo-ambient-live-tag">Inactif</span>
-                        </div>
-
-                        <!-- Visualiseur dynamique de fréquences -->
-                        <div class="pomo-visualizer-container">
-                          <canvas id="ambient-waves-canvas" class="ambient-waves-canvas" width="460" height="65"></canvas>
-                          <span id="ambient-now-playing" class="ambient-now-playing">Générateur Procédural Audio</span>
-                        </div>
-
-                        <!-- Grille des 6 ambiances sonores -->
-                        <div class="ambient-modes-grid">
-                          <button type="button" class="ambient-mode-card active" data-ambient-mode="rain">
-                            <i class="fa-solid fa-cloud-showers-heavy"></i>
-                            <span>Pluie cyber</span>
-                          </button>
-                          <button type="button" class="ambient-mode-card" data-ambient-mode="lofi">
-                            <i class="fa-solid fa-radio"></i>
-                            <span>Radio Lo-Fi</span>
-                          </button>
-                          <button type="button" class="ambient-mode-card" data-ambient-mode="brown">
-                            <i class="fa-solid fa-wave-square"></i>
-                            <span>Bruit brun</span>
-                          </button>
-                          <button type="button" class="ambient-mode-card" data-ambient-mode="storm">
-                            <i class="fa-solid fa-bolt"></i>
-                            <span>Orage néon</span>
-                          </button>
-                          <button type="button" class="ambient-mode-card" data-ambient-mode="space">
-                            <i class="fa-solid fa-shuttle-space"></i>
-                            <span>Deep space</span>
-                          </button>
-                          <button type="button" class="ambient-mode-card" data-ambient-mode="night">
-                            <i class="fa-solid fa-moon"></i>
-                            <span>Nuit synthé</span>
-                          </button>
-                        </div>
-
-                        <!-- Contrôles audio (Master Play + Slider Volume) -->
-                        <div class="ambient-controls-bar">
-                          <button type="button" id="ambient-master-toggle" class="ambient-master-btn">
-                            <i id="ambient-master-icon" class="fa-solid fa-play"></i>
-                            <span id="ambient-master-label">Écouter</span>
-                          </button>
-
-                          <div class="ambient-volume-wrap">
-                            <i class="fa-solid fa-volume-low"></i>
-                            <input type="range" id="ambient-vol-slider" min="0" max="1" step="0.05" value="0.5" />
-                            <i class="fa-solid fa-volume-high"></i>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- MODULE 4 : INTENTION & FOCUS DE LA SESSION -->
-                      <div class="pomo-panel-box pomo-task-box">
-                        <div class="pomo-box-head">
-                          <div class="pomo-box-title">
-                            <i class="fa-solid fa-crosshairs text-accent"></i>
-                            <span>Intention de Session</span>
-                          </div>
-                          <span class="pomo-task-saved-hint" id="pomo-task-saved-hint">Auto-sauvegardé</span>
-                        </div>
-                        <div class="pomo-task-input-wrap">
-                          <input
-                            type="text"
-                            id="pomo-task-input"
-                            class="pomo-task-input"
-                            placeholder="Sur quoi travaillez-vous durant ce cycle ?"
-                            maxlength="120"
-                            autocomplete="off"
-                          />
-                          <button type="button" id="pomo-task-clear-btn" class="pomo-task-clear-btn" title="Effacer l'intention">
-                            <i class="fa-solid fa-xmark"></i>
-                          </button>
-                        </div>
-                        <span class="pomo-task-tip"><i class="fa-solid fa-lightbulb"></i> Définir une cible claire augmente la concentration de 40%.</span>
-                      </div>
-                    </div>
-
+                  <!-- Raccourcis clavier sous le cadran -->
+                  <div class="pomo-hero-keyboard-footer">
+                    <span><kbd>Espace</kbd> Basculer Start / Pause</span>
+                    <span><kbd>R</kbd> Remise à zéro</span>
                   </div>
                 </div>
+
+                <!-- COLONNE DROITE (~38%) : SUIVI, GRAPHIQUE, PARAMÉTRAGE & AMBIANCE LO-FI -->
+                <div class="pomo-side-cockpit">
+                  
+                  <!-- MODULE 1 : GRAPHIQUE DES DERNIÈRES SESSIONS & OBJECTIF DU JOUR -->
+                  <div class="pomo-panel-box pomo-history-box">
+                    <div class="pomo-box-head">
+                      <div class="pomo-box-title">
+                        <i class="fa-solid fa-chart-column text-accent"></i>
+                        <span>Sessions Récentes &amp; Objectif</span>
+                      </div>
+                      <span class="stats-badge" id="pomo-today-sessions-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="pomo-cycles-count">0</span> / 4 terminées
+                      </span>
+                    </div>
+
+                    <!-- Mini Graphique BarChart SVG des 7 derniers jours -->
+                    <div class="pomo-history-chart-wrap">
+                      <svg id="pomo-history-chart" class="pomo-history-chart" viewBox="0 0 280 75">
+                        <!-- Barres dynamiques générées en JS -->
+                      </svg>
+                    </div>
+
+                    <!-- Jalons du cycle de 4 sessions -->
+                    <div class="pomo-dots-milestones">
+                      <div class="pomo-dots-wrap" id="pomo-dots-wrap">
+                        <div class="pomo-dot" data-step="1"><span>1</span></div>
+                        <div class="pomo-dot" data-step="2"><span>2</span></div>
+                        <div class="pomo-dot" data-step="3"><span>3</span></div>
+                        <div class="pomo-dot" data-step="4"><span>4</span></div>
+                      </div>
+                      <span class="pomo-dots-sub">Cycle de 4 sessions avant pause longue de 15 min</span>
+                    </div>
+
+                    <div class="pomo-stats-inline">
+                      <div class="pomo-stat-pill">
+                        <span class="label">Temps focus total</span>
+                        <strong class="val" id="pomo-total-time">0 min</strong>
+                      </div>
+                      <div class="pomo-stat-pill">
+                        <span class="label">Prochaine pause</span>
+                        <strong class="val" id="pomo-next-break">5 min</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- MODULE 2 : PARAMÉTRAGE DES RYTHMES & INTERVALLES -->
+                  <div class="pomo-panel-box pomo-modes-box">
+                    <div class="pomo-box-head">
+                      <div class="pomo-box-title">
+                        <i class="fa-solid fa-sliders text-accent"></i>
+                        <span>Rythmes &amp; Intervalles</span>
+                      </div>
+                      <button type="button" id="pomo-test-chime-btn" class="pomo-mini-chime-btn" onclick="window.playPomoChime && window.playPomoChime()" title="Tester le carillon zen">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Carillon</span>
+                      </button>
+                    </div>
+
+                    <!-- Sélection du mode -->
+                    <div class="pomo-modes-bar">
+                      <button type="button" class="pomo-mode-chip active" data-pomo-mode="work" onclick="window.setPomoMode && window.setPomoMode('work')">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Focus (25m)</span>
+                      </button>
+                      <button type="button" class="pomo-mode-chip" data-pomo-mode="short" onclick="window.setPomoMode && window.setPomoMode('short')">
+                        <i class="fa-solid fa-mug-hot"></i>
+                        <span>Pause (5m)</span>
+                      </button>
+                      <button type="button" class="pomo-mode-chip" data-pomo-mode="long" onclick="window.setPomoMode && window.setPomoMode('long')">
+                        <i class="fa-solid fa-couch"></i>
+                        <span>Longue (15m)</span>
+                      </button>
+                    </div>
+
+                    <!-- Presets de travail -->
+                    <div class="pomo-presets-grid">
+                      <button type="button" class="pomo-preset-btn active" data-pomo-preset="25" onclick="window.applyPomoPreset && window.applyPomoPreset(25)">
+                        <strong>25 / 5 min</strong>
+                        <span>Standard</span>
+                      </button>
+                      <button type="button" class="pomo-preset-btn" data-pomo-preset="50" onclick="window.applyPomoPreset && window.applyPomoPreset(50)">
+                        <strong>50 / 10 min</strong>
+                        <span>Deep Work</span>
+                      </button>
+                      <button type="button" class="pomo-preset-btn" data-pomo-preset="15" onclick="window.applyPomoPreset && window.applyPomoPreset(15)">
+                        <strong>15 / 3 min</strong>
+                        <span>Sprint</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- MODULE 3 : STUDIO D'AMBIANCE SONORE LO-FI COMBINÉ -->
+                  <div class="pomo-panel-box pomo-ambient-box">
+                    <div class="pomo-box-head">
+                      <div class="pomo-box-title">
+                        <i class="fa-solid fa-headphones text-purple"></i>
+                        <span>Ambiance Sonore &amp; Lo-Fi</span>
+                      </div>
+                      <span class="pomo-ambient-badge" id="pomo-ambient-live-tag">Inactif</span>
+                    </div>
+
+                    <!-- Visualiseur dynamique de fréquences -->
+                    <div class="pomo-visualizer-container">
+                      <canvas id="ambient-waves-canvas" class="ambient-waves-canvas" width="380" height="48"></canvas>
+                      <span id="ambient-now-playing" class="ambient-now-playing">Générateur Procédural Audio</span>
+                    </div>
+
+                    <!-- Grille des 6 ambiances sonores -->
+                    <div class="ambient-modes-grid">
+                      <button type="button" class="ambient-mode-card active" data-ambient-mode="rain" onclick="window.selectAmbientMode && window.selectAmbientMode('rain')">
+                        <i class="fa-solid fa-cloud-showers-heavy"></i>
+                        <span>Pluie cyber</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="lofi" onclick="window.selectAmbientMode && window.selectAmbientMode('lofi')">
+                        <i class="fa-solid fa-radio"></i>
+                        <span>Radio Lo-Fi</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="brown" onclick="window.selectAmbientMode && window.selectAmbientMode('brown')">
+                        <i class="fa-solid fa-wave-square"></i>
+                        <span>Bruit brun</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="storm" onclick="window.selectAmbientMode && window.selectAmbientMode('storm')">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Orage néon</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="space" onclick="window.selectAmbientMode && window.selectAmbientMode('space')">
+                        <i class="fa-solid fa-shuttle-space"></i>
+                        <span>Deep space</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="night" onclick="window.selectAmbientMode && window.selectAmbientMode('night')">
+                        <i class="fa-solid fa-moon"></i>
+                        <span>Nuit synthé</span>
+                      </button>
+                    </div>
+
+                    <!-- Contrôles audio (Master Play + Slider Volume) -->
+                    <div class="ambient-controls-bar">
+                      <button type="button" id="ambient-master-toggle" class="ambient-master-btn" onclick="window.ambientToggle && window.ambientToggle()">
+                        <i id="ambient-master-icon" class="fa-solid fa-play"></i>
+                        <span id="ambient-master-label">Écouter</span>
+                      </button>
+
+                      <div class="ambient-volume-wrap">
+                        <i class="fa-solid fa-volume-low"></i>
+                        <input type="range" id="ambient-vol-slider" min="0" max="1" step="0.05" value="0.5" />
+                        <i class="fa-solid fa-volume-high"></i>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
               </div>
 
               <!-- VUE 6 : BLOC-NOTES RAPIDE (SCRATCHPAD) -->
@@ -2359,7 +2315,7 @@
     <script defer src="js/feeds.js?v=3.1"></script>
     <script defer src="js/bookmarks.js?v=3.1"></script>
     <script defer src="js/markets.js?v=3.3"></script>
-    <script defer src="js/widgets.js?v=3.4"></script>
+    <script defer src="js/widgets.js?v=3.6"></script>
     <script defer src="js/custom-hub.js?v=3.2"></script>
     <script defer src="js/command-palette.js?v=3.2"></script>
     <script defer src="js/shortcuts.js?v=3.2"></script>
