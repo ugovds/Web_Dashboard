@@ -163,6 +163,36 @@ function updatePomoUI() {
 
   if (countBadge) countBadge.textContent = pomoCompletedCount;
 
+  // Mise à jour de la pilule et du statut d'en-tête
+  const headerStatus = document.getElementById('pomo-header-status-text');
+  const headerPill = document.getElementById('pomo-header-status-pill');
+  if (headerStatus) {
+    if (pomoIsRunning) {
+      headerStatus.textContent = pomoMode === 'focus' ? `Focus en cours (${timeFormatted})` : `Pause en cours (${timeFormatted})`;
+    } else {
+      headerStatus.textContent = pomoMode === 'focus' ? `Prêt pour le focus (${Math.round(total / 60)} min)` : `Prêt pour la pause (${Math.round(total / 60)} min)`;
+    }
+  }
+  if (headerPill) {
+    headerPill.classList.toggle('active', pomoIsRunning);
+  }
+
+  // Temps total accumulé et prochaine pause
+  const totalTimeEl = document.getElementById('pomo-total-time');
+  if (totalTimeEl) {
+    const focusDurationMin = Math.round((POMO_DURATIONS.focus || 1500) / 60);
+    const totalMin = pomoCompletedCount * focusDurationMin;
+    const hrs = Math.floor(totalMin / 60);
+    const mins = totalMin % 60;
+    totalTimeEl.textContent = hrs > 0 ? `${hrs}h ${mins > 0 ? mins + 'm' : ''}` : `${mins} min`;
+  }
+
+  const nextBreakEl = document.getElementById('pomo-next-break');
+  if (nextBreakEl) {
+    const isLongNext = ((pomoCompletedCount + 1) % 4 === 0) && pomoCompletedCount > 0;
+    nextBreakEl.textContent = isLongNext ? `${Math.round((POMO_DURATIONS.long || 900) / 60)} min (Longue)` : `${Math.round((POMO_DURATIONS.short || 300) / 60)} min`;
+  }
+
   // Mise à jour des points d'objectif journalier (sur 4)
   const dots = document.querySelectorAll('#pomo-dots-wrap .pomo-dot');
   const completedMod = pomoCompletedCount % 4;
@@ -297,6 +327,51 @@ function initPomodoroWidget() {
       resetPomoTimer();
       if (typeof showToast === 'function') {
         showToast(`Intervalles Pomodoro : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
+      }
+    });
+  });
+
+  // Bouton de test du carillon zen
+  const testChimeBtn = document.getElementById('pomo-test-chime-btn');
+  if (testChimeBtn) {
+    testChimeBtn.addEventListener('click', () => {
+      playPomoChime();
+      if (typeof showToast === 'function') showToast('Carillon zen joué 🔔', 'info');
+    });
+  }
+
+  // Raccourcis clavier (Espace pour Démarrer/Pause, R pour Reset) lorsque l'onglet Pomodoro est visible
+  document.addEventListener('keydown', (e) => {
+    const pomoView = document.getElementById('deck-view-pomodoro');
+    if (!pomoView || pomoView.hidden || pomoView.style.display === 'none') return;
+
+    // Ne pas intercepter si l'utilisateur saisit du texte dans un champ ou éditeur
+    const tag = document.activeElement?.tagName?.toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
+
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (pomoIsRunning) pausePomoTimer();
+      else startPomoTimer();
+    } else if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      resetPomoTimer();
+      if (typeof showToast === 'function') showToast('Compteur réinitialisé', 'info');
+    }
+  });
+
+  // Boutons rapides d'ambiance sonore dans la carte Pomodoro
+  document.querySelectorAll('.pomo-quick-ambient-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.ambientMode;
+      if (typeof ambientCurrentMode !== 'undefined' && typeof startAmbientSound === 'function' && typeof stopAmbientSound === 'function') {
+        if (ambientIsPlaying && ambientCurrentMode === mode) {
+          stopAmbientSound();
+        } else {
+          ambientCurrentMode = mode;
+          try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
+          startAmbientSound();
+        }
       }
     });
   });
@@ -677,6 +752,20 @@ function updateAmbientUI() {
   if (topbarAmbientText) {
     topbarAmbientText.textContent = ambientIsPlaying ? 'En lecture ♪' : 'Audio';
   }
+
+  // Synchronisation du badge et des boutons rapides d'ambiance dans la vue Pomodoro
+  const pomoLiveTag = document.getElementById('pomo-ambient-live-tag');
+  if (pomoLiveTag) {
+    let modeLabel = 'Pluie';
+    if (ambientCurrentMode === 'brown') modeLabel = 'Bruit Brun';
+    if (ambientCurrentMode === 'lofi') modeLabel = 'Café Lo-Fi';
+    if (ambientCurrentMode === 'space') modeLabel = 'Espace';
+    pomoLiveTag.textContent = ambientIsPlaying ? `En écoute : ${modeLabel} ♪` : 'Audio Inactif';
+    pomoLiveTag.classList.toggle('playing', ambientIsPlaying);
+  }
+  document.querySelectorAll('.pomo-quick-ambient-btn').forEach((b) => {
+    b.classList.toggle('active', ambientIsPlaying && b.dataset.ambientMode === ambientCurrentMode);
+  });
 }
 
 function initAmbientWidget() {

@@ -495,29 +495,651 @@
 }
 
 /* ========================================================
-   VUE 6 : POMODORO
+   VUE 6 : POMODORO & STUDIO FOCUS
    ======================================================== */
-.pomodoro-full-view {
+.deck-slide-view.pomodoro-full-view {
+  width: 100%;
   height: 100%;
   min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: 18px;
-  padding: 2rem;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  flex-direction: column;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
-.pomodoro-full-view .pomo-panel {
-  max-width: 520px;
+.pomo-container {
   width: 100%;
+  max-width: 1350px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: clamp(16px, 2.2vh, 26px);
+  padding: clamp(12px, 1.8vh, 24px) clamp(20px, 2.6vw, 48px) clamp(60px, 8vh, 100px);
+  box-sizing: border-box;
+}
+
+/* 1. Header Focus */
+.pomo-header {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  background: rgba(14, 18, 28, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(18px, 2.4vh, 26px);
+  padding: clamp(16px, 2.2vh, 24px) clamp(20px, 2.4vw, 36px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.pomo-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pomo-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  padding: 0.25rem 0.8rem;
+  border-radius: 99px;
+  width: fit-content;
+  margin-bottom: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.pomo-status-pill.active {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.pomo-status-pill .pulse-purple {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #a78bfa;
+  box-shadow: 0 0 10px #a78bfa;
+}
+
+.pomo-status-pill.active .pulse-purple {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+}
+
+.pomo-title {
+  font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.pomo-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.pomo-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pomo-header-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 1.15rem;
+  border-radius: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.pomo-header-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.4);
+  transform: translateY(-1px);
+}
+
+.pomo-shortcut-hints {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pomo-hint-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.pomo-hint-item kbd,
+.pomo-shortcuts-list kbd {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  padding: 2px 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 2. Grille Principale */
+.pomo-grid-layout {
+  display: grid;
+  grid-template-columns: 1.45fr 1fr;
+  gap: clamp(16px, 2.2vh, 26px);
+  width: 100%;
+  align-items: start;
+}
+
+/* 3. Hero Card (Cadran & Contrôles) */
+.pomo-hero-card {
+  background: rgba(15, 20, 32, 0.82);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(18px, 2.2vh, 26px);
+  padding: clamp(22px, 3vh, 36px) clamp(20px, 2.4vw, 36px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(18px, 2.4vh, 24px);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.pomo-hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+}
+
+.pomo-modes-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  padding: 4px;
+  max-width: 100%;
+}
+
+.pomo-mode-chip {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.55rem 1.2rem;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.pomo-mode-chip:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pomo-mode-chip.active {
+  background: var(--accent-primary);
+  color: #0c0f17;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+/* Grand Cadran Circulaire */
+.pomo-dial-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.pomo-dial-ring {
+  position: relative;
+  width: clamp(230px, 30vh, 275px);
+  height: clamp(230px, 30vh, 275px);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.06) 0%, rgba(9, 13, 22, 0.88) 75%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.55), inset 0 0 30px rgba(0, 0, 0, 0.85), 0 0 25px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.3s ease;
+}
+
+.pomo-svg-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  transform: rotate(-90deg);
+}
+
+.pomo-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 5;
+}
+
+.pomo-ring-arc {
+  fill: none;
+  stroke: var(--accent-primary);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 0 6px var(--accent-primary));
+}
+
+.pomo-dial-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  z-index: 2;
+  text-align: center;
+}
+
+.pomo-digits {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(2.8rem, 4.4vw, 3.6rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.2);
+}
+
+.pomo-status {
+  font-size: 0.74rem;
+  color: var(--accent-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+  padding: 0.22rem 0.75rem;
+  border-radius: 99px;
+}
+
+/* Jauge linéaire */
+.pomo-progress-bar-wrap {
+  width: 82%;
+  max-width: 380px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.pomo-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, var(--accent-primary));
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+/* Presets */
+.pomo-presets-row {
+  display: flex;
+  gap: 0.65rem;
+  width: 100%;
+  max-width: 440px;
+  justify-content: center;
+}
+
+.pomo-preset-btn {
+  flex: 1;
+  padding: 0.55rem 0.85rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.pomo-preset-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.pomo-preset-btn.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.15);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+/* Actions Controls */
+.pomo-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+.pomo-start-btn {
+  flex: 1;
+  padding: 0.8rem 1.8rem;
+  border-radius: 14px;
+  background: var(--accent-primary);
+  color: #0c0f17;
+  font-family: inherit;
+  font-size: 0.98rem;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 20px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+.pomo-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.45);
+}
+
+.pomo-reset-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.pomo-reset-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: rotate(-45deg);
+}
+
+/* 4. Colonne d'accompagnement latérale */
+.pomo-side-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.8vh, 22px);
+}
+
+.pomo-side-card {
+  background: rgba(15, 20, 32, 0.78);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: clamp(16px, 2vh, 22px);
+  padding: clamp(16px, 2.2vh, 22px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.pomo-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.75rem;
+}
+
+.pomo-head-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.pomo-side-head .stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.pomo-milestones-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pomo-dots-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+}
+
+.pomo-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.3s ease;
+}
+
+.pomo-dot.done {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+.pomo-dots-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.pomo-mini-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.pomo-stat-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pomo-stat-item .stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.pomo-stat-item .stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.pomo-tip-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.65rem 0.8rem;
+}
+
+.pomo-tip-note i {
+  color: #f59e0b;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Quick Ambient Card */
+.pomo-ambient-status {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.55rem;
+  border-radius: 99px;
+  transition: all 0.2s ease;
+}
+
+.pomo-ambient-status.playing {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+.pomo-quick-ambient-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.pomo-quick-ambient-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pomo-quick-ambient-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.pomo-quick-ambient-btn.active {
+  background: rgba(167, 139, 250, 0.18);
+  border-color: #a78bfa;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(167, 139, 250, 0.25);
+}
+
+.pomo-quick-ambient-btn i {
+  font-size: 0.9rem;
+  color: var(--accent-primary);
+}
+
+/* Shortcuts list */
+.pomo-shortcuts-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pomo-shortcuts-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.pomo-shortcuts-list li i {
+  color: var(--accent-primary);
+  width: 16px;
+  text-align: center;
+}
+
+@media (max-width: 950px) {
+  .pomo-grid-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ========================================================

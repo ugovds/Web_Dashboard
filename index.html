@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="css/base.css?v=3.0" />
     <link rel="stylesheet" href="css/deck.css?v=3.0" />
     <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
-    <link rel="stylesheet" href="css/dashboard.css?v=3.3" />
+    <link rel="stylesheet" href="css/dashboard.css?v=3.4" />
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
@@ -1124,67 +1124,180 @@
 
               <!-- VUE 5 : MINUTEUR FOCUS / POMODORO -->
               <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view" hidden>
-                <div class="deck-widget-panel pomo-panel">
-                  <div class="pomo-modes-bar">
-                    <button type="button" class="pomo-mode-chip active" data-pomo-mode="work">Focus (25m)</button>
-                    <button type="button" class="pomo-mode-chip" data-pomo-mode="short">Pause (5m)</button>
-                    <button type="button" class="pomo-mode-chip" data-pomo-mode="long">Longue (15m)</button>
-                  </div>
-
-                  <div class="pomo-dial-wrap">
-                    <div class="pomo-dial-ring">
-                      <svg class="pomo-svg-ring" viewBox="0 0 200 200">
-                        <circle class="pomo-ring-track" cx="100" cy="100" r="88"></circle>
-                        <circle
-                          id="pomo-ring-arc"
-                          class="pomo-ring-arc"
-                          cx="100"
-                          cy="100"
-                          r="88"
-                          stroke-dasharray="552.92"
-                          stroke-dashoffset="0"
-                        ></circle>
-                      </svg>
-                      <div class="pomo-dial-content">
-                        <span id="pomo-time" class="pomo-digits">25:00</span>
-                        <span id="pomo-status" class="pomo-status">Focus Time</span>
+                <div class="pomo-container">
+                  <!-- 1. EN-TÊTE ÉPURÉ DU MODULE FOCUS -->
+                  <header class="pomo-header">
+                    <div class="pomo-header-left">
+                      <div class="pomo-status-pill" id="pomo-header-status-pill">
+                        <span class="status-dot pulse-purple"></span>
+                        <span id="pomo-header-status-text">Prêt pour le focus (25 min)</span>
+                      </div>
+                      <h2 class="pomo-title">Minuteur Focus &amp; Pomodoro</h2>
+                      <span class="pomo-subtitle">Cycles de travail rythmés, sessions de pause &amp; productivité sans distraction</span>
+                    </div>
+                    <div class="pomo-header-actions">
+                      <button type="button" id="pomo-test-chime-btn" class="pomo-header-btn" title="Tester le carillon zen">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Tester le carillon</span>
+                      </button>
+                      <div class="pomo-shortcut-hints">
+                        <span class="pomo-hint-item"><kbd>Espace</kbd> Play/Pause</span>
+                        <span class="pomo-hint-item"><kbd>R</kbd> Reset</span>
                       </div>
                     </div>
-                  </div>
+                  </header>
 
-                  <div class="pomo-progress-bar-wrap">
-                    <div id="pomo-progress-fill" class="pomo-progress-fill" style="width: 100%;"></div>
-                  </div>
-
-                  <!-- Presets d'intervalles rapides -->
-                  <div class="pomo-presets-row">
-                    <button type="button" class="pomo-preset-btn active" data-pomo-preset="25">25/5 Standard</button>
-                    <button type="button" class="pomo-preset-btn" data-pomo-preset="50">50/10 Deep Work</button>
-                    <button type="button" class="pomo-preset-btn" data-pomo-preset="15">15/3 Sprint</button>
-                  </div>
-
-                  <div class="pomo-controls-row">
-                    <button type="button" id="pomo-start-btn" class="modal-btn primary pomo-btn-main">
-                      <i class="fa-solid fa-play"></i> Démarrer
-                    </button>
-                    <button type="button" id="pomo-reset-btn" class="modal-btn secondary" title="Réinitialiser">
-                      <i class="fa-solid fa-rotate-left"></i>
-                    </button>
-                  </div>
-
-                  <div class="pomo-stats-footer">
-                    <div class="pomo-milestones-row">
-                      <span class="pomo-goal-text">Objectif :</span>
-                      <div class="pomo-dots-wrap" id="pomo-dots-wrap">
-                        <span class="pomo-dot"></span>
-                        <span class="pomo-dot"></span>
-                        <span class="pomo-dot"></span>
-                        <span class="pomo-dot"></span>
+                  <!-- 2. GRILLE PRINCIPALE DU MODULE FOCUS -->
+                  <div class="pomo-grid-layout">
+                    <!-- A. CARTE HÉRO CENTRALE (Cadran circulaire et commandes) -->
+                    <div class="pomo-hero-card">
+                      <!-- Barre de sélection des modes -->
+                      <div class="pomo-modes-bar">
+                        <button type="button" class="pomo-mode-chip active" data-pomo-mode="work">
+                          <i class="fa-solid fa-brain"></i>
+                          <span>Focus (25m)</span>
+                        </button>
+                        <button type="button" class="pomo-mode-chip" data-pomo-mode="short">
+                          <i class="fa-solid fa-mug-hot"></i>
+                          <span>Pause (5m)</span>
+                        </button>
+                        <button type="button" class="pomo-mode-chip" data-pomo-mode="long">
+                          <i class="fa-solid fa-couch"></i>
+                          <span>Longue (15m)</span>
+                        </button>
                       </div>
-                      <span class="stats-badge">
-                        <i class="fa-solid fa-circle-check"></i>
-                        <span id="pomo-cycles-count">0</span> / 4 complétées
-                      </span>
+
+                      <!-- Grand cadran circulaire SVG -->
+                      <div class="pomo-dial-wrap">
+                        <div class="pomo-dial-ring">
+                          <svg class="pomo-svg-ring" viewBox="0 0 200 200">
+                            <circle class="pomo-ring-track" cx="100" cy="100" r="88"></circle>
+                            <circle
+                              id="pomo-ring-arc"
+                              class="pomo-ring-arc"
+                              cx="100"
+                              cy="100"
+                              r="88"
+                              stroke-dasharray="552.92"
+                              stroke-dashoffset="0"
+                            ></circle>
+                          </svg>
+                          <div class="pomo-dial-content">
+                            <span id="pomo-time" class="pomo-digits">25:00</span>
+                            <span id="pomo-status" class="pomo-status">Focus Time</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Barre de progression linéaire -->
+                      <div class="pomo-progress-bar-wrap">
+                        <div id="pomo-progress-fill" class="pomo-progress-fill" style="width: 100%;"></div>
+                      </div>
+
+                      <!-- Préréglages d'intervalles rapides -->
+                      <div class="pomo-presets-row">
+                        <button type="button" class="pomo-preset-btn active" data-pomo-preset="25">25/5 Standard</button>
+                        <button type="button" class="pomo-preset-btn" data-pomo-preset="50">50/10 Deep Work</button>
+                        <button type="button" class="pomo-preset-btn" data-pomo-preset="15">15/3 Sprint</button>
+                      </div>
+
+                      <!-- Boutons de commande principaux -->
+                      <div class="pomo-controls-row">
+                        <button type="button" id="pomo-start-btn" class="pomo-start-btn">
+                          <i class="fa-solid fa-play"></i> Démarrer
+                        </button>
+                        <button type="button" id="pomo-reset-btn" class="pomo-reset-btn" title="Réinitialiser (R)">
+                          <i class="fa-solid fa-rotate-left"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- B. COLONNE D'ACCOMPAGNEMENT LATÉRALE -->
+                    <div class="pomo-side-col">
+                      <!-- Carte 1 : Objectif & Statistiques -->
+                      <div class="pomo-side-card">
+                        <div class="pomo-side-head">
+                          <div class="pomo-head-title">
+                            <i class="fa-solid fa-chart-pie text-accent"></i>
+                            <span>Objectif Journalier</span>
+                          </div>
+                          <span class="stats-badge">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span id="pomo-cycles-count">0</span> / 4 complétées
+                          </span>
+                        </div>
+
+                        <div class="pomo-milestones-box">
+                          <div class="pomo-dots-wrap" id="pomo-dots-wrap">
+                            <span class="pomo-dot" title="Session 1"></span>
+                            <span class="pomo-dot" title="Session 2"></span>
+                            <span class="pomo-dot" title="Session 3"></span>
+                            <span class="pomo-dot" title="Session 4"></span>
+                          </div>
+                          <span class="pomo-dots-label">Cycle de 4 sessions avant pause longue</span>
+                        </div>
+
+                        <div class="pomo-mini-stats-grid">
+                          <div class="pomo-stat-item">
+                            <span class="stat-label">Temps focus estimé</span>
+                            <span class="stat-val" id="pomo-total-time">0 min</span>
+                          </div>
+                          <div class="pomo-stat-item">
+                            <span class="stat-label">Prochaine pause</span>
+                            <span class="stat-val" id="pomo-next-break">5 min</span>
+                          </div>
+                        </div>
+
+                        <div class="pomo-tip-note">
+                          <i class="fa-regular fa-lightbulb"></i>
+                          <span>Après 4 cycles de 25 min, accordez-vous une pause longue de 15 min pour consolider votre mémoire.</span>
+                        </div>
+                      </div>
+
+                      <!-- Carte 2 : Ambiance Sonore Rapide (Lo-Fi & Bruits) -->
+                      <div class="pomo-side-card pomo-ambient-quick-card">
+                        <div class="pomo-side-head">
+                          <div class="pomo-head-title">
+                            <i class="fa-solid fa-headphones text-purple"></i>
+                            <span>Ambiance de Concentration</span>
+                          </div>
+                          <span class="pomo-ambient-status" id="pomo-ambient-live-tag">Audio Inactif</span>
+                        </div>
+
+                        <div class="pomo-quick-ambient-grid">
+                          <button type="button" class="pomo-quick-ambient-btn" data-ambient-mode="rain">
+                            <i class="fa-solid fa-cloud-showers-heavy"></i>
+                            <span>Pluie</span>
+                          </button>
+                          <button type="button" class="pomo-quick-ambient-btn" data-ambient-mode="lofi">
+                            <i class="fa-solid fa-radio"></i>
+                            <span>Café Lo-Fi</span>
+                          </button>
+                          <button type="button" class="pomo-quick-ambient-btn" data-ambient-mode="brown">
+                            <i class="fa-solid fa-wave-square"></i>
+                            <span>Bruit Brun</span>
+                          </button>
+                          <button type="button" class="pomo-quick-ambient-btn" data-ambient-mode="space">
+                            <i class="fa-solid fa-shuttle-space"></i>
+                            <span>Espace</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Carte 3 : Raccourcis & Praticité -->
+                      <div class="pomo-side-card pomo-tips-card">
+                        <div class="pomo-side-head">
+                          <div class="pomo-head-title">
+                            <i class="fa-solid fa-keyboard text-cyan"></i>
+                            <span>Contrôles Rapides</span>
+                          </div>
+                        </div>
+                        <ul class="pomo-shortcuts-list">
+                          <li><kbd>Espace</kbd> <span>Démarrer ou mettre en pause</span></li>
+                          <li><kbd>R</kbd> <span>Réinitialiser le compte à rebours</span></li>
+                          <li><i class="fa-solid fa-bell-slash"></i> <span>Carillon automatique à la fin de chaque période</span></li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2247,7 +2360,7 @@
     <script defer src="js/feeds.js?v=3.1"></script>
     <script defer src="js/bookmarks.js?v=3.1"></script>
     <script defer src="js/markets.js?v=3.3"></script>
-    <script defer src="js/widgets.js?v=3.1"></script>
+    <script defer src="js/widgets.js?v=3.2"></script>
     <script defer src="js/custom-hub.js?v=3.1"></script>
     <script defer src="js/command-palette.js?v=3.1"></script>
     <script defer src="js/shortcuts.js?v=3.1"></script>
