@@ -1,5 +1,9 @@
 /* ========================================================
-   css/sidebar.css - Navigation Latérale Rétractable & Cockpit Menu
+   css/sidebar.css - Navigation Latérale Moderne "Floating Glass Dock"
+   - Angles ultra-arrondis (Cockpit / Pill Modern)
+   - Correction intégrale de l'affichage des icônes en mode réduit
+   - Animations modernes, flous d'ambiance et micro-interactions
+   - Adapté pour écrans 34" Ultrawide, PC Portables et Mobiles
    ======================================================== */
 
 .dashboard-layout {
@@ -12,62 +16,75 @@
   background: transparent;
 }
 
-/* --- SIDEBAR GAUCHE SLIM & RÉTRACTABLE --- */
+/* ========================================================
+   SIDEBAR : DOCK FLOTTANT EN VERRE ULTRA-MODERNE
+   ======================================================== */
 .dashboard-sidebar {
   position: relative;
-  width: 68px; /* Mode compact par défaut avec seulement les icônes */
-  height: 100vh;
-  background: rgba(10, 12, 18, 0.82);
-  border-right: 1px solid var(--border-subtle);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
+  width: 72px; /* Largeur compacte par défaut */
+  height: calc(100vh - 24px);
+  margin: 12px 0 12px 14px;
+  border-radius: 24px;
+  background: rgba(12, 15, 23, 0.76);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0.85rem 0.55rem;
-  transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+  padding: 0.85rem 0.5rem;
+  transition: width 0.32s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.32s ease, transform 0.3s ease;
   z-index: 50;
-  box-shadow: 6px 0 28px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.12);
   user-select: none;
   flex-shrink: 0;
 }
 
-/* État déplié / expanded (au hover si auto-expand ou verrouillé via toggle) */
+/* État déplié / expanded */
 .dashboard-sidebar.expanded,
 .dashboard-sidebar.locked-expanded {
-  width: 230px;
-  box-shadow: 12px 0 38px rgba(0, 0, 0, 0.65);
+  width: 244px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14), inset 0 1px 1px rgba(255, 255, 255, 0.16);
 }
 
-/* --- HAUT DE SIDEBAR : ARTWORK / BRAND --- */
+/* ========================================================
+   HEADER SIDEBAR : AVATAR DU THÈME & BRANDING
+   ======================================================== */
 .sidebar-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.35rem 0.4rem 0.85rem 0.4rem;
-  border-bottom: 1px solid var(--border-subtle);
-  margin-bottom: 0.65rem;
+  padding: 0.25rem 0.3rem 0.75rem 0.3rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 0.55rem;
   position: relative;
-  min-height: 48px;
+  min-height: 52px;
 }
 
 .sidebar-brand-avatar {
   position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
   overflow: hidden;
   border: 1.5px solid var(--border-highlight);
-  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
   flex-shrink: 0;
   cursor: pointer;
-  background: #000;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  background: #080a10;
+  margin: 0 auto;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dashboard-sidebar.expanded .sidebar-brand-avatar,
+.dashboard-sidebar.locked-expanded .sidebar-brand-avatar {
+  margin: 0;
 }
 
 .sidebar-brand-avatar:hover {
-  transform: scale(1.05);
+  transform: scale(1.08) rotate(-2deg);
   border-color: var(--accent-primary);
+  box-shadow: 0 0 24px var(--accent-primary);
 }
 
 .sidebar-brand-avatar img {
@@ -79,75 +96,82 @@
 
 .sidebar-status-dot {
   position: absolute;
-  bottom: -2px;
-  right: -2px;
-  width: 9px;
-  height: 9px;
+  bottom: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--accent-primary);
-  border: 2px solid #090a0f;
-  box-shadow: 0 0 8px var(--accent-primary);
+  border: 2px solid #080a10;
+  box-shadow: 0 0 10px var(--accent-primary);
+  animation: statusPulse 2.4s infinite ease-in-out;
+}
+
+@keyframes statusPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.75; }
 }
 
 .sidebar-brand-info {
-  display: flex;
+  display: none;
   flex-direction: column;
   overflow: hidden;
   white-space: nowrap;
   opacity: 0;
   transform: translateX(-10px);
   transition: opacity 0.22s ease, transform 0.22s ease;
-  pointer-events: none;
 }
 
 .dashboard-sidebar.expanded .sidebar-brand-info,
 .dashboard-sidebar.locked-expanded .sidebar-brand-info {
+  display: flex;
   opacity: 1;
   transform: translateX(0);
-  pointer-events: auto;
 }
 
 .sidebar-brand-title {
   font-family: "Orbitron", monospace;
-  font-size: 0.82rem;
+  font-size: 0.86rem;
   font-weight: 800;
-  color: var(--accent-white, #fff);
+  color: #fff;
   letter-spacing: 1.2px;
   line-height: 1.1;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .sidebar-brand-sub {
-  font-size: 0.65rem;
+  font-size: 0.66rem;
   color: var(--accent-primary);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
 }
 
-/* Bouton pour plier/déplier la sidebar */
+/* Bouton chevron pour verrouiller/déplier */
 .sidebar-toggle-btn {
   position: absolute;
-  right: 0.35rem;
+  right: 0.25rem;
   top: 50%;
   transform: translateY(-50%);
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
   cursor: pointer;
   display: none;
   align-items: center;
   justify-content: center;
-  font-size: 0.72rem;
-  transition: all 0.2s ease;
+  font-size: 0.75rem;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
   color: var(--accent-primary);
-  border-color: var(--border-highlight);
+  border-color: var(--accent-primary);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .dashboard-sidebar.expanded .sidebar-toggle-btn,
@@ -155,16 +179,18 @@
   display: flex;
 }
 
-/* --- NAVIGATION LIST --- */
+/* ========================================================
+   LISTE DES ONGLETS DE NAVIGATION
+   ======================================================== */
 .sidebar-nav {
   position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.38rem;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0.2rem 0;
+  padding: 0.25rem 0;
   scrollbar-width: none;
 }
 
@@ -172,44 +198,70 @@
   display: none;
 }
 
-/* Indicateur coulissant vertical */
+/* Indicateur coulissant vertical ultra-doux avec flou néon */
 .sidebar-indicator {
   position: absolute;
-  left: 3px;
-  width: calc(100% - 6px);
-  height: 42px;
-  background: linear-gradient(90deg, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16), rgba(255, 255, 255, 0.04));
-  border: 1px solid var(--border-highlight);
-  border-left: 3px solid var(--accent-primary);
-  border-radius: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 46px;
+  background: linear-gradient(135deg, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.2), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.55);
+  border-radius: 16px;
   z-index: 1;
   pointer-events: none;
-  transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), height 0.2s ease, opacity 0.2s ease;
-  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.15);
+  transition: transform 0.26s cubic-bezier(0.2, 0.9, 0.3, 1), height 0.2s ease, width 0.25s ease;
+  box-shadow: 0 0 20px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35), inset 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.15);
 }
 
-/* Boutons d'onglets de la navigation */
+.dashboard-sidebar.expanded .sidebar-indicator,
+.dashboard-sidebar.locked-expanded .sidebar-indicator {
+  left: 6px;
+  transform: none;
+  width: calc(100% - 12px);
+  border-left: 3px solid var(--accent-primary);
+}
+
+/* --- BOUTONS D'ONGLETS (SIDEBAR-NAV-ITEM) --- */
 .sidebar-nav-item {
   position: relative;
   z-index: 2;
   display: flex;
   align-items: center;
-  height: 42px;
-  padding: 0 0.8rem;
-  border-radius: 10px;
+  justify-content: center; /* En mode compact : icône parfaitement centrée */
+  width: 48px;
+  height: 46px;
+  margin: 0 auto;
+  border-radius: 16px;
   background: transparent;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
   text-decoration: none;
   font-family: inherit;
-  transition: color 0.2s ease, background 0.2s ease, transform 0.15s ease;
+  transition: all 0.24s cubic-bezier(0.2, 0.9, 0.3, 1);
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* En mode déplié : alignement à gauche avec padding */
+.dashboard-sidebar.expanded .sidebar-nav-item,
+.dashboard-sidebar.locked-expanded .sidebar-nav-item {
   width: 100%;
+  justify-content: flex-start;
+  padding: 0 0.9rem;
+  margin: 0;
 }
 
 .sidebar-nav-item:hover {
-  color: var(--accent-white, #fff);
-  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px) scale(1.05);
+}
+
+.dashboard-sidebar.expanded .sidebar-nav-item:hover,
+.dashboard-sidebar.locked-expanded .sidebar-nav-item:hover {
+  transform: translateX(3px);
 }
 
 .sidebar-nav-item.active {
@@ -217,105 +269,110 @@
   font-weight: 700;
 }
 
+/* Encadré d'icône (visible et net en mode compact) */
 .sidebar-nav-item .nav-icon-wrap {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   flex-shrink: 0;
   position: relative;
-  transition: transform 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s ease;
 }
 
 .sidebar-nav-item:hover .nav-icon-wrap {
-  transform: scale(1.1);
+  transform: scale(1.12);
+}
+
+/* Animation douce d'impulsion lumineuse sur l'icône active */
+@keyframes activeIconGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px var(--accent-primary));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--accent-primary)) drop-shadow(0 0 24px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.6));
+  }
 }
 
 .sidebar-nav-item.active .nav-icon-wrap i {
-  filter: drop-shadow(0 0 6px var(--accent-primary));
+  animation: activeIconGlow 2.8s ease-in-out infinite;
 }
 
-/* Libellé texte de l'onglet */
-.sidebar-nav-item .nav-label {
-  margin-left: 0.75rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  flex: 1;
-  text-align: left;
+/* --- TEXTE ET BADGES : MASQUÉS TOTALEMENT EN MODE RÉDUIT (FIX BUG) --- */
+.sidebar-nav-item .nav-label,
+.sidebar-nav-item .nav-kbd,
+.sidebar-nav-item .nav-badge {
+  display: none !important;
 }
 
+/* Affichage fluide en mode déplié */
 .dashboard-sidebar.expanded .sidebar-nav-item .nav-label,
 .dashboard-sidebar.locked-expanded .sidebar-nav-item .nav-label {
+  display: block !important;
+  margin-left: 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
   opacity: 1;
   transform: translateX(0);
-}
-
-/* Badge de raccourci clavier */
-.sidebar-nav-item .nav-kbd {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-subtle);
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  opacity: 0;
-  transform: translateX(6px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  flex: 1;
+  text-align: left;
+  letter-spacing: 0.2px;
 }
 
 .dashboard-sidebar.expanded .sidebar-nav-item .nav-kbd,
 .dashboard-sidebar.locked-expanded .sidebar-nav-item .nav-kbd {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-/* Pastille de compteur de tâches ou alertes */
-.sidebar-nav-item .nav-badge {
+  display: inline-block !important;
+  font-family: "JetBrains Mono", monospace;
   font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.12rem 0.42rem;
-  border-radius: 99px;
-  background: var(--accent-primary);
-  color: #05070a;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.12rem 0.38rem;
+  border-radius: 5px;
   margin-left: auto;
-  opacity: 0;
-  transition: opacity 0.2s ease;
 }
 
 .dashboard-sidebar.expanded .sidebar-nav-item .nav-badge,
 .dashboard-sidebar.locked-expanded .sidebar-nav-item .nav-badge {
-  opacity: 1;
+  display: inline-block !important;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 99px;
+  background: var(--accent-primary);
+  color: #05070a;
+  margin-left: auto;
 }
 
-/* --- TOOLTIP FLOTTANT LORSQUE LA SIDEBAR EST COMPACTE --- */
+/* ========================================================
+   TOOLTIP FLOTTANT GLASSMORPHISM EN MODE RÉDUIT
+   ======================================================== */
 .sidebar-nav-item .sidebar-tooltip {
   position: absolute;
-  left: calc(100% + 14px);
+  left: calc(100% + 16px);
   top: 50%;
-  transform: translateY(-50%) translateX(-6px);
-  background: var(--surface-strong, #131722);
-  border: 1px solid var(--border-highlight);
-  padding: 0.38rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.74rem;
+  transform: translateY(-50%) translateX(-8px) scale(0.92);
+  background: rgba(18, 22, 34, 0.88);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  padding: 0.45rem 0.85rem;
+  border-radius: 12px;
+  font-size: 0.76rem;
   font-weight: 600;
-  color: var(--accent-white, #fff);
+  color: #fff;
   white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.18s ease, transform 0.18s ease;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.65);
+  transition: opacity 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
   z-index: 999;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
 .sidebar-tooltip::before {
@@ -326,55 +383,62 @@
   transform: translateY(-50%);
   border-width: 5px;
   border-style: solid;
-  border-color: transparent var(--border-highlight) transparent transparent;
+  border-color: transparent rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35) transparent transparent;
 }
 
 .sidebar-nav-item:hover .sidebar-tooltip,
 .sidebar-nav-item:focus-visible .sidebar-tooltip {
   opacity: 1;
-  transform: translateY(-50%) translateX(0);
+  transform: translateY(-50%) translateX(0) scale(1);
 }
 
-/* Ne pas afficher le tooltip si la sidebar est dépliée */
 .dashboard-sidebar.expanded .sidebar-tooltip,
 .dashboard-sidebar.locked-expanded .sidebar-tooltip {
   display: none !important;
 }
 
-/* --- PIED DE SIDEBAR : ACTIONS RAPIDES & HINTS --- */
+/* ========================================================
+   PIED DE SIDEBAR : HINTS & BOUTONS RONDS
+   ======================================================== */
 .sidebar-footer {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.6rem;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
 }
 
-/* Indication de navigation flèches clavier */
 .sidebar-kbd-help {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
   padding: 0.35rem 0.4rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  font-size: 0.7rem;
   color: var(--text-muted);
   cursor: help;
   overflow: hidden;
   white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.sidebar-kbd-help:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-highlight);
+  color: #fff;
 }
 
 .sidebar-kbd-help .kbd-pill {
   font-family: "JetBrains Mono", monospace;
   font-weight: 700;
-  padding: 0.08rem 0.28rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
+  border: 1px solid var(--border-highlight);
+  border-radius: 6px;
   color: var(--accent-primary);
 }
 
@@ -389,33 +453,118 @@
   display: inline;
 }
 
-/* Actions rapides (Nuit / Thème / Command Palette / Toggle sidebar) */
 .sidebar-actions-grid {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.35rem;
 }
 
 .sidebar-action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-subtle);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: var(--text-muted);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 0.8rem;
-  transition: all 0.2s ease;
-  position: relative;
+  font-size: 0.85rem;
+  transition: all 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .sidebar-action-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
   color: var(--accent-primary);
-  border-color: var(--border-highlight);
-  transform: translateY(-1px);
+  border-color: var(--accent-primary);
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+}
+
+/* ========================================================
+   RESPONSIVE : ULTRA-LARGE (34" ULTRAWIDE), LAPTOPS & MOBILE
+   ======================================================== */
+
+/* --- ÉCRANS GÉANTS / 34" ULTRAWIDE (> 2000px) --- */
+@media (min-width: 2000px) {
+  .dashboard-sidebar {
+    width: 80px;
+    margin: 16px 0 16px 18px;
+    height: calc(100vh - 32px);
+    border-radius: 28px;
+    padding: 1.1rem 0.6rem;
+  }
+  .dashboard-sidebar.expanded,
+  .dashboard-sidebar.locked-expanded {
+    width: 260px;
+  }
+  .sidebar-nav-item {
+    width: 52px;
+    height: 50px;
+    border-radius: 18px;
+  }
+  .dashboard-sidebar.expanded .sidebar-nav-item,
+  .dashboard-sidebar.locked-expanded .sidebar-nav-item {
+    width: 100%;
+  }
+  .sidebar-nav-item .nav-icon-wrap {
+    font-size: 1.25rem;
+  }
+  .sidebar-indicator {
+    width: 52px;
+    height: 50px;
+    border-radius: 18px;
+  }
+  .sidebar-brand-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 18px;
+  }
+}
+
+/* --- MOBILE & TABLETTES (< 768px) : DOCK FLOTTANT EN BAS --- */
+@media (max-width: 768px) {
+  .dashboard-layout {
+    flex-direction: column;
+  }
+  .dashboard-sidebar {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    width: calc(100vw - 20px) !important;
+    height: 60px;
+    margin: 0;
+    flex-direction: row;
+    border-radius: 20px;
+    padding: 0.35rem 0.65rem;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.85);
+  }
+  .sidebar-header,
+  .sidebar-footer {
+    display: none !important;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+  }
+  .sidebar-nav-item {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+  .sidebar-indicator {
+    display: none; /* Simplification en vue mobile tactile */
+  }
+  .sidebar-nav-item.active {
+    background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22);
+    border: 1px solid var(--accent-primary);
+  }
 }

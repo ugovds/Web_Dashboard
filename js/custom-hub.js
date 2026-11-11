@@ -15,6 +15,8 @@ const VIEW_TITLES = {
   customize: { title: 'Paramètres & Hub', sub: 'Thèmes, Couleurs, Horloge & Sauvegarde', icon: 'fa-solid fa-sliders' }
 };
 
+let updateDeckIndicator = null;
+
 function initDeckViewSlider() {
   const navBtns = document.querySelectorAll('.deck-nav-btn');
   const allViews = document.querySelectorAll('.deck-slide-view');
@@ -24,8 +26,12 @@ function initDeckViewSlider() {
     if (!indicator || !activeBtn) return;
     const isVertical = activeBtn.classList.contains('sidebar-nav-item') || activeBtn.closest('.sidebar-nav');
     if (isVertical) {
+      const sidebar = document.getElementById('dashboard-sidebar');
+      const isExpanded = sidebar && (sidebar.classList.contains('expanded') || sidebar.classList.contains('locked-expanded'));
       indicator.style.height = `${activeBtn.offsetHeight}px`;
-      indicator.style.transform = `translateY(${activeBtn.offsetTop}px)`;
+      indicator.style.transform = isExpanded
+        ? `translateY(${activeBtn.offsetTop}px)`
+        : `translateX(-50%) translateY(${activeBtn.offsetTop}px)`;
       indicator.style.width = '';
     } else {
       indicator.style.width = `${activeBtn.offsetWidth}px`;
@@ -36,6 +42,8 @@ function initDeckViewSlider() {
       activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     } catch {}
   }
+
+  updateDeckIndicator = updateIndicator;
 
   function updateTopbarInfo(targetKey) {
     const meta = VIEW_TITLES[targetKey] || { title: targetKey, sub: '', icon: 'fa-solid fa-layer-group' };
@@ -102,12 +110,8 @@ function initSidebarControls() {
       toggleBtn.innerHTML = expanded ? '<i class="fa-solid fa-chevron-left"></i>' : '<i class="fa-solid fa-chevron-right"></i>';
 
       const curr = document.querySelector('.deck-nav-btn.active');
-      const ind = document.querySelector('.sidebar-indicator');
-      if (curr && ind) {
-        setTimeout(() => {
-          ind.style.height = `${curr.offsetHeight}px`;
-          ind.style.transform = `translateY(${curr.offsetTop}px)`;
-        }, 120);
+      if (curr && typeof updateDeckIndicator === 'function') {
+        setTimeout(() => updateDeckIndicator(curr), 80);
       }
     });
   }
@@ -118,12 +122,8 @@ function initSidebarControls() {
       if (!sidebar.classList.contains('locked-expanded')) {
         sidebar.classList.add('expanded');
         const curr = document.querySelector('.deck-nav-btn.active');
-        const ind = document.querySelector('.sidebar-indicator');
-        if (curr && ind) {
-          setTimeout(() => {
-            ind.style.height = `${curr.offsetHeight}px`;
-            ind.style.transform = `translateY(${curr.offsetTop}px)`;
-          }, 80);
+        if (curr && typeof updateDeckIndicator === 'function') {
+          setTimeout(() => updateDeckIndicator(curr), 80);
         }
       }
     });
@@ -131,12 +131,8 @@ function initSidebarControls() {
     sidebar.addEventListener('mouseleave', () => {
       sidebar.classList.remove('expanded');
       const curr = document.querySelector('.deck-nav-btn.active');
-      const ind = document.querySelector('.sidebar-indicator');
-      if (curr && ind) {
-        setTimeout(() => {
-          ind.style.height = `${curr.offsetHeight}px`;
-          ind.style.transform = `translateY(${curr.offsetTop}px)`;
-        }, 80);
+      if (curr && typeof updateDeckIndicator === 'function') {
+        setTimeout(() => updateDeckIndicator(curr), 80);
       }
     });
   }

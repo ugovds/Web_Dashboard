@@ -14,19 +14,22 @@
   background: transparent;
 }
 
-/* --- TOPBAR HUD MINIMALISTE --- */
+/* --- TOPBAR HUD FLOTTANTE ET MODERNE --- */
 .dashboard-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1.75rem;
-  background: rgba(10, 12, 18, 0.55);
-  border-bottom: 1px solid var(--border-subtle);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  margin: 12px 14px 0 12px;
+  padding: 0.65rem 1.4rem;
+  border-radius: 20px;
+  background: rgba(12, 15, 23, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
   z-index: 20;
   flex-shrink: 0;
   gap: 1rem;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
 }
 
 .topbar-left {
@@ -150,15 +153,17 @@
   flex-direction: column;
 }
 
-/* Animation douce lors du basculement d'onglet */
+/* Animation moderne avec flou subtil et translation */
 @keyframes viewFadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px) scale(0.995);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
   }
 }
 
@@ -172,7 +177,7 @@
 .deck-slide-view.active {
   display: flex;
   flex-direction: column;
-  animation: viewFadeIn 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: viewFadeIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
 /* ========================================================
@@ -492,4 +497,76 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+/* ========================================================
+   RESPONSIVE : 34" ULTRAWIDE, LAPTOPS & MOBILE VIEWPORT
+   ======================================================== */
+
+/* --- ÉCRANS GÉANTS / 34" ULTRAWIDE (>= 2200px) --- */
+@media (min-width: 2200px) {
+  .dashboard-overview-body {
+    grid-template-columns: 380px 1fr;
+    gap: 1.75rem;
+  }
+  .dashboard-search-hero {
+    max-width: 1200px;
+  }
+  .overview-right-col .categories-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.4rem;
+  }
+  .agenda-full-view {
+    grid-template-columns: 460px 1fr;
+    gap: 2rem;
+  }
+  .system-full-view .crypto-ticker-cards {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .feeds-full-view .merged-feed-list {
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  }
+}
+
+/* --- ÉCRANS LARGES STANDARDS (1600px - 2199px) --- */
+@media (min-width: 1600px) and (max-width: 2199px) {
+  .overview-right-col .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* --- TABLETTES ET PC PORTABLES COMPACTS (<= 1150px) --- */
+@media (max-width: 1150px) {
+  .dashboard-overview-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .overview-left-col {
+    height: auto;
+  }
+  .agenda-full-view {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+}
+
+/* --- MOBILES (<= 768px) --- */
+@media (max-width: 768px) {
+  .dashboard-main-area {
+    padding-bottom: 78px; /* Évite de recouvrir le contenu avec le dock du bas */
+  }
+  .dashboard-topbar {
+    margin: 8px 8px 0 8px;
+    border-radius: 16px;
+    padding: 0.5rem 0.85rem;
+  }
+  .topbar-search-trigger {
+    display: none; /* Accessible directement dans la vue générale */
+  }
+  .dashboard-viewport {
+    padding: 1rem 0.85rem;
+  }
+  .overview-right-col .categories-grid {
+    grid-template-columns: 1fr;
+  }
 }
