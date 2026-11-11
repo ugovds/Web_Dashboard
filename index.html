@@ -46,7 +46,7 @@
     <link rel="stylesheet" href="css/base.css?v=3.0" />
     <link rel="stylesheet" href="css/deck.css?v=3.0" />
     <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
-    <link rel="stylesheet" href="css/dashboard.css?v=4.0" />
+    <link rel="stylesheet" href="css/dashboard.css?v=3.8" />
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
@@ -1115,404 +1115,213 @@
               </div>
 
               <!-- VUE 5 : STUDIO FOCUS POMODORO & AMBIANCE LO-FI (2 COLONNES COMME L'AGENDA) -->
-                            <!-- VUE 5 : STUDIO POMODORO FOCUSO (INSPIRÉ DU UI KIT FOCUSO) -->
-              <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view focuso-root" hidden>
-                <div class="focuso-container">
-                  
-                  <!-- ==============================================
-                       COLONNE 1 (GAUCHE ~52%) : MINUTEUR HÉROS & TÂCHES
-                       ============================================== -->
-                  <div class="focuso-main-stage">
-                    
-                    <!-- Barre supérieure de tâche active & statut -->
-                    <div class="focuso-top-bar">
-                      <div class="focuso-active-task-pill" id="focuso-active-task-pill" onclick="window.focusoOpenNewTaskModal && window.focusoOpenNewTaskModal()">
-                        <div class="task-icon-circle">
-                          <i class="fa-solid fa-laptop-code" id="focuso-task-icon"></i>
-                        </div>
-                        <div class="task-text-info">
-                          <span class="task-title" id="focuso-task-title">Design User Interface (UI)</span>
-                          <span class="task-meta" id="focuso-task-progress">0/4 sessions • 0/100 min</span>
-                        </div>
-                        <i class="fa-solid fa-chevron-down task-chevron"></i>
-                      </div>
-
-                      <div class="focuso-mode-badge" id="focuso-mode-badge">
-                        <span class="pulse-dot"></span>
-                        <span id="focuso-mode-label">Session Focus</span>
-                      </div>
-                    </div>
-
-                    <!-- Grand Cadran Circulaire Focuso avec Ticks & Arc Corail -->
-                    <div class="focuso-dial-wrapper">
-                      <div class="focuso-dial">
-                        <svg class="focuso-dial-svg" viewBox="0 0 360 360">
-                          <!-- Graduation radiale (Tick marks tout autour du cadran) -->
-                          <g class="focuso-ticks" id="focuso-ticks-group">
-                            <!-- Générés dynamiquement en JS -->
-                          </g>
-                          <!-- Piste de fond -->
-                          <circle class="focuso-dial-track" cx="180" cy="180" r="130"></circle>
-                          <!-- Arc animé de progression Corail -->
-                          <circle
-                            id="focuso-dial-arc"
-                            class="focuso-dial-arc"
-                            cx="180"
-                            cy="180"
-                            r="130"
-                            stroke-dasharray="816.81"
-                            stroke-dashoffset="0"
-                          ></circle>
-                        </svg>
-
-                        <!-- Contenu au centre du cadran -->
-                        <div class="focuso-dial-center">
-                          <div class="dial-center-icon" id="focuso-center-icon">
-                            <i class="fa-solid fa-brain"></i>
-                          </div>
-                          <div class="dial-digits" id="focuso-digits">25:00</div>
-                          
-                          <!-- Jalons de 4 points Focuso -->
-                          <div class="focuso-milestone-dots" id="focuso-milestone-dots">
-                            <span class="milestone-dot" data-step="1"></span>
-                            <span class="milestone-dot" data-step="2"></span>
-                            <span class="milestone-dot" data-step="3"></span>
-                            <span class="milestone-dot" data-step="4"></span>
-                          </div>
-
-                          <div class="dial-subtitle" id="focuso-subtitle">Stay Focused!</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Boutons de contrôle héros Focuso (Reset, Grand Play/Pause, Skip) -->
-                    <div class="focuso-controls-cluster">
-                      <button type="button" id="focuso-btn-reset" class="focuso-ctrl-btn reset" onclick="window.focusoReset && window.focusoReset()" title="Réinitialiser la session (R)">
-                        <i class="fa-solid fa-rotate-left"></i>
-                      </button>
-
-                      <button type="button" id="focuso-btn-play" class="focuso-play-hero-btn" onclick="window.focusoPlayPause && window.focusoPlayPause()">
-                        <i class="fa-solid fa-play" id="focuso-play-icon"></i>
-                      </button>
-
-                      <button type="button" id="focuso-btn-skip" class="focuso-ctrl-btn skip" onclick="window.focusoSkip && window.focusoSkip()" title="Passer à la phase suivante (S)">
-                        <i class="fa-solid fa-forward-step"></i>
-                      </button>
-                    </div>
-
-                    <!-- Barre d'outils rapides Focuso sous les contrôles -->
-                    <div class="focuso-quick-tools">
-                      <button type="button" class="focuso-tool-pill" id="focuso-tool-preset" onclick="window.focusoCyclePreset && window.focusoCyclePreset()">
-                        <i class="fa-solid fa-sliders"></i>
-                        <span id="focuso-preset-label">Standard (25/5m)</span>
-                      </button>
-                      <button type="button" class="focuso-tool-pill" id="focuso-tool-chime" onclick="window.focusoTestChime && window.focusoTestChime()" title="Tester le son">
-                        <i class="fa-solid fa-bell"></i>
-                        <span>Carillon Zen</span>
-                      </button>
-                      <button type="button" class="focuso-tool-pill" id="focuso-tool-noise" onclick="window.focusoToggleNoise && window.focusoToggleNoise()">
-                        <i class="fa-solid fa-headphones"></i>
-                        <span id="focuso-noise-label">Bruit Blanc</span>
-                      </button>
-                      <button type="button" class="focuso-tool-pill" id="focuso-tool-zen" onclick="window.focusoToggleZen && window.focusoToggleZen()">
-                        <i class="fa-solid fa-expand"></i>
-                        <span>Plein Écran</span>
-                      </button>
-                    </div>
-
-                    <!-- Section des tâches récentes & sélecteur rapide -->
-                    <div class="focuso-tasks-card">
-                      <div class="tasks-card-header">
-                        <div class="tasks-card-title">
-                          <i class="fa-solid fa-list-check text-coral"></i>
-                          <span>Tâches Récentes</span>
-                        </div>
-                        <button type="button" class="btn-new-task" onclick="window.focusoOpenNewTaskModal && window.focusoOpenNewTaskModal()">
-                          <i class="fa-solid fa-plus"></i> Nouvelle tâche
-                        </button>
-                      </div>
-
-                      <div class="focuso-tasks-list" id="focuso-tasks-list">
-                        <!-- Rendu dynamique des cartes de tâches -->
-                      </div>
-                    </div>
-
+              <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view" hidden>
+                
+                <!-- COLONNE GAUCHE (ÉLÉMENT MAÎTRE ~62%) : MINUTEUR GÉANT XXL -->
+                <div class="pomo-timer-stage">
+                  <!-- Mode actif en discret -->
+                  <div class="pomo-hero-badge-row">
+                    <span class="pomo-active-mode-tag" id="pomo-active-mode-tag">
+                      <i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS • 25 MIN
+                    </span>
                   </div>
 
-
-                  <!-- ==============================================
-                       COLONNE 2 (DROITE ~48%) : COCKPIT ANALYTIQUE, AGENDA & PERSONNALISATION
-                       ============================================== -->
-                  <div class="focuso-cockpit-stage">
-                    
-                    <!-- Navigation par sous-onglets horizontaux du cockpit -->
-                    <div class="focuso-cockpit-tabs">
-                      <button type="button" class="cockpit-tab-btn active" data-tab="reports" onclick="window.focusoSwitchCockpitTab && window.focusoSwitchCockpitTab('reports')">
-                        <i class="fa-solid fa-chart-simple"></i> Rapports &amp; Graphiques
-                      </button>
-                      <button type="button" class="cockpit-tab-btn" data-tab="calendar" onclick="window.focusoSwitchCockpitTab && window.focusoSwitchCockpitTab('calendar')">
-                        <i class="fa-regular fa-calendar-check"></i> Calendrier Sessions
-                      </button>
-                      <button type="button" class="cockpit-tab-btn" data-tab="settings" onclick="window.focusoSwitchCockpitTab && window.focusoSwitchCockpitTab('settings')">
-                        <i class="fa-solid fa-gear"></i> Personnalisation
-                      </button>
+                  <!-- Grand cadran circulaire XXL (diamètre 480px - 500px) -->
+                  <div class="pomo-dial-wrap">
+                    <div class="pomo-dial-ring">
+                      <svg class="pomo-svg-ring" viewBox="0 0 320 320">
+                        <circle class="pomo-ring-track" cx="160" cy="160" r="142"></circle>
+                        <circle
+                          id="pomo-ring-arc"
+                          class="pomo-ring-arc"
+                          cx="160"
+                          cy="160"
+                          r="142"
+                          stroke-dasharray="892.21"
+                          stroke-dashoffset="0"
+                        ></circle>
+                      </svg>
+                      <div class="pomo-dial-content">
+                        <span id="pomo-time" class="pomo-digits">25:00</span>
+                        <span id="pomo-status" class="pomo-status">Focus Time</span>
+                      </div>
                     </div>
-
-                    <!-- PANNEAU 1 : RAPPORTS & GRAPHIQUES D'ACTIVITÉ (Focus Time, Bar Chart, Heatmap) -->
-                    <div id="focuso-panel-reports" class="focuso-tab-panel active">
-                      
-                      <!-- 3 Cartes KPI statistiques -->
-                      <div class="focuso-kpi-row">
-                        <div class="kpi-card">
-                          <span class="kpi-label">Temps Focus Total</span>
-                          <strong class="kpi-val" id="focuso-kpi-total">46.2 h</strong>
-                          <span class="kpi-sub"><i class="fa-solid fa-arrow-trend-up text-coral"></i> +12% cette semaine</span>
-                        </div>
-                        <div class="kpi-card">
-                          <span class="kpi-label">Moyenne Quotidienne</span>
-                          <strong class="kpi-val" id="focuso-kpi-avg">6.6 h</strong>
-                          <span class="kpi-sub">Objectif 6h atteint</span>
-                        </div>
-                        <div class="kpi-card">
-                          <span class="kpi-label">Total Sessions</span>
-                          <strong class="kpi-val" id="focuso-kpi-sessions">109</strong>
-                          <span class="kpi-sub">Cycle actuel 2/4</span>
-                        </div>
-                      </div>
-
-                      <!-- Graphique en Barres d'activité sur 7 jours avec bulle active -->
-                      <div class="focuso-report-box">
-                        <div class="report-box-head">
-                          <span class="box-title"><i class="fa-solid fa-chart-column text-coral"></i> Temps Focus Hebdomadaire</span>
-                          <span class="report-filter-badge">7 derniers jours</span>
-                        </div>
-
-                        <div class="focuso-chart-container">
-                          <svg id="focuso-bar-chart" class="focuso-bar-chart-svg" viewBox="0 0 460 170">
-                            <!-- Barres dynamiques générées par JS -->
-                          </svg>
-                        </div>
-                      </div>
-
-                      <!-- Heatmap des heures productives (Productive Hours) -->
-                      <div class="focuso-report-box">
-                        <div class="report-box-head">
-                          <span class="box-title"><i class="fa-solid fa-fire text-coral"></i> Heatmap des Heures Productives</span>
-                          <span class="report-filter-badge">Intensité horaire</span>
-                        </div>
-
-                        <div class="focuso-heatmap-grid" id="focuso-heatmap-grid">
-                          <!-- Rendu de la matrice 7 jours x 4 créneaux (Matin, Midi, Après-midi, Soir) -->
-                        </div>
-                        <div class="focuso-heatmap-legend">
-                          <span>Moins actif</span>
-                          <div class="legend-scale">
-                            <span class="scale-box lv0"></span>
-                            <span class="scale-box lv1"></span>
-                            <span class="scale-box lv2"></span>
-                            <span class="scale-box lv3"></span>
-                            <span class="scale-box lv4"></span>
-                          </div>
-                          <span>Très productif</span>
-                        </div>
-                      </div>
-
-                    </div>
-
-
-                    <!-- PANNEAU 2 : CALENDRIER & HISTORIQUE DES SESSIONS (Focuso Calendar) -->
-                    <div id="focuso-panel-calendar" class="focuso-tab-panel" hidden>
-                      
-                      <div class="focuso-calendar-card">
-                        <!-- Navigation Mois -->
-                        <div class="calendar-header-row">
-                          <button type="button" class="cal-nav-btn" onclick="window.focusoCalPrev && window.focusoCalPrev()"><i class="fa-solid fa-chevron-left"></i></button>
-                          <span class="cal-current-month" id="focuso-cal-month-title">Décembre 2026</span>
-                          <button type="button" class="cal-nav-btn" onclick="window.focusoCalNext && window.focusoCalNext()"><i class="fa-solid fa-chevron-right"></i></button>
-                        </div>
-
-                        <!-- Grille du calendrier mensuel -->
-                        <div class="focuso-calendar-grid">
-                          <div class="cal-day-header">Lun</div>
-                          <div class="cal-day-header">Mar</div>
-                          <div class="cal-day-header">Mer</div>
-                          <div class="cal-day-header">Jeu</div>
-                          <div class="cal-day-header">Ven</div>
-                          <div class="cal-day-header">Sam</div>
-                          <div class="cal-day-header">Dim</div>
-                          <div id="focuso-calendar-days" class="cal-days-cells">
-                            <!-- Cellules des jours avec badge session -->
-                          </div>
-                        </div>
-
-                        <!-- Bilan du jour sélectionné -->
-                        <div class="cal-day-summary-row">
-                          <div class="cal-summary-item">
-                            <span class="sub">Progression</span>
-                            <strong class="val" id="focuso-cal-progress-val">71.4%</strong>
-                          </div>
-                          <div class="cal-summary-item">
-                            <span class="sub">Temps travaillé</span>
-                            <strong class="val text-coral" id="focuso-cal-worked-val">300 min</strong>
-                          </div>
-                          <div class="cal-summary-item">
-                            <span class="sub">Sessions</span>
-                            <strong class="val" id="focuso-cal-sessions-val">12 sessions</strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Chronologie détaillée des sessions du jour -->
-                      <div class="focuso-history-card">
-                        <div class="history-card-head">
-                          <span class="box-title"><i class="fa-solid fa-clock-rotate-left text-coral"></i> Sessions du jour sélectionné</span>
-                          <span id="focuso-selected-date-label" class="date-badge">Aujourd'hui</span>
-                        </div>
-                        <div class="focuso-history-timeline" id="focuso-history-timeline">
-                          <!-- Timeline dynamique des sessions -->
-                        </div>
-                      </div>
-
-                    </div>
-
-
-                    <!-- PANNEAU 3 : PERSONNALISATION & RÉGLAGES -->
-                    <div id="focuso-panel-settings" class="focuso-tab-panel" hidden>
-                      
-                      <!-- Module 1 : Durée des intervalles -->
-                      <div class="focuso-settings-box">
-                        <div class="settings-box-head">
-                          <i class="fa-solid fa-stopwatch text-coral"></i>
-                          <span>Durées des Intervalles (minutes)</span>
-                        </div>
-                        <div class="settings-durations-grid">
-                          <div class="duration-input-group">
-                            <label>Session Focus</label>
-                            <div class="number-stepper">
-                              <button type="button" onclick="window.focusoStepDuration('focus', -5)">-</button>
-                              <input type="number" id="focuso-cfg-focus" min="5" max="120" step="5" value="25" readonly />
-                              <button type="button" onclick="window.focusoStepDuration('focus', 5)">+</button>
-                            </div>
-                          </div>
-                          <div class="duration-input-group">
-                            <label>Pause Courte</label>
-                            <div class="number-stepper">
-                              <button type="button" onclick="window.focusoStepDuration('short', -1)">-</button>
-                              <input type="number" id="focuso-cfg-short" min="1" max="30" step="1" value="5" readonly />
-                              <button type="button" onclick="window.focusoStepDuration('short', 1)">+</button>
-                            </div>
-                          </div>
-                          <div class="duration-input-group">
-                            <label>Pause Longue</label>
-                            <div class="number-stepper">
-                              <button type="button" onclick="window.focusoStepDuration('long', -5)">-</button>
-                              <input type="number" id="focuso-cfg-long" min="5" max="60" step="5" value="15" readonly />
-                              <button type="button" onclick="window.focusoStepDuration('long', 5)">+</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Module 2 : Sons et Carillon -->
-                      <div class="focuso-settings-box">
-                        <div class="settings-box-head">
-                          <i class="fa-solid fa-volume-high text-coral"></i>
-                          <span>Sons &amp; Alertes</span>
-                        </div>
-                        <div class="sound-selection-row">
-                          <label>Tonalité de fin :</label>
-                          <select id="focuso-cfg-sound" class="focuso-select" onchange="window.focusoChangeSound && window.focusoChangeSound(this.value)">
-                            <option value="zen">Bol Tibétain &amp; Gong Zen</option>
-                            <option value="chime">Carillon Cristallin Majeur</option>
-                            <option value="bell">Cloche Douce</option>
-                            <option value="digital">Bip Synthétique Discret</option>
-                          </select>
-                          <button type="button" class="btn-test-sound" onclick="window.focusoTestChime && window.focusoTestChime()">Tester</button>
-                        </div>
-                        <div class="settings-toggle-row">
-                          <div>
-                            <strong>Démarrage auto des pauses</strong>
-                            <span>Passe automatiquement en pause dès la fin du focus</span>
-                          </div>
-                          <label class="switch">
-                            <input type="checkbox" id="focuso-cfg-autobreak" onchange="window.focusoToggleAutoBreak && window.focusoToggleAutoBreak(this.checked)" />
-                            <span class="slider"></span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <!-- Module 3 : Ambiance sonore & Bruit blanc -->
-                      <div class="focuso-settings-box">
-                        <div class="settings-box-head">
-                          <i class="fa-solid fa-headphones text-coral"></i>
-                          <span>Générateur Ambiance &amp; Bruit Blanc</span>
-                        </div>
-                        <div class="ambient-cards-compact">
-                          <button type="button" class="amb-card active" data-amb="rain" onclick="window.focusoSelectAmbient && window.focusoSelectAmbient('rain')">
-                            <i class="fa-solid fa-cloud-showers-heavy"></i> Pluie
-                          </button>
-                          <button type="button" class="amb-card" data-amb="lofi" onclick="window.focusoSelectAmbient && window.focusoSelectAmbient('lofi')">
-                            <i class="fa-solid fa-radio"></i> Lo-Fi
-                          </button>
-                          <button type="button" class="amb-card" data-amb="brown" onclick="window.focusoSelectAmbient && window.focusoSelectAmbient('brown')">
-                            <i class="fa-solid fa-wave-square"></i> Bruit brun
-                          </button>
-                          <button type="button" class="amb-card" data-amb="storm" onclick="window.focusoSelectAmbient && window.focusoSelectAmbient('storm')">
-                            <i class="fa-solid fa-bolt"></i> Orage
-                          </button>
-                          <button type="button" class="amb-card" data-amb="space" onclick="window.focusoSelectAmbient && window.focusoSelectAmbient('space')">
-                            <i class="fa-solid fa-shuttle-space"></i> Espace
-                          </button>
-                          <button type="button" class="amb-card" data-amb="night" onclick="window.focusoSelectAmbient && window.focusoSelectAmbient('night')">
-                            <i class="fa-solid fa-moon"></i> Nuit
-                          </button>
-                        </div>
-                        <div class="sound-volume-bar">
-                          <i class="fa-solid fa-volume-low"></i>
-                          <input type="range" id="focuso-amb-volume" min="0" max="1" step="0.05" value="0.5" oninput="window.focusoSetAmbVolume && window.focusoSetAmbVolume(this.value)" />
-                          <i class="fa-solid fa-volume-high"></i>
-                        </div>
-                      </div>
-
-                    </div>
-
                   </div>
 
+                  <!-- Jauge de progression linéaire -->
+                  <div class="pomo-progress-bar-wrap">
+                    <div id="pomo-progress-fill" class="pomo-progress-fill" style="width: 100%;"></div>
+                  </div>
+
+                  <!-- Boutons de commande principaux grand format -->
+                  <div class="pomo-controls-row">
+                    <button type="button" id="pomo-start-btn" class="pomo-start-btn" onclick="window.pomoStartToggle && window.pomoStartToggle()">
+                      <i class="fa-solid fa-play"></i>
+                      <span>Démarrer la session</span>
+                    </button>
+                    <button type="button" id="pomo-reset-btn" class="pomo-reset-btn" onclick="window.pomoReset && window.pomoReset()" title="Réinitialiser (R)">
+                      <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                  </div>
+
+                  <!-- Raccourcis clavier sous le cadran -->
+                  <div class="pomo-hero-keyboard-footer">
+                    <span><kbd>Espace</kbd> Basculer Start / Pause</span>
+                    <span><kbd>R</kbd> Remise à zéro</span>
+                  </div>
                 </div>
 
-                <!-- Modale d'ajout rapide de tâche Focuso -->
-                <div id="focuso-task-modal" class="focuso-modal-overlay" hidden onclick="if(event.target===this) window.focusoCloseTaskModal && window.focusoCloseTaskModal()">
-                  <div class="focuso-modal-card">
-                    <div class="modal-card-head">
-                      <h3><i class="fa-solid fa-plus-circle text-coral"></i> Nouvelle Tâche Focus</h3>
-                      <button type="button" class="modal-close-x" onclick="window.focusoCloseTaskModal && window.focusoCloseTaskModal()">&times;</button>
+                <!-- COLONNE DROITE (~38%) : SUIVI, GRAPHIQUE, PARAMÉTRAGE & AMBIANCE LO-FI -->
+                <div class="pomo-side-cockpit">
+                  
+                  <!-- MODULE 1 : GRAPHIQUE DES DERNIÈRES SESSIONS & OBJECTIF DU JOUR -->
+                  <div class="pomo-panel-box pomo-history-box">
+                    <div class="pomo-box-head">
+                      <div class="pomo-box-title">
+                        <i class="fa-solid fa-chart-column text-accent"></i>
+                        <span>Sessions Récentes &amp; Objectif</span>
+                      </div>
+                      <span class="stats-badge" id="pomo-today-sessions-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span id="pomo-cycles-count">0</span> / 4 terminées
+                      </span>
                     </div>
-                    <form id="focuso-task-form" onsubmit="window.focusoSaveNewTask && window.focusoSaveNewTask(event)">
-                      <div class="form-group">
-                        <label>Titre de la tâche</label>
-                        <input type="text" id="focuso-new-task-name" placeholder="Ex: Révision du rapport trimestriel..." required maxlength="80" />
+
+                    <!-- Mini Graphique BarChart SVG des 7 derniers jours -->
+                    <div class="pomo-history-chart-wrap">
+                      <svg id="pomo-history-chart" class="pomo-history-chart" viewBox="0 0 280 75">
+                        <!-- Barres dynamiques générées en JS -->
+                      </svg>
+                    </div>
+
+                    <!-- Jalons du cycle de 4 sessions -->
+                    <div class="pomo-dots-milestones">
+                      <div class="pomo-dots-wrap" id="pomo-dots-wrap">
+                        <div class="pomo-dot" data-step="1"><span>1</span></div>
+                        <div class="pomo-dot" data-step="2"><span>2</span></div>
+                        <div class="pomo-dot" data-step="3"><span>3</span></div>
+                        <div class="pomo-dot" data-step="4"><span>4</span></div>
                       </div>
-                      <div class="form-group-row">
-                        <div class="form-group">
-                          <label>Sessions cibles</label>
-                          <input type="number" id="focuso-new-task-target" min="1" max="16" value="4" />
-                        </div>
-                        <div class="form-group">
-                          <label>Catégorie</label>
-                          <select id="focuso-new-task-category">
-                            <option value="code">💻 Code / Dév</option>
-                            <option value="design">🎨 Design &amp; UI</option>
-                            <option value="write">📝 Rédaction</option>
-                            <option value="study">📚 Étude / Recherche</option>
-                          </select>
-                        </div>
+                      <span class="pomo-dots-sub">Cycle de 4 sessions avant pause longue de 15 min</span>
+                    </div>
+
+                    <div class="pomo-stats-inline">
+                      <div class="pomo-stat-pill">
+                        <span class="label">Temps focus total</span>
+                        <strong class="val" id="pomo-total-time">0 min</strong>
                       </div>
-                      <div class="modal-actions">
-                        <button type="button" class="btn-cancel" onclick="window.focusoCloseTaskModal && window.focusoCloseTaskModal()">Annuler</button>
-                        <button type="submit" class="btn-confirm">Créer la tâche</button>
+                      <div class="pomo-stat-pill">
+                        <span class="label">Prochaine pause</span>
+                        <strong class="val" id="pomo-next-break">5 min</strong>
                       </div>
-                    </form>
+                    </div>
                   </div>
+
+                  <!-- MODULE 2 : PARAMÉTRAGE DES RYTHMES & INTERVALLES -->
+                  <div class="pomo-panel-box pomo-modes-box">
+                    <div class="pomo-box-head">
+                      <div class="pomo-box-title">
+                        <i class="fa-solid fa-sliders text-accent"></i>
+                        <span>Rythmes &amp; Intervalles</span>
+                      </div>
+                      <button type="button" id="pomo-test-chime-btn" class="pomo-mini-chime-btn" onclick="window.playPomoChime && window.playPomoChime()" title="Tester le carillon zen">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Carillon</span>
+                      </button>
+                    </div>
+
+                    <!-- Sélection du mode -->
+                    <div class="pomo-modes-bar">
+                      <button type="button" class="pomo-mode-chip active" data-pomo-mode="work" onclick="window.setPomoMode && window.setPomoMode('work')">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Focus (25m)</span>
+                      </button>
+                      <button type="button" class="pomo-mode-chip" data-pomo-mode="short" onclick="window.setPomoMode && window.setPomoMode('short')">
+                        <i class="fa-solid fa-mug-hot"></i>
+                        <span>Pause (5m)</span>
+                      </button>
+                      <button type="button" class="pomo-mode-chip" data-pomo-mode="long" onclick="window.setPomoMode && window.setPomoMode('long')">
+                        <i class="fa-solid fa-couch"></i>
+                        <span>Longue (15m)</span>
+                      </button>
+                    </div>
+
+                    <!-- Presets de travail -->
+                    <div class="pomo-presets-grid">
+                      <button type="button" class="pomo-preset-btn active" data-pomo-preset="25" onclick="window.applyPomoPreset && window.applyPomoPreset(25)">
+                        <strong>25 / 5 min</strong>
+                        <span>Standard</span>
+                      </button>
+                      <button type="button" class="pomo-preset-btn" data-pomo-preset="50" onclick="window.applyPomoPreset && window.applyPomoPreset(50)">
+                        <strong>50 / 10 min</strong>
+                        <span>Deep Work</span>
+                      </button>
+                      <button type="button" class="pomo-preset-btn" data-pomo-preset="15" onclick="window.applyPomoPreset && window.applyPomoPreset(15)">
+                        <strong>15 / 3 min</strong>
+                        <span>Sprint</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- MODULE 3 : STUDIO D'AMBIANCE SONORE LO-FI COMBINÉ -->
+                  <div class="pomo-panel-box pomo-ambient-box">
+                    <div class="pomo-box-head">
+                      <div class="pomo-box-title">
+                        <i class="fa-solid fa-headphones text-purple"></i>
+                        <span>Ambiance Sonore &amp; Lo-Fi</span>
+                      </div>
+                      <span class="pomo-ambient-badge" id="pomo-ambient-live-tag">Inactif</span>
+                    </div>
+
+                    <!-- Visualiseur dynamique de fréquences -->
+                    <div class="pomo-visualizer-container">
+                      <canvas id="ambient-waves-canvas" class="ambient-waves-canvas" width="380" height="48"></canvas>
+                      <span id="ambient-now-playing" class="ambient-now-playing">Générateur Procédural Audio</span>
+                    </div>
+
+                    <!-- Grille des 6 ambiances sonores -->
+                    <div class="ambient-modes-grid">
+                      <button type="button" class="ambient-mode-card active" data-ambient-mode="rain" onclick="window.selectAmbientMode && window.selectAmbientMode('rain')">
+                        <i class="fa-solid fa-cloud-showers-heavy"></i>
+                        <span>Pluie cyber</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="lofi" onclick="window.selectAmbientMode && window.selectAmbientMode('lofi')">
+                        <i class="fa-solid fa-radio"></i>
+                        <span>Radio Lo-Fi</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="brown" onclick="window.selectAmbientMode && window.selectAmbientMode('brown')">
+                        <i class="fa-solid fa-wave-square"></i>
+                        <span>Bruit brun</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="storm" onclick="window.selectAmbientMode && window.selectAmbientMode('storm')">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Orage néon</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="space" onclick="window.selectAmbientMode && window.selectAmbientMode('space')">
+                        <i class="fa-solid fa-shuttle-space"></i>
+                        <span>Deep space</span>
+                      </button>
+                      <button type="button" class="ambient-mode-card" data-ambient-mode="night" onclick="window.selectAmbientMode && window.selectAmbientMode('night')">
+                        <i class="fa-solid fa-moon"></i>
+                        <span>Nuit synthé</span>
+                      </button>
+                    </div>
+
+                    <!-- Contrôles audio (Master Play + Slider Volume) -->
+                    <div class="ambient-controls-bar">
+                      <button type="button" id="ambient-master-toggle" class="ambient-master-btn" onclick="window.ambientToggle && window.ambientToggle()">
+                        <i id="ambient-master-icon" class="fa-solid fa-play"></i>
+                        <span id="ambient-master-label">Écouter</span>
+                      </button>
+
+                      <div class="ambient-volume-wrap">
+                        <i class="fa-solid fa-volume-low"></i>
+                        <input type="range" id="ambient-vol-slider" min="0" max="1" step="0.05" value="0.5" />
+                        <i class="fa-solid fa-volume-high"></i>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
 
               </div>
@@ -2506,7 +2315,7 @@
     <script defer src="js/feeds.js?v=3.1"></script>
     <script defer src="js/bookmarks.js?v=3.1"></script>
     <script defer src="js/markets.js?v=3.3"></script>
-    <script defer src="js/widgets.js?v=4.0"></script>
+    <script defer src="js/widgets.js?v=3.6"></script>
     <script defer src="js/custom-hub.js?v=3.2"></script>
     <script defer src="js/command-palette.js?v=3.2"></script>
     <script defer src="js/shortcuts.js?v=3.2"></script>

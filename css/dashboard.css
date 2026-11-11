@@ -496,25 +496,16 @@
 
 /* ========================================================
 /* ========================================================
-/* ========================================================
-   VUE 5 : STUDIO POMODORO FOCUSO (INSPIRÉ DU UI KIT FOCUSO)
+   VUE 5 : STUDIO FOCUS POMODORO & AMBIANCE LO-FI (2 Colonnes Style Agenda)
    ======================================================== */
-:root {
-  --focuso-coral: #ff4d4f;
-  --focuso-coral-gradient: linear-gradient(135deg, #ff4d4f 0%, #f43f5e 100%);
-  --focuso-coral-glow: rgba(255, 77, 79, 0.42);
-}
-
-.text-coral {
-  color: #ff4d4f !important;
-}
-
-.focuso-root.pomodoro-full-view,
+.pomodoro-full-view,
 .deck-slide-view.pomodoro-full-view.active {
-  display: block !important;
-  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.55fr) minmax(380px, 1fr) !important;
+  gap: clamp(16px, 1.8vw, 28px) !important;
   height: 100% !important;
   min-height: 0 !important;
+  width: 100% !important;
   box-sizing: border-box !important;
   padding: 0 !important;
   background: transparent !important;
@@ -526,159 +517,77 @@
   overflow: hidden !important;
 }
 
-.focuso-container {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(380px, 1fr);
-  gap: clamp(16px, 1.8vw, 26px);
-  height: 100%;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
 @media (max-width: 1050px) {
-  .focuso-container {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    overflow-y: auto;
+  .pomodoro-full-view,
+  .deck-slide-view.pomodoro-full-view.active {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto auto !important;
+    overflow-y: auto !important;
   }
 }
 
-/* ========================================================
-   COLONNE GAUCHE (~52%) : MINUTEUR HÉROS FOCUSO & TÂCHES
-   ======================================================== */
-.focuso-main-stage,
-.focuso-cockpit-stage {
-  background: rgba(14, 19, 31, 0.78);
+/* Les deux piliers inspirés directement de l'Agenda */
+.pomo-timer-stage,
+.pomo-side-cockpit {
+  background: rgba(12, 16, 26, 0.74);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: clamp(18px, 2.2vh, 26px);
-  padding: clamp(14px, 1.8vh, 22px) clamp(16px, 1.8vw, 24px);
+  padding: clamp(16px, 2.2vh, 28px) clamp(20px, 2.2vw, 32px);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   box-shadow: 0 16px 45px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.09);
   height: 100%;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
 }
 
-.focuso-main-stage {
-  display: flex;
-  flex-direction: column;
+/* ========================================================
+   COLONNE GAUCHE (~62%) : MINUTEUR GÉANT XXL (HERO ELEMENT)
+   ======================================================== */
+.pomo-timer-stage {
+  align-items: center;
   justify-content: space-between;
-  gap: clamp(10px, 1.4vh, 16px);
+  gap: clamp(12px, 1.6vh, 20px);
 }
 
-.focuso-main-stage::before {
+.pomo-timer-stage::before {
   content: '';
   position: absolute;
   top: 0;
   left: 15%;
   right: 15%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #ff4d4f, transparent);
+  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
   opacity: 0.85;
 }
 
-/* Barre de tâche active */
-.focuso-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-}
-
-.focuso-active-task-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 99px;
-  padding: 0.35rem 0.95rem 0.35rem 0.45rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  max-width: 75%;
-}
-
-.focuso-active-task-pill:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 77, 79, 0.4);
-}
-
-.task-icon-circle {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--focuso-coral-gradient);
-  color: #ffffff;
+.pomo-hero-badge-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  box-shadow: 0 4px 12px var(--focuso-coral-glow);
-  flex-shrink: 0;
+  width: 100%;
 }
 
-.task-text-info {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-  overflow: hidden;
-}
-
-.task-title {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.task-meta {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
-
-.task-chevron {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-left: 0.2rem;
-}
-
-.focuso-mode-badge {
+.pomo-active-mode-tag {
+  font-size: 0.76rem;
+  font-weight: 800;
+  color: var(--accent-primary);
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.28);
+  padding: 0.35rem 1rem;
+  border-radius: 99px;
+  letter-spacing: 0.08em;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #ff4d4f;
-  background: rgba(255, 77, 79, 0.12);
-  border: 1px solid rgba(255, 77, 79, 0.3);
-  padding: 0.35rem 0.85rem;
-  border-radius: 99px;
-  white-space: nowrap;
+  gap: 0.55rem;
 }
 
-.pulse-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ff4d4f;
-  box-shadow: 0 0 8px #ff4d4f;
-  animation: pulseDot 2s infinite ease-in-out;
-}
-
-@keyframes pulseDot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
-}
-
-/* Grand Cadran Circulaire Focuso avec Ticks & Arc */
-.focuso-dial-wrapper {
+/* Cadran Circulaire XXL Majestueux (380px à 500px) */
+.pomo-dial-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -686,26 +595,26 @@
   width: 100%;
   flex: 1;
   min-height: 0;
-  padding: clamp(4px, 1vh, 12px) 0;
+  padding: clamp(6px, 1.2vh, 18px) 0;
 }
 
-.focuso-dial {
+.pomo-dial-ring {
   position: relative;
-  width: clamp(290px, 42vh, 410px);
-  height: clamp(290px, 42vh, 410px);
+  width: clamp(360px, 50vh, 490px);
+  height: clamp(360px, 50vh, 490px);
   max-width: 90%;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 77, 79, 0.08) 0%, rgba(8, 12, 20, 0.95) 72%);
-  border: 2px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.7), inset 0 0 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 77, 79, 0.15);
+  background: radial-gradient(circle, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12) 0%, rgba(8, 12, 20, 0.95) 72%);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 65px rgba(0, 0, 0, 0.75), inset 0 0 50px rgba(0, 0, 0, 0.95), 0 0 35px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
 }
 
-.focuso-dial-svg {
+.pomo-svg-ring {
   position: absolute;
   top: 0;
   left: 0;
@@ -715,1077 +624,601 @@
   transform: rotate(-90deg);
 }
 
-.focuso-ticks line {
-  stroke: rgba(255, 255, 255, 0.15);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-}
-
-.focuso-ticks line.major-tick {
-  stroke: rgba(255, 255, 255, 0.35);
-  stroke-width: 2;
-}
-
-.focuso-dial-track {
+.pomo-ring-track {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.05);
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 7;
+}
+
+.pomo-ring-arc {
+  fill: none;
+  stroke: var(--accent-primary);
   stroke-width: 8;
-}
-
-.focuso-dial-arc {
-  fill: none;
-  stroke: #ff4d4f;
-  stroke-width: 9;
   stroke-linecap: round;
   transition: stroke-dashoffset 0.85s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: drop-shadow(0 0 10px #ff4d4f);
+  filter: drop-shadow(0 0 12px var(--accent-primary));
 }
 
-.focuso-dial-center {
+.pomo-dial-content {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
+  gap: 0.6rem;
   z-index: 2;
   text-align: center;
 }
 
-.dial-center-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(255, 77, 79, 0.14);
-  color: #ff4d4f;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.9rem;
-}
-
-.dial-digits {
+.pomo-digits {
   font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(3.6rem, 5.2vw, 4.8rem);
+  font-size: clamp(4.8rem, 6.8vw, 6.4rem);
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.04em;
   line-height: 1;
-  text-shadow: 0 0 32px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 36px rgba(255, 255, 255, 0.35);
 }
 
-.focuso-milestone-dots {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin: 2px 0;
-}
-
-.milestone-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.16);
-  transition: all 0.3s ease;
-}
-
-.milestone-dot.active {
-  background: #ff4d4f;
-  box-shadow: 0 0 8px #ff4d4f;
-  transform: scale(1.15);
-}
-
-.dial-subtitle {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
+.pomo-status {
+  font-size: 0.85rem;
+  color: var(--accent-primary);
   text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-weight: 800;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
+  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+  padding: 0.35rem 1.15rem;
+  border-radius: 99px;
 }
 
-/* Boutons de contrôle héros Focuso */
-.focuso-controls-cluster {
+/* Jauge linéaire */
+.pomo-progress-bar-wrap {
+  width: clamp(320px, 44vh, 480px);
+  max-width: 90%;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.pomo-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, var(--accent-primary));
+  border-radius: 99px;
+  transition: width 0.4s ease;
+  box-shadow: 0 0 10px var(--accent-primary);
+}
+
+/* Boutons de commandes principaux */
+.pomo-controls-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.4rem;
-  width: 100%;
-  padding: 0.2rem 0;
+  gap: 1rem;
+  width: clamp(320px, 44vh, 480px);
+  max-width: 90%;
 }
 
-.focuso-ctrl-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
-  font-size: 1.15rem;
+.pomo-start-btn {
+  flex: 1;
+  padding: 1.1rem 2rem;
+  border-radius: 16px;
+  background: var(--accent-primary);
+  color: #0c0f17;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 800;
+  border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.8rem;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 30px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.42);
 }
 
-.focuso-ctrl-btn:hover {
+.pomo-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 36px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.55);
+}
+
+.pomo-start-btn:active {
+  transform: translateY(1px);
+}
+
+.pomo-start-btn.running {
+  background: #f59e0b;
+  box-shadow: 0 8px 30px rgba(245, 158, 11, 0.42);
+}
+
+.pomo-start-btn * {
+  pointer-events: none;
+}
+
+.pomo-reset-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.pomo-reset-btn:hover {
   background: rgba(255, 255, 255, 0.12);
   color: #ffffff;
-  border-color: rgba(255, 77, 79, 0.4);
-  transform: scale(1.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: rotate(-45deg);
 }
 
-.focuso-ctrl-btn:active {
-  transform: scale(0.95);
-}
-
-.focuso-ctrl-btn * {
+.pomo-reset-btn * {
   pointer-events: none;
 }
 
-.focuso-play-hero-btn {
-  width: 76px;
-  height: 76px;
-  border-radius: 50%;
-  background: var(--focuso-coral-gradient);
-  color: #ffffff;
-  font-size: 1.6rem;
-  border: none;
-  cursor: pointer;
+.pomo-hero-keyboard-footer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0 10px 30px var(--focuso-coral-glow);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.focuso-play-hero-btn:hover {
-  transform: scale(1.08) translateY(-2px);
-  box-shadow: 0 14px 40px rgba(255, 77, 79, 0.6);
-}
-
-.focuso-play-hero-btn:active {
-  transform: scale(0.96);
-}
-
-.focuso-play-hero-btn.running {
-  background: #f59e0b;
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.45);
-}
-
-.focuso-play-hero-btn * {
-  pointer-events: none;
-}
-
-/* Outils rapides sous les contrôles */
-.focuso-quick-tools {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.focuso-tool-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.42rem 0.85rem;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: inherit;
-}
-
-.focuso-tool-pill:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.16);
-}
-
-.focuso-tool-pill.active {
-  background: rgba(255, 77, 79, 0.15);
-  border-color: #ff4d4f;
-  color: #ff4d4f;
-}
-
-.focuso-tool-pill * {
-  pointer-events: none;
-}
-
-/* Section des tâches récentes */
-.focuso-tasks-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 16px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.tasks-card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.tasks-card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.btn-new-task {
-  background: transparent;
-  border: none;
-  color: #ff4d4f;
+  gap: 1.25rem;
   font-size: 0.74rem;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.4rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.btn-new-task:hover {
-  background: rgba(255, 77, 79, 0.12);
-}
-
-.focuso-tasks-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 120px;
-  overflow-y: auto;
-}
-
-.focuso-task-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 6px 10px;
-  transition: all 0.2s ease;
-}
-
-.focuso-task-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 77, 79, 0.3);
-}
-
-.focuso-task-item.active {
-  background: rgba(255, 77, 79, 0.1);
-  border-color: rgba(255, 77, 79, 0.4);
-}
-
-.task-item-left {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  overflow: hidden;
-}
-
-.task-item-dot {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.72rem;
-  color: #ffffff;
-  flex-shrink: 0;
-}
-
-.task-item-text {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  line-height: 1.2;
-}
-
-.task-item-title {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #ffffff;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.task-item-sub {
-  font-size: 0.66rem;
   color: var(--text-muted);
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.task-item-play-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ff4d4f;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.7rem;
-  transition: all 0.2s ease;
-}
-
-.task-item-play-btn:hover {
-  background: #ff4d4f;
+.pomo-hero-keyboard-footer kbd {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
   color: #ffffff;
-  transform: scale(1.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 /* ========================================================
-   COLONNE DROITE (~48%) : COCKPIT ANALYTIQUE, AGENDA & CONFIG
+   COLONNE DROITE (~38%) : COCKPIT SUIVI, GRAPHIQUE & OPTIONS
    ======================================================== */
-.focuso-cockpit-stage {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 1.6vh, 18px);
+.pomo-side-cockpit {
   overflow-y: auto;
+  gap: clamp(12px, 1.8vh, 18px);
+  justify-content: flex-start;
+  padding-right: clamp(14px, 1.8vw, 24px);
 }
 
-.focuso-cockpit-stage::-webkit-scrollbar {
+.pomo-side-cockpit::-webkit-scrollbar {
   width: 6px;
 }
-.focuso-cockpit-stage::-webkit-scrollbar-thumb {
+.pomo-side-cockpit::-webkit-scrollbar-track {
+  background: transparent;
+}
+.pomo-side-cockpit::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
   border-radius: 99px;
 }
-
-/* Sous-onglets de navigation */
-.focuso-cockpit-tabs {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 99px;
-  padding: 4px;
+.pomo-side-cockpit::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
 }
 
-.cockpit-tab-btn {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 0.55rem 0.6rem;
-  border-radius: 99px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  font-family: inherit;
-  white-space: nowrap;
-}
-
-.cockpit-tab-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.cockpit-tab-btn.active {
-  background: var(--focuso-coral-gradient);
-  color: #ffffff;
-  font-weight: 800;
-  box-shadow: 0 4px 14px var(--focuso-coral-glow);
-}
-
-.cockpit-tab-btn * {
-  pointer-events: none;
-}
-
-.focuso-tab-panel {
+.pomo-panel-box {
+  background: rgba(16, 22, 35, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: clamp(14px, 1.8vh, 18px);
+  padding: clamp(12px, 1.6vh, 16px) clamp(14px, 1.6vw, 18px);
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 1.4vh, 16px);
+  gap: 0.85rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  flex-shrink: 0;
 }
 
-.focuso-tab-panel[hidden] {
-  display: none !important;
+.pomo-box-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 0.65rem;
 }
 
-/* 3 Cartes KPI statistiques */
-.focuso-kpi-row {
+.pomo-box-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.stats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
+  font-weight: 700;
+}
+
+/* Mini Bar Chart SVG des 7 derniers jours */
+.pomo-history-chart-wrap {
+  width: 100%;
+  background: rgba(8, 12, 20, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+.pomo-history-chart {
+  width: 100%;
+  height: 75px;
+  display: block;
+}
+
+.pomo-history-chart text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+}
+
+.pomo-history-chart rect.bar-track {
+  fill: rgba(255, 255, 255, 0.04);
+}
+
+.pomo-history-chart rect.bar-fill {
+  transition: all 0.3s ease;
+}
+
+.pomo-dots-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pomo-dots-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.pomo-dot {
+  flex: 1;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.pomo-dot.done {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: #0c0f17;
+  font-weight: 800;
+  box-shadow: 0 0 12px var(--accent-primary);
+}
+
+.pomo-dots-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.pomo-stats-inline {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.65rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
 }
 
-.kpi-card {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 14px;
-  padding: 10px 12px;
+.pomo-stat-pill {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-.kpi-label {
+.pomo-stat-pill .label {
   font-size: 0.68rem;
   color: var(--text-muted);
 }
 
-.kpi-val {
+.pomo-stat-pill .val {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 1.15rem;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #ffffff;
 }
 
-.kpi-sub {
-  font-size: 0.65rem;
-  color: var(--text-muted);
+/* Module Rythmes & Presets */
+.pomo-mini-chime-btn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-}
-
-/* Boîtes de rapport & Graphiques */
-.focuso-report-box,
-.focuso-calendar-card,
-.focuso-history-card,
-.focuso-settings-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 16px;
-  padding: 12px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.report-box-head,
-.history-card-head,
-.settings-box-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-.box-title,
-.settings-box-head span {
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.report-filter-badge,
-.date-badge {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  padding: 0.2rem 0.6rem;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 99px;
-}
-
-/* Graphique en Barres Hebdomadaire Focuso */
-.focuso-chart-container {
-  width: 100%;
-  background: rgba(8, 12, 20, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  padding: 10px;
-  box-sizing: border-box;
-}
-
-.focuso-bar-chart-svg {
-  width: 100%;
-  height: 150px;
-  display: block;
-}
-
-/* Heatmap des heures productives */
-.focuso-heatmap-grid {
-  display: grid;
-  grid-template-columns: 40px repeat(7, 1fr);
-  gap: 5px;
-  padding: 4px 0;
-}
-
-.heatmap-label {
-  font-size: 0.66rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-}
-
-.heatmap-cell {
-  height: 22px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.04);
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.heatmap-cell:hover {
-  transform: scale(1.15);
-  box-shadow: 0 0 8px rgba(255, 77, 79, 0.5);
-}
-
-.heatmap-cell.lv0 { background: rgba(255, 255, 255, 0.04); }
-.heatmap-cell.lv1 { background: rgba(255, 77, 79, 0.25); }
-.heatmap-cell.lv2 { background: rgba(255, 77, 79, 0.5); }
-.heatmap-cell.lv3 { background: rgba(255, 77, 79, 0.75); }
-.heatmap-cell.lv4 { background: #ff4d4f; box-shadow: 0 0 6px #ff4d4f; }
-
-.focuso-heatmap-legend {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.6rem;
-  font-size: 0.66rem;
-  color: var(--text-muted);
-}
-
-.legend-scale {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-.scale-box {
-  width: 10px;
-  height: 10px;
-  border-radius: 3px;
-}
-.scale-box.lv0 { background: rgba(255, 255, 255, 0.05); }
-.scale-box.lv1 { background: rgba(255, 77, 79, 0.25); }
-.scale-box.lv2 { background: rgba(255, 77, 79, 0.5); }
-.scale-box.lv3 { background: rgba(255, 77, 79, 0.75); }
-.scale-box.lv4 { background: #ff4d4f; }
-
-/* Calendrier Focuso */
-.calendar-header-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.cal-current-month {
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.cal-nav-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: var(--text-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
   font-size: 0.75rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.cal-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-}
-
-.focuso-calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  text-align: center;
-}
-
-.cal-day-header {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  padding: 4px 0;
-}
-
-.cal-days-cells {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-}
-
-.cal-day-cell {
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--text-secondary);
   cursor: pointer;
-  position: relative;
   transition: all 0.2s ease;
-  background: transparent;
-  border: none;
 }
 
-.cal-day-cell:hover {
-  background: rgba(255, 255, 255, 0.08);
+.pomo-mini-chime-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.cal-day-cell.has-sessions::after {
-  content: '';
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #ff4d4f;
-  position: absolute;
-  bottom: 4px;
-}
-
-.cal-day-cell.selected {
-  background: var(--focuso-coral-gradient) !important;
-  color: #ffffff !important;
-  font-weight: 800;
-  box-shadow: 0 4px 14px var(--focuso-coral-glow);
-}
-
-.cal-day-cell.today:not(.selected) {
-  border: 1.5px solid #ff4d4f;
-  color: #ff4d4f;
-}
-
-.cal-day-cell.empty {
-  opacity: 0.2;
-  cursor: default;
-}
-
-.cal-day-summary-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.025);
-  border-radius: 12px;
-  padding: 8px 10px;
-  text-align: center;
-}
-
-.cal-summary-item {
-  display: flex;
-  flex-direction: column;
-}
-
-.cal-summary-item .sub {
-  font-size: 0.65rem;
-  color: var(--text-muted);
-}
-
-.cal-summary-item .val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-/* Timeline des sessions */
-.focuso-history-timeline {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 160px;
-  overflow-y: auto;
-}
-
-.timeline-item {
+.pomo-modes-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  background: rgba(255, 255, 255, 0.025);
-  border-left: 3px solid #ff4d4f;
-  border-radius: 4px 10px 10px 4px;
-  padding: 6px 10px;
-}
-
-.timeline-item.break {
-  border-left-color: #38bdf8;
-}
-
-.timeline-item-title {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.timeline-item-time {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  font-family: 'JetBrains Mono', monospace;
-}
-
-/* Réglages & Personnalisation */
-.settings-durations-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.6rem;
-}
-
-.duration-input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.duration-input-group label {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-}
-
-.number-stepper {
-  display: flex;
-  align-items: center;
+  gap: 0.35rem;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  overflow: hidden;
+  border-radius: 99px;
+  padding: 3px;
 }
 
-.number-stepper button {
-  width: 28px;
-  height: 32px;
+.pomo-mode-chip {
+  flex: 1;
   background: transparent;
   border: none;
-  color: #ffffff;
-  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding: 0.48rem 0.5rem;
+  border-radius: 99px;
+  font-size: 0.76rem;
+  font-weight: 700;
   cursor: pointer;
-  display: flex;
+  transition: all 0.2s ease;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.number-stepper button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ff4d4f;
-}
-
-.number-stepper input {
-  flex: 1;
-  width: 100%;
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  text-align: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.82rem;
-  font-weight: 700;
-  outline: none;
-}
-
-.sound-selection-row {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.sound-selection-row label {
-  font-size: 0.72rem;
-  color: var(--text-muted);
+  gap: 0.4rem;
+  font-family: inherit;
   white-space: nowrap;
 }
 
-.focuso-select {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  padding: 0.45rem 0.6rem;
+.pomo-mode-chip:hover {
   color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pomo-mode-chip.active {
+  background: var(--accent-primary);
+  color: #0c0f17;
+  font-weight: 800;
+  box-shadow: 0 4px 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
+}
+
+.pomo-mode-chip * {
+  pointer-events: none;
+}
+
+.pomo-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.pomo-preset-btn {
+  padding: 0.6rem 0.45rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
   font-family: inherit;
-  font-size: 0.75rem;
-  outline: none;
-}
-
-.focuso-select option {
-  background: #111522;
-  color: #ffffff;
-}
-
-.btn-test-sound {
-  padding: 0.45rem 0.85rem;
-  border-radius: 10px;
-  background: rgba(255, 77, 79, 0.15);
-  border: 1px solid rgba(255, 77, 79, 0.3);
-  color: #ff4d4f;
-  font-size: 0.74rem;
-  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.btn-test-sound:hover {
-  background: #ff4d4f;
-  color: #ffffff;
-}
-
-.settings-toggle-row {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-top: 0.4rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 2px;
+  text-align: center;
 }
 
-.settings-toggle-row strong {
-  display: block;
-  font-size: 0.76rem;
+.pomo-preset-btn strong {
+  font-size: 0.82rem;
   color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.settings-toggle-row span {
+.pomo-preset-btn span {
   font-size: 0.68rem;
   color: var(--text-muted);
 }
 
-.switch {
+.pomo-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.pomo-preset-btn.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.16);
+  border-color: var(--accent-primary);
+}
+
+.pomo-preset-btn.active strong {
+  color: var(--accent-primary);
+}
+
+.pomo-preset-btn * {
+  pointer-events: none;
+}
+
+/* Module Ambiance Lo-Fi Combiné */
+.pomo-ambient-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.2rem 0.65rem;
+  border-radius: 99px;
+  transition: all 0.2s ease;
+}
+
+.pomo-ambient-badge.playing {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.16);
+  border-color: rgba(167, 139, 250, 0.35);
+}
+
+.pomo-visualizer-container {
   position: relative;
-  display: inline-block;
-  width: 38px;
-  height: 22px;
-  flex-shrink: 0;
+  width: 100%;
+  height: 64px;
+  background: rgba(6, 9, 16, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+.ambient-waves-canvas {
+  width: 100%;
+  height: 36px;
+  display: block;
 }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(255, 255, 255, 0.12);
-  transition: .3s;
-  border-radius: 34px;
+.ambient-now-playing {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.03em;
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: .3s;
-  border-radius: 50%;
-}
-
-input:checked + .slider {
-  background-color: #ff4d4f;
-  box-shadow: 0 0 10px rgba(255, 77, 79, 0.4);
-}
-
-input:checked + .slider:before {
-  transform: translateX(16px);
-}
-
-.ambient-cards-compact {
+.ambient-modes-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
-.amb-card {
-  padding: 0.5rem 0.4rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.ambient-mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0.4rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   color: var(--text-muted);
   font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
   transition: all 0.2s ease;
   font-family: inherit;
 }
 
-.amb-card:hover {
+.ambient-mode-card i {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.ambient-mode-card:hover {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.16);
 }
 
-.amb-card.active {
-  background: rgba(255, 77, 79, 0.18);
-  border-color: #ff4d4f;
+.ambient-mode-card.active {
+  background: rgba(167, 139, 250, 0.18);
+  border-color: #a78bfa;
   color: #ffffff;
   font-weight: 700;
-  box-shadow: 0 0 12px rgba(255, 77, 79, 0.3);
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.25);
 }
 
-.sound-volume-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  padding-top: 0.2rem;
+.ambient-mode-card.active i {
+  color: #a78bfa;
 }
 
-.sound-volume-bar input[type="range"] {
-  flex: 1;
-  accent-color: #ff4d4f;
-  height: 4px;
+.ambient-mode-card * {
+  pointer-events: none;
 }
 
-/* Modale d'ajout de tâche */
-.focuso-modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 99999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.focuso-modal-card {
-  width: 90%;
-  max-width: 440px;
-  background: #111624;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.modal-card-head {
+.ambient-controls-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.8rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.modal-card-head h3 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #ffffff;
-  display: flex;
+.ambient-master-btn {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.modal-close-x {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.25rem;
-  cursor: pointer;
-}
-
-.focuso-modal-card form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.form-group label {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-
-.form-group input,
-.form-group select {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  padding: 0.55rem 0.75rem;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.8rem;
-  outline: none;
-}
-
-.form-group-row {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.6rem;
-  padding-top: 0.5rem;
-}
-
-.btn-cancel {
   padding: 0.5rem 1rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.btn-confirm {
-  padding: 0.5rem 1.2rem;
-  border-radius: 10px;
-  background: var(--focuso-coral-gradient);
-  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #ffffff;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 14px var(--focuso-coral-glow);
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
+.ambient-master-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.ambient-master-btn.playing {
+  background: #10b981;
+  color: #0c0f17;
+  border-color: #10b981;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+}
+
+.ambient-master-btn * {
+  pointer-events: none;
+}
+
+.ambient-volume-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  flex: 1;
+  max-width: 160px;
+}
+
+.ambient-volume-wrap input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent-primary);
+  height: 4px;
+}
 
    VUE 7 : BLOC-NOTES SCRATCHPAD
    ======================================================== */

@@ -72,844 +72,562 @@ function applyWidgetVisibility() {
 }
 
 /* ========================================================
-/* ========================================================
-   1. STUDIO FOCUSO POMODORO & SUIVI D'ACTIVITÉ (INSPIRÉ DE FOCUSO)
+   1. MINUTEUR FOCUS / POMODORO
    ======================================================== */
-
-let FOCUSO_DURATIONS = {
+let POMO_DURATIONS = {
   focus: 25 * 60,
   short: 5 * 60,
   long: 15 * 60
 };
 
-// Restauration des durées personnalisées
-try {
-  const savedDurations = JSON.parse(localStorage.getItem('focuso_durations') || '{}');
-  if (savedDurations.focus) FOCUSO_DURATIONS.focus = savedDurations.focus;
-  if (savedDurations.short) FOCUSO_DURATIONS.short = savedDurations.short;
-  if (savedDurations.long) FOCUSO_DURATIONS.long = savedDurations.long;
-} catch {}
+let pomoMode = 'focus';
+let pomoTimeLeft = POMO_DURATIONS.focus;
+let pomoInterval = null;
+let pomoIsRunning = false;
+let pomoCompletedCount = 0;
 
-let focusoMode = 'focus'; // 'focus' | 'short' | 'long'
-let focusoTimeLeft = FOCUSO_DURATIONS.focus;
-let focusoIsRunning = false;
-let focusoTimerInterval = null;
-let focusoEndTime = 0;
-let focusoCompletedCount = 0;
-let focusoSound = 'zen';
-let focusoAutoBreak = false;
-let focusoStrictMode = false;
-let focusoSelectedPreset = 25;
-let focusoCalDate = new Date();
-let focusoSelectedDayKey = new Date().toISOString().split('T')[0];
-
-let focusoActiveTask = {
-  id: 'task-1',
-  title: 'Design User Interface (UI)',
-  completed: 0,
-  target: 4,
-  category: 'design'
-};
-
-let focusoTasks = [
-  { id: 'task-1', title: 'Design User Interface (UI)', completed: 0, target: 4, category: 'design' },
-  { id: 'task-2', title: 'Market Research & Analysis', completed: 1, target: 5, category: 'study' },
-  { id: 'task-3', title: 'Développement Frontend Web', completed: 2, target: 6, category: 'code' },
-  { id: 'task-4', title: 'Rédaction Rapport & Synthèse', completed: 0, target: 3, category: 'write' }
-];
-
-// Chargement initial depuis localStorage
-try {
-  focusoCompletedCount = Number(localStorage.getItem('focuso_completed_count') || 0);
-  focusoSound = localStorage.getItem('focuso_sound') || 'zen';
-  focusoAutoBreak = localStorage.getItem('focuso_autobreak') === 'true';
-  const savedTasks = JSON.parse(localStorage.getItem('focuso_tasks') || 'null');
-  if (savedTasks && Array.isArray(savedTasks) && savedTasks.length > 0) {
-    focusoTasks = savedTasks;
-    focusoActiveTask = focusoTasks[0];
-  }
-} catch {}
-
-// Audio Web Audio API pour les carillons Focuso
-function playFocusoChime(type) {
+function playPomoChime() {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
-    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    const chord = [523.25, 659.25, 783.99, 1046.5]; // Accord majeur C5-E5-G5-C6
 
-    const now = ctx.currentTime;
-    const soundType = type || focusoSound;
-
-    if (soundType === 'zen') {
-      // Bol tibétain & Gong zen harmonique (216Hz, 432Hz, 648Hz)
-      [216, 432, 648].forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.18 / (idx + 1), now + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.4);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 2.5);
-      });
-    } else if (soundType === 'chime') {
-      // Carillon cristallin C5-E5-G5-C6
-      [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-        const st = now + idx * 0.12;
-        gain.gain.setValueAtTime(0, st);
-        gain.gain.linearRampToValueAtTime(0.14, st + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.0001, st + 0.9);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(st);
-        osc.stop(st + 0.95);
-      });
-    } else if (soundType === 'bell') {
-      // Cloche douce
-      [880, 1760].forEach((freq, idx) => {
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.15 / (idx + 1), now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + 1.25);
-      });
-    } else {
-      // Bip digital synthétique discret
+    chord.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(580, now);
-      osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
-      gain.gain.setValueAtTime(0.12, now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+      osc.frequency.value = freq;
+
+      const startTime = ctx.currentTime + idx * 0.12;
+      const stopTime = startTime + 0.9;
+
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(0.12, startTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, stopTime);
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start(now);
-      osc.stop(now + 0.26);
-    }
+      osc.start(startTime);
+      osc.stop(stopTime);
+    });
   } catch (err) {
-    console.warn('Audio Focuso bloqué ou non disponible :', err);
+    console.warn('Web Audio chime non supporté ou bloqué :', err);
   }
 }
 
-// Graduation radiale (Tick marks tout autour du cadran Focuso)
-function renderFocusoTicks() {
-  const group = document.getElementById('focuso-ticks-group');
-  if (!group) return;
-  let html = '';
-  const cx = 180;
-  const cy = 180;
-  for (let i = 0; i < 60; i++) {
-    const angle = (i * 6) * Math.PI / 180;
-    const isMajor = i % 5 === 0;
-    const rInner = isMajor ? 142 : 146;
-    const rOuter = 153;
-    const x1 = (cx + rInner * Math.sin(angle)).toFixed(1);
-    const y1 = (cy - rInner * Math.cos(angle)).toFixed(1);
-    const x2 = (cx + rOuter * Math.sin(angle)).toFixed(1);
-    const y2 = (cy - rOuter * Math.cos(angle)).toFixed(1);
-    html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="${isMajor ? 'major-tick' : ''}" />`;
-  }
-  group.innerHTML = html;
-}
 
-// Mise à jour de l'interface Focuso (Cadran, Digits, Tâches, Jalons)
-function updateFocusoUI() {
-  const digitsEl = document.getElementById('focuso-digits');
-  const arcEl = document.getElementById('focuso-dial-arc');
-  const playIcon = document.getElementById('focuso-play-icon');
-  const playBtn = document.getElementById('focuso-btn-play');
-  const modeBadgeLabel = document.getElementById('focuso-mode-label');
-  const centerIcon = document.getElementById('focuso-center-icon');
-  const subtitleEl = document.getElementById('focuso-subtitle');
-
-  const m = String(Math.floor(focusoTimeLeft / 60)).padStart(2, '0');
-  const s = String(focusoTimeLeft % 60).padStart(2, '0');
-  const formatted = `${m}:${s}`;
-
-  if (digitsEl) digitsEl.textContent = formatted;
-
-  if (focusoIsRunning) {
-    document.title = `(${formatted}) ${focusoMode === 'focus' ? 'Focus' : 'Pause'} • Startpage`;
-  } else {
-    document.title = 'Startpage';
-  }
-
-  // Animation de l'arc de cercle SVG (r=130 => circum=816.81)
-  if (arcEl) {
-    const circum = 816.81;
-    const total = FOCUSO_DURATIONS[focusoMode] || 1500;
-    const progress = Math.max(0, Math.min(1, (total - focusoTimeLeft) / total));
-    arcEl.style.strokeDasharray = circum.toFixed(2);
-    arcEl.style.strokeDashoffset = (circum * (1 - progress)).toFixed(2);
-  }
-
-  // Bouton Play / Pause
-  if (playIcon) {
-    playIcon.className = focusoIsRunning ? 'fa-solid fa-pause' : 'fa-solid fa-play';
-  }
-  if (playBtn) {
-    playBtn.classList.toggle('running', focusoIsRunning);
-  }
-
-  // Badge du mode & Icône centrale
-  if (modeBadgeLabel) {
-    if (focusoMode === 'focus') modeBadgeLabel.textContent = 'Session Focus';
-    else if (focusoMode === 'short') modeBadgeLabel.textContent = 'Pause Courte';
-    else modeBadgeLabel.textContent = 'Pause Longue';
-  }
-
-  if (centerIcon) {
-    if (focusoMode === 'focus') centerIcon.innerHTML = '<i class="fa-solid fa-brain"></i>';
-    else if (focusoMode === 'short') centerIcon.innerHTML = '<i class="fa-solid fa-mug-hot"></i>';
-    else centerIcon.innerHTML = '<i class="fa-solid fa-couch"></i>';
-  }
-
-  if (subtitleEl) {
-    if (focusoMode === 'focus') subtitleEl.textContent = 'Stay Focused!';
-    else subtitleEl.textContent = 'Take a Rest!';
-  }
-
-  // Jalons 4 points Focuso
-  const dots = document.querySelectorAll('#focuso-milestone-dots .milestone-dot');
-  const step = focusoCompletedCount % 4;
-  dots.forEach((dot, idx) => {
-    dot.classList.toggle('active', idx < step || (step === 0 && focusoCompletedCount > 0 && idx === 3));
-  });
-
-  // Tâche active dans la barre supérieure
-  const taskTitleEl = document.getElementById('focuso-task-title');
-  const taskProgressEl = document.getElementById('focuso-task-progress');
-  const taskIconEl = document.getElementById('focuso-task-icon');
-
-  if (taskTitleEl && focusoActiveTask) taskTitleEl.textContent = focusoActiveTask.title;
-  if (taskProgressEl && focusoActiveTask) {
-    const totalMins = focusoActiveTask.completed * Math.round(FOCUSO_DURATIONS.focus / 60);
-    const targetMins = focusoActiveTask.target * Math.round(FOCUSO_DURATIONS.focus / 60);
-    taskProgressEl.textContent = `${focusoActiveTask.completed}/${focusoActiveTask.target} sessions • ${totalMins}/${targetMins} min`;
-  }
-  if (taskIconEl && focusoActiveTask) {
-    if (focusoActiveTask.category === 'code') taskIconEl.className = 'fa-solid fa-code';
-    else if (focusoActiveTask.category === 'design') taskIconEl.className = 'fa-solid fa-paintbrush';
-    else if (focusoActiveTask.category === 'write') taskIconEl.className = 'fa-solid fa-pen-nib';
-    else taskIconEl.className = 'fa-solid fa-book-open';
-  }
-
-  // Rendu de la liste des tâches
-  renderFocusoTasks();
-}
-
-// Commandes globales Focuso
-window.focusoPlayPause = function() {
-  if (focusoIsRunning) {
-    focusoPause();
-  } else {
-    focusoStart();
-  }
-};
-
-function focusoStart() {
-  if (focusoIsRunning) return;
-  focusoIsRunning = true;
-  focusoEndTime = Date.now() + focusoTimeLeft * 1000;
-
-  if (focusoTimerInterval) clearInterval(focusoTimerInterval);
-  focusoTimerInterval = setInterval(() => {
-    const remaining = Math.round((focusoEndTime - Date.now()) / 1000);
-    if (remaining > 0) {
-      focusoTimeLeft = remaining;
-      updateFocusoUI();
-    } else {
-      focusoTimeLeft = 0;
-      updateFocusoUI();
-      onFocusoComplete();
-    }
-  }, 250);
-
-  updateFocusoUI();
-}
-
-function focusoPause() {
-  focusoIsRunning = false;
-  if (focusoTimerInterval) clearInterval(focusoTimerInterval);
-  focusoTimerInterval = null;
-  updateFocusoUI();
-}
-
-window.focusoReset = function() {
-  focusoPause();
-  focusoTimeLeft = FOCUSO_DURATIONS[focusoMode] || (25 * 60);
-  updateFocusoUI();
-  if (typeof showToast === 'function') showToast('Session remise à zéro', 'info');
-};
-
-window.focusoSkip = function() {
-  focusoPause();
-  if (focusoMode === 'focus') {
-    focusoMode = 'short';
-  } else {
-    focusoMode = 'focus';
-  }
-  focusoTimeLeft = FOCUSO_DURATIONS[focusoMode];
-  updateFocusoUI();
-  if (typeof showToast === 'function') {
-    showToast(`Passage en ${focusoMode === 'focus' ? 'Session Focus' : 'Pause'}`, 'info');
-  }
-};
-
-function onFocusoComplete() {
-  focusoPause();
-  playFocusoChime(focusoSound);
-
-  if (focusoMode === 'focus') {
-    focusoCompletedCount++;
-    try { localStorage.setItem('focuso_completed_count', focusoCompletedCount); } catch {}
-
-    if (focusoActiveTask) {
-      focusoActiveTask.completed++;
-      saveFocusoTasks();
-    }
-
-    // Enregistrement dans l'historique
-    recordFocusoHistorySession({
-      title: focusoActiveTask ? focusoActiveTask.title : 'Session Focus',
-      duration: Math.round(FOCUSO_DURATIONS.focus / 60),
-      timestamp: Date.now(),
-      type: 'focus'
-    });
-
-    if (typeof showToast === 'function') {
-      showToast('🎉 Bravo ! Session Focus complétée avec succès.', 'success');
-    }
-
-    if (focusoCompletedCount % 4 === 0) {
-      focusoMode = 'long';
-    } else {
-      focusoMode = 'short';
-    }
-    focusoTimeLeft = FOCUSO_DURATIONS[focusoMode];
-    updateFocusoUI();
-    refreshFocusoReports();
-    renderFocusoCalendar();
-
-    if (focusoAutoBreak) {
-      setTimeout(() => focusoStart(), 1000);
-    }
-  } else {
-    if (typeof showToast === 'function') {
-      showToast('⚡ Pause terminée ! Prêt à reprendre le focus.', 'info');
-    }
-    focusoMode = 'focus';
-    focusoTimeLeft = FOCUSO_DURATIONS.focus;
-    updateFocusoUI();
-  }
-}
-
-// Enregistrement de session
-function recordFocusoHistorySession(session) {
+function getPomoHistoryData() {
+  let hist = null;
   try {
-    const history = JSON.parse(localStorage.getItem('focuso_history_v2') || '[]');
-    history.push(session);
-    localStorage.setItem('focuso_history_v2', JSON.stringify(history));
-  } catch {}
-}
-
-function getFocusoHistory() {
-  try {
-    const raw = localStorage.getItem('focuso_history_v2');
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  // Données de démonstration réalistes si vide
-  const sample = [];
-  const now = Date.now();
-  const dayMs = 86400000;
-  sample.push({ title: 'Design User Interface (UI)', duration: 25, timestamp: now - 3600000 * 2, type: 'focus' });
-  sample.push({ title: 'Market Research & Analysis', duration: 25, timestamp: now - 3600000 * 4, type: 'focus' });
-  sample.push({ title: 'Développement Frontend Web', duration: 50, timestamp: now - dayMs * 1, type: 'focus' });
-  sample.push({ title: 'Rédaction Rapport & Synthèse', duration: 25, timestamp: now - dayMs * 2, type: 'focus' });
-  sample.push({ title: 'Design Wireframe UI Kit', duration: 25, timestamp: now - dayMs * 3, type: 'focus' });
-  return sample;
-}
-
-// Gestion des tâches Focuso
-function saveFocusoTasks() {
-  try {
-    localStorage.setItem('focuso_tasks', JSON.stringify(focusoTasks));
-  } catch {}
-}
-
-function renderFocusoTasks() {
-  const listEl = document.getElementById('focuso-tasks-list');
-  if (!listEl) return;
-  let html = '';
-  focusoTasks.forEach((t) => {
-    const isActive = focusoActiveTask && focusoActiveTask.id === t.id;
-    let iconClass = 'fa-solid fa-laptop-code';
-    let dotColor = '#3b82f6';
-    if (t.category === 'design') { iconClass = 'fa-solid fa-palette'; dotColor = '#f43f5e'; }
-    else if (t.category === 'write') { iconClass = 'fa-solid fa-pen'; dotColor = '#f59e0b'; }
-    else if (t.category === 'study') { iconClass = 'fa-solid fa-book'; dotColor = '#10b981'; }
-
-    html += `
-      <div class="focuso-task-item ${isActive ? 'active' : ''}" onclick="window.focusoSelectTask('${t.id}')">
-        <div class="task-item-left">
-          <div class="task-item-dot" style="background:${dotColor};">
-            <i class="${iconClass}"></i>
-          </div>
-          <div class="task-item-text">
-            <span class="task-item-title">${t.title}</span>
-            <span class="task-item-sub">${t.completed}/${t.target} sessions • ${t.completed * 25}/${t.target * 25}m</span>
-          </div>
-        </div>
-        <button type="button" class="task-item-play-btn" title="Sélectionner cette tâche">
-          <i class="fa-solid fa-play"></i>
-        </button>
-      </div>`;
-  });
-  listEl.innerHTML = html;
-}
-
-window.focusoSelectTask = function(taskId) {
-  const found = focusoTasks.find(t => t.id === taskId);
-  if (found) {
-    focusoActiveTask = found;
-    updateFocusoUI();
-    if (typeof showToast === 'function') showToast(`Tâche active : ${found.title}`, 'info');
-  }
-};
-
-window.focusoOpenNewTaskModal = function() {
-  const modal = document.getElementById('focuso-task-modal');
-  if (modal) modal.hidden = false;
-};
-
-window.focusoCloseTaskModal = function() {
-  const modal = document.getElementById('focuso-task-modal');
-  if (modal) modal.hidden = true;
-};
-
-window.focusoSaveNewTask = function(e) {
-  if (e) e.preventDefault();
-  const nameInput = document.getElementById('focuso-new-task-name');
-  const targetInput = document.getElementById('focuso-new-task-target');
-  const catInput = document.getElementById('focuso-new-task-category');
-
-  if (!nameInput || !nameInput.value.trim()) return;
-
-  const newTask = {
-    id: 'task-' + Date.now(),
-    title: nameInput.value.trim(),
-    completed: 0,
-    target: Number(targetInput ? targetInput.value : 4) || 4,
-    category: catInput ? catInput.value : 'code'
-  };
-
-  focusoTasks.unshift(newTask);
-  focusoActiveTask = newTask;
-  saveFocusoTasks();
-  updateFocusoUI();
-  window.focusoCloseTaskModal();
-  if (typeof showToast === 'function') showToast(`Nouvelle tâche créée : ${newTask.title}`, 'success');
-};
-
-// Cycle des presets rapides (25/5 Standard, 50/10 Deep, 15/3 Sprint)
-window.focusoCyclePreset = function() {
-  if (focusoSelectedPreset === 25) {
-    focusoSelectedPreset = 50;
-    FOCUSO_DURATIONS.focus = 50 * 60;
-    FOCUSO_DURATIONS.short = 10 * 60;
-    FOCUSO_DURATIONS.long = 20 * 60;
-  } else if (focusoSelectedPreset === 50) {
-    focusoSelectedPreset = 15;
-    FOCUSO_DURATIONS.focus = 15 * 60;
-    FOCUSO_DURATIONS.short = 3 * 60;
-    FOCUSO_DURATIONS.long = 10 * 60;
-  } else {
-    focusoSelectedPreset = 25;
-    FOCUSO_DURATIONS.focus = 25 * 60;
-    FOCUSO_DURATIONS.short = 5 * 60;
-    FOCUSO_DURATIONS.long = 15 * 60;
+    const raw = localStorage.getItem('startpage_pomo_history');
+    if (raw) hist = JSON.parse(raw);
+  } catch (e) {
+    hist = null;
   }
 
-  const presetLabel = document.getElementById('focuso-preset-label');
-  if (presetLabel) {
-    if (focusoSelectedPreset === 50) presetLabel.textContent = 'Deep Work (50/10m)';
-    else if (focusoSelectedPreset === 15) presetLabel.textContent = 'Sprint (15/3m)';
-    else presetLabel.textContent = 'Standard (25/5m)';
-  }
-
-  focusoReset();
-};
-
-window.focusoToggleStrictMode = function() {
-  focusoStrictMode = !focusoStrictMode;
-  const strictPill = document.getElementById('focuso-tool-strict');
-  if (strictPill) strictPill.classList.toggle('active', focusoStrictMode);
-  if (typeof showToast === 'function') {
-    showToast(focusoStrictMode ? 'Mode Strict Activé' : 'Mode Normal', 'info');
-  }
-};
-
-window.focusoToggleZen = function() {
-  const root = document.getElementById('deck-view-pomodoro');
-  if (root) {
-    if (!document.fullscreenElement) {
-      root.requestFullscreen().catch(() => {});
-    } else {
-      document.exitFullscreen().catch(() => {});
-    }
-  }
-};
-
-window.focusoTestChime = function() {
-  playFocusoChime(focusoSound);
-  if (typeof showToast === 'function') showToast('Carillon joué 🔔', 'info');
-};
-
-window.focusoToggleNoise = function() {
-  if (typeof startAmbientSound === 'function' && typeof stopAmbientSound === 'function') {
-    if (ambientIsPlaying) {
-      stopAmbientSound();
-      const noisePill = document.getElementById('focuso-tool-noise');
-      if (noisePill) noisePill.classList.remove('active');
-    } else {
-      startAmbientSound();
-      const noisePill = document.getElementById('focuso-tool-noise');
-      if (noisePill) noisePill.classList.add('active');
-    }
-  }
-};
-
-window.focusoSelectAmbient = function(mode) {
-  if (typeof startAmbientSound === 'function') {
-    ambientCurrentMode = mode;
-    try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
-    document.querySelectorAll('.amb-card').forEach((c) => {
-      c.classList.toggle('active', c.dataset.amb === mode);
-    });
-    if (ambientIsPlaying) startAmbientSound();
-  }
-};
-
-window.focusoSetAmbVolume = function(val) {
-  const vol = Number(val) || 0.5;
-  try { localStorage.setItem('startpage_ambient_vol', vol); } catch {}
-  if (ambientGainNode && ambientAudioCtx) {
-    ambientGainNode.gain.setValueAtTime(vol * 0.35, ambientAudioCtx.currentTime);
-  }
-  if (ambientRadioAudio) ambientRadioAudio.volume = vol;
-};
-
-// Navigation sous-onglets Cockpit (Rapports, Calendrier, Personnalisation)
-window.focusoSwitchCockpitTab = function(tabName) {
-  document.querySelectorAll('.cockpit-tab-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.tab === tabName);
-  });
-  document.querySelectorAll('.focuso-tab-panel').forEach((panel) => {
-    panel.hidden = panel.id !== `focuso-panel-${tabName}`;
-  });
-
-  if (tabName === 'reports') refreshFocusoReports();
-  if (tabName === 'calendar') renderFocusoCalendar();
-};
-
-// Réglages & Personnalisation
-window.focusoStepDuration = function(type, delta) {
-  const current = Math.round(FOCUSO_DURATIONS[type] / 60);
-  const next = Math.max(type === 'short' ? 1 : 5, current + delta);
-  FOCUSO_DURATIONS[type] = next * 60;
-  try {
-    localStorage.setItem('focuso_durations', JSON.stringify(FOCUSO_DURATIONS));
-  } catch {}
-
-  const input = document.getElementById(`focuso-cfg-${type}`);
-  if (input) input.value = next;
-
-  if (focusoMode === type) {
-    focusoTimeLeft = FOCUSO_DURATIONS[type];
-    updateFocusoUI();
-  }
-};
-
-window.focusoChangeSound = function(val) {
-  focusoSound = val;
-  try { localStorage.setItem('focuso_sound', val); } catch {}
-};
-
-window.focusoToggleAutoBreak = function(val) {
-  focusoAutoBreak = !!val;
-  try { localStorage.setItem('focuso_autobreak', focusoAutoBreak); } catch {}
-};
-
-// Graphiques d'activité & Rapports (Bar Chart & Heatmap Focuso)
-function refreshFocusoReports() {
-  const history = getFocusoHistory();
-  const totalMins = history.reduce((acc, s) => acc + (s.duration || 25), 0);
-  const totalHrs = (totalMins / 60).toFixed(1);
-  const avgHrs = (totalMins / 60 / 7).toFixed(1);
-
-  const kpiTotal = document.getElementById('focuso-kpi-total');
-  const kpiAvg = document.getElementById('focuso-kpi-avg');
-  const kpiSessions = document.getElementById('focuso-kpi-sessions');
-
-  if (kpiTotal) kpiTotal.textContent = `${totalHrs} h`;
-  if (kpiAvg) kpiAvg.textContent = `${avgHrs} h`;
-  if (kpiSessions) kpiSessions.textContent = Math.max(history.length, focusoCompletedCount);
-
-  renderFocusoBarChart();
-  renderFocusoHeatmap();
-}
-
-function renderFocusoBarChart() {
-  const svg = document.getElementById('focuso-bar-chart');
-  if (!svg) return;
-
-  const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
   const today = new Date();
-  const daysData = [];
+  const todayKey = today.toISOString().split('T')[0];
 
+  // Si aucun historique n'existe, on pré-remplit avec des données représentatives
+  if (!hist || typeof hist !== 'object') {
+    hist = {};
+    const sampleCounts = [2, 4, 3, 5, 2, 4, pomoCompletedCount || 3];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(today.getDate() - i);
+      const k = d.toISOString().split('T')[0];
+      hist[k] = sampleCounts[6 - i];
+    }
+    try {
+      localStorage.setItem('startpage_pomo_history', JSON.stringify(hist));
+    } catch (e) {}
+  }
+
+  // Toujours s'assurer que le nombre aujourd'hui reflète pomoCompletedCount s'il est supérieur
+  if (pomoCompletedCount > 0 && (Number(hist[todayKey]) || 0) < pomoCompletedCount) {
+    hist[todayKey] = pomoCompletedCount;
+  }
+
+  const days = [];
+  const dayLabels = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
     d.setDate(today.getDate() - i);
     const key = d.toISOString().split('T')[0];
-    const label = dayNames[d.getDay()];
-    // Heures simulées réalistes avec accent sur le jour 15 / aujourd'hui
-    let hrs = (i === 1) ? 5.8 : (i === 0 ? Math.max(1.5, (focusoCompletedCount * 0.45)) : [3.2, 4.5, 6.0, 4.2, 5.0][i % 5]);
-    daysData.push({ key, label, hrs, isSelected: (i === 1 || (i === 0 && focusoCompletedCount >= 4)) });
+    const label = dayLabels[d.getDay()];
+    const count = Number(hist[key]) || 0;
+    days.push({ key, label, count, isToday: i === 0 });
   }
 
-  const maxHrs = 8;
-  const svgW = 460;
-  const svgH = 150;
-  const botPad = 26;
-  const topPad = 32;
-  const chartH = svgH - botPad - topPad;
-  const slotW = svgW / 7;
-  const barW = 28;
+  return days;
+}
+
+function recordPomoSessionInHistory() {
+  try {
+    const todayKey = new Date().toISOString().split('T')[0];
+    let hist = {};
+    try {
+      hist = JSON.parse(localStorage.getItem('startpage_pomo_history') || '{}');
+    } catch {}
+    hist[todayKey] = (Number(hist[todayKey]) || 0) + 1;
+    localStorage.setItem('startpage_pomo_history', JSON.stringify(hist));
+  } catch (e) {}
+}
+
+function renderPomoHistoryChart() {
+  const svg = document.getElementById('pomo-history-chart');
+  if (!svg) return;
+
+  const data = getPomoHistoryData();
+  const maxVal = Math.max(4, ...data.map(d => d.count));
+  const svgWidth = 280;
+  const svgHeight = 75;
+  const bottomPad = 18;
+  const topPad = 8;
+  const chartHeight = svgHeight - bottomPad - topPad;
+
+  const barWidth = 24;
+  const slotWidth = svgWidth / data.length;
 
   let html = '';
+  // Ligne de base
+  html += '<line x1="8" y1="' + (svgHeight - bottomPad) + '" x2="' + (svgWidth - 8) + '" y2="' + (svgHeight - bottomPad) + '" stroke="rgba(255,255,255,0.08)" stroke-width="1" />';
 
-  // Ligne de repère moyenne 6h (comme sur le template Focuso)
-  const avgY = Math.round(topPad + chartH * (1 - 6 / maxHrs));
-  html += `<line x1="10" y1="${avgY}" x2="${svgW - 10}" y2="${avgY}" stroke="rgba(255,77,79,0.3)" stroke-dasharray="4,4" stroke-width="1.5" />`;
-  html += `<text x="${svgW - 14}" y="${avgY - 4}" text-anchor="end" fill="rgba(255,77,79,0.7)" font-size="9" font-family="'JetBrains Mono', monospace">Objectif 6h</text>`;
+  data.forEach((item, idx) => {
+    const x = Math.round(idx * slotWidth + (slotWidth - barWidth) / 2);
+    const barH = item.count > 0 ? Math.max(6, Math.round((item.count / maxVal) * chartHeight)) : 0;
+    const y = Math.round(svgHeight - bottomPad - barH);
 
-  daysData.forEach((d, idx) => {
-    const x = Math.round(idx * slotW + (slotW - barW) / 2);
-    const barH = Math.max(8, Math.round((d.hrs / maxHrs) * chartH));
-    const y = Math.round(svgH - botPad - barH);
+    // Fond de barre
+    html += '<rect class="bar-track" x="' + x + '" y="' + topPad + '" width="' + barWidth + '" height="' + chartHeight + '" rx="4" fill="rgba(255,255,255,0.04)" />';
 
-    // Fond de piste
-    html += `<rect x="${x}" y="${topPad}" width="${barW}" height="${chartH}" rx="8" fill="rgba(255,255,255,0.03)" />`;
+    // Barre active
+    if (barH > 0) {
+      const fill = item.isToday ? 'var(--accent-primary)' : 'rgba(167, 139, 250, 0.45)';
+      const shadow = item.isToday ? 'filter="drop-shadow(0 0 5px var(--accent-primary))"' : '';
+      html += '<rect class="bar-fill ' + (item.isToday ? 'today' : '') + '" x="' + x + '" y="' + y + '" width="' + barWidth + '" height="' + barH + '" rx="4" fill="' + fill + '" ' + shadow + '>';
+      html += '<title>' + item.label + ' (' + item.key + ') : ' + item.count + ' session' + (item.count > 1 ? 's' : '') + '</title>';
+      html += '</rect>';
 
-    // Barre active corail
-    const fill = d.isSelected ? 'url(#coralGrad)' : 'rgba(255, 77, 79, 0.45)';
-    html += `<rect x="${x}" y="${y}" width="${barW}" height="${barH}" rx="8" fill="${fill}">
-      <title>${d.label} (${d.key}) : ${d.hrs}h</title>
-    </rect>`;
-
-    // Bulle avec pointeur sur la barre sélectionnée (comme dans Focuso "5.8h")
-    if (d.isSelected) {
-      const bubbleW = 38;
-      const bubbleH = 20;
-      const bubbleX = Math.round(x + barW / 2 - bubbleW / 2);
-      const bubbleY = Math.round(y - bubbleH - 7);
-      html += `
-        <g class="focuso-chart-bubble">
-          <rect x="${bubbleX}" y="${bubbleY}" width="${bubbleW}" height="${bubbleH}" rx="6" fill="#ff4d4f" filter="drop-shadow(0 3px 6px rgba(0,0,0,0.4))" />
-          <polygon points="${x + barW / 2 - 4},${bubbleY + bubbleH} ${x + barW / 2 + 4},${bubbleY + bubbleH} ${x + barW / 2},${bubbleY + bubbleH + 5}" fill="#ff4d4f" />
-          <text x="${x + barW / 2}" y="${bubbleY + 13}" text-anchor="middle" font-size="9" font-weight="800" fill="#ffffff" font-family="'JetBrains Mono', monospace">${d.hrs}h</text>
-        </g>`;
+      // Nombre si assez de hauteur
+      if (barH >= 14) {
+        html += '<text x="' + (x + barWidth / 2) + '" y="' + (y + 10) + '" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="800">' + item.count + '</text>';
+      }
     }
 
     // Nom du jour
-    const textColor = d.isSelected ? '#ff4d4f' : 'rgba(255,255,255,0.5)';
-    const textWeight = d.isSelected ? '800' : '600';
-    html += `<text x="${x + barW / 2}" y="${svgH - 8}" text-anchor="middle" font-size="10" fill="${textColor}" font-weight="${textWeight}">${d.label}</text>`;
+    const textColor = item.isToday ? 'var(--accent-primary)' : 'rgba(255,255,255,0.45)';
+    const textWeight = item.isToday ? '800' : '500';
+    html += '<text x="' + (x + barWidth / 2) + '" y="' + (svgHeight - 4) + '" text-anchor="middle" font-size="9" fill="' + textColor + '" font-weight="' + textWeight + '">' + item.label + '</text>';
   });
 
-  // Définition du gradient corail
-  const defs = `
-    <defs>
-      <linearGradient id="coralGrad" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#ff4d4f" />
-        <stop offset="100%" stop-color="#f43f5e" />
-      </linearGradient>
-    </defs>`;
-
-  svg.innerHTML = defs + html;
+  svg.innerHTML = html;
 }
 
-function renderFocusoHeatmap() {
-  const grid = document.getElementById('focuso-heatmap-grid');
-  if (!grid) return;
+function updatePomoUI() {
+  const display = document.getElementById('pomo-time') || document.getElementById('pomo-timer-display');
+  const status = document.getElementById('pomo-status') || document.getElementById('pomo-status-label');
+  const progressBar = document.getElementById('pomo-progress-fill') || document.getElementById('pomo-progress-bar');
+  const ringArc = document.getElementById('pomo-ring-arc');
+  const toggleBtn = document.getElementById('pomo-start-btn') || document.getElementById('pomo-btn-toggle');
+  const countBadge = document.getElementById('pomo-cycles-count') || document.getElementById('pomo-sessions-count');
 
-  const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-  const slots = ['6h', '10h', '14h', '18h'];
-  let html = '';
+  const m = String(Math.floor(pomoTimeLeft / 60)).padStart(2, '0');
+  const s = String(pomoTimeLeft % 60).padStart(2, '0');
+  const timeFormatted = `${m}:${s}`;
 
-  // En-têtes des jours
-  html += '<div></div>';
-  days.forEach(d => {
-    html += `<div class="heatmap-label" style="justify-content:center;font-weight:700;">${d}</div>`;
+  if (display) display.textContent = timeFormatted;
+
+  if (pomoIsRunning) {
+    document.title = `(${timeFormatted}) Focus • Startpage`;
+  } else {
+    document.title = 'Startpage';
+  }
+
+  const total = POMO_DURATIONS[pomoMode] || 1500;
+  const pct = Math.min(100, Math.max(0, ((total - pomoTimeLeft) / total) * 100));
+  if (progressBar) progressBar.style.width = `${pct}%`;
+
+  // Arc SVG circulaire avec circonférence dynamique (r=124 => 779.11)
+  if (ringArc) {
+    const r = parseFloat(ringArc.getAttribute('r')) || 142;
+    const circum = 2 * Math.PI * r;
+    ringArc.style.strokeDasharray = circum.toFixed(2);
+    const offset = circum - (pct / 100) * circum;
+    ringArc.style.strokeDashoffset = offset.toFixed(2);
+  }
+
+  if (toggleBtn) {
+    toggleBtn.innerHTML = pomoIsRunning
+      ? '<i class="fa-solid fa-pause"></i> <span>Mettre en pause</span>'
+      : '<i class="fa-solid fa-play"></i> <span>Démarrer la session</span>';
+    toggleBtn.classList.toggle('running', pomoIsRunning);
+  }
+
+  if (status) {
+    if (pomoIsRunning) {
+      status.textContent = pomoMode === 'focus' ? 'Session en cours...' : 'Pause en cours...';
+    } else {
+      status.textContent = pomoMode === 'focus' ? 'Prêt pour le focus' : 'Prêt pour la pause';
+    }
+  }
+
+  // Badge du mode actif au-dessus du cadran
+  const activeModeTag = document.getElementById('pomo-active-mode-tag');
+  if (activeModeTag) {
+    if (pomoMode === 'focus') {
+      activeModeTag.innerHTML = '<i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS';
+    } else if (pomoMode === 'short') {
+      activeModeTag.innerHTML = '<i class="fa-solid fa-mug-hot text-accent"></i> PAUSE COURTE';
+    } else {
+      activeModeTag.innerHTML = '<i class="fa-solid fa-couch text-accent"></i> PAUSE LONGUE';
+    }
+  }
+
+  if (countBadge) countBadge.textContent = pomoCompletedCount;
+
+  // Mise à jour de la pilule et du statut d'en-tête
+  const headerStatus = document.getElementById('pomo-header-status-text');
+  const headerPill = document.getElementById('pomo-header-status-pill');
+  if (headerStatus) {
+    if (pomoIsRunning) {
+      headerStatus.textContent = pomoMode === 'focus' ? `Focus en cours (${timeFormatted})` : `Pause en cours (${timeFormatted})`;
+    } else {
+      headerStatus.textContent = pomoMode === 'focus' ? `Session Prête • ${Math.round(total / 60)} min` : `Pause Prête • ${Math.round(total / 60)} min`;
+    }
+  }
+  if (headerPill) {
+    headerPill.classList.toggle('active', pomoIsRunning);
+  }
+
+  // Temps total accumulé et prochaine pause
+  const totalTimeEl = document.getElementById('pomo-total-time');
+  if (totalTimeEl) {
+    const focusDurationMin = Math.round((POMO_DURATIONS.focus || 1500) / 60);
+    const totalMin = pomoCompletedCount * focusDurationMin;
+    const hrs = Math.floor(totalMin / 60);
+    const mins = totalMin % 60;
+    totalTimeEl.textContent = hrs > 0 ? `${hrs}h ${mins > 0 ? mins + 'm' : ''}` : `${mins} min`;
+  }
+
+  const nextBreakEl = document.getElementById('pomo-next-break');
+  if (nextBreakEl) {
+    const isLongNext = ((pomoCompletedCount + 1) % 4 === 0) && pomoCompletedCount > 0;
+    nextBreakEl.textContent = isLongNext ? `${Math.round((POMO_DURATIONS.long || 900) / 60)} min (Longue)` : `${Math.round((POMO_DURATIONS.short || 300) / 60)} min`;
+  }
+
+  // Mise à jour des points d'objectif journalier (sur 4)
+  const dots = document.querySelectorAll('#pomo-dots-wrap .pomo-dot');
+  const completedMod = pomoCompletedCount % 4;
+  dots.forEach((dot, idx) => {
+    dot.classList.toggle('done', idx < completedMod || pomoCompletedCount >= 4);
   });
+}
 
-  // Matrice créneaux x jours avec intensités variées (0 à 4)
-  const pattern = [
-    [1, 2, 3, 2, 4, 1, 0],
-    [2, 4, 4, 3, 4, 2, 1],
-    [3, 3, 2, 4, 3, 3, 2],
-    [1, 2, 4, 2, 1, 0, 0]
-  ];
+function startPomoTimer() {
+  if (pomoIsRunning) return;
 
-  slots.forEach((slot, rowIdx) => {
-    html += `<div class="heatmap-label">${slot}</div>`;
-    for (let col = 0; col < 7; col++) {
-      const lv = pattern[rowIdx][col];
-      html += `<div class="heatmap-cell lv${lv}" title="${days[col]} à ${slot} : intensité ${lv}/4"></div>`;
+  try {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+  } catch (e) {}
+
+  pomoIsRunning = true;
+  updatePomoUI();
+
+  if (pomoInterval) clearInterval(pomoInterval);
+  pomoInterval = setInterval(() => {
+    if (pomoTimeLeft > 0) {
+      pomoTimeLeft--;
+      updatePomoUI();
+    } else {
+      clearInterval(pomoInterval);
+      pomoIsRunning = false;
+      playPomoChime();
+
+      try {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification(pomoMode === 'focus' ? '🎉 Focus Terminé !' : '⚡ Pause Terminée !', {
+            body: pomoMode === 'focus' ? 'Prenez une pause bien méritée.' : 'Prêt à reprendre une session de focus !',
+            icon: 'images/gif.gif'
+          });
+        }
+      } catch (e) {}
+
+      if (pomoMode === 'focus') {
+        pomoCompletedCount++;
+        try { localStorage.setItem('startpage_pomo_count', pomoCompletedCount); } catch {}
+        if (typeof showToast === 'function') {
+          showToast('🎉 Session Focus terminée ! Prenez une pause bien méritée.', 'success');
+        }
+        setPomoMode('short');
+      } else {
+        if (typeof showToast === 'function') {
+          showToast('⚡ Pause terminée ! Prêt à reprendre le focus.', 'info');
+        }
+        setPomoMode('focus');
+      }
+    }
+  }, 1000);
+}
+
+function pausePomoTimer() {
+  pomoIsRunning = false;
+  if (pomoInterval) clearInterval(pomoInterval);
+  updatePomoUI();
+}
+
+function resetPomoTimer() {
+  pausePomoTimer();
+  pomoTimeLeft = POMO_DURATIONS[pomoMode] || 1500;
+  updatePomoUI();
+}
+
+function setPomoMode(mode) {
+  pomoMode = (mode === 'work' || mode === 'focus') ? 'focus' : mode;
+  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+    const chipMode = (chip.dataset.pomoMode === 'work' || chip.dataset.pomoMode === 'focus') ? 'focus' : chip.dataset.pomoMode;
+    chip.classList.toggle('active', chipMode === pomoMode);
+  });
+  resetPomoTimer();
+}
+
+function applyPomoPreset(presetValue) {
+  const preset = Number(presetValue) || 25;
+  document.querySelectorAll('.pomo-preset-btn').forEach((b) => {
+    b.classList.toggle('active', Number(b.dataset.pomoPreset) === preset);
+  });
+  if (preset === 50) {
+    POMO_DURATIONS.focus = 50 * 60;
+    POMO_DURATIONS.short = 10 * 60;
+    POMO_DURATIONS.long = 20 * 60;
+  } else if (preset === 15) {
+    POMO_DURATIONS.focus = 15 * 60;
+    POMO_DURATIONS.short = 3 * 60;
+    POMO_DURATIONS.long = 10 * 60;
+  } else {
+    POMO_DURATIONS.focus = 25 * 60;
+    POMO_DURATIONS.short = 5 * 60;
+    POMO_DURATIONS.long = 15 * 60;
+  }
+
+  // Mettre à jour les labels des modes sans détruire l'icône
+  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+    const m = chip.dataset.pomoMode;
+    const span = chip.querySelector('span');
+    if (!span) return;
+    if (m === 'work' || m === 'focus') {
+      span.textContent = `Focus (${Math.round(POMO_DURATIONS.focus / 60)}m)`;
+    } else if (m === 'short') {
+      span.textContent = `Pause (${Math.round(POMO_DURATIONS.short / 60)}m)`;
+    } else if (m === 'long') {
+      span.textContent = `Longue (${Math.round(POMO_DURATIONS.long / 60)}m)`;
     }
   });
 
-  grid.innerHTML = html;
+  resetPomoTimer();
+  if (typeof showToast === 'function') {
+    showToast(`Intervalles configurés : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
+  }
 }
 
-// Calendrier mensuel & Timeline quotidienne (Focuso Calendar)
-window.focusoCalPrev = function() {
-  focusoCalDate.setMonth(focusoCalDate.getMonth() - 1);
-  renderFocusoCalendar();
+// Variable sentinelle pour éviter d'enregistrer les écouteurs délégués en double
+let pomoEventsDelegated = false;
+
+
+// Fonctions globales exposées pour garantir le fonctionnement immédiat des boutons
+window.pomoStartToggle = function() {
+  if (pomoIsRunning) pausePomoTimer();
+  else startPomoTimer();
 };
-
-window.focusoCalNext = function() {
-  focusoCalDate.setMonth(focusoCalDate.getMonth() + 1);
-  renderFocusoCalendar();
+window.pomoReset = resetPomoTimer;
+window.setPomoMode = setPomoMode;
+window.applyPomoPreset = applyPomoPreset;
+window.playPomoChime = playPomoChime;
+window.ambientToggle = function() {
+  if (ambientIsPlaying) stopAmbientSound();
+  else startAmbientSound();
 };
-
-function renderFocusoCalendar() {
-  const titleEl = document.getElementById('focuso-cal-month-title');
-  const cellsEl = document.getElementById('focuso-calendar-days');
-  if (!titleEl || !cellsEl) return;
-
-  const year = focusoCalDate.getFullYear();
-  const month = focusoCalDate.getMonth();
-  const monthNames = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-  titleEl.textContent = `${monthNames[month]} ${year}`;
-
-  const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7; // Lundi = 0
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const today = new Date();
-
-  let html = '';
-  // Jours vides début
-  for (let i = 0; i < firstDayIndex; i++) {
-    html += '<div class="cal-day-cell empty"></div>';
-  }
-
-  for (let day = 1; day <= daysInMonth; day++) {
-    const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === day;
-    const isSelected = dStr === focusoSelectedDayKey;
-    // Jours avec sessions (jours pairs ou aujourd'hui)
-    const hasSessions = (day % 3 === 0) || (day === 15) || (day === 20) || isToday;
-
-    let classes = 'cal-day-cell';
-    if (isToday) classes += ' today';
-    if (isSelected) classes += ' selected';
-    if (hasSessions) classes += ' has-sessions';
-
-    html += `<button type="button" class="${classes}" onclick="window.focusoSelectCalendarDay('${dStr}')">${day}</button>`;
-  }
-
-  cellsEl.innerHTML = html;
-  renderFocusoTimeline(focusoSelectedDayKey);
-}
-
-window.focusoSelectCalendarDay = function(dateStr) {
-  focusoSelectedDayKey = dateStr;
-  renderFocusoCalendar();
-};
-
-function renderFocusoTimeline(dateStr) {
-  const timelineEl = document.getElementById('focuso-history-timeline');
-  const dateBadgeEl = document.getElementById('focuso-selected-date-label');
-  const progVal = document.getElementById('focuso-cal-progress-val');
-  const workedVal = document.getElementById('focuso-cal-worked-val');
-  const sessionsVal = document.getElementById('focuso-cal-sessions-val');
-
-  if (dateBadgeEl) {
-    const todayStr = new Date().toISOString().split('T')[0];
-    dateBadgeEl.textContent = (dateStr === todayStr) ? "Aujourd'hui" : dateStr;
-  }
-
-  if (progVal) progVal.textContent = '71.4%';
-  if (workedVal) workedVal.textContent = '300 min';
-  if (sessionsVal) sessionsVal.textContent = '12 sessions';
-
-  if (!timelineEl) return;
-
-  const items = [
-    { title: 'Design User Interface (UI)', time: '14:00 - 14:25', duration: '25 min', type: 'focus' },
-    { title: 'Pause Café & Étirements', time: '14:25 - 14:30', duration: '5 min', type: 'break' },
-    { title: 'Market Research & Analysis', time: '14:30 - 14:55', duration: '25 min', type: 'focus' },
-    { title: 'Développement Frontend Web', time: '15:00 - 15:50', duration: '50 min', type: 'focus' }
-  ];
-
-  let html = '';
-  items.forEach(it => {
-    html += `
-      <div class="timeline-item ${it.type}">
-        <div>
-          <span class="timeline-item-title">${it.title}</span>
-          <span style="font-size:0.65rem;color:var(--text-muted);display:block;">${it.duration}</span>
-        </div>
-        <span class="timeline-item-time">${it.time}</span>
-      </div>`;
+window.selectAmbientMode = function(mode) {
+  ambientCurrentMode = mode;
+  try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
+  document.querySelectorAll('.ambient-mode-card').forEach((c) => {
+    c.classList.toggle('active', c.dataset.ambientMode === mode);
   });
+  if (ambientIsPlaying) startAmbientSound();
+  else updateAmbientUI();
+};
 
-  timelineEl.innerHTML = html;
-}
-
-// Initialisation principale du module Focuso
 function initPomodoroWidget() {
-  renderFocusoTicks();
-  updateFocusoUI();
-  refreshFocusoReports();
-  renderFocusoCalendar();
+  try {
+    pomoCompletedCount = Number(localStorage.getItem('startpage_pomo_count') || 0);
+  } catch {
+    pomoCompletedCount = 0;
+  }
 
-  // Écouteur de raccourcis clavier
-  document.addEventListener('keydown', (e) => {
-    const pomoView = document.getElementById('deck-view-pomodoro');
-    if (!pomoView || pomoView.hidden || pomoView.style.display === 'none') return;
+  // 1. Attachement DIRECT des écouteurs sur les éléments du DOM
+  const startBtn = document.getElementById('pomo-start-btn');
+  if (startBtn) {
+    startBtn.onclick = (e) => {
+      e.preventDefault();
+      if (pomoIsRunning) pausePomoTimer();
+      else startPomoTimer();
+    };
+  }
 
-    const tag = document.activeElement?.tagName?.toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
+  const resetBtn = document.getElementById('pomo-reset-btn');
+  if (resetBtn) {
+    resetBtn.onclick = (e) => {
+      e.preventDefault();
+      resetPomoTimer();
+    };
+  }
 
-    if (e.code === 'Space') {
+  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+    chip.onclick = (e) => {
       e.preventDefault();
-      window.focusoPlayPause();
-    } else if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      e.preventDefault();
-      window.focusoReset();
-    } else if (e.code === 'KeyS' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      e.preventDefault();
-      window.focusoSkip();
-    }
+      setPomoMode(chip.dataset.pomoMode);
+    };
   });
-}
 
+  document.querySelectorAll('.pomo-preset-btn').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      applyPomoPreset(btn.dataset.pomoPreset);
+    };
+  });
+
+  const chimeBtn = document.getElementById('pomo-test-chime-btn');
+  if (chimeBtn) {
+    chimeBtn.onclick = (e) => {
+      e.preventDefault();
+      playPomoChime();
+      if (typeof showToast === 'function') showToast('Carillon zen joué 🔔', 'info');
+    };
+  }
+
+  // Intention de session (champ rapide auto-sauvegardé)
+  const taskInput = document.getElementById('pomo-task-input');
+  const taskClearBtn = document.getElementById('pomo-task-clear-btn');
+  if (taskInput) {
+    try {
+      const savedTask = localStorage.getItem('startpage_pomo_task') || '';
+      taskInput.value = savedTask;
+      if (taskClearBtn) taskClearBtn.classList.toggle('visible', savedTask.length > 0);
+    } catch {}
+
+    taskInput.oninput = () => {
+      try {
+        localStorage.setItem('startpage_pomo_task', taskInput.value.trim());
+      } catch {}
+      if (taskClearBtn) taskClearBtn.classList.toggle('visible', taskInput.value.trim().length > 0);
+    };
+  }
+
+  if (taskClearBtn && taskInput) {
+    taskClearBtn.onclick = (e) => {
+      e.preventDefault();
+      taskInput.value = '';
+      try { localStorage.removeItem('startpage_pomo_task'); } catch {}
+      taskClearBtn.classList.remove('visible');
+      taskInput.focus();
+    };
+  }
+
+  // 2. Écouteurs délégués globaux en complément
+  if (!pomoEventsDelegated) {
+    pomoEventsDelegated = true;
+
+    document.addEventListener('click', (e) => {
+      const toggleBtn = e.target.closest('#pomo-start-btn, #pomo-btn-toggle');
+      if (toggleBtn) {
+        e.preventDefault();
+        if (pomoIsRunning) pausePomoTimer();
+        else startPomoTimer();
+        return;
+      }
+
+      const resetBtn = e.target.closest('#pomo-reset-btn, #pomo-btn-reset');
+      if (resetBtn) {
+        e.preventDefault();
+        resetPomoTimer();
+        return;
+      }
+
+      const modeChip = e.target.closest('.pomo-mode-chip');
+      if (modeChip && modeChip.dataset.pomoMode) {
+        e.preventDefault();
+        setPomoMode(modeChip.dataset.pomoMode);
+        return;
+      }
+
+      const presetBtn = e.target.closest('.pomo-preset-btn');
+      if (presetBtn && presetBtn.dataset.pomoPreset) {
+        e.preventDefault();
+        applyPomoPreset(presetBtn.dataset.pomoPreset);
+        return;
+      }
+
+      const testChimeBtn = e.target.closest('#pomo-test-chime-btn');
+      if (testChimeBtn) {
+        e.preventDefault();
+        playPomoChime();
+        if (typeof showToast === 'function') showToast('Carillon zen joué 🔔', 'info');
+        return;
+      }
+
+      const ambientCard = e.target.closest('.ambient-mode-card');
+      if (ambientCard && ambientCard.dataset.ambientMode) {
+        e.preventDefault();
+        const mode = ambientCard.dataset.ambientMode;
+        ambientCurrentMode = mode;
+        try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
+        document.querySelectorAll('.ambient-mode-card').forEach((c) => {
+          c.classList.toggle('active', c.dataset.ambientMode === ambientCurrentMode);
+        });
+        if (ambientIsPlaying) {
+          startAmbientSound();
+        } else {
+          updateAmbientUI();
+        }
+        return;
+      }
+
+      const ambientMaster = e.target.closest('#ambient-master-toggle');
+      if (ambientMaster) {
+        e.preventDefault();
+        if (ambientIsPlaying) stopAmbientSound();
+        else startAmbientSound();
+        return;
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const pomoView = document.getElementById('deck-view-pomodoro');
+      if (!pomoView || pomoView.hidden || pomoView.style.display === 'none') return;
+
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (pomoIsRunning) pausePomoTimer();
+        else startPomoTimer();
+      } else if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        resetPomoTimer();
+        if (typeof showToast === 'function') showToast('Compteur réinitialisé', 'info');
+      }
+    });
+  }
+
+  updatePomoUI();
+}
 
 /* ========================================================
    2. BLOC-NOTES RAPIDE (SCRATCHPAD) & APERÇU MARKDOWN
@@ -2072,6 +1790,7 @@ function setTabVisibilityWithAnimation(key, isEnabled, callback) {
   function run() {
     try { initPomodoroWidget(); } catch (e) {}
     try { initAmbientWidget(); } catch (e) {}
+    try { renderPomoHistoryChart(); } catch (e) {}
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', run);
