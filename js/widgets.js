@@ -143,9 +143,9 @@ function updatePomoUI() {
   const pct = Math.min(100, Math.max(0, ((total - pomoTimeLeft) / total) * 100));
   if (progressBar) progressBar.style.width = `${pct}%`;
 
-  // Arc SVG circulaire avec circonférence dynamique (r=106 => 666.02)
+  // Arc SVG circulaire avec circonférence dynamique (r=124 => 779.11)
   if (ringArc) {
-    const r = parseFloat(ringArc.getAttribute('r')) || 106;
+    const r = parseFloat(ringArc.getAttribute('r')) || 124;
     const circum = 2 * Math.PI * r;
     ringArc.style.strokeDasharray = circum.toFixed(2);
     const offset = circum - (pct / 100) * circum;
@@ -222,13 +222,16 @@ function updatePomoUI() {
 function startPomoTimer() {
   if (pomoIsRunning) return;
 
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission().catch(() => {});
-  }
+  try {
+    if (typeof Notification !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+  } catch (e) {}
 
   pomoIsRunning = true;
   updatePomoUI();
 
+  if (pomoInterval) clearInterval(pomoInterval);
   pomoInterval = setInterval(() => {
     if (pomoTimeLeft > 0) {
       pomoTimeLeft--;
@@ -238,14 +241,14 @@ function startPomoTimer() {
       pomoIsRunning = false;
       playPomoChime();
 
-      if ('Notification' in window && Notification.permission === 'granted') {
-        try {
+      try {
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
           new Notification(pomoMode === 'focus' ? '🎉 Focus Terminé !' : '⚡ Pause Terminée !', {
             body: pomoMode === 'focus' ? 'Prenez une pause bien méritée.' : 'Prêt à reprendre une session de focus !',
             icon: 'images/gif.gif'
           });
-        } catch {}
-      }
+        }
+      } catch (e) {}
 
       if (pomoMode === 'focus') {
         pomoCompletedCount++;
@@ -334,12 +337,80 @@ function initPomodoroWidget() {
     pomoCompletedCount = 0;
   }
 
+  // 1. Attachement DIRECT des écouteurs sur les éléments du DOM
+  const startBtn = document.getElementById('pomo-start-btn');
+  if (startBtn) {
+    startBtn.onclick = (e) => {
+      e.preventDefault();
+      if (pomoIsRunning) pausePomoTimer();
+      else startPomoTimer();
+    };
+  }
+
+  const resetBtn = document.getElementById('pomo-reset-btn');
+  if (resetBtn) {
+    resetBtn.onclick = (e) => {
+      e.preventDefault();
+      resetPomoTimer();
+    };
+  }
+
+  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+    chip.onclick = (e) => {
+      e.preventDefault();
+      setPomoMode(chip.dataset.pomoMode);
+    };
+  });
+
+  document.querySelectorAll('.pomo-preset-btn').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      applyPomoPreset(btn.dataset.pomoPreset);
+    };
+  });
+
+  const chimeBtn = document.getElementById('pomo-test-chime-btn');
+  if (chimeBtn) {
+    chimeBtn.onclick = (e) => {
+      e.preventDefault();
+      playPomoChime();
+      if (typeof showToast === 'function') showToast('Carillon zen joué 🔔', 'info');
+    };
+  }
+
+  // Intention de session (champ rapide auto-sauvegardé)
+  const taskInput = document.getElementById('pomo-task-input');
+  const taskClearBtn = document.getElementById('pomo-task-clear-btn');
+  if (taskInput) {
+    try {
+      const savedTask = localStorage.getItem('startpage_pomo_task') || '';
+      taskInput.value = savedTask;
+      if (taskClearBtn) taskClearBtn.classList.toggle('visible', savedTask.length > 0);
+    } catch {}
+
+    taskInput.oninput = () => {
+      try {
+        localStorage.setItem('startpage_pomo_task', taskInput.value.trim());
+      } catch {}
+      if (taskClearBtn) taskClearBtn.classList.toggle('visible', taskInput.value.trim().length > 0);
+    };
+  }
+
+  if (taskClearBtn && taskInput) {
+    taskClearBtn.onclick = (e) => {
+      e.preventDefault();
+      taskInput.value = '';
+      try { localStorage.removeItem('startpage_pomo_task'); } catch {}
+      taskClearBtn.classList.remove('visible');
+      taskInput.focus();
+    };
+  }
+
+  // 2. Écouteurs délégués globaux en complément
   if (!pomoEventsDelegated) {
     pomoEventsDelegated = true;
 
-    // Délégation globale sur le document pour garantir que tous les clics fonctionnent instantanément
     document.addEventListener('click', (e) => {
-      // 1. Bouton Démarrer / Mettre en pause
       const toggleBtn = e.target.closest('#pomo-start-btn, #pomo-btn-toggle');
       if (toggleBtn) {
         e.preventDefault();
@@ -348,7 +419,6 @@ function initPomodoroWidget() {
         return;
       }
 
-      // 2. Bouton Réinitialiser
       const resetBtn = e.target.closest('#pomo-reset-btn, #pomo-btn-reset');
       if (resetBtn) {
         e.preventDefault();
@@ -356,7 +426,6 @@ function initPomodoroWidget() {
         return;
       }
 
-      // 3. Puces de changement de mode (Focus, Pause, Longue)
       const modeChip = e.target.closest('.pomo-mode-chip');
       if (modeChip && modeChip.dataset.pomoMode) {
         e.preventDefault();
@@ -364,7 +433,6 @@ function initPomodoroWidget() {
         return;
       }
 
-      // 4. Boutons de présélections (25/5, 50/10, 15/3)
       const presetBtn = e.target.closest('.pomo-preset-btn');
       if (presetBtn && presetBtn.dataset.pomoPreset) {
         e.preventDefault();
@@ -372,7 +440,6 @@ function initPomodoroWidget() {
         return;
       }
 
-      // 5. Bouton de test du carillon zen
       const testChimeBtn = e.target.closest('#pomo-test-chime-btn');
       if (testChimeBtn) {
         e.preventDefault();
@@ -381,7 +448,6 @@ function initPomodoroWidget() {
         return;
       }
 
-      // 6. Cartes de choix d'ambiance sonore
       const ambientCard = e.target.closest('.ambient-mode-card');
       if (ambientCard && ambientCard.dataset.ambientMode) {
         e.preventDefault();
@@ -399,7 +465,6 @@ function initPomodoroWidget() {
         return;
       }
 
-      // 7. Bouton Master Play / Stop de l'ambiance sonore
       const ambientMaster = e.target.closest('#ambient-master-toggle');
       if (ambientMaster) {
         e.preventDefault();
@@ -409,12 +474,10 @@ function initPomodoroWidget() {
       }
     });
 
-    // Raccourcis clavier (Espace pour Démarrer/Pause, R pour Reset) lorsque l'onglet Pomodoro est visible
     document.addEventListener('keydown', (e) => {
       const pomoView = document.getElementById('deck-view-pomodoro');
       if (!pomoView || pomoView.hidden || pomoView.style.display === 'none') return;
 
-      // Ne pas intercepter si l'utilisateur saisit du texte dans un champ ou éditeur
       const tag = document.activeElement?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
 

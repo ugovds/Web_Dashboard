@@ -2,18 +2,23 @@
  * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache PWA)
  */
 
-const CACHE_NAME = 'violet-startpage-v2.5';
+const CACHE_NAME = 'violet-startpage-v3.6';
 
 const STATIC_ASSETS = [
   './',
   './index.html',
   './css/style.css',
   './css/base.css',
+  './css/sidebar.css',
+  './css/dashboard.css',
   './css/clock.css',
   './css/search.css',
   './css/bookmarks.css',
   './css/calendar.css',
   './css/tasks.css',
+  './css/weather.css',
+  './css/feeds.css',
+  './css/markets.css',
   './css/deck.css',
   './css/widgets.css',
   './css/modals.css',
@@ -28,6 +33,16 @@ const STATIC_ASSETS = [
   './js/weather-fx.js',
   './js/weather.js',
   './js/calendar.js',
+  './js/tasks.js',
+  './js/search.js',
+  './js/feeds.js',
+  './js/bookmarks.js',
+  './js/markets.js',
+  './js/widgets.js',
+  './js/custom-hub.js',
+  './js/command-palette.js',
+  './js/shortcuts.js',
+  './js/app.js',
   './js/tasks.js',
   './js/search.js',
   './js/feeds.js',

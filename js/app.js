@@ -53,10 +53,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof applyWidgetVisibility === 'function') applyWidgetVisibility();
   if (typeof initCustomHub === 'function') initCustomHub();
   if (typeof initShortcuts === 'function') initShortcuts();
+  if (typeof initWidgets === 'function') initWidgets();
 
   // === PHASE 2 : DIFFÉRÉE (Tâches secondaires libérant le thread) ===
   const deferNonCritical = () => {
-    if (typeof initWidgets === 'function') initWidgets();
     if (typeof initMarkets === 'function') initMarkets();
     if (typeof initWeather === 'function') initWeather();
     if (typeof initWeatherFx === 'function') initWeatherFx();
