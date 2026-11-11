@@ -29,18 +29,33 @@ La startpage intègre 4 thèmes visuels avec éclairage ambiant (Ambilight), orb
 
 ---
 
-## 📐 Architecture de l'Interface (Bento 3 Colonnes)
+## 📐 Architecture de l'Interface (Cockpit Dashboard avec Menu Latéral)
 
-Le tableau de bord est structuré en 3 colonnes immersives qui exploitent toute la hauteur de l'écran :
+Le tableau de bord est structuré en **Dashboard moderne de type cockpit** avec navigation latérale et topbar HUD discrète :
 
-1. **Colonne Gauche (Visuels & Station Horloge)** :
-   - Illustration animée du thème actif avec indicateur d'état système.
-   - Station Horloge Chrono-HUD (cadran radial SVG, micro-compteur millisecondes, cycle solaire, progression du jour et fuseaux horaires).
-2. **Colonne Centrale (Navigation & Productivité)** :
-   - Barre de recherche Omnibox (moteurs, raccourcis bangs, calculatrice en temps réel et autocomplétion).
-   - Grille Bento des catégories et signets avec densité adaptative et réorganisation par glisser-déposer.
-3. **Colonne Droite (Cyberdeck Multi-Vues à 9 Onglets)** :
-   - Slider interactif donnant accès aux différents outils : Agenda & Tâches, Météo complète, Actualités RSS, Moniteur Système & Marchés boursiers, Minuteur Focus Pomodoro, Bloc-Notes, Ambiance Sonore, Citations, et Centre de Configuration.
+1. **Menu Latéral Gauche (Sidebar Slim & Rétractable)** :
+   - Mode compact par défaut avec icônes épurées (~68px) et infobulles flottantes (tooltips).
+   - Dépliable par survol ou verrouillable en mode étendu via le bouton chevron.
+   - **Navigation rapide aux flèches clavier (<kbd>↑</kbd> / <kbd>↓</kbd>)** permettant de basculer instantanément d'un onglet à l'autre.
+   - Indicateur lumineux vertical glissant avec animation fluide.
+   - Actions rapides : Mode Nuit / Atténuation HUD (<kbd>Ctrl+Shift+D</kbd>), cyclage de thème et palette de commandes (<kbd>Ctrl+K</kbd>).
+
+2. **Topbar HUD Minimaliste** :
+   - Titre et icône dynamique de l'onglet actif.
+   - Déclencheur rapide de recherche (<kbd>/</kbd>).
+   - Pastilles interactives de télémétrie : météo en direct, bouton play/pause audio Lo-Fi et nom du thème actif.
+
+3. **Espace de Travail Spacieux (10 Vues Plein Format)** :
+   - **Accueil (Vue Générale)** : Barre Omnibox + Grande station horloge HUD + Grille spacieuse des signets et catégories.
+   - **Agenda & Tâches** : Calendrier mensuel interactif à gauche et To-Do list complète à droite.
+   - **Météo & Radar** : Courbe de température & pluie 24h, métriques détaillées, prévisions sur 3j et radar satellite en direct.
+   - **Actualités** : Lecteur de flux d'actualités F1, Football, Tech et vos flux RSS sur mesure.
+   - **Système & Marchés** : Latence ping en temps réel (sparkline SVG), batterie, uptime et indices boursiers.
+   - **Focus Pomodoro** : Minuteur circulaire avec presets, carillon et jalons de session.
+   - **Bloc-Notes Scratchpad** : Éditeur Markdown avec prévisualisation et export.
+   - **Ambiance Lo-Fi** : Synthèse audio procédurale et radio avec visualiseur Canvas.
+   - **Citations** : Citations de culture hacker, dev et cyberpunk.
+   - **Paramètres** : Centre complet de personnalisation des thèmes, de l'horloge et sauvegarde JSON.
 
 ---
 
@@ -190,11 +205,15 @@ violet-startpage/
 
 | Raccourci | Action |
 | :--- | :--- |
-| <kbd>/</kbd> | Activer la barre de recherche |
-| <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd> | Basculer instantanément entre les 3 thèmes |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Naviguer entre les onglets de la sidebar (quand aucun champ texte n'est actif) |
+| <kbd>Alt+1</kbd> à <kbd>Alt+0</kbd> | Accès direct aux 10 onglets du Dashboard |
+| <kbd>/</kbd> | Activer la barre de recherche Omnibox |
+| <kbd>Ctrl+K</kbd> ou <kbd>B</kbd> | Ouvrir la palette de commandes globale |
+| <kbd>Ctrl+Shift+D</kbd> | Basculer le mode Nuit / Atténuation HUD |
+| <kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd> | Basculer instantanément entre les 4 thèmes visuels |
+| <kbd>T</kbd> | Ajouter rapidement une tâche (active l'agenda et cible le champ) |
 | <kbd>Entrée</kbd> | Valider une recherche, ajouter une tâche ou enregistrer |
-| <kbd>↑</kbd> / <kbd>↓</kbd> | Naviguer dans les suggestions de recherche |
-| <kbd>Échap</kbd> | Fermer les modales ou masquer les suggestions |
+| <kbd>Échap</kbd> | Fermer les modales ou quitter le champ actif |
 
 ---
 
