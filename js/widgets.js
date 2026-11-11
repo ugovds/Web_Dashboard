@@ -72,7 +72,7 @@ function applyWidgetVisibility() {
 }
 
 /* ========================================================
-   1. MINUTEUR FOCUS / POMODORO
+   1. MINUTEUR FOCUS / POMODORO (DRIFT-PROOF & RELIABLE)
    ======================================================== */
 let POMO_DURATIONS = {
   focus: 25 * 60,
@@ -80,12 +80,18 @@ let POMO_DURATIONS = {
   long: 15 * 60
 };
 
-let pomoMode = 'focus';
+let pomoMode = 'focus'; // 'focus', 'short', 'long'
 let pomoTimeLeft = POMO_DURATIONS.focus;
+let pomoTargetEndTime = 0;
 let pomoInterval = null;
 let pomoIsRunning = false;
 let pomoCompletedCount = 0;
+let pomoActivePreset = 25;
+let pomoWidgetInitialized = false;
 
+/**
+ * Carillon Zen harmonique (Web Audio API)
+ */
 function playPomoChime() {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -95,31 +101,34 @@ function playPomoChime() {
       ctx.resume().catch(() => {});
     }
     const chord = [523.25, 659.25, 783.99, 1046.5]; // Accord majeur C5-E5-G5-C6
+    const now = ctx.currentTime;
 
     chord.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.value = freq;
+      osc.frequency.setValueAtTime(freq, now);
 
-      const startTime = ctx.currentTime + idx * 0.12;
-      const stopTime = startTime + 0.9;
+      const startTime = now + idx * 0.12;
+      const duration = 1.3;
 
       gain.gain.setValueAtTime(0, startTime);
       gain.gain.linearRampToValueAtTime(0.12, startTime + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.0001, stopTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(startTime);
-      osc.stop(stopTime);
+      osc.stop(startTime + duration + 0.1);
     });
   } catch (err) {
     console.warn('Web Audio chime non supporté ou bloqué :', err);
   }
 }
 
-
+/**
+ * Données d'activité des 7 derniers jours
+ */
 function getPomoHistoryData() {
   let hist = null;
   try {
@@ -132,7 +141,6 @@ function getPomoHistoryData() {
   const today = new Date();
   const todayKey = today.toISOString().split('T')[0];
 
-  // Si aucun historique n'existe, on pré-remplit avec des données représentatives
   if (!hist || typeof hist !== 'object') {
     hist = {};
     const sampleCounts = [2, 4, 3, 5, 2, 4, pomoCompletedCount || 3];
@@ -147,7 +155,6 @@ function getPomoHistoryData() {
     } catch (e) {}
   }
 
-  // Toujours s'assurer que le nombre aujourd'hui reflète pomoCompletedCount s'il est supérieur
   if (pomoCompletedCount > 0 && (Number(hist[todayKey]) || 0) < pomoCompletedCount) {
     hist[todayKey] = pomoCompletedCount;
   }
@@ -178,6 +185,9 @@ function recordPomoSessionInHistory() {
   } catch (e) {}
 }
 
+/**
+ * Rendu du mini graphique BarChart SVG
+ */
 function renderPomoHistoryChart() {
   const svg = document.getElementById('pomo-history-chart');
   if (!svg) return;
@@ -185,16 +195,15 @@ function renderPomoHistoryChart() {
   const data = getPomoHistoryData();
   const maxVal = Math.max(4, ...data.map(d => d.count));
   const svgWidth = 280;
-  const svgHeight = 75;
-  const bottomPad = 18;
+  const svgHeight = 80;
+  const bottomPad = 20;
   const topPad = 8;
   const chartHeight = svgHeight - bottomPad - topPad;
 
-  const barWidth = 24;
+  const barWidth = 22;
   const slotWidth = svgWidth / data.length;
 
   let html = '';
-  // Ligne de base
   html += '<line x1="8" y1="' + (svgHeight - bottomPad) + '" x2="' + (svgWidth - 8) + '" y2="' + (svgHeight - bottomPad) + '" stroke="rgba(255,255,255,0.08)" stroke-width="1" />';
 
   data.forEach((item, idx) => {
@@ -202,24 +211,20 @@ function renderPomoHistoryChart() {
     const barH = item.count > 0 ? Math.max(6, Math.round((item.count / maxVal) * chartHeight)) : 0;
     const y = Math.round(svgHeight - bottomPad - barH);
 
-    // Fond de barre
-    html += '<rect class="bar-track" x="' + x + '" y="' + topPad + '" width="' + barWidth + '" height="' + chartHeight + '" rx="4" fill="rgba(255,255,255,0.04)" />';
+    html += '<rect class="bar-track" x="' + x + '" y="' + topPad + '" width="' + barWidth + '" height="' + chartHeight + '" rx="5" fill="rgba(255,255,255,0.04)" />';
 
-    // Barre active
     if (barH > 0) {
       const fill = item.isToday ? 'var(--accent-primary)' : 'rgba(167, 139, 250, 0.45)';
-      const shadow = item.isToday ? 'filter="drop-shadow(0 0 5px var(--accent-primary))"' : '';
-      html += '<rect class="bar-fill ' + (item.isToday ? 'today' : '') + '" x="' + x + '" y="' + y + '" width="' + barWidth + '" height="' + barH + '" rx="4" fill="' + fill + '" ' + shadow + '>';
+      const shadow = item.isToday ? 'filter="drop-shadow(0 0 6px var(--accent-primary))"' : '';
+      html += '<rect class="bar-fill ' + (item.isToday ? 'today' : '') + '" x="' + x + '" y="' + y + '" width="' + barWidth + '" height="' + barH + '" rx="5" fill="' + fill + '" ' + shadow + '>';
       html += '<title>' + item.label + ' (' + item.key + ') : ' + item.count + ' session' + (item.count > 1 ? 's' : '') + '</title>';
       html += '</rect>';
 
-      // Nombre si assez de hauteur
       if (barH >= 14) {
-        html += '<text x="' + (x + barWidth / 2) + '" y="' + (y + 10) + '" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="800">' + item.count + '</text>';
+        html += '<text x="' + (x + barWidth / 2) + '" y="' + (y + 11) + '" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="800">' + item.count + '</text>';
       }
     }
 
-    // Nom du jour
     const textColor = item.isToday ? 'var(--accent-primary)' : 'rgba(255,255,255,0.45)';
     const textWeight = item.isToday ? '800' : '500';
     html += '<text x="' + (x + barWidth / 2) + '" y="' + (svgHeight - 4) + '" text-anchor="middle" font-size="9" fill="' + textColor + '" font-weight="' + textWeight + '">' + item.label + '</text>';
@@ -228,11 +233,16 @@ function renderPomoHistoryChart() {
   svg.innerHTML = html;
 }
 
+/**
+ * Mise à jour complète de l'interface Pomodoro
+ */
 function updatePomoUI() {
   const display = document.getElementById('pomo-time') || document.getElementById('pomo-timer-display');
   const status = document.getElementById('pomo-status') || document.getElementById('pomo-status-label');
+  const substatus = document.getElementById('pomo-substatus');
   const progressBar = document.getElementById('pomo-progress-fill') || document.getElementById('pomo-progress-bar');
   const ringArc = document.getElementById('pomo-ring-arc');
+  const dialRing = document.getElementById('pomo-dial-ring');
   const toggleBtn = document.getElementById('pomo-start-btn') || document.getElementById('pomo-btn-toggle');
   const countBadge = document.getElementById('pomo-cycles-count') || document.getElementById('pomo-sessions-count');
 
@@ -243,7 +253,8 @@ function updatePomoUI() {
   if (display) display.textContent = timeFormatted;
 
   if (pomoIsRunning) {
-    document.title = `(${timeFormatted}) Focus • Startpage`;
+    const modeLabel = pomoMode === 'focus' ? 'Focus' : 'Pause';
+    document.title = `(${timeFormatted}) ${modeLabel} • Startpage`;
   } else {
     document.title = 'Startpage';
   }
@@ -252,13 +263,16 @@ function updatePomoUI() {
   const pct = Math.min(100, Math.max(0, ((total - pomoTimeLeft) / total) * 100));
   if (progressBar) progressBar.style.width = `${pct}%`;
 
-  // Arc SVG circulaire avec circonférence dynamique (r=124 => 779.11)
   if (ringArc) {
     const r = parseFloat(ringArc.getAttribute('r')) || 142;
     const circum = 2 * Math.PI * r;
     ringArc.style.strokeDasharray = circum.toFixed(2);
     const offset = circum - (pct / 100) * circum;
     ringArc.style.strokeDashoffset = offset.toFixed(2);
+  }
+
+  if (dialRing) {
+    dialRing.classList.toggle('running', pomoIsRunning);
   }
 
   if (toggleBtn) {
@@ -270,41 +284,41 @@ function updatePomoUI() {
 
   if (status) {
     if (pomoIsRunning) {
-      status.textContent = pomoMode === 'focus' ? 'Session en cours...' : 'Pause en cours...';
+      status.textContent = pomoMode === 'focus' ? 'Focus en cours...' : 'Pause en cours...';
     } else {
-      status.textContent = pomoMode === 'focus' ? 'Prêt pour le focus' : 'Prêt pour la pause';
+      status.textContent = pomoMode === 'focus' ? 'Focus Time' : 'Temps de Pause';
     }
   }
 
-  // Badge du mode actif au-dessus du cadran
+  if (substatus) {
+    if (pomoIsRunning) {
+      substatus.textContent = pomoMode === 'focus' ? 'Restez concentré sur votre tâche' : 'Détendez-vous et respirez';
+    } else {
+      substatus.textContent = pomoMode === 'focus' ? 'Prêt à démarrer (Espace)' : 'Prêt pour la pause (Espace)';
+    }
+  }
+
   const activeModeTag = document.getElementById('pomo-active-mode-tag');
   if (activeModeTag) {
+    const mins = Math.round(total / 60);
     if (pomoMode === 'focus') {
-      activeModeTag.innerHTML = '<i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS';
+      activeModeTag.innerHTML = `<i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS • ${mins} MIN`;
     } else if (pomoMode === 'short') {
-      activeModeTag.innerHTML = '<i class="fa-solid fa-mug-hot text-accent"></i> PAUSE COURTE';
+      activeModeTag.innerHTML = `<i class="fa-solid fa-mug-hot text-accent"></i> PAUSE COURTE • ${mins} MIN`;
     } else {
-      activeModeTag.innerHTML = '<i class="fa-solid fa-couch text-accent"></i> PAUSE LONGUE';
+      activeModeTag.innerHTML = `<i class="fa-solid fa-couch text-accent"></i> PAUSE LONGUE • ${mins} MIN`;
     }
+  }
+
+  const completedInCycle = pomoCompletedCount % 4;
+  const currentNum = completedInCycle + 1;
+  const cycleCurrentEl = document.getElementById('pomo-cycle-current');
+  if (cycleCurrentEl) {
+    cycleCurrentEl.textContent = currentNum <= 4 ? currentNum : 4;
   }
 
   if (countBadge) countBadge.textContent = pomoCompletedCount;
 
-  // Mise à jour de la pilule et du statut d'en-tête
-  const headerStatus = document.getElementById('pomo-header-status-text');
-  const headerPill = document.getElementById('pomo-header-status-pill');
-  if (headerStatus) {
-    if (pomoIsRunning) {
-      headerStatus.textContent = pomoMode === 'focus' ? `Focus en cours (${timeFormatted})` : `Pause en cours (${timeFormatted})`;
-    } else {
-      headerStatus.textContent = pomoMode === 'focus' ? `Session Prête • ${Math.round(total / 60)} min` : `Pause Prête • ${Math.round(total / 60)} min`;
-    }
-  }
-  if (headerPill) {
-    headerPill.classList.toggle('active', pomoIsRunning);
-  }
-
-  // Temps total accumulé et prochaine pause
   const totalTimeEl = document.getElementById('pomo-total-time');
   if (totalTimeEl) {
     const focusDurationMin = Math.round((POMO_DURATIONS.focus || 1500) / 60);
@@ -317,17 +331,74 @@ function updatePomoUI() {
   const nextBreakEl = document.getElementById('pomo-next-break');
   if (nextBreakEl) {
     const isLongNext = ((pomoCompletedCount + 1) % 4 === 0) && pomoCompletedCount > 0;
-    nextBreakEl.textContent = isLongNext ? `${Math.round((POMO_DURATIONS.long || 900) / 60)} min (Longue)` : `${Math.round((POMO_DURATIONS.short || 300) / 60)} min`;
+    nextBreakEl.textContent = isLongNext
+      ? `${Math.round((POMO_DURATIONS.long || 900) / 60)} min (Longue)`
+      : `${Math.round((POMO_DURATIONS.short || 300) / 60)} min`;
   }
 
-  // Mise à jour des points d'objectif journalier (sur 4)
   const dots = document.querySelectorAll('#pomo-dots-wrap .pomo-dot');
-  const completedMod = pomoCompletedCount % 4;
   dots.forEach((dot, idx) => {
-    dot.classList.toggle('done', idx < completedMod || pomoCompletedCount >= 4);
+    dot.classList.toggle('done', idx < completedInCycle || (completedInCycle === 0 && pomoCompletedCount > 0 && pomoMode !== 'focus'));
+  });
+
+  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+    chip.classList.toggle('active', chip.dataset.pomoMode === pomoMode);
+  });
+
+  document.querySelectorAll('.pomo-preset-btn').forEach((btn) => {
+    btn.classList.toggle('active', Number(btn.dataset.pomoPreset) === pomoActivePreset);
   });
 }
 
+/**
+ * Gestion de fin de session (Focus ou Pause)
+ */
+function handlePomoSessionComplete() {
+  if (pomoInterval) clearInterval(pomoInterval);
+  pomoInterval = null;
+  pomoIsRunning = false;
+  playPomoChime();
+
+  if (pomoMode === 'focus') {
+    pomoCompletedCount++;
+    try { localStorage.setItem('startpage_pomo_count', pomoCompletedCount); } catch {}
+    recordPomoSessionInHistory();
+    renderPomoHistoryChart();
+
+    try {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification('🎉 Focus Terminé !', {
+          body: 'Prenez une pause bien méritée.',
+          icon: 'images/gif.gif'
+        });
+      }
+    } catch (e) {}
+
+    const isLongBreak = (pomoCompletedCount % 4 === 0);
+    if (typeof showToast === 'function') {
+      showToast(isLongBreak ? '🎉 4 sessions terminées ! Pause longue de 15 min.' : '🎉 Session Focus terminée ! Pause de 5 min.', 'success');
+    }
+    setPomoMode(isLongBreak ? 'long' : 'short');
+  } else {
+    try {
+      if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        new Notification('⚡ Pause Terminée !', {
+          body: 'Prêt à reprendre une session de focus !',
+          icon: 'images/gif.gif'
+        });
+      }
+    } catch (e) {}
+
+    if (typeof showToast === 'function') {
+      showToast('⚡ Pause terminée ! Prêt à reprendre le focus.', 'info');
+    }
+    setPomoMode('focus');
+  }
+}
+
+/**
+ * Démarrer le minuteur
+ */
 function startPomoTimer() {
   if (pomoIsRunning) return;
 
@@ -338,75 +409,79 @@ function startPomoTimer() {
   } catch (e) {}
 
   pomoIsRunning = true;
+  pomoTargetEndTime = Date.now() + pomoTimeLeft * 1000;
   updatePomoUI();
 
   if (pomoInterval) clearInterval(pomoInterval);
   pomoInterval = setInterval(() => {
-    if (pomoTimeLeft > 0) {
-      pomoTimeLeft--;
-      updatePomoUI();
-    } else {
-      clearInterval(pomoInterval);
-      pomoIsRunning = false;
-      playPomoChime();
+    const remaining = Math.max(0, Math.round((pomoTargetEndTime - Date.now()) / 1000));
+    pomoTimeLeft = remaining;
+    updatePomoUI();
 
-      try {
-        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          new Notification(pomoMode === 'focus' ? '🎉 Focus Terminé !' : '⚡ Pause Terminée !', {
-            body: pomoMode === 'focus' ? 'Prenez une pause bien méritée.' : 'Prêt à reprendre une session de focus !',
-            icon: 'images/gif.gif'
-          });
-        }
-      } catch (e) {}
-
-      if (pomoMode === 'focus') {
-        pomoCompletedCount++;
-        try { localStorage.setItem('startpage_pomo_count', pomoCompletedCount); } catch {}
-        if (typeof showToast === 'function') {
-          showToast('🎉 Session Focus terminée ! Prenez une pause bien méritée.', 'success');
-        }
-        setPomoMode('short');
-      } else {
-        if (typeof showToast === 'function') {
-          showToast('⚡ Pause terminée ! Prêt à reprendre le focus.', 'info');
-        }
-        setPomoMode('focus');
-      }
+    if (pomoTimeLeft <= 0) {
+      handlePomoSessionComplete();
     }
-  }, 1000);
+  }, 250);
 }
 
+/**
+ * Mettre en pause le minuteur
+ */
 function pausePomoTimer() {
   pomoIsRunning = false;
   if (pomoInterval) clearInterval(pomoInterval);
+  pomoInterval = null;
   updatePomoUI();
 }
 
+/**
+ * Remettre à zéro le minuteur
+ */
 function resetPomoTimer() {
   pausePomoTimer();
   pomoTimeLeft = POMO_DURATIONS[pomoMode] || 1500;
   updatePomoUI();
 }
 
+/**
+ * Passer à l'étape suivante (Focus -> Pause, Pause -> Focus)
+ */
+function skipPomoStep() {
+  pausePomoTimer();
+  if (pomoMode === 'focus') {
+    const isLongNext = ((pomoCompletedCount + 1) % 4 === 0) && pomoCompletedCount > 0;
+    setPomoMode(isLongNext ? 'long' : 'short');
+    if (typeof showToast === 'function') {
+      showToast(isLongNext ? 'Passage à la pause longue' : 'Passage à la pause courte', 'info');
+    }
+  } else {
+    setPomoMode('focus');
+    if (typeof showToast === 'function') {
+      showToast('Prêt pour une nouvelle session Focus', 'info');
+    }
+  }
+}
+
+/**
+ * Changer de mode (Focus, Pause courte, Pause longue)
+ */
 function setPomoMode(mode) {
   pomoMode = (mode === 'work' || mode === 'focus') ? 'focus' : mode;
-  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
-    const chipMode = (chip.dataset.pomoMode === 'work' || chip.dataset.pomoMode === 'focus') ? 'focus' : chip.dataset.pomoMode;
-    chip.classList.toggle('active', chipMode === pomoMode);
-  });
   resetPomoTimer();
 }
 
+/**
+ * Appliquer un preset de rythmes (25, 50, 15)
+ */
 function applyPomoPreset(presetValue) {
-  const preset = Number(presetValue) || 25;
-  document.querySelectorAll('.pomo-preset-btn').forEach((b) => {
-    b.classList.toggle('active', Number(b.dataset.pomoPreset) === preset);
-  });
-  if (preset === 50) {
+  pomoActivePreset = Number(presetValue) || 25;
+  try { localStorage.setItem('startpage_pomo_preset', pomoActivePreset); } catch {}
+
+  if (pomoActivePreset === 50) {
     POMO_DURATIONS.focus = 50 * 60;
     POMO_DURATIONS.short = 10 * 60;
     POMO_DURATIONS.long = 20 * 60;
-  } else if (preset === 15) {
+  } else if (pomoActivePreset === 15) {
     POMO_DURATIONS.focus = 15 * 60;
     POMO_DURATIONS.short = 3 * 60;
     POMO_DURATIONS.long = 10 * 60;
@@ -416,12 +491,11 @@ function applyPomoPreset(presetValue) {
     POMO_DURATIONS.long = 15 * 60;
   }
 
-  // Mettre à jour les labels des modes sans détruire l'icône
   document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
     const m = chip.dataset.pomoMode;
     const span = chip.querySelector('span');
     if (!span) return;
-    if (m === 'work' || m === 'focus') {
+    if (m === 'focus' || m === 'work') {
       span.textContent = `Focus (${Math.round(POMO_DURATIONS.focus / 60)}m)`;
     } else if (m === 'short') {
       span.textContent = `Pause (${Math.round(POMO_DURATIONS.short / 60)}m)`;
@@ -432,37 +506,24 @@ function applyPomoPreset(presetValue) {
 
   resetPomoTimer();
   if (typeof showToast === 'function') {
-    showToast(`Intervalles configurés : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
+    showToast(`Rythmes configurés : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
   }
 }
 
-// Variable sentinelle pour éviter d'enregistrer les écouteurs délégués en double
-let pomoEventsDelegated = false;
-
-
-// Fonctions globales exposées pour garantir le fonctionnement immédiat des boutons
+// Expositions globales fiables
 window.pomoStartToggle = function() {
   if (pomoIsRunning) pausePomoTimer();
   else startPomoTimer();
 };
 window.pomoReset = resetPomoTimer;
+window.pomoSkip = skipPomoStep;
 window.setPomoMode = setPomoMode;
 window.applyPomoPreset = applyPomoPreset;
 window.playPomoChime = playPomoChime;
-window.ambientToggle = function() {
-  if (ambientIsPlaying) stopAmbientSound();
-  else startAmbientSound();
-};
-window.selectAmbientMode = function(mode) {
-  ambientCurrentMode = mode;
-  try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
-  document.querySelectorAll('.ambient-mode-card').forEach((c) => {
-    c.classList.toggle('active', c.dataset.ambientMode === mode);
-  });
-  if (ambientIsPlaying) startAmbientSound();
-  else updateAmbientUI();
-};
 
+/**
+ * Initialisation unique et fiable du widget Pomodoro
+ */
 function initPomodoroWidget() {
   try {
     pomoCompletedCount = Number(localStorage.getItem('startpage_pomo_count') || 0);
@@ -470,7 +531,22 @@ function initPomodoroWidget() {
     pomoCompletedCount = 0;
   }
 
-  // 1. Attachement DIRECT des écouteurs sur les éléments du DOM
+  try {
+    const savedPreset = Number(localStorage.getItem('startpage_pomo_preset') || 25);
+    if ([15, 25, 50].includes(savedPreset)) {
+      pomoActivePreset = savedPreset;
+      if (pomoActivePreset === 50) {
+        POMO_DURATIONS.focus = 50 * 60;
+        POMO_DURATIONS.short = 10 * 60;
+        POMO_DURATIONS.long = 20 * 60;
+      } else if (pomoActivePreset === 15) {
+        POMO_DURATIONS.focus = 15 * 60;
+        POMO_DURATIONS.short = 3 * 60;
+        POMO_DURATIONS.long = 10 * 60;
+      }
+    }
+  } catch {}
+
   const startBtn = document.getElementById('pomo-start-btn');
   if (startBtn) {
     startBtn.onclick = (e) => {
@@ -485,6 +561,15 @@ function initPomodoroWidget() {
     resetBtn.onclick = (e) => {
       e.preventDefault();
       resetPomoTimer();
+      if (typeof showToast === 'function') showToast('Minuteur réinitialisé', 'info');
+    };
+  }
+
+  const skipBtn = document.getElementById('pomo-skip-btn');
+  if (skipBtn) {
+    skipBtn.onclick = (e) => {
+      e.preventDefault();
+      skipPomoStep();
     };
   }
 
@@ -511,7 +596,6 @@ function initPomodoroWidget() {
     };
   }
 
-  // Intention de session (champ rapide auto-sauvegardé)
   const taskInput = document.getElementById('pomo-task-input');
   const taskClearBtn = document.getElementById('pomo-task-clear-btn');
   if (taskInput) {
@@ -539,77 +623,11 @@ function initPomodoroWidget() {
     };
   }
 
-  // 2. Écouteurs délégués globaux en complément
-  if (!pomoEventsDelegated) {
-    pomoEventsDelegated = true;
-
-    document.addEventListener('click', (e) => {
-      const toggleBtn = e.target.closest('#pomo-start-btn, #pomo-btn-toggle');
-      if (toggleBtn) {
-        e.preventDefault();
-        if (pomoIsRunning) pausePomoTimer();
-        else startPomoTimer();
-        return;
-      }
-
-      const resetBtn = e.target.closest('#pomo-reset-btn, #pomo-btn-reset');
-      if (resetBtn) {
-        e.preventDefault();
-        resetPomoTimer();
-        return;
-      }
-
-      const modeChip = e.target.closest('.pomo-mode-chip');
-      if (modeChip && modeChip.dataset.pomoMode) {
-        e.preventDefault();
-        setPomoMode(modeChip.dataset.pomoMode);
-        return;
-      }
-
-      const presetBtn = e.target.closest('.pomo-preset-btn');
-      if (presetBtn && presetBtn.dataset.pomoPreset) {
-        e.preventDefault();
-        applyPomoPreset(presetBtn.dataset.pomoPreset);
-        return;
-      }
-
-      const testChimeBtn = e.target.closest('#pomo-test-chime-btn');
-      if (testChimeBtn) {
-        e.preventDefault();
-        playPomoChime();
-        if (typeof showToast === 'function') showToast('Carillon zen joué 🔔', 'info');
-        return;
-      }
-
-      const ambientCard = e.target.closest('.ambient-mode-card');
-      if (ambientCard && ambientCard.dataset.ambientMode) {
-        e.preventDefault();
-        const mode = ambientCard.dataset.ambientMode;
-        ambientCurrentMode = mode;
-        try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
-        document.querySelectorAll('.ambient-mode-card').forEach((c) => {
-          c.classList.toggle('active', c.dataset.ambientMode === ambientCurrentMode);
-        });
-        if (ambientIsPlaying) {
-          startAmbientSound();
-        } else {
-          updateAmbientUI();
-        }
-        return;
-      }
-
-      const ambientMaster = e.target.closest('#ambient-master-toggle');
-      if (ambientMaster) {
-        e.preventDefault();
-        if (ambientIsPlaying) stopAmbientSound();
-        else startAmbientSound();
-        return;
-      }
-    });
-
+  if (!pomoWidgetInitialized) {
+    pomoWidgetInitialized = true;
     document.addEventListener('keydown', (e) => {
       const pomoView = document.getElementById('deck-view-pomodoro');
-      if (!pomoView || pomoView.hidden || pomoView.style.display === 'none') return;
+      if (!pomoView || pomoView.hidden || !pomoView.classList.contains('active')) return;
 
       const tag = document.activeElement?.tagName?.toLowerCase();
       if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
@@ -622,11 +640,15 @@ function initPomodoroWidget() {
         e.preventDefault();
         resetPomoTimer();
         if (typeof showToast === 'function') showToast('Compteur réinitialisé', 'info');
+      } else if (e.code === 'KeyS' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        skipPomoStep();
       }
     });
   }
 
   updatePomoUI();
+  renderPomoHistoryChart();
 }
 
 /* ========================================================
@@ -1028,14 +1050,13 @@ function initAmbientWidget() {
   const masterBtn = document.getElementById('ambient-master-toggle');
   const volSlider = document.getElementById('ambient-vol-slider');
 
-  // Restauration du mode et du volume sauvegardés
   const savedMode = localStorage.getItem('startpage_ambient_mode');
   if (savedMode) {
     ambientCurrentMode = savedMode;
-    document.querySelectorAll('.ambient-mode-card').forEach((c) => {
-      c.classList.toggle('active', c.dataset.ambientMode === ambientCurrentMode);
-    });
   }
+  document.querySelectorAll('.ambient-mode-card').forEach((c) => {
+    c.classList.toggle('active', c.dataset.ambientMode === ambientCurrentMode);
+  });
 
   const savedVol = localStorage.getItem('startpage_ambient_vol');
   if (savedVol !== null && volSlider) {
@@ -1043,14 +1064,15 @@ function initAmbientWidget() {
   }
 
   if (masterBtn) {
-    masterBtn.addEventListener('click', () => {
+    masterBtn.onclick = (e) => {
+      e.preventDefault();
       if (ambientIsPlaying) stopAmbientSound();
       else startAmbientSound();
-    });
+    };
   }
 
   if (volSlider) {
-    volSlider.addEventListener('input', () => {
+    volSlider.oninput = () => {
       const vol = Number(volSlider.value);
       localStorage.setItem('startpage_ambient_vol', volSlider.value);
       if (ambientGainNode && ambientAudioCtx) {
@@ -1059,11 +1081,12 @@ function initAmbientWidget() {
       if (ambientRadioAudio) {
         ambientRadioAudio.volume = vol;
       }
-    });
+    };
   }
 
   document.querySelectorAll('.ambient-mode-card').forEach((card) => {
-    card.addEventListener('click', () => {
+    card.onclick = (e) => {
+      e.preventDefault();
       ambientCurrentMode = card.dataset.ambientMode;
       localStorage.setItem('startpage_ambient_mode', ambientCurrentMode);
       document.querySelectorAll('.ambient-mode-card').forEach((c) => {
@@ -1071,9 +1094,10 @@ function initAmbientWidget() {
       });
       if (ambientIsPlaying) startAmbientSound();
       else updateAmbientUI();
-    });
+    };
   });
 
+  updateAmbientUI();
   drawAmbientVisualizer();
 }
 

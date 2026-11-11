@@ -107,6 +107,10 @@ function initDeckViewSlider() {
       if (target === 'customize') {
         const activeSubtab = document.querySelector('.hub-tab-btn.active')?.dataset.hubTab || 'appearance';
         switchHubTab(activeSubtab);
+      } else if (target === 'pomodoro') {
+        if (typeof renderPomoHistoryChart === 'function') renderPomoHistoryChart();
+        if (typeof updatePomoUI === 'function') updatePomoUI();
+        if (typeof drawAmbientVisualizer === 'function') drawAmbientVisualizer();
       }
 
       updateIndicator(btn);
