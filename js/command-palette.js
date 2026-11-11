@@ -53,13 +53,12 @@ function getPaletteItems() {
 
   // 2. Vues du deck (Navigation rapide)
   const deckViews = [
-    { title: 'Ouvrir Agenda & Tâches', category: 'Navigation', icon: 'fa-regular fa-calendar-check', key: 'agenda', shortcut: 'Alt+1' },
-    { title: 'Ouvrir Météo & Prévisions', category: 'Navigation', icon: 'fa-solid fa-cloud-sun', key: 'weather', shortcut: 'Alt+2' },
-    { title: 'Ouvrir Actualités en direct', category: 'Navigation', icon: 'fa-solid fa-newspaper', key: 'feeds', shortcut: 'Alt+3' },
-    { title: 'Ouvrir Télémétrie Système & Marchés', category: 'Navigation', icon: 'fa-solid fa-microchip', key: 'system', shortcut: 'Alt+4' },
-    { title: 'Ouvrir Minuteur Focus / Pomodoro', category: 'Navigation', icon: 'fa-solid fa-stopwatch', key: 'pomodoro', shortcut: 'Alt+5' },
-    { title: 'Ouvrir Bloc-Notes Rapide', category: 'Navigation', icon: 'fa-solid fa-note-sticky', key: 'notes', shortcut: 'Alt+6' },
-    { title: 'Ouvrir Ambiance Sonore Lo-Fi', category: 'Navigation', icon: 'fa-solid fa-headphones', key: 'ambient', shortcut: 'Alt+7' },
+    { title: 'Ouvrir Agenda & Tâches', category: 'Navigation', icon: 'fa-regular fa-calendar-check', key: 'agenda', shortcut: 'Alt+2' },
+    { title: 'Ouvrir Météo & Prévisions', category: 'Navigation', icon: 'fa-solid fa-cloud-sun', key: 'weather', shortcut: 'Alt+3' },
+    { title: 'Ouvrir Actualités en direct', category: 'Navigation', icon: 'fa-solid fa-newspaper', key: 'feeds', shortcut: 'Alt+4' },
+    { title: 'Ouvrir Marchés Boursiers & Portefeuille', category: 'Navigation', icon: 'fa-solid fa-chart-line', key: 'system', shortcut: 'Alt+5' },
+    { title: 'Ouvrir Studio Focus & Ambiance Lo-Fi', category: 'Navigation', icon: 'fa-solid fa-stopwatch', key: 'pomodoro', shortcut: 'Alt+6' },
+    { title: 'Ouvrir Bloc-Notes Rapide', category: 'Navigation', icon: 'fa-solid fa-note-sticky', key: 'notes', shortcut: 'Alt+7' },
     { title: 'Ouvrir Citations Cyberpunk', category: 'Navigation', icon: 'fa-solid fa-quote-left', key: 'quotes', shortcut: 'Alt+8' },
     { title: 'Ouvrir Configuration & Thèmes', category: 'Navigation', icon: 'fa-solid fa-sliders', key: 'customize', shortcut: 'Alt+9' }
   ];

@@ -17,7 +17,6 @@ function initShortcuts() {
     'system',
     'pomodoro',
     'notes',
-    'ambient',
     'quotes',
     'customize'
   ];

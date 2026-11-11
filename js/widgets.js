@@ -38,7 +38,7 @@ function saveWidgetSettings() {
 
 function applyWidgetVisibility() {
   // Synchroniser les boutons de navigation du deck (sidebar cockpit)
-  const keys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'ambient', 'quotes'];
+  const keys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
   keys.forEach((key) => {
     const isEnabled = currentWidgetSettings[key] !== false;
     const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${key}"]`);
@@ -91,6 +91,9 @@ function playPomoChime() {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
     const chord = [523.25, 659.25, 783.99, 1046.5]; // Accord majeur C5-E5-G5-C6
 
     chord.forEach((freq, idx) => {
@@ -140,17 +143,20 @@ function updatePomoUI() {
   const pct = Math.min(100, Math.max(0, ((total - pomoTimeLeft) / total) * 100));
   if (progressBar) progressBar.style.width = `${pct}%`;
 
-  // Arc SVG circulaire (circonférence = 2 * PI * 88 ≈ 552.92)
+  // Arc SVG circulaire avec circonférence dynamique (r=106 => 666.02)
   if (ringArc) {
-    const circum = 552.92;
+    const r = parseFloat(ringArc.getAttribute('r')) || 106;
+    const circum = 2 * Math.PI * r;
+    ringArc.style.strokeDasharray = circum.toFixed(2);
     const offset = circum - (pct / 100) * circum;
-    ringArc.style.strokeDashoffset = offset.toFixed(1);
+    ringArc.style.strokeDashoffset = offset.toFixed(2);
   }
 
   if (toggleBtn) {
     toggleBtn.innerHTML = pomoIsRunning
-      ? '<i class="fa-solid fa-pause"></i> Pause'
-      : '<i class="fa-solid fa-play"></i> Démarrer';
+      ? '<i class="fa-solid fa-pause"></i> <span>Mettre en pause</span>'
+      : '<i class="fa-solid fa-play"></i> <span>Démarrer la session</span>';
+    toggleBtn.classList.toggle('running', pomoIsRunning);
   }
 
   if (status) {
@@ -158,6 +164,18 @@ function updatePomoUI() {
       status.textContent = pomoMode === 'focus' ? 'Session en cours...' : 'Pause en cours...';
     } else {
       status.textContent = pomoMode === 'focus' ? 'Prêt pour le focus' : 'Prêt pour la pause';
+    }
+  }
+
+  // Badge du mode actif au-dessus du cadran
+  const activeModeTag = document.getElementById('pomo-active-mode-tag');
+  if (activeModeTag) {
+    if (pomoMode === 'focus') {
+      activeModeTag.innerHTML = '<i class="fa-solid fa-brain text-accent"></i> SESSION FOCUS';
+    } else if (pomoMode === 'short') {
+      activeModeTag.innerHTML = '<i class="fa-solid fa-mug-hot text-accent"></i> PAUSE COURTE';
+    } else {
+      activeModeTag.innerHTML = '<i class="fa-solid fa-couch text-accent"></i> PAUSE LONGUE';
     }
   }
 
@@ -170,7 +188,7 @@ function updatePomoUI() {
     if (pomoIsRunning) {
       headerStatus.textContent = pomoMode === 'focus' ? `Focus en cours (${timeFormatted})` : `Pause en cours (${timeFormatted})`;
     } else {
-      headerStatus.textContent = pomoMode === 'focus' ? `Prêt pour le focus (${Math.round(total / 60)} min)` : `Prêt pour la pause (${Math.round(total / 60)} min)`;
+      headerStatus.textContent = pomoMode === 'focus' ? `Session Prête • ${Math.round(total / 60)} min` : `Pause Prête • ${Math.round(total / 60)} min`;
     }
   }
   if (headerPill) {
@@ -231,7 +249,7 @@ function startPomoTimer() {
 
       if (pomoMode === 'focus') {
         pomoCompletedCount++;
-        localStorage.setItem('startpage_pomo_count', pomoCompletedCount);
+        try { localStorage.setItem('startpage_pomo_count', pomoCompletedCount); } catch {}
         if (typeof showToast === 'function') {
           showToast('🎉 Session Focus terminée ! Prenez une pause bien méritée.', 'success');
         }
@@ -254,18 +272,60 @@ function pausePomoTimer() {
 
 function resetPomoTimer() {
   pausePomoTimer();
-  pomoTimeLeft = POMO_DURATIONS[pomoMode];
+  pomoTimeLeft = POMO_DURATIONS[pomoMode] || 1500;
   updatePomoUI();
 }
 
 function setPomoMode(mode) {
-  pomoMode = (mode === 'work') ? 'focus' : mode;
+  pomoMode = (mode === 'work' || mode === 'focus') ? 'focus' : mode;
   document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
-    const chipMode = chip.dataset.pomoMode === 'work' ? 'focus' : chip.dataset.pomoMode;
+    const chipMode = (chip.dataset.pomoMode === 'work' || chip.dataset.pomoMode === 'focus') ? 'focus' : chip.dataset.pomoMode;
     chip.classList.toggle('active', chipMode === pomoMode);
   });
   resetPomoTimer();
 }
+
+function applyPomoPreset(presetValue) {
+  const preset = Number(presetValue) || 25;
+  document.querySelectorAll('.pomo-preset-btn').forEach((b) => {
+    b.classList.toggle('active', Number(b.dataset.pomoPreset) === preset);
+  });
+  if (preset === 50) {
+    POMO_DURATIONS.focus = 50 * 60;
+    POMO_DURATIONS.short = 10 * 60;
+    POMO_DURATIONS.long = 20 * 60;
+  } else if (preset === 15) {
+    POMO_DURATIONS.focus = 15 * 60;
+    POMO_DURATIONS.short = 3 * 60;
+    POMO_DURATIONS.long = 10 * 60;
+  } else {
+    POMO_DURATIONS.focus = 25 * 60;
+    POMO_DURATIONS.short = 5 * 60;
+    POMO_DURATIONS.long = 15 * 60;
+  }
+
+  // Mettre à jour les labels des modes sans détruire l'icône
+  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
+    const m = chip.dataset.pomoMode;
+    const span = chip.querySelector('span');
+    if (!span) return;
+    if (m === 'work' || m === 'focus') {
+      span.textContent = `Focus (${Math.round(POMO_DURATIONS.focus / 60)}m)`;
+    } else if (m === 'short') {
+      span.textContent = `Pause (${Math.round(POMO_DURATIONS.short / 60)}m)`;
+    } else if (m === 'long') {
+      span.textContent = `Longue (${Math.round(POMO_DURATIONS.long / 60)}m)`;
+    }
+  });
+
+  resetPomoTimer();
+  if (typeof showToast === 'function') {
+    showToast(`Intervalles configurés : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
+  }
+}
+
+// Variable sentinelle pour éviter d'enregistrer les écouteurs délégués en double
+let pomoEventsDelegated = false;
 
 function initPomodoroWidget() {
   try {
@@ -274,107 +334,101 @@ function initPomodoroWidget() {
     pomoCompletedCount = 0;
   }
 
-  const toggleBtn = document.getElementById('pomo-start-btn') || document.getElementById('pomo-btn-toggle');
-  const resetBtn = document.getElementById('pomo-reset-btn') || document.getElementById('pomo-btn-reset');
+  if (!pomoEventsDelegated) {
+    pomoEventsDelegated = true;
 
-  if (toggleBtn) {
-    toggleBtn.addEventListener('click', () => {
-      if (pomoIsRunning) pausePomoTimer();
-      else startPomoTimer();
-    });
-  }
-
-  if (resetBtn) {
-    resetBtn.addEventListener('click', resetPomoTimer);
-  }
-
-  document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
-    chip.addEventListener('click', () => setPomoMode(chip.dataset.pomoMode));
-  });
-
-  // Presets d'intervalles rapides (25/5, 50/10, 15/3)
-  document.querySelectorAll('.pomo-preset-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.pomo-preset-btn').forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      const preset = Number(btn.dataset.pomoPreset) || 25;
-      if (preset === 50) {
-        POMO_DURATIONS.focus = 50 * 60;
-        POMO_DURATIONS.short = 10 * 60;
-        POMO_DURATIONS.long = 20 * 60;
-      } else if (preset === 15) {
-        POMO_DURATIONS.focus = 15 * 60;
-        POMO_DURATIONS.short = 3 * 60;
-        POMO_DURATIONS.long = 10 * 60;
-      } else {
-        POMO_DURATIONS.focus = 25 * 60;
-        POMO_DURATIONS.short = 5 * 60;
-        POMO_DURATIONS.long = 15 * 60;
+    // Délégation globale sur le document pour garantir que tous les clics fonctionnent instantanément
+    document.addEventListener('click', (e) => {
+      // 1. Bouton Démarrer / Mettre en pause
+      const toggleBtn = e.target.closest('#pomo-start-btn, #pomo-btn-toggle');
+      if (toggleBtn) {
+        e.preventDefault();
+        if (pomoIsRunning) pausePomoTimer();
+        else startPomoTimer();
+        return;
       }
 
-      // Mettre à jour les labels des modes
-      document.querySelectorAll('.pomo-mode-chip').forEach((chip) => {
-        const m = chip.dataset.pomoMode;
-        if (m === 'work' || m === 'focus') {
-          chip.textContent = `Focus (${Math.round(POMO_DURATIONS.focus / 60)}m)`;
-        } else if (m === 'short') {
-          chip.textContent = `Pause (${Math.round(POMO_DURATIONS.short / 60)}m)`;
-        } else if (m === 'long') {
-          chip.textContent = `Longue (${Math.round(POMO_DURATIONS.long / 60)}m)`;
-        }
-      });
-
-      resetPomoTimer();
-      if (typeof showToast === 'function') {
-        showToast(`Intervalles Pomodoro : ${Math.round(POMO_DURATIONS.focus / 60)}m / ${Math.round(POMO_DURATIONS.short / 60)}m`, 'info');
+      // 2. Bouton Réinitialiser
+      const resetBtn = e.target.closest('#pomo-reset-btn, #pomo-btn-reset');
+      if (resetBtn) {
+        e.preventDefault();
+        resetPomoTimer();
+        return;
       }
-    });
-  });
 
-  // Bouton de test du carillon zen
-  const testChimeBtn = document.getElementById('pomo-test-chime-btn');
-  if (testChimeBtn) {
-    testChimeBtn.addEventListener('click', () => {
-      playPomoChime();
-      if (typeof showToast === 'function') showToast('Carillon zen joué 🔔', 'info');
-    });
-  }
+      // 3. Puces de changement de mode (Focus, Pause, Longue)
+      const modeChip = e.target.closest('.pomo-mode-chip');
+      if (modeChip && modeChip.dataset.pomoMode) {
+        e.preventDefault();
+        setPomoMode(modeChip.dataset.pomoMode);
+        return;
+      }
 
-  // Raccourcis clavier (Espace pour Démarrer/Pause, R pour Reset) lorsque l'onglet Pomodoro est visible
-  document.addEventListener('keydown', (e) => {
-    const pomoView = document.getElementById('deck-view-pomodoro');
-    if (!pomoView || pomoView.hidden || pomoView.style.display === 'none') return;
+      // 4. Boutons de présélections (25/5, 50/10, 15/3)
+      const presetBtn = e.target.closest('.pomo-preset-btn');
+      if (presetBtn && presetBtn.dataset.pomoPreset) {
+        e.preventDefault();
+        applyPomoPreset(presetBtn.dataset.pomoPreset);
+        return;
+      }
 
-    // Ne pas intercepter si l'utilisateur saisit du texte dans un champ ou éditeur
-    const tag = document.activeElement?.tagName?.toLowerCase();
-    if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
+      // 5. Bouton de test du carillon zen
+      const testChimeBtn = e.target.closest('#pomo-test-chime-btn');
+      if (testChimeBtn) {
+        e.preventDefault();
+        playPomoChime();
+        if (typeof showToast === 'function') showToast('Carillon zen joué 🔔', 'info');
+        return;
+      }
 
-    if (e.code === 'Space') {
-      e.preventDefault();
-      if (pomoIsRunning) pausePomoTimer();
-      else startPomoTimer();
-    } else if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      e.preventDefault();
-      resetPomoTimer();
-      if (typeof showToast === 'function') showToast('Compteur réinitialisé', 'info');
-    }
-  });
-
-  // Boutons rapides d'ambiance sonore dans la carte Pomodoro
-  document.querySelectorAll('.pomo-quick-ambient-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const mode = btn.dataset.ambientMode;
-      if (typeof ambientCurrentMode !== 'undefined' && typeof startAmbientSound === 'function' && typeof stopAmbientSound === 'function') {
-        if (ambientIsPlaying && ambientCurrentMode === mode) {
-          stopAmbientSound();
-        } else {
-          ambientCurrentMode = mode;
-          try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
+      // 6. Cartes de choix d'ambiance sonore
+      const ambientCard = e.target.closest('.ambient-mode-card');
+      if (ambientCard && ambientCard.dataset.ambientMode) {
+        e.preventDefault();
+        const mode = ambientCard.dataset.ambientMode;
+        ambientCurrentMode = mode;
+        try { localStorage.setItem('startpage_ambient_mode', mode); } catch {}
+        document.querySelectorAll('.ambient-mode-card').forEach((c) => {
+          c.classList.toggle('active', c.dataset.ambientMode === ambientCurrentMode);
+        });
+        if (ambientIsPlaying) {
           startAmbientSound();
+        } else {
+          updateAmbientUI();
         }
+        return;
+      }
+
+      // 7. Bouton Master Play / Stop de l'ambiance sonore
+      const ambientMaster = e.target.closest('#ambient-master-toggle');
+      if (ambientMaster) {
+        e.preventDefault();
+        if (ambientIsPlaying) stopAmbientSound();
+        else startAmbientSound();
+        return;
       }
     });
-  });
+
+    // Raccourcis clavier (Espace pour Démarrer/Pause, R pour Reset) lorsque l'onglet Pomodoro est visible
+    document.addEventListener('keydown', (e) => {
+      const pomoView = document.getElementById('deck-view-pomodoro');
+      if (!pomoView || pomoView.hidden || pomoView.style.display === 'none') return;
+
+      // Ne pas intercepter si l'utilisateur saisit du texte dans un champ ou éditeur
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || document.activeElement?.isContentEditable) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        if (pomoIsRunning) pausePomoTimer();
+        else startPomoTimer();
+      } else if (e.code === 'KeyR' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        resetPomoTimer();
+        if (typeof showToast === 'function') showToast('Compteur réinitialisé', 'info');
+      }
+    });
+  }
 
   updatePomoUI();
 }
@@ -616,12 +670,12 @@ function drawAmbientVisualizer() {
 
   ctx.clearRect(0, 0, w, h);
 
-  const bars = 18;
+  const bars = 22;
   const barWidth = w / bars - 4;
-  const accent = getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#31e1f7';
+  const accent = getComputedStyle(document.body).getPropertyValue('--accent-primary').trim() || '#a78bfa';
 
   for (let i = 0; i < bars; i++) {
-    const heightRatio = ambientIsPlaying ? Math.sin(Date.now() * 0.005 + i * 0.5) * 0.4 + 0.55 : 0.08;
+    const heightRatio = ambientIsPlaying ? Math.sin(Date.now() * 0.006 + i * 0.45) * 0.38 + 0.52 : 0.08;
     const barHeight = Math.max(3, heightRatio * (h - 10));
     const x = i * (barWidth + 4) + 2;
     const y = h - barHeight;
@@ -631,6 +685,7 @@ function drawAmbientVisualizer() {
     ctx.fillRect(x, y, barWidth, barHeight);
   }
 
+  if (ambientVisualizerReq) cancelAnimationFrame(ambientVisualizerReq);
   if (ambientIsPlaying) {
     ambientVisualizerReq = requestAnimationFrame(drawAmbientVisualizer);
   }
@@ -648,7 +703,9 @@ function startAmbientSound() {
       ambientRadioAudio.crossOrigin = 'anonymous';
     }
     ambientRadioAudio.volume = volume;
-    ambientRadioAudio.play().catch(() => {});
+    ambientRadioAudio.play().catch((err) => {
+      console.warn('Lecture flux radio restreinte :', err);
+    });
     ambientIsPlaying = true;
     updateAmbientUI();
     drawAmbientVisualizer();
@@ -658,6 +715,9 @@ function startAmbientSound() {
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     ambientAudioCtx = new AudioCtx();
+    if (ambientAudioCtx.state === 'suspended') {
+      ambientAudioCtx.resume().catch(() => {});
+    }
     ambientGainNode = ambientAudioCtx.createGain();
     ambientGainNode.gain.setValueAtTime(volume * 0.35, ambientAudioCtx.currentTime);
 
@@ -1432,15 +1492,14 @@ function initWidgets() {
   initQuotesWidget();
 
   // Écouteurs dans le centre de personnalisation (onglet Widgets)
-  const allWidgetKeys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'ambient', 'quotes'];
+  const allWidgetKeys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
   const widgetLabels = {
     agenda: 'Agenda & Tâches',
     weather: 'Météo & Radar',
     feeds: 'Actualités',
     system: 'Système & Bourse',
-    pomodoro: 'Focus Pomodoro',
+    pomodoro: 'Focus & Ambiance Lo-Fi',
     notes: 'Bloc-Notes',
-    ambient: 'Ambiance Lo-Fi',
     quotes: 'Citations'
   };
 

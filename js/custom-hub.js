@@ -7,10 +7,9 @@ const VIEW_TITLES = {
   agenda: { title: 'Agenda & Tâches', sub: 'Calendrier mensuel & To-Do list', icon: 'fa-regular fa-calendar-check' },
   weather: { title: 'Météo & Radar', sub: 'Prévisions 24h & Satellite direct', icon: 'fa-solid fa-cloud-sun' },
   feeds: { title: 'Actualités en Direct', sub: 'F1, Football, Tech & Flux RSS', icon: 'fa-solid fa-newspaper' },
-  system: { title: 'Système & Marchés', sub: 'Télémétrie PC, Ping & Bourse', icon: 'fa-solid fa-microchip' },
-  pomodoro: { title: 'Focus Pomodoro', sub: 'Minuteur de productivité & Intervalles', icon: 'fa-solid fa-stopwatch' },
+  system: { title: 'Marchés & Portefeuille', sub: 'Cotations réelles, indices mondiaux & ETF', icon: 'fa-solid fa-chart-line' },
+  pomodoro: { title: 'Studio Focus & Ambiance', sub: 'Minuteur Pomodoro, Intervalles & Sons Lo-Fi', icon: 'fa-solid fa-stopwatch' },
   notes: { title: 'Bloc-Notes', sub: 'Scratchpad Markdown & Sauvegarde locale', icon: 'fa-solid fa-note-sticky' },
-  ambient: { title: 'Ambiance Sonore', sub: 'Générateur audio Lo-Fi procédural', icon: 'fa-solid fa-headphones' },
   quotes: { title: 'Citations & Motivation', sub: 'Philosophie hacker & science-fiction', icon: 'fa-solid fa-quote-left' },
   customize: { title: 'Paramètres & Hub', sub: 'Thèmes, Couleurs, Horloge & Sauvegarde', icon: 'fa-solid fa-sliders' }
 };
@@ -23,7 +22,6 @@ const VIEW_KEYS = [
   'system',
   'pomodoro',
   'notes',
-  'ambient',
   'quotes',
   'customize'
 ];
