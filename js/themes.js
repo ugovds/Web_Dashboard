@@ -280,33 +280,6 @@ function initGlassInteractions() {
       applyGlassTint(variantKey, true);
     });
   });
-
-  // Effet d'ondulation liquide interactive au clic sur les éléments en verre (Liquid Glass)
-  document.addEventListener('pointerdown', (e) => {
-    if (currentTheme !== '5') return;
-
-    const glassEl = e.target.closest(
-      '.dash-card, .dash-hero-card, .dash-kpi-card, .unified-deck-card, .category-card, .deck-nav-btn'
-    );
-    if (!glassEl) return;
-
-    const rect = glassEl.getBoundingClientRect();
-    const ripple = document.createElement('span');
-    ripple.className = 'glass-click-ripple';
-    const size = Math.max(rect.width, rect.height) * 1.5;
-    const x = e.clientX - rect.left - size / 2;
-    const y = e.clientY - rect.top - size / 2;
-
-    ripple.style.width = `${size}px`;
-    ripple.style.height = `${size}px`;
-    ripple.style.left = `${x}px`;
-    ripple.style.top = `${y}px`;
-
-    glassEl.appendChild(ripple);
-    setTimeout(() => {
-      ripple.remove();
-    }, 650);
-  });
 }
 
 function initThemes() {
