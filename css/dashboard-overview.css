@@ -5,6 +5,15 @@
    ======================================================== */
 
 /* --- CONTENEUR PRINCIPAL DU DASHBOARD ACCUEIL --- */
+#deck-view-dashboard {
+  position: relative !important;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .dashboard-home-view {
   display: flex;
   flex-direction: column;
@@ -14,6 +23,105 @@
   min-height: 0;
   box-sizing: border-box;
   padding-bottom: 1rem;
+}
+
+/* ========================================================
+   SQUELETTE DE CHARGEMENT ULTRA-RAPIDE & TRANSITION FLUIDE
+   ======================================================== */
+.dashboard-skeleton-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+  overflow-y: auto;
+  overflow-x: hidden;
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.dashboard-skeleton-view.is-fading-out {
+  opacity: 0;
+  transform: translate3d(0, -4px, 0) scale(0.992);
+}
+
+.dashboard-skeleton-view[hidden],
+.dashboard-skeleton-view.is-hidden {
+  display: none !important;
+}
+
+.dashboard-real-content {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.dashboard-real-content.is-loading {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: translate3d(0, 6px, 0) !important;
+}
+
+/* Éléments squelettes de préchargement */
+.skel-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.skel-elem {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.skel-circle {
+  border-radius: 50% !important;
+}
+
+.skel-bar {
+  border-radius: 6px;
+}
+
+.skel-pill {
+  border-radius: 9999px;
+}
+
+.skel-squircle {
+  border-radius: 16px;
+}
+
+/* Shimmer lumineux ultra-fluide GPU */
+.skel-elem::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    rgba(255, 255, 255, 0.15) 50%,
+    rgba(255, 255, 255, 0.04) 70%,
+    transparent 100%
+  );
+  animation: dashboardSkeletonSweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes dashboardSkeletonSweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* --- 1. HERO BANNER : SALUTATION, ÉTAT HUD & RECHERCHE OMNIBOX --- */

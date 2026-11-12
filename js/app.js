@@ -40,7 +40,29 @@ function showToast(message, type = 'info') {
   }, 3200);
 }
 
+// Transition fluide depuis le squelette de préchargement vers la page réelle
+function revealDashboardFromSkeleton() {
+  const skeleton = document.getElementById('dashboard-skeleton-view');
+  const realView = document.getElementById('dashboard-real-view');
+  if (!skeleton || !realView) return;
+
+  if (realView.classList.contains('is-loaded')) return;
+
+  requestAnimationFrame(() => {
+    skeleton.classList.add('is-fading-out');
+    realView.classList.remove('is-loading');
+    realView.classList.add('is-loaded');
+
+    setTimeout(() => {
+      skeleton.classList.add('is-hidden');
+      skeleton.setAttribute('hidden', '');
+    }, 460);
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  const loadStart = performance.now();
+
   // === PHASE 1 : CRITIQUE (Affichage immédiat de l'interface) ===
   if (typeof initThemes === 'function') initThemes();
   if (typeof initAppearance === 'function') initAppearance();
@@ -55,6 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initShortcuts === 'function') initShortcuts();
   if (typeof initWidgets === 'function') initWidgets();
   if (typeof initOverviewDashboard === 'function') initOverviewDashboard();
+
+  // Déclencher la transition fluide du squelette vers le contenu réel
+  // avec un délai minimal perçu (~240ms) pour garantir une transition soyeuse
+  const elapsed = performance.now() - loadStart;
+  const minSkeletonDisplayMs = Math.max(0, 240 - elapsed);
+  setTimeout(revealDashboardFromSkeleton, minSkeletonDisplayMs);
+
+  // Sécurité anti-blocage au cas où un script externe tarderait
+  setTimeout(revealDashboardFromSkeleton, 1200);
 
   // === PHASE 2 : DIFFÉRÉE (Tâches secondaires libérant le thread) ===
   const deferNonCritical = () => {

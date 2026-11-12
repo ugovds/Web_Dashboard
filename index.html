@@ -47,7 +47,7 @@
     <link rel="stylesheet" href="css/deck.css?v=3.0" />
     <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
     <link rel="stylesheet" href="css/dashboard.css?v=4.3" />
-    <link rel="stylesheet" href="css/dashboard-overview.css?v=1.0" />
+    <link rel="stylesheet" href="css/dashboard-overview.css?v=1.1" />
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
@@ -64,7 +64,7 @@
     <link rel="stylesheet" href="css/themes/sakura.css?v=4.0" />
     <link rel="stylesheet" href="css/themes/cyberdeck.css?v=4.0" />
     <link rel="stylesheet" href="css/themes/retrowave.css?v=4.0" />
-    <link rel="stylesheet" href="css/themes/glass.css?v=5.3" />
+    <link rel="stylesheet" href="css/themes/glass.css?v=5.4" />
   </head>
 
   <body data-theme="4">
@@ -208,7 +208,164 @@
                VUE 1 : ACCUEIL COCKPIT (TABLEAU DE BORD EXÉCUTIF & RÉSUMÉ)
                ============================================== -->
           <div id="deck-view-dashboard" class="deck-slide-view active">
-            <div class="dashboard-home-view">
+            <!-- ==============================================
+                 SQUELETTE DE TRANSITION INSTANTANÉ (FIRST PAINT 0MS)
+                 ============================================== -->
+            <div id="dashboard-skeleton-view" class="dashboard-home-view dashboard-skeleton-view" aria-hidden="true">
+              <!-- Squelette Hero Banner -->
+              <div class="dash-hero-card skel-card">
+                <div class="dash-hero-top">
+                  <div class="dash-greeting-group">
+                    <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <div class="skel-elem skel-bar" style="width: 220px; height: 22px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 310px; height: 13px;"></div>
+                    </div>
+                  </div>
+                  <div class="dash-hero-telemetry">
+                    <div class="skel-elem skel-pill" style="width: 125px; height: 32px;"></div>
+                    <div class="skel-elem skel-pill" style="width: 135px; height: 32px;"></div>
+                    <div class="skel-elem skel-pill" style="width: 80px; height: 32px;"></div>
+                  </div>
+                </div>
+                <div class="dash-hero-search">
+                  <div class="skel-elem skel-pill" style="width: 100%; height: 48px;"></div>
+                </div>
+              </div>
+
+              <!-- Squelette KPI Row -->
+              <div class="dash-kpi-row">
+                <div class="dash-kpi-card skel-card">
+                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
+                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+                    <div class="skel-elem skel-bar" style="width: 85px; height: 12px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 130px; height: 18px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 110px; height: 11px;"></div>
+                  </div>
+                </div>
+                <div class="dash-kpi-card skel-card">
+                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
+                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+                    <div class="skel-elem skel-bar" style="width: 95px; height: 12px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 125px; height: 18px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 105px; height: 11px;"></div>
+                  </div>
+                </div>
+                <div class="dash-kpi-card skel-card">
+                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
+                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+                    <div class="skel-elem skel-bar" style="width: 105px; height: 12px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 90px; height: 18px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 95px; height: 11px;"></div>
+                  </div>
+                </div>
+                <div class="dash-kpi-card skel-card">
+                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
+                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+                    <div class="skel-elem skel-bar" style="width: 115px; height: 12px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 80px; height: 18px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 120px; height: 11px;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Squelette Bento Grid -->
+              <div class="dash-grid-layout">
+                <!-- Colonne Gauche -->
+                <div class="dash-col-left">
+                  <!-- Marchés Skeleton -->
+                  <div class="dash-card dash-card-markets skel-card">
+                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.95rem;">
+                      <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div class="skel-elem skel-bar" style="width: 160px; height: 16px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 250px; height: 11px;"></div>
+                        </div>
+                      </div>
+                      <div class="skel-elem skel-pill" style="width: 115px; height: 28px;"></div>
+                    </div>
+                    <div class="dash-market-cards-grid">
+                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
+                    </div>
+                    <div class="skel-elem skel-squircle" style="height: 48px; margin-top: 0.5rem;"></div>
+                  </div>
+
+                  <!-- Météo Skeleton -->
+                  <div class="dash-card dash-card-weather skel-card">
+                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+                      <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div class="skel-elem skel-bar" style="width: 180px; height: 16px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 140px; height: 11px;"></div>
+                        </div>
+                      </div>
+                      <div class="skel-elem skel-pill" style="width: 105px; height: 28px;"></div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0;">
+                      <div style="display: flex; align-items: center; gap: 1.2rem;">
+                        <div class="skel-elem skel-bar" style="width: 72px; height: 46px; border-radius: 10px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div class="skel-elem skel-bar" style="width: 130px; height: 18px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 170px; height: 12px;"></div>
+                        </div>
+                      </div>
+                      <div class="skel-elem skel-circle" style="width: 50px; height: 50px;"></div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 0.8rem;">
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Colonne Droite -->
+                <div class="dash-col-right">
+                  <!-- Agenda Skeleton -->
+                  <div class="dash-card dash-card-agenda skel-card" style="height: 100%;">
+                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+                      <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div class="skel-elem skel-bar" style="width: 160px; height: 16px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 180px; height: 11px;"></div>
+                        </div>
+                      </div>
+                      <div class="skel-elem skel-pill" style="width: 95px; height: 28px;"></div>
+                    </div>
+                    <!-- 7 Jours Pills -->
+                    <div style="display: flex; gap: 6px; margin-bottom: 0.95rem;">
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                    </div>
+                    <!-- Formulaire d'ajout rapide skeleton -->
+                    <div class="skel-elem skel-squircle" style="height: 44px; margin-bottom: 0.85rem; border-radius: 14px;"></div>
+                    <!-- Liste de tâches shimmer -->
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VRAI CONTENU DU DASHBOARD (RÉVÉLÉ EN TRANSITION FLUIDE) -->
+            <div id="dashboard-real-view" class="dashboard-home-view dashboard-real-content is-loading">
               <!-- 1. HERO BANNER : Salutation, État du Système & Barre Omnibox -->
               <div class="dash-hero-card">
                 <div class="dash-hero-top">
@@ -2768,6 +2925,6 @@
     <script defer src="js/skulpt-stdlib.js"></script>
     <script defer src="js/notes-studio.js?v=5.0"></script>
     <script defer src="js/dashboard.js?v=5.0"></script>
-    <script defer src="js/app.js?v=5.0"></script>
+    <script defer src="js/app.js?v=5.1"></script>
   </body>
 </html>
