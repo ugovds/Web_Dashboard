@@ -128,25 +128,8 @@
   transform: rotate(45deg);
 }
 
-.topbar-config-kbd {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.65rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  padding: 0.08rem 0.35rem;
-  color: var(--text-muted);
-}
-
-.topbar-right .topbar-config-btn.active .topbar-config-kbd {
-  background: rgba(var(--accent-primary-rgb, 124, 77, 255), 0.25);
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
-}
-
 @media (max-width: 600px) {
-  .topbar-config-label,
-  .topbar-config-kbd {
+  .topbar-config-label {
     display: none;
   }
   .topbar-right .topbar-config-btn {

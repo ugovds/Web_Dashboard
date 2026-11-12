@@ -129,10 +129,10 @@ function initShortcuts() {
     const isSearchEmpty = active === searchInput && searchInput.value.trim() === '';
     const isNotTyping = active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA' && active.tagName !== 'SELECT';
 
-    // Navigation au clavier par touches Flèches Haut & Bas entre les onglets
+    // Navigation au clavier par touches Flèches Haut & Bas entre les onglets de la sidebar
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isNotTyping) {
       e.preventDefault();
-      const visibleBtns = Array.from(document.querySelectorAll('.deck-nav-btn')).filter(
+      const visibleBtns = Array.from(document.querySelectorAll('.sidebar-nav .deck-nav-btn')).filter(
         (b) => b.offsetParent !== null && !b.classList.contains('tab-hidden') && b.style.display !== 'none'
       );
       if (visibleBtns.length) {
@@ -141,7 +141,7 @@ function initShortcuts() {
         if (e.key === 'ArrowDown') {
           targetIdx = activeIdx < 0 ? 0 : (activeIdx + 1) % visibleBtns.length;
         } else {
-          targetIdx = activeIdx < 0 ? 0 : (activeIdx - 1 + visibleBtns.length) % visibleBtns.length;
+          targetIdx = activeIdx < 0 ? (visibleBtns.length - 1) : (activeIdx - 1 + visibleBtns.length) % visibleBtns.length;
         }
         visibleBtns[targetIdx].click();
       }
