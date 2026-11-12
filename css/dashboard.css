@@ -19,7 +19,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 12px 14px 0 12px;
+  margin: 14px 1.75rem 0 1.75rem;
   padding: 0.65rem 1.4rem;
   border-radius: 20px;
   background: rgba(12, 15, 23, 0.72);
@@ -75,70 +75,87 @@
   color: var(--text-muted);
 }
 
-/* Topbar Center : Quick Search trigger */
-.topbar-search-trigger {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  padding: 0.45rem 1rem;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 0.78rem;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-
-.topbar-search-trigger:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--border-highlight);
-  color: var(--accent-white, #fff);
-}
-
-.topbar-search-trigger kbd {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.68rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border-subtle);
-  border-radius: 4px;
-  padding: 0.08rem 0.35rem;
-  color: var(--accent-primary);
-}
-
-/* Topbar Right : Status Pills */
+/* Topbar Right : Bouton Paramètres HUD */
 .topbar-right {
   display: flex;
   align-items: center;
   gap: 0.65rem;
 }
 
-.topbar-pill {
+.topbar-right .topbar-config-btn {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
-  gap: 0.45rem;
-  padding: 0.35rem 0.75rem;
+  gap: 0.55rem;
+  padding: 0.45rem 0.95rem;
   border-radius: 99px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
-  font-size: 0.74rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  text-decoration: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
 }
 
-.topbar-pill:hover {
+.topbar-right .topbar-config-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--border-highlight);
   color: var(--accent-white, #fff);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
 }
 
-.topbar-pill i {
+.topbar-right .topbar-config-btn:active {
+  transform: translateY(0);
+}
+
+.topbar-right .topbar-config-btn.active {
+  background: rgba(var(--accent-primary-rgb, 124, 77, 255), 0.16);
+  border-color: var(--accent-primary);
+  color: var(--accent-white, #fff);
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 124, 77, 255), 0.3);
+}
+
+.topbar-right .topbar-config-btn i {
   color: var(--accent-primary);
-  font-size: 0.78rem;
+  font-size: 0.85rem;
+  transition: transform 0.3s ease;
+}
+
+.topbar-right .topbar-config-btn:hover i {
+  transform: rotate(45deg);
+}
+
+.topbar-config-kbd {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.08rem 0.35rem;
+  color: var(--text-muted);
+}
+
+.topbar-right .topbar-config-btn.active .topbar-config-kbd {
+  background: rgba(var(--accent-primary-rgb, 124, 77, 255), 0.25);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+}
+
+@media (max-width: 600px) {
+  .topbar-config-label,
+  .topbar-config-kbd {
+    display: none;
+  }
+  .topbar-right .topbar-config-btn {
+    padding: 0.45rem;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    justify-content: center;
+  }
 }
 
 /* --- VIEWPORT DES VUES --- */
@@ -1448,13 +1465,13 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding: 0.5rem 1rem 2rem 1rem;
+  padding: 0;
 }
 
 .customize-deck-panel {
-  max-width: 1140px;
+  max-width: 100%;
   width: 100%;
-  margin: 0 auto;
+  margin: 0;
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   border-radius: 20px;
@@ -1522,12 +1539,9 @@
     padding-bottom: 78px; /* Évite de recouvrir le contenu avec le dock du bas */
   }
   .dashboard-topbar {
-    margin: 8px 8px 0 8px;
+    margin: 8px 0.85rem 0 0.85rem;
     border-radius: 16px;
     padding: 0.5rem 0.85rem;
-  }
-  .topbar-search-trigger {
-    display: none; /* Accessible directement dans la vue générale */
   }
   .dashboard-viewport {
     padding: 1rem 0.85rem;

@@ -41,15 +41,12 @@ function initDeckViewSlider() {
       indicator.style.height = `${activeBtn.offsetHeight}px`;
       indicator.style.transform = `translateY(${activeBtn.offsetTop}px)`;
       indicator.style.opacity = '1';
+      try {
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+      } catch {}
     } else {
-      indicator.style.width = `${activeBtn.offsetWidth}px`;
-      indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
-      indicator.style.height = '';
-      indicator.style.opacity = '1';
+      indicator.style.opacity = '0';
     }
-    try {
-      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-    } catch {}
   }
 
   updateDeckIndicator = updateIndicator;
@@ -181,57 +178,6 @@ function initSidebarControls() {
   const brandAvatar = document.getElementById('sidebar-brand-avatar');
   if (brandAvatar) {
     brandAvatar.addEventListener('click', () => {
-      const themes = ['1', '2', '3', '4'];
-      const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
-      if (typeof applyTheme === 'function') applyTheme(nextTheme);
-    });
-  }
-
-  // Topbar : Déclencheur recherche
-  const topbarSearchBtn = document.getElementById('topbar-search-btn');
-  if (topbarSearchBtn) {
-    topbarSearchBtn.addEventListener('click', () => {
-      const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]');
-      if (homeBtn && !homeBtn.classList.contains('active')) {
-        homeBtn.click();
-      }
-      const searchInput = document.getElementById('search-input');
-      if (searchInput) {
-        setTimeout(() => {
-          searchInput.focus();
-          searchInput.select();
-        }, 60);
-      }
-    });
-  }
-
-  // Topbar : Pilule météo
-  const topbarWeatherPill = document.getElementById('topbar-weather-pill');
-  if (topbarWeatherPill) {
-    topbarWeatherPill.addEventListener('click', () => {
-      const weatherBtn = document.querySelector('.deck-nav-btn[data-deck-view="weather"]');
-      if (weatherBtn) weatherBtn.click();
-    });
-  }
-
-  // Topbar : Pilule ambiance
-  const topbarAmbientPill = document.getElementById('topbar-ambient-pill');
-  if (topbarAmbientPill) {
-    topbarAmbientPill.addEventListener('click', () => {
-      const toggle = document.getElementById('ambient-master-toggle');
-      if (toggle) {
-        toggle.click();
-      } else {
-        const ambientBtn = document.querySelector('.deck-nav-btn[data-deck-view="ambient"]');
-        if (ambientBtn) ambientBtn.click();
-      }
-    });
-  }
-
-  // Topbar : Pilule thème
-  const topbarThemePill = document.getElementById('topbar-theme-pill');
-  if (topbarThemePill) {
-    topbarThemePill.addEventListener('click', () => {
       const themes = ['1', '2', '3', '4'];
       const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
       if (typeof applyTheme === 'function') applyTheme(nextTheme);

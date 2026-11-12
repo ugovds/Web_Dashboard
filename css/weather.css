@@ -46,7 +46,7 @@
   display: flex;
   flex-direction: column;
   gap: clamp(18px, 2.5vh, 32px);
-  padding: clamp(12px, 1.8vh, 26px) clamp(20px, 2.6vw, 56px) clamp(60px, 8vh, 100px);
+  padding: 0 0 clamp(60px, 8vh, 100px) 0;
   box-sizing: border-box;
 }
 
@@ -826,7 +826,7 @@
 
 @media (max-width: 768px) {
   .samsung-weather-container {
-    padding: 10px 14px 60px;
+    padding: 0 0 60px 0;
     gap: 16px;
   }
 
