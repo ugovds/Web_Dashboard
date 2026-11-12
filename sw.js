@@ -2,7 +2,7 @@
  * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache PWA)
  */
 
-const CACHE_NAME = 'violet-startpage-v5.4';
+const CACHE_NAME = 'violet-startpage-v5.5';
 
 const STATIC_ASSETS = [
   './',
