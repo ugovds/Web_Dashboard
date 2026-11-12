@@ -660,6 +660,20 @@
   gap: 0.45rem;
 }
 
+.term-local-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  color: #34d399;
+  font-size: 0.68rem;
+  font-weight: 700;
+  margin-left: 0.4rem;
+}
+
 .terminal-actions {
   display: flex;
   align-items: center;

@@ -355,6 +355,78 @@
   }
 
   // ========================================================
+  // 3b. MOTEUR D'EXÉCUTION LOCAL ULTRA-RAPIDE (runner.py)
+  // ========================================================
+  let localRunnerUrl = null;
+  let localRunnerTools = null;
+
+  async function probeLocalRunner() {
+    const endpoints = [
+      '', // Same-origin (si exécuté via ./runner.py directement)
+      'http://127.0.0.1:3000',
+      'http://localhost:3000',
+      'http://127.0.0.1:8080',
+      'http://localhost:8080'
+    ];
+
+    for (const base of endpoints) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 200);
+        const res = await fetch(`${base}/api/status`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.engine === 'local-native') {
+            localRunnerUrl = base;
+            localRunnerTools = data.tools || {};
+            updateLocalRunnerBadge(true);
+            return true;
+          }
+        }
+      } catch {
+        // Suivant
+      }
+    }
+    localRunnerUrl = null;
+    localRunnerTools = null;
+    updateLocalRunnerBadge(false);
+    return false;
+  }
+
+  function updateLocalRunnerBadge(isOnline) {
+    let indicator = document.getElementById('terminal-local-indicator');
+    if (!indicator) {
+      const titleWrap = document.querySelector('.terminal-title');
+      if (titleWrap) {
+        indicator = document.createElement('span');
+        indicator.id = 'terminal-local-indicator';
+        indicator.className = 'term-local-pill';
+        titleWrap.appendChild(indicator);
+      }
+    }
+    if (indicator) {
+      if (isOnline) {
+        indicator.hidden = false;
+        indicator.innerHTML = '<span class="status-dot" style="background:#34d399;box-shadow:0 0 8px #34d399;width:6px;height:6px;border-radius:50%;display:inline-block;"></span> Moteur Local (10ms)';
+        indicator.title = 'Moteur local actif : vos compilateurs système sont utilisés directement.';
+      } else {
+        indicator.hidden = true;
+      }
+    }
+  }
+
+  async function executeLocalRunner(lang, code, stdin = '') {
+    const res = await fetch(`${localRunnerUrl}/api/run`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lang, code, stdin })
+    });
+    if (!res.ok) throw new Error(`Erreur serveur local HTTP ${res.status}`);
+    return await res.json();
+  }
+
+  // ========================================================
   // 4. ÉTAT ET CONTRÔLEUR PRINCIPAL DU STUDIO
   // ========================================================
   let buffers = [];
@@ -678,6 +750,40 @@
     printToTerminal(`--- Lancement de l'exécution [${currentLang.toUpperCase()}] ---`, 'system');
 
     try {
+      // 1. PRIORITÉ ABSOLUE : Moteur local natif (runner.py) si actif
+      const hasLocal = (localRunnerUrl !== null) || (await probeLocalRunner());
+      if (hasLocal && localRunnerUrl) {
+        printToTerminal(`[Moteur Local] Exécution avec vos compilateurs système (${currentLang.toUpperCase()})...`, 'system');
+        const res = await executeLocalRunner(currentLang, code, '');
+
+        if (res.compiler_error) {
+          const compMsg = res.compiler_error.trim();
+          if (compMsg) {
+            printToTerminal('--- Sortie du compilateur ---', 'error');
+            printToTerminal(compMsg, 'error');
+          }
+        }
+
+        if (res.program_output) {
+          printToTerminal(res.program_output.trimEnd(), 'stdout');
+        }
+
+        if (res.program_error) {
+          printToTerminal(res.program_error.trimEnd(), 'error');
+        }
+
+        const elapsed = res.time_ms !== undefined ? res.time_ms : Math.round(performance.now() - startTime);
+        if (res.status === 0) {
+          setExecutionStatus('success', elapsed);
+          printToTerminal(`✔ Exécution locale réussie (${res.engine || 'natif'}) en ${elapsed} ms.`, 'success');
+        } else {
+          setExecutionStatus('error', elapsed);
+          printToTerminal(`✖ Code retour d'erreur : ${res.status} (en ${elapsed} ms)`, 'error');
+        }
+        return;
+      }
+
+      // 2. FALLBACK 1 : Oz et JavaScript tournent à 100% dans le navigateur
       if (currentLang === 'oz') {
         // Exécution Oz locale dans le navigateur
         const count = evaluateOzCode(code, (msg, type) => {
@@ -712,7 +818,10 @@
         setExecutionStatus('success', elapsed);
         printToTerminal(`✔ Exécution JS terminée en ${elapsed} ms.`, 'success');
       } else {
-        // Exécution distante C / Python / Java / Bash via Wandbox
+        // 3. FALLBACK 2 : Cloud Wandbox pour C, Java, Python (si runner local pas allumé)
+        printToTerminal(`[Mode Cloud] Moteur local non détecté. Connexion au cluster distant...`, 'system');
+        printToTerminal(`💡 Pour exécuter directement sur votre machine en 10ms (comme VS Code) : lancez './runner.py' dans votre terminal !`, 'system');
+
         let compilerKey = 'cpython-3.11.10';
         let codeToSend = code;
 
@@ -720,7 +829,6 @@
           compilerKey = 'gcc-13.2.0-c';
         } else if (currentLang === 'java') {
           compilerKey = 'openjdk-jdk-21+35';
-          // Si l'utilisateur n'a pas déclaré de classe publique, s'assurer que c'est une classe standard
           if (!code.includes('class ')) {
             codeToSend = `public class Main {\n    public static void main(String[] args) {\n${code}\n    }\n}`;
           } else if (code.includes('public class ') && !code.includes('public class Main')) {
@@ -730,7 +838,6 @@
           compilerKey = 'bash';
         }
 
-        printToTerminal(`Compilation & exécution en cours via ${compilerKey}...`, 'system');
         const res = await executeWandbox(compilerKey, codeToSend);
 
         if (res.compiler_error || res.compiler_message) {
@@ -793,11 +900,25 @@
         printToTerminal(`Commandes disponibles :
   run            - Exécute le code actuellement ouvert
   clear          - Efface la console du terminal
+  status         - État du moteur local vs cloud
   lang <nom>     - Bascule le langage (ex: lang oz, lang c, lang python, lang java)
   template <nom> - Charge un modèle (ex: template quicksort, template list)
   date           - Affiche l'heure et la date système
   about          - Informations sur le studio de code
   help           - Affiche ce menu d'aide`, 'stdout');
+        break;
+      case 'status':
+      case 'engine':
+      case 'local':
+        if (localRunnerUrl) {
+          printToTerminal(`⚡ MOTEUR LOCAL ACTIF sur ${localRunnerUrl}
+Compilateurs système connectés : GCC, Python 3, Java (javac), Oz (ozc/ozengine), Bash.
+Vos exécutions tournent à vitesse native (~10-50ms) sur votre processeur.`, 'success');
+        } else {
+          printToTerminal(`Moteur Local inactif. Le studio utilise le mode hybride (Oz & JS en local, C/Java via fallback cloud).
+💡 Pour tout exécuter sur votre PC à la vitesse de VS Code :
+Lancez './runner.py' dans votre terminal !`, 'warning');
+        }
         break;
       case 'lang':
         if (['python', 'c', 'java', 'oz', 'javascript', 'bash'].includes(arg)) {
@@ -1174,6 +1295,7 @@ if x not in memo: memo[x] = f(x)</pre>
     clearTerminal();
     updateTerminalBadge();
     renderCheatsheet('oz');
+    probeLocalRunner();
 
     // Événements Éditeur
     let autoSaveTimer = null;

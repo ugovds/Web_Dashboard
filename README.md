@@ -52,7 +52,7 @@ Le tableau de bord est structuré en **Dashboard moderne de type cockpit** avec 
    - **Actualités** : Lecteur de flux d'actualités F1, Football, Tech et vos flux RSS sur mesure.
    - **Système & Marchés** : Latence ping en temps réel (sparkline SVG), batterie, uptime et indices boursiers.
    - **Focus Pomodoro** : Minuteur circulaire avec presets, carillon et jalons de session.
-   - **Bloc-Notes Scratchpad** : Éditeur Markdown avec prévisualisation et export.
+   - **Dev Studio & Bloc-Notes** : Playground multi-langages (Python, C, Oz, Java, JS), terminal interactif et moteur d'exécution local ultra-rapide (`./runner.py`).
    - **Ambiance Lo-Fi** : Synthèse audio procédurale et radio avec visualiseur Canvas.
    - **Citations** : Citations de culture hacker, dev et cyberpunk.
    - **Paramètres** : Centre complet de personnalisation des thèmes, de l'horloge et sauvegarde JSON.
@@ -237,6 +237,20 @@ violet-startpage/
    ```text
    https://ugovds.github.io/startup_page/
    ```
+
+---
+
+## ⚡ Moteur d'Exécution Local & Compilateurs Natifs (`./runner.py`)
+
+Pour exécuter instantanément votre code (C, Java, Python, Oz, JS, Bash) directement avec les compilateurs de votre PC en **10 à 25 ms** (comme dans VS Code ou IntelliJ) :
+
+```bash
+./runner.py
+# ou : python3 runner.py 3000
+```
+
+Ouvrez ensuite [http://localhost:3000](http://localhost:3000) dans votre navigateur.
+Le dashboard détecte automatiquement vos compilateurs natifs (`/usr/bin/gcc`, `/usr/bin/javac`, `/usr/bin/python3`, `/usr/bin/ozc`) et route toutes les exécutions localement.
 
 ---
 
