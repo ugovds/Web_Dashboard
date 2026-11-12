@@ -315,6 +315,10 @@ function saveAndRenderTodos(skipStorageSave = false, skipCalendar = false) {
       setTimeout(() => inputToFocus.focus(), 20);
     }
   }
+
+  if (typeof renderDashboardAgenda === 'function') {
+    renderDashboardAgenda();
+  }
 }
 
 function escapeHtml(str) {

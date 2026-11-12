@@ -8,6 +8,7 @@
  */
 
 const defaultWidgetSettings = {
+  bookmarks: true,
   agenda: true,
   weather: true,
   feeds: true,
@@ -38,7 +39,7 @@ function saveWidgetSettings() {
 
 function applyWidgetVisibility() {
   // Synchroniser les boutons de navigation du deck (sidebar cockpit)
-  const keys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
+  const keys = ['bookmarks', 'agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
   keys.forEach((key) => {
     const isEnabled = currentWidgetSettings[key] !== false;
     const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${key}"]`);
@@ -1587,8 +1588,9 @@ function initWidgets() {
   initQuotesWidget();
 
   // Écouteurs dans le centre de personnalisation (onglet Widgets)
-  const allWidgetKeys = ['agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
+  const allWidgetKeys = ['bookmarks', 'agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
   const widgetLabels = {
+    bookmarks: 'Raccourcis Web & Favoris',
     agenda: 'Agenda & Tâches',
     weather: 'Météo & Radar',
     feeds: 'Actualités',

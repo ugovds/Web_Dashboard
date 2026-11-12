@@ -1814,6 +1814,9 @@ async function fetchLiveMarketData() {
   renderMarketMovers();
   renderForexCryptoModule();
   updateMarketGlobalStatus();
+  if (typeof renderDashboardMarkets === 'function') {
+    renderDashboardMarkets();
+  }
 
   if (refreshBtn) {
     setTimeout(() => refreshBtn.querySelector('i')?.classList.remove('fa-spin'), 600);
@@ -1829,6 +1832,9 @@ function initMarkets() {
 
   renderIndicesMarquee();
   updateMarketGlobalStatus();
+  if (typeof renderDashboardMarkets === 'function') {
+    renderDashboardMarkets();
+  }
   renderHeroSpotlight(currentHeroAssetId);
   renderMarketBarometer();
   renderMarketMovers();

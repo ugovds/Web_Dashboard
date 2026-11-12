@@ -11,6 +11,7 @@
 function initShortcuts() {
   const DECK_VIEWS_ORDER = [
     'dashboard',
+    'bookmarks',
     'agenda',
     'weather',
     'feeds',
@@ -132,7 +133,7 @@ function initShortcuts() {
     // Navigation au clavier par touches Flèches Haut & Bas exclusivement entre les onglets de la sidebar
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isNotTyping) {
       e.preventDefault();
-      const sidebarKeys = ['dashboard', 'agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
+      const sidebarKeys = ['dashboard', 'bookmarks', 'agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
       const sidebarBtns = sidebarKeys
         .map((k) => document.querySelector(`.sidebar-nav .deck-nav-btn[data-deck-view="${k}"]`))
         .filter((b) => b && !b.classList.contains('tab-hidden') && b.style.display !== 'none');

@@ -554,6 +554,11 @@ function renderWeatherDeckView(data) {
 
   // Mise à jour de l'URL du radar satellite RainViewer
   updateWeatherRadar(area);
+
+  // Hook vers le tableau de bord d'accueil
+  if (typeof renderDashboardWeather === 'function') {
+    renderDashboardWeather(data);
+  }
 }
 
 /**

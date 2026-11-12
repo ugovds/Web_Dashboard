@@ -3,7 +3,8 @@
  */
 
 const VIEW_TITLES = {
-  dashboard: { title: 'Accueil', sub: 'Tableau de bord & Signets', icon: 'fa-solid fa-house' },
+  dashboard: { title: 'Accueil', sub: 'Cockpit & Vue d\'ensemble', icon: 'fa-solid fa-house' },
+  bookmarks: { title: 'Raccourcis Web', sub: 'Favoris, Signets & Catégories', icon: 'fa-solid fa-compass' },
   agenda: { title: 'Agenda & Tâches', sub: 'Calendrier mensuel & To-Do list', icon: 'fa-regular fa-calendar-check' },
   weather: { title: 'Météo & Radar', sub: 'Prévisions 24h & Satellite direct', icon: 'fa-solid fa-cloud-sun' },
   feeds: { title: 'Actualités en Direct', sub: 'F1, Football, Tech & Flux RSS', icon: 'fa-solid fa-newspaper' },
@@ -16,6 +17,7 @@ const VIEW_TITLES = {
 
 const VIEW_KEYS = [
   'dashboard',
+  'bookmarks',
   'agenda',
   'weather',
   'feeds',

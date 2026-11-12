@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initCustomHub === 'function') initCustomHub();
   if (typeof initShortcuts === 'function') initShortcuts();
   if (typeof initWidgets === 'function') initWidgets();
+  if (typeof initOverviewDashboard === 'function') initOverviewDashboard();
 
   // === PHASE 2 : DIFFÉRÉE (Tâches secondaires libérant le thread) ===
   const deferNonCritical = () => {

@@ -47,6 +47,7 @@
     <link rel="stylesheet" href="css/deck.css?v=3.0" />
     <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
     <link rel="stylesheet" href="css/dashboard.css?v=4.3" />
+    <link rel="stylesheet" href="css/dashboard-overview.css?v=1.0" />
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.0" />
@@ -101,68 +102,76 @@
         <nav class="sidebar-nav" id="sidebar-nav">
           <div class="sidebar-indicator" id="sidebar-indicator"></div>
 
-          <!-- 1. ACCUEIL (Tableau de bord / Omnibox & Signets) -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item active" data-deck-view="dashboard" title="Accueil & Signets (Alt+1)">
+          <!-- 1. ACCUEIL (Tableau de bord / Cockpit) -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item active" data-deck-view="dashboard" title="Accueil &amp; Cockpit (Alt+1)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-house"></i></div>
             <span class="nav-label">Accueil</span>
             <kbd class="nav-kbd">1</kbd>
-            <div class="sidebar-tooltip">Accueil & Signets <kbd>1</kbd></div>
+            <div class="sidebar-tooltip">Accueil &amp; Cockpit <kbd>1</kbd></div>
           </button>
 
-          <!-- 2. AGENDA & TÂCHES -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="agenda" data-widget-nav="agenda" title="Agenda & Tâches (Alt+2)">
-            <div class="nav-icon-wrap"><i class="fa-regular fa-calendar-check"></i></div>
-            <span class="nav-label">Agenda & Tâches</span>
+          <!-- 2. RACCOURCIS WEB & FAVORIS -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="bookmarks" data-widget-nav="bookmarks" title="Raccourcis Web &amp; Favoris (Alt+2)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-compass"></i></div>
+            <span class="nav-label">Raccourcis</span>
             <kbd class="nav-kbd">2</kbd>
-            <div class="sidebar-tooltip">Agenda & Tâches <kbd>2</kbd></div>
+            <div class="sidebar-tooltip">Raccourcis Web <kbd>2</kbd></div>
           </button>
 
-          <!-- 3. MÉTÉO & RADAR -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="weather" data-widget-nav="weather" title="Météo Détaillée & Radar (Alt+3)">
-            <div class="nav-icon-wrap"><i class="fa-solid fa-cloud-sun"></i></div>
-            <span class="nav-label">Météo & Radar</span>
+          <!-- 3. AGENDA & TÂCHES -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="agenda" data-widget-nav="agenda" title="Agenda &amp; Tâches (Alt+3)">
+            <div class="nav-icon-wrap"><i class="fa-regular fa-calendar-check"></i></div>
+            <span class="nav-label">Agenda &amp; Tâches</span>
             <kbd class="nav-kbd">3</kbd>
-            <div class="sidebar-tooltip">Météo & Radar <kbd>3</kbd></div>
+            <div class="sidebar-tooltip">Agenda &amp; Tâches <kbd>3</kbd></div>
           </button>
 
-          <!-- 4. ACTUALITÉS -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="feeds" data-widget-nav="feeds" title="Actualités en direct (Alt+4)">
+          <!-- 4. MÉTÉO & RADAR -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="weather" data-widget-nav="weather" title="Météo Détaillée &amp; Radar (Alt+4)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-cloud-sun"></i></div>
+            <span class="nav-label">Météo &amp; Radar</span>
+            <kbd class="nav-kbd">4</kbd>
+            <div class="sidebar-tooltip">Météo &amp; Radar <kbd>4</kbd></div>
+          </button>
+
+          <!-- 5. ACTUALITÉS -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="feeds" data-widget-nav="feeds" title="Actualités en direct (Alt+5)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-newspaper"></i></div>
             <span class="nav-label">Actualités</span>
-            <kbd class="nav-kbd">4</kbd>
-            <div class="sidebar-tooltip">Actualités <kbd>4</kbd></div>
+            <kbd class="nav-kbd">5</kbd>
+            <div class="sidebar-tooltip">Actualités <kbd>5</kbd></div>
           </button>
 
-          <!-- 5. MARCHÉS & ETF -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="system" data-widget-nav="system" title="Marchés Boursiers, Actions &amp; ETF (Alt+5)">
+          <!-- 6. MARCHÉS & ETF -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="system" data-widget-nav="system" title="Marchés Boursiers, Actions &amp; ETF (Alt+6)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-chart-line"></i></div>
             <span class="nav-label">Marchés</span>
-            <kbd class="nav-kbd">5</kbd>
-            <div class="sidebar-tooltip">Marchés &amp; ETF <kbd>5</kbd></div>
+            <kbd class="nav-kbd">6</kbd>
+            <div class="sidebar-tooltip">Marchés &amp; ETF <kbd>6</kbd></div>
           </button>
 
-          <!-- 6. FOCUS POMODORO & AMBIANCE LO-FI -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="pomodoro" data-widget-nav="pomodoro" title="Studio Focus Pomodoro &amp; Ambiance Lo-Fi (Alt+6)">
+          <!-- 7. FOCUS POMODORO & AMBIANCE LO-FI -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="pomodoro" data-widget-nav="pomodoro" title="Studio Focus Pomodoro &amp; Ambiance Lo-Fi (Alt+7)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-stopwatch"></i></div>
             <span class="nav-label">Focus &amp; Lo-Fi</span>
-            <kbd class="nav-kbd">6</kbd>
-            <div class="sidebar-tooltip">Focus &amp; Lo-Fi <kbd>6</kbd></div>
+            <kbd class="nav-kbd">7</kbd>
+            <div class="sidebar-tooltip">Focus &amp; Lo-Fi <kbd>7</kbd></div>
           </button>
 
-          <!-- 7. BLOC-NOTES -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="notes" data-widget-nav="notes" title="Dev Studio, Code &amp; Bloc-Notes (Alt+7)">
+          <!-- 8. BLOC-NOTES -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="notes" data-widget-nav="notes" title="Dev Studio, Code &amp; Bloc-Notes (Alt+8)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-laptop-code"></i></div>
             <span class="nav-label">Notes &amp; Code</span>
-            <kbd class="nav-kbd">7</kbd>
-            <div class="sidebar-tooltip">Studio &amp; Code <kbd>7</kbd></div>
+            <kbd class="nav-kbd">8</kbd>
+            <div class="sidebar-tooltip">Studio &amp; Code <kbd>8</kbd></div>
           </button>
 
-          <!-- 8. CITATIONS -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="quotes" data-widget-nav="quotes" title="Citations Cyberpunk (Alt+8)">
+          <!-- 9. CITATIONS -->
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="quotes" data-widget-nav="quotes" title="Citations Cyberpunk (Alt+9)">
             <div class="nav-icon-wrap"><i class="fa-solid fa-quote-left"></i></div>
             <span class="nav-label">Citations</span>
-            <kbd class="nav-kbd">8</kbd>
-            <div class="sidebar-tooltip">Citations <kbd>8</kbd></div>
+            <kbd class="nav-kbd">9</kbd>
+            <div class="sidebar-tooltip">Citations <kbd>9</kbd></div>
           </button>
         </nav>
       </aside>
@@ -180,13 +189,13 @@
               </div>
               <div class="topbar-title-group">
                 <span class="topbar-view-title" id="topbar-view-title">Accueil</span>
-                <span class="topbar-view-subtitle" id="topbar-view-subtitle">Tableau de bord & Signets</span>
+                <span class="topbar-view-subtitle" id="topbar-view-subtitle">Cockpit &amp; Vue d'ensemble</span>
               </div>
             </div>
           </div>
 
           <div class="topbar-right">
-            <button type="button" class="deck-nav-btn topbar-config-btn" data-deck-view="customize" title="Paramètres &amp; Personnalisation (Alt+9)">
+            <button type="button" class="deck-nav-btn topbar-config-btn" data-deck-view="customize" title="Paramètres &amp; Personnalisation (Alt+0)">
               <i class="fa-solid fa-sliders"></i>
               <span class="topbar-config-label">Paramètres</span>
             </button>
@@ -195,138 +204,383 @@
 
         <!-- Viewport des vues du dashboard -->
         <main class="dashboard-viewport" id="dashboard-viewport">
-          <!-- VUE 1 : ACCUEIL (DASHBOARD GÉNÉRAL AVEC HORLOGE ET SIGNETS) -->
+          <!-- ==============================================
+               VUE 1 : ACCUEIL COCKPIT (TABLEAU DE BORD EXÉCUTIF & RÉSUMÉ)
+               ============================================== -->
           <div id="deck-view-dashboard" class="deck-slide-view active">
-            <div class="dashboard-overview-container">
-              <!-- Barre de Recherche Omnibox -->
-              <div class="dashboard-search-hero">
-                <div class="search-wrapper">
-                  <form id="search-form" class="search-box">
-                    <div id="engine-badge" class="engine-badge">
-                      <i id="engine-icon" class="fa-brands fa-google"></i>
-                      <span id="engine-name">Google</span>
+            <div class="dashboard-home-view">
+              <!-- 1. HERO BANNER : Salutation, État du Système & Barre Omnibox -->
+              <div class="dash-hero-card">
+                <div class="dash-hero-top">
+                  <div class="dash-greeting-group">
+                    <div class="dash-greeting-avatar">
+                      <i class="fa-solid fa-atom"></i>
                     </div>
-                    <span class="prompt-arrow">&gt;</span>
-                    <input
-                      id="search-input"
-                      type="text"
-                      placeholder="Rechercher, calculer (12*8) ou taper !help pour les préfixes..."
-                      autocomplete="off"
-                      autofocus
-                    />
-                    <span id="calc-preview" class="calc-preview" hidden></span>
-                    <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
-                  </form>
+                    <div class="dash-greeting-text">
+                      <h2 id="dash-greeting-label">Bonjour, Commandant 👋</h2>
+                      <p>Bienvenue sur votre Cyberdeck • Vue cockpit en temps réel</p>
+                    </div>
+                  </div>
 
-                  <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
+                  <div class="dash-hero-telemetry">
+                    <span class="dash-tele-chip status-chip">
+                      <span class="dash-pulse-dot"></span> Système En Ligne
+                    </span>
+                    <span class="dash-tele-chip" id="dash-tele-date">
+                      <i class="fa-regular fa-calendar"></i> Chargement...
+                    </span>
+                    <span class="dash-tele-chip" id="dash-tele-time">
+                      <i class="fa-regular fa-clock"></i> 00:00
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Barre de Recherche Omnibox Intégrée -->
+                <div class="dash-hero-search">
+                  <div class="search-wrapper">
+                    <form id="search-form" class="search-box">
+                      <div id="engine-badge" class="engine-badge">
+                        <i id="engine-icon" class="fa-brands fa-google"></i>
+                        <span id="engine-name">Google</span>
+                      </div>
+                      <span class="prompt-arrow">&gt;</span>
+                      <input
+                        id="search-input"
+                        type="text"
+                        placeholder="Rechercher, calculer (12*8) ou taper !help pour les préfixes..."
+                        autocomplete="off"
+                        autofocus
+                      />
+                      <span id="calc-preview" class="calc-preview" hidden></span>
+                      <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
+                    </form>
+                    <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
+                  </div>
                 </div>
               </div>
 
-              <!-- Grille Cockpit : 4 Quadrants pour les Catégories de Signets -->
-              <div class="dashboard-overview-body">
-                <!-- Horloge masquée (conservée sans affichage pour réactivation éventuelle sans casser les scripts) -->
-                <aside class="overview-left-col" id="overview-clock-col" style="display: none !important;" aria-hidden="true">
-                  <!-- Grand Cadre Horloge & Date Moderne -->
-                  <div class="left-clock-card font-inter clock-style-editorial clock-size-medium" id="left-clock-card">
-                    <div class="clock-card-top">
-                      <button type="button" id="clock-tz-badge" class="clock-tz-pill" title="Cliquer pour changer de fuseau horaire">
-                        <i class="fa-solid fa-globe"></i> LOCAL • PARIS
-                      </button>
-                      <button type="button" id="clock-mode-toggle" class="clock-tz-pill clock-mode-pill" title="Basculer entre Horloge et Compte à rebours">
-                        <i id="clock-mode-icon" class="fa-solid fa-clock"></i> <span id="clock-mode-label">Horloge</span>
-                      </button>
+              <!-- 2. BANDEAU DE MÉTRIQUES KPI EN DIRECT (4 CARTES COCKPIT) -->
+              <div class="dash-kpi-row">
+                <!-- KPI 1 : Météo -->
+                <div class="dash-kpi-card kpi-weather" data-deck-view="weather" title="Ouvrir la météo détaillée">
+                  <div class="dash-kpi-icon">
+                    <i class="fa-solid fa-cloud-sun"></i>
+                  </div>
+                  <div class="dash-kpi-content">
+                    <span class="dash-kpi-label">Météo en Direct</span>
+                    <div class="dash-kpi-val-row">
+                      <span class="dash-kpi-val" id="kpi-weather-val">14°C • Éclaircies</span>
                     </div>
+                    <span class="dash-kpi-sub" id="kpi-weather-sub">Paris • Ressenti 13°C</span>
+                  </div>
+                </div>
 
-                    <!-- Salutation chaleureuse & moderne -->
-                    <span id="clock-greeting" class="clock-greeting">Bonjour</span>
-
-                    <!-- Affichage moderne et épuré de l'heure -->
-                    <div class="left-clock-display" id="left-clock-display">
-                      <div class="time-digits-box">
-                        <span id="time" class="left-time-main">00:00</span>
-                        <span id="clock-ms-tick" class="clock-ms-tick" style="display: none;">.00</span>
-                      </div>
-                      <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
+                <!-- KPI 2 : Marché Phare -->
+                <div class="dash-kpi-card kpi-market" data-deck-view="system" title="Ouvrir les marchés boursiers">
+                  <div class="dash-kpi-icon">
+                    <i class="fa-solid fa-arrow-trend-up"></i>
+                  </div>
+                  <div class="dash-kpi-content">
+                    <span class="dash-kpi-label">Top Actif Marché</span>
+                    <div class="dash-kpi-val-row">
+                      <span class="dash-kpi-val" id="kpi-market-val">NVDA 175.8$</span>
+                      <span class="dash-kpi-badge up" id="kpi-market-badge">+2.84%</span>
                     </div>
+                    <span class="dash-kpi-sub" id="kpi-market-sub">Mega-Cap Tech &amp; IA</span>
+                  </div>
+                </div>
 
-                    <!-- Affichage Flip Clock Rétro (style Fliqlo) -->
-                    <div id="clock-flip-wrap" class="clock-flip-wrap" style="display: none;">
-                      <div class="flip-unit"><span class="flip-digit" id="flip-h">12</span></div>
-                      <span class="flip-sep">:</span>
-                      <div class="flip-unit"><span class="flip-digit" id="flip-m">30</span></div>
-                      <span class="flip-sep" id="flip-sec-sep" style="display:none;">:</span>
-                      <div class="flip-unit" id="flip-sec-unit" style="display:none;"><span class="flip-digit" id="flip-s">00</span></div>
+                <!-- KPI 3 : Agenda & Tâches -->
+                <div class="dash-kpi-card kpi-agenda" data-deck-view="agenda" title="Ouvrir le calendrier et les tâches">
+                  <div class="dash-kpi-icon">
+                    <i class="fa-regular fa-calendar-check"></i>
+                  </div>
+                  <div class="dash-kpi-content">
+                    <span class="dash-kpi-label">Agenda &amp; Échéances</span>
+                    <div class="dash-kpi-val-row">
+                      <span class="dash-kpi-val" id="kpi-agenda-val">0 à faire</span>
+                      <span class="dash-kpi-badge neutral" id="kpi-agenda-badge">À jour</span>
                     </div>
+                    <span class="dash-kpi-sub" id="kpi-agenda-sub">Cette semaine</span>
+                  </div>
+                </div>
 
-                    <!-- Affichage Horloge Analogique Suisse (style Braun) -->
-                    <div id="clock-analog-wrap" class="clock-analog-wrap" style="display: none;">
-                      <svg class="clock-analog-svg" viewBox="0 0 200 200">
-                        <circle class="analog-face" cx="100" cy="100" r="92" />
-                        <!-- 12 graduations -->
-                        <line class="analog-tick major" x1="100" y1="14" x2="100" y2="26" />
-                        <line class="analog-tick major" x1="100" y1="186" x2="100" y2="174" />
-                        <line class="analog-tick major" x1="14" y1="100" x2="26" y2="100" />
-                        <line class="analog-tick major" x1="186" y1="100" x2="174" y2="100" />
-                        <line class="analog-tick" x1="143" y1="25" x2="137" y2="35" />
-                        <line class="analog-tick" x1="175" y1="57" x2="165" y2="63" />
-                        <line class="analog-tick" x1="175" y1="143" x2="165" y2="137" />
-                        <line class="analog-tick" x1="143" y1="175" x2="137" y2="165" />
-                        <line class="analog-tick" x1="57" y1="175" x2="63" y2="165" />
-                        <line class="analog-tick" x1="25" y1="143" x2="35" y2="137" />
-                        <line class="analog-tick" x1="25" y1="57" x2="35" y2="63" />
-                        <line class="analog-tick" x1="57" y1="25" x2="63" y2="35" />
-                        <!-- Aiguilles -->
-                        <line id="analog-hour-hand" class="analog-hand-hour" x1="100" y1="100" x2="100" y2="52" />
-                        <line id="analog-min-hand" class="analog-hand-min" x1="100" y1="100" x2="100" y2="34" />
-                        <line id="analog-sec-hand" class="analog-hand-sec" x1="100" y1="114" x2="100" y2="24" />
-                        <circle class="analog-center-dot" cx="100" cy="100" r="4.5" />
-                      </svg>
+                <!-- KPI 4 : Historique Récent -->
+                <div class="dash-kpi-card kpi-history" data-deck-view="bookmarks" title="Ouvrir tous les raccourcis">
+                  <div class="dash-kpi-icon">
+                    <i class="fa-solid fa-compass"></i>
+                  </div>
+                  <div class="dash-kpi-content">
+                    <span class="dash-kpi-label">Navigation Récente</span>
+                    <div class="dash-kpi-val-row">
+                      <span class="dash-kpi-val" id="kpi-history-val">5 récents</span>
                     </div>
+                    <span class="dash-kpi-sub">Accès rapide aux favoris</span>
+                  </div>
+                </div>
+              </div>
 
-                    <!-- Télémétrie Calendaire & Cycle Solaire -->
-                    <div class="left-clock-telemetry">
-                      <div id="date" class="left-date-main">Chargement...</div>
-                      <div class="clock-telemetry-chips">
-                        <span class="chrono-chip" id="clock-week-chip">
-                          <i class="fa-solid fa-calendar-week"></i>
-                          <span id="clock-week-text">Sem. --</span>
-                        </span>
-                        <span class="chrono-chip" id="clock-day-chip">
-                          <i class="fa-solid fa-hourglass-half"></i>
-                          <span id="clock-day-text">Jour --/365</span>
-                        </span>
-                        <span class="chrono-chip solar-chip" id="clock-solar-chip">
-                          <i id="clock-solar-icon" class="fa-solid fa-sun"></i>
-                          <span id="clock-solar-text">Diurne</span>
-                        </span>
-                      </div>
-                    </div>
-
-                    <!-- Progression du cycle journalier (%) -->
-                    <div id="day-progress-wrap" class="day-progress-wrap">
-                      <div class="day-progress-header">
-                        <span class="day-progress-title">
-                          <i class="fa-solid fa-circle-notch"></i> Progression Journée
-                        </span>
-                        <div class="day-progress-stats">
-                          <span id="day-progress-pct" class="progress-pct-bold">0%</span>
-                          <span id="day-progress-remaining" class="progress-remaining-sub">(12h 00m restants)</span>
+              <!-- 3. BENTO GRID MODULAIRE DU DASHBOARD -->
+              <div class="dash-grid-layout">
+                <!-- COLONNE GAUCHE (Bourse & Météo Prévisions) -->
+                <div class="dash-col-left">
+                  <!-- MODULE 1 : MARCHÉS, ACTIONS & ETF FAVORIS (S&P500, STOXX 600, EM, NVIDIA) -->
+                  <div class="dash-card dash-card-markets">
+                    <div class="dash-card-header">
+                      <div class="dash-card-title-group">
+                        <div class="dash-card-icon-box">
+                          <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <div class="dash-card-title-text">
+                          <h3>Marchés &amp; ETF Favoris</h3>
+                          <span>S&amp;P 500 • Europe Stoxx 600 • MSCI Emerging Markets • NVIDIA</span>
                         </div>
                       </div>
-                      <div class="day-progress-track">
-                        <div id="day-progress-fill" class="day-progress-fill" style="width: 0%;">
-                          <span class="progress-glow-head"></span>
-                        </div>
-                      </div>
+                      <button type="button" class="dash-card-link-btn" data-deck-view="system" title="Ouvrir la watchlist complète">
+                        Terminal Marchés <i class="fa-solid fa-arrow-right"></i>
+                      </button>
+                    </div>
+
+                    <!-- Grille des 4 cartes d'actifs spécifiques -->
+                    <div id="dash-market-cards-grid" class="dash-market-cards-grid">
+                      <!-- Rempli dynamiquement par renderDashboardMarkets() -->
+                    </div>
+
+                    <!-- Barre de télémétrie de l'actif sélectionné -->
+                    <div id="dash-asset-preview-bar" class="dash-asset-preview-bar">
+                      <!-- Rempli dynamiquement -->
                     </div>
                   </div>
-                </aside>
 
-                <!-- Zone principale : Grille des 4 Quadrants pour les Catégories -->
-                <section class="overview-categories-section">
-                  <div id="categories-container" class="categories-grid"></div>
-                </section>
+                  <!-- MODULE 2 : MÉTÉO AVEC GRAPHIQUE TEMPÉRATURES / PRÉCIPITATIONS -->
+                  <div class="dash-card dash-card-weather">
+                    <div class="dash-card-header">
+                      <div class="dash-card-title-group">
+                        <div class="dash-card-icon-box">
+                          <i class="fa-solid fa-cloud-sun-rain"></i>
+                        </div>
+                        <div class="dash-card-title-text">
+                          <h3>Météo Actuelle &amp; Prévisions 24h</h3>
+                          <span id="dash-weather-loc-badge"><i class="fa-solid fa-location-dot"></i> Paris, France</span>
+                        </div>
+                      </div>
+                      <button type="button" class="dash-card-link-btn" data-deck-view="weather" title="Ouvrir le radar satellite">
+                        Radar &amp; Détails <i class="fa-solid fa-arrow-right"></i>
+                      </button>
+                    </div>
+
+                    <!-- Hero météo en direct -->
+                    <div class="dash-weather-hero">
+                      <div class="dash-weather-main">
+                        <i id="dash-weather-big-icon" class="fa-solid fa-cloud-sun dash-weather-big-icon"></i>
+                        <div class="dash-weather-temp-block">
+                          <span id="dash-weather-big-temp" class="dash-weather-big-temp">14°C</span>
+                          <span id="dash-weather-desc" class="dash-weather-desc">Éclaircies</span>
+                        </div>
+                      </div>
+                      <div id="dash-weather-details-chips" class="dash-weather-details-chips">
+                        <!-- Rempli dynamiquement -->
+                      </div>
+                    </div>
+
+                    <!-- Graphique interactif dual Températures & Précipitations (24h) -->
+                    <div class="dash-weather-chart-box">
+                      <div class="dash-chart-legend">
+                        <span style="font-weight: 600;"><i class="fa-solid fa-chart-area"></i> Profil 24h</span>
+                        <div class="dash-legend-items">
+                          <span class="dash-legend-item"><span class="dash-legend-line"></span> Température (°C)</span>
+                          <span class="dash-legend-item"><span class="dash-legend-bar"></span> Précipitations (%)</span>
+                        </div>
+                      </div>
+                      <div id="dash-weather-svg-container" class="dash-weather-svg-container">
+                        <!-- Rempli dynamiquement par drawDualWeatherChart() -->
+                      </div>
+                    </div>
+
+                    <!-- Bandeau résumé des 3 prochains jours -->
+                    <div id="dash-weather-3days-row" class="dash-weather-3days-row">
+                      <!-- Rempli dynamiquement -->
+                    </div>
+                  </div>
+                </div>
+
+                <!-- COLONNE DROITE (Agenda Semaine & Historique Récent) -->
+                <div class="dash-col-right">
+                  <!-- MODULE 3 : MINI AGENDA DE LA SEMAINE & PROCHAINS ÉVÉNEMENTS -->
+                  <div class="dash-card dash-card-agenda">
+                    <div class="dash-card-header">
+                      <div class="dash-card-title-group">
+                        <div class="dash-card-icon-box">
+                          <i class="fa-regular fa-calendar-check"></i>
+                        </div>
+                        <div class="dash-card-title-text">
+                          <h3>Agenda de la Semaine</h3>
+                          <span>Prochaines échéances &amp; To-Do</span>
+                        </div>
+                      </div>
+                      <button type="button" class="dash-card-link-btn" data-deck-view="agenda" title="Ouvrir l'agenda complet">
+                        Agenda Plein <i class="fa-solid fa-arrow-right"></i>
+                      </button>
+                    </div>
+
+                    <!-- Bandeau des 7 jours de la semaine (Lun à Dim) -->
+                    <div id="dash-week-strip" class="dash-week-strip">
+                      <!-- Rempli dynamiquement -->
+                    </div>
+
+                    <!-- Liste des tâches à venir -->
+                    <div id="dash-upcoming-list" class="dash-upcoming-list">
+                      <!-- Rempli dynamiquement -->
+                    </div>
+
+                    <!-- Formulaire d'ajout rapide de tâche -->
+                    <form id="dash-task-fast-form" class="dash-task-fast-form">
+                      <input
+                        id="dash-task-fast-input"
+                        type="text"
+                        placeholder="+ Ajouter une tâche rapide... (Entrée)"
+                        autocomplete="off"
+                      />
+                      <button type="submit" class="dash-task-fast-btn" title="Ajouter la tâche">+</button>
+                    </form>
+                  </div>
+
+                  <!-- MODULE 4 : HISTORIQUE DES SITES CONSULTÉS (5 DERNIERS) -->
+                  <div class="dash-card dash-card-history">
+                    <div class="dash-card-header">
+                      <div class="dash-card-title-group">
+                        <div class="dash-card-icon-box">
+                          <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <div class="dash-card-title-text">
+                          <h3>Sites Récents</h3>
+                          <span>5 derniers sites consultés</span>
+                        </div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" id="dash-clear-history-btn" class="dash-history-clear-btn" title="Vider l'historique">
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <button type="button" class="dash-card-link-btn" data-deck-view="bookmarks" title="Voir tous les raccourcis">
+                          Raccourcis <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Liste des 5 derniers sites -->
+                    <div id="dash-history-list" class="dash-history-list">
+                      <!-- Rempli dynamiquement par renderVisitedSites() -->
+                    </div>
+                  </div>
+
+                  <!-- MODULE 5 : ACTIONS RAPIDES & PRODUCTIVITÉ -->
+                  <div class="dash-card dash-card-shortcuts">
+                    <div class="dash-quick-actions-row">
+                      <button type="button" class="dash-quick-action-card action-pomo" data-deck-view="pomodoro" title="Lancer une session Pomodoro">
+                        <i class="fa-solid fa-stopwatch"></i>
+                        <span>Focus Lo-Fi</span>
+                      </button>
+                      <button type="button" class="dash-quick-action-card action-code" data-deck-view="notes" title="Ouvrir le Dev Studio Code">
+                        <i class="fa-solid fa-laptop-code"></i>
+                        <span>Dev Studio</span>
+                      </button>
+                      <button type="button" class="dash-quick-action-card action-news" data-deck-view="feeds" title="Lire les actualités">
+                        <i class="fa-solid fa-newspaper"></i>
+                        <span>Actualités</span>
+                      </button>
+                      <button type="button" class="dash-quick-action-card action-book" data-deck-view="bookmarks" title="Ouvrir les raccourcis web">
+                        <i class="fa-solid fa-compass"></i>
+                        <span>Raccourcis</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <!-- Horloge masquée (conservée sans affichage pour réactivation éventuelle sans casser les scripts) -->
+            <aside class="overview-left-col" id="overview-clock-col" style="display: none !important;" aria-hidden="true">
+              <div class="left-clock-card font-inter clock-style-editorial clock-size-medium" id="left-clock-card">
+                <div class="clock-card-top">
+                  <button type="button" id="clock-tz-badge" class="clock-tz-pill"><i class="fa-solid fa-globe"></i> LOCAL • PARIS</button>
+                  <button type="button" id="clock-mode-toggle" class="clock-tz-pill clock-mode-pill"><i id="clock-mode-icon" class="fa-solid fa-clock"></i> <span id="clock-mode-label">Horloge</span></button>
+                </div>
+                <span id="clock-greeting" class="clock-greeting">Bonjour</span>
+                <div class="left-clock-display" id="left-clock-display">
+                  <div class="time-digits-box">
+                    <span id="time" class="left-time-main">00:00</span>
+                    <span id="clock-ms-tick" class="clock-ms-tick" style="display: none;">.00</span>
+                  </div>
+                  <span id="clock-ampm-pill" class="ampm-pill" hidden>AM</span>
+                </div>
+                <div id="clock-flip-wrap" class="clock-flip-wrap" style="display: none;">
+                  <div class="flip-unit"><span class="flip-digit" id="flip-h">12</span></div>
+                  <span class="flip-sep">:</span>
+                  <div class="flip-unit"><span class="flip-digit" id="flip-m">30</span></div>
+                  <span class="flip-sep" id="flip-sec-sep" style="display:none;">:</span>
+                  <div class="flip-unit" id="flip-sec-unit" style="display:none;"><span class="flip-digit" id="flip-s">00</span></div>
+                </div>
+                <div id="clock-analog-wrap" class="clock-analog-wrap" style="display: none;">
+                  <svg class="clock-analog-svg" viewBox="0 0 200 200">
+                    <circle class="analog-face" cx="100" cy="100" r="92" />
+                    <line class="analog-tick major" x1="100" y1="14" x2="100" y2="26" />
+                    <line id="analog-hour-hand" class="analog-hand-hour" x1="100" y1="100" x2="100" y2="52" />
+                    <line id="analog-min-hand" class="analog-hand-min" x1="100" y1="100" x2="100" y2="34" />
+                    <line id="analog-sec-hand" class="analog-hand-sec" x1="100" y1="114" x2="100" y2="24" />
+                    <circle class="analog-center-dot" cx="100" cy="100" r="4.5" />
+                  </svg>
+                </div>
+                <div class="left-clock-telemetry">
+                  <div id="date" class="left-date-main">Chargement...</div>
+                  <div class="clock-telemetry-chips">
+                    <span class="chrono-chip" id="clock-week-chip"><i class="fa-solid fa-calendar-week"></i><span id="clock-week-text">Sem. --</span></span>
+                    <span class="chrono-chip" id="clock-day-chip"><i class="fa-solid fa-hourglass-half"></i><span id="clock-day-text">Jour --/365</span></span>
+                    <span class="chrono-chip solar-chip" id="clock-solar-chip"><i id="clock-solar-icon" class="fa-solid fa-sun"></i><span id="clock-solar-text">Diurne</span></span>
+                  </div>
+                </div>
+                <div id="day-progress-wrap" class="day-progress-wrap">
+                  <div class="day-progress-header">
+                    <span class="day-progress-title"><i class="fa-solid fa-circle-notch"></i> Progression Journée</span>
+                    <div class="day-progress-stats">
+                      <span id="day-progress-pct" class="progress-pct-bold">0%</span>
+                      <span id="day-progress-remaining" class="progress-remaining-sub">(12h 00m restants)</span>
+                    </div>
+                  </div>
+                  <div class="day-progress-track">
+                    <div id="day-progress-fill" class="day-progress-fill" style="width: 0%;"><span class="progress-glow-head"></span></div>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+
+          <!-- ==============================================
+               VUE 2 : RACCOURCIS WEB & FAVORIS (NOUVEL ONGLET DÉDIÉ)
+               ============================================== -->
+          <div id="deck-view-bookmarks" class="deck-slide-view bookmarks-full-view" hidden>
+            <div class="bookmarks-view-header">
+              <div class="bookmarks-title-group">
+                <div class="bookmarks-title-icon"><i class="fa-solid fa-compass"></i></div>
+                <div>
+                  <h2 class="bookmarks-title">Raccourcis Web &amp; Favoris</h2>
+                  <span class="bookmarks-subtitle">Accès rapide à vos applications et sites web préférés par catégorie</span>
+                </div>
+              </div>
+              <div class="bookmarks-header-actions">
+                <button type="button" id="bookmarks-add-link-btn" class="bookmarks-action-btn primary" title="Ajouter un raccourci">
+                  <i class="fa-solid fa-plus"></i> <span>Nouveau Raccourci</span>
+                </button>
+                <button type="button" class="bookmarks-action-btn" data-deck-view="customize" title="Gérer les catégories dans les paramètres">
+                  <i class="fa-solid fa-sliders"></i> <span>Gérer Catégories</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="bookmarks-view-body">
+              <!-- Zone principale : Grille des Catégories de Signets -->
+              <section class="overview-categories-section">
+                <div id="categories-container" class="categories-grid"></div>
+              </section>
             </div>
           </div>
 
@@ -2525,6 +2779,7 @@
     <script defer src="js/skulpt.min.js"></script>
     <script defer src="js/skulpt-stdlib.js"></script>
     <script defer src="js/notes-studio.js?v=1.1"></script>
+    <script defer src="js/dashboard.js?v=1.0"></script>
     <script defer src="js/app.js?v=3.2"></script>
   </body>
 </html>

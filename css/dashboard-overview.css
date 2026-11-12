@@ -1,0 +1,1297 @@
+/* ========================================================
+   css/dashboard-overview.css - Tableau de Bord Exécutif "Accueil"
+   Design Cockpit Futuriste, Bento Grid & Raccourcis Dédiés
+   Violet Dev Studio // Startpage
+   ======================================================== */
+
+/* --- CONTENEUR PRINCIPAL DU DASHBOARD ACCUEIL --- */
+.dashboard-home-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  padding-bottom: 1rem;
+}
+
+/* --- 1. HERO BANNER : SALUTATION, ÉTAT HUD & RECHERCHE OMNIBOX --- */
+.dash-hero-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.95rem;
+  padding: 1.15rem 1.4rem;
+  border-radius: 20px;
+  background: var(--surface, rgba(14, 18, 28, 0.76));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-hero-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-primary, #31e1f7), var(--accent-secondary, #b55fe6), transparent);
+  opacity: 0.75;
+}
+
+.dash-hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dash-greeting-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.dash-greeting-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, rgba(var(--accent-primary-rgb, 49, 225, 247), 0.2), rgba(var(--accent-secondary-rgb, 181, 95, 230), 0.2));
+  border: 1.5px solid var(--border-highlight, rgba(49, 225, 247, 0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: var(--accent-primary, #31e1f7);
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.25);
+  flex-shrink: 0;
+}
+
+.dash-greeting-text h2 {
+  font-size: 1.28rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  line-height: 1.2;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.dash-greeting-text p {
+  font-size: 0.8rem;
+  color: var(--text-muted, #7c859e);
+  margin-top: 2px;
+}
+
+.dash-hero-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.dash-tele-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  font-size: 0.76rem;
+  color: var(--text-main, #eef2f6);
+  font-weight: 500;
+  user-select: none;
+}
+
+.dash-tele-chip.status-chip {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.08);
+  color: #34d399;
+}
+
+.dash-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: dashPulse 2s infinite ease-in-out;
+}
+
+@keyframes dashPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.55; }
+}
+
+/* Recherche omnibox intégrée */
+.dash-hero-search {
+  width: 100%;
+}
+
+.dash-hero-search .search-box {
+  background: rgba(8, 11, 19, 0.75);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.12));
+  padding: 0.65rem 1.15rem;
+  border-radius: 14px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease;
+}
+
+.dash-hero-search .search-box:focus-within {
+  border-color: var(--accent-primary, #31e1f7);
+  box-shadow: 0 0 20px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.25), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* --- 2. BANDEAU DE MÉTRIQUES KPI EN DIRECT (4 CARTES) --- */
+.dash-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(10px, 1.2vw, 18px);
+  flex-shrink: 0;
+}
+
+.dash-kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.05rem;
+  border-radius: 16px;
+  background: var(--surface, rgba(14, 18, 28, 0.72));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+
+.dash-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-highlight, rgba(49, 225, 247, 0.4));
+  background: var(--surface-strong, rgba(22, 28, 42, 0.85));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.15);
+}
+
+.dash-kpi-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dash-kpi-card.kpi-weather .dash-kpi-icon {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.28);
+}
+
+.dash-kpi-card.kpi-market .dash-kpi-icon {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.28);
+}
+
+.dash-kpi-card.kpi-agenda .dash-kpi-icon {
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.12);
+  border-color: rgba(167, 139, 250, 0.28);
+}
+
+.dash-kpi-card.kpi-history .dash-kpi-icon {
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.12);
+  border-color: rgba(251, 146, 60, 0.28);
+}
+
+.dash-kpi-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.dash-kpi-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted, #7c859e);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-kpi-val-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin-top: 1px;
+}
+
+.dash-kpi-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  letter-spacing: -0.2px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-kpi-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.dash-kpi-badge.up {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.15);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.dash-kpi-badge.down {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.dash-kpi-badge.neutral {
+  color: var(--accent-primary, #31e1f7);
+  background: rgba(49, 225, 247, 0.12);
+  border: 1px solid rgba(49, 225, 247, 0.25);
+}
+
+.dash-kpi-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted, #7c859e);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- 3. BENTO GRID PRINCIPALE DU DASHBOARD (2 COLONNES ASYMÉTRIQUES) --- */
+.dash-grid-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(14px, 1.6vw, 24px);
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.dash-col-left,
+.dash-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 1.6vw, 22px);
+  min-width: 0;
+}
+
+/* Style de Carte Unifiée Cockpit */
+.dash-card {
+  background: var(--surface, rgba(14, 18, 28, 0.74));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border-radius: 20px;
+  padding: 1.25rem 1.4rem;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.dash-card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Header de Carte */
+.dash-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-shrink: 0;
+}
+
+.dash-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.dash-card-icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary, #31e1f7);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.dash-card-title-text h3 {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.dash-card-title-text span {
+  font-size: 0.72rem;
+  color: var(--text-muted, #7c859e);
+  display: block;
+  margin-top: 2px;
+}
+
+.dash-card-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-primary, #31e1f7);
+  background: rgba(var(--accent-primary-rgb, 49, 225, 247), 0.08);
+  border: 1px solid rgba(var(--accent-primary-rgb, 49, 225, 247), 0.2);
+  padding: 0.32rem 0.7rem;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.dash-card-link-btn:hover {
+  background: rgba(var(--accent-primary-rgb, 49, 225, 247), 0.2);
+  border-color: var(--accent-primary, #31e1f7);
+  transform: translateX(2px);
+  color: #ffffff;
+}
+
+/* --- 4. MODULE ACTIONS & ETF FAVORIS (S&P500, STOXX 600, MSCI EM, NVIDIA) --- */
+.dash-market-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 0.95rem;
+}
+
+.dash-market-asset-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.85rem 0.95rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dash-market-asset-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.dash-market-asset-item.is-selected {
+  border-color: var(--accent-primary, #31e1f7);
+  background: rgba(var(--accent-primary-rgb, 49, 225, 247), 0.08);
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.2);
+}
+
+.dash-asset-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.dash-asset-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.dash-asset-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  color: var(--accent-white, #fff);
+  flex-shrink: 0;
+}
+
+.dash-asset-title-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-asset-title-block strong {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  line-height: 1.1;
+}
+
+.dash-asset-title-block span {
+  font-size: 0.68rem;
+  color: var(--text-muted, #7c859e);
+}
+
+.dash-asset-chg-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+}
+
+.dash-asset-chg-pill.up {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.15);
+}
+
+.dash-asset-chg-pill.down {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.15);
+}
+
+.dash-asset-chart-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
+}
+
+.dash-asset-price-val {
+  font-size: 1.12rem;
+  font-weight: 800;
+  color: var(--accent-white, #ffffff);
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-asset-sparkline {
+  width: 84px;
+  height: 28px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+/* Zone d'aperçu dynamique de l'actif sélectionné */
+.dash-asset-preview-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(8, 11, 18, 0.65);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.06));
+  flex-wrap: wrap;
+}
+
+.dash-preview-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.dash-stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-stat-item label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  color: var(--text-muted, #7c859e);
+  font-weight: 600;
+}
+
+.dash-stat-item strong {
+  font-size: 0.86rem;
+  color: var(--accent-white, #ffffff);
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-timeframe-toggles {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px;
+  border-radius: 8px;
+}
+
+.dash-tf-btn {
+  padding: 0.22rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted, #7c859e);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.dash-tf-btn.active,
+.dash-tf-btn:hover {
+  color: var(--accent-white, #ffffff);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* --- 5. MODULE MÉTÉO AVEC GRAPHIQUE TEMPÉRATURES & PRÉCIPITATIONS --- */
+.dash-weather-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.95rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-wrap: wrap;
+}
+
+.dash-weather-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dash-weather-big-icon {
+  font-size: 2.8rem;
+  color: #38bdf8;
+  filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.4));
+  flex-shrink: 0;
+}
+
+.dash-weather-temp-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-weather-big-temp {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--accent-white, #ffffff);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.dash-weather-desc {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main, #c5c6c7);
+  margin-top: 4px;
+}
+
+.dash-weather-details-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.dash-weather-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.72rem;
+  color: var(--text-main, #eef2f6);
+}
+
+.dash-weather-chip i {
+  color: var(--accent-primary, #31e1f7);
+  font-size: 0.75rem;
+}
+
+/* Zone du graphique dual Températures & Précipitations */
+.dash-weather-chart-box {
+  margin-top: 0.95rem;
+  position: relative;
+  width: 100%;
+}
+
+.dash-chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-muted, #7c859e);
+}
+
+.dash-legend-items {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dash-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dash-legend-line {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: #38bdf8;
+}
+
+.dash-legend-bar {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: rgba(49, 225, 247, 0.35);
+  border: 1px solid rgba(49, 225, 247, 0.8);
+}
+
+.dash-weather-svg-container {
+  width: 100%;
+  height: 145px;
+  position: relative;
+}
+
+.dash-weather-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.dash-weather-tooltip {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(14, 18, 28, 0.94);
+  border: 1px solid var(--accent-primary, #31e1f7);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.7rem;
+  color: #ffffff;
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  display: none;
+  z-index: 10;
+}
+
+/* Bandeau des 3 prochains jours */
+.dash-weather-3days-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.dash-day-forecast-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.dash-day-name {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--accent-white, #fff);
+}
+
+.dash-day-icon {
+  font-size: 0.95rem;
+  color: var(--accent-primary, #31e1f7);
+}
+
+.dash-day-temps {
+  font-size: 0.74rem;
+  color: var(--text-main, #c5c6c7);
+  font-weight: 600;
+}
+
+/* --- 6. MINI AGENDA DE LA SEMAINE & PROCHAINS ÉVÉNEMENTS --- */
+.dash-week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.45rem;
+  margin-bottom: 0.95rem;
+}
+
+.dash-week-day-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.45rem 0.2rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  position: relative;
+}
+
+.dash-week-day-pill:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dash-week-day-pill.today {
+  border-color: var(--accent-primary, #31e1f7);
+  background: rgba(var(--accent-primary-rgb, 49, 225, 247), 0.12);
+  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.2);
+}
+
+.dash-week-day-pill.selected {
+  background: var(--accent-primary, #31e1f7);
+  border-color: var(--accent-primary, #31e1f7);
+  color: #06040e !important;
+}
+
+.dash-week-day-pill.selected .dash-day-short,
+.dash-week-day-pill.selected .dash-day-num {
+  color: #06040e !important;
+  font-weight: 800;
+}
+
+.dash-day-short {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  color: var(--text-muted, #7c859e);
+  font-weight: 600;
+}
+
+.dash-day-num {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  margin-top: 2px;
+}
+
+.dash-day-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent-secondary, #b55fe6);
+  margin-top: 3px;
+  opacity: 0;
+}
+
+.dash-week-day-pill.has-task .dash-day-dot {
+  opacity: 1;
+}
+
+/* Liste des prochains événements / tâches */
+.dash-upcoming-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 0.85rem;
+}
+
+.dash-task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.2s ease;
+}
+
+.dash-task-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dash-task-item.is-done {
+  opacity: 0.55;
+}
+
+.dash-task-item.is-done .dash-task-title {
+  text-decoration: line-through;
+  color: var(--text-muted, #7c859e);
+}
+
+.dash-task-left {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.dash-task-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 17px;
+  height: 17px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-subtle, rgba(255, 255, 255, 0.2));
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.dash-task-checkbox:checked {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.dash-task-checkbox:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -52%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.dash-task-title {
+  font-size: 0.82rem;
+  color: var(--accent-white, #ffffff);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.dash-task-badge-prio {
+  font-size: 0.65rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.dash-task-badge-prio.urgent {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.dash-task-badge-prio.normal {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+}
+
+.dash-task-badge-prio.low {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+}
+
+.dash-task-badge-date {
+  font-size: 0.68rem;
+  color: var(--text-muted, #7c859e);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+}
+
+.dash-tasks-empty {
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+  color: var(--text-muted, #7c859e);
+  font-size: 0.8rem;
+}
+
+/* Formulaire d'ajout rapide de tâche */
+.dash-task-fast-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 10px;
+  background: rgba(8, 11, 18, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dash-task-fast-form input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: 0.78rem;
+  color: var(--text-main, #eef2f6);
+  outline: none;
+}
+
+.dash-task-fast-form input::placeholder {
+  color: var(--text-muted, #7c859e);
+}
+
+.dash-task-fast-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--accent-primary, #31e1f7);
+  color: #06040e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.18s ease;
+}
+
+.dash-task-fast-btn:hover {
+  transform: scale(1.08);
+}
+
+/* --- 7. MODULE HISTORIQUE DES SITES CONSULTÉS (5 DERNIERS) --- */
+.dash-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.dash-history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.22s ease;
+}
+
+.dash-history-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-highlight, rgba(49, 225, 247, 0.35));
+  transform: translateX(3px);
+}
+
+.dash-history-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.dash-history-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  color: var(--accent-primary, #31e1f7);
+  flex-shrink: 0;
+}
+
+.dash-history-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dash-history-name {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-history-domain {
+  font-size: 0.7rem;
+  color: var(--text-muted, #7c859e);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-history-right {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.dash-history-time {
+  font-size: 0.68rem;
+  color: var(--text-muted, #7c859e);
+  white-space: nowrap;
+}
+
+.dash-history-arrow {
+  color: var(--text-muted, #7c859e);
+  font-size: 0.72rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.dash-history-item:hover .dash-history-arrow {
+  color: var(--accent-primary, #31e1f7);
+  transform: translate(2px, -2px);
+}
+
+.dash-history-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #7c859e);
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.dash-history-clear-btn:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* --- 8. MODULE ACTIONS PRODUCTIVITÉ (QUICK LAUNCH) --- */
+.dash-quick-actions-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.65rem;
+}
+
+.dash-quick-action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.75rem 0.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
+  color: inherit;
+  user-select: none;
+}
+
+.dash-quick-action-card:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-highlight, rgba(49, 225, 247, 0.4));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.dash-quick-action-card i {
+  font-size: 1.15rem;
+}
+
+.dash-quick-action-card span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-white, #fff);
+  text-align: center;
+}
+
+.dash-quick-action-card.action-pomo i { color: #f43f5e; }
+.dash-quick-action-card.action-code i { color: #a78bfa; }
+.dash-quick-action-card.action-news i { color: #38bdf8; }
+.dash-quick-action-card.action-book i { color: #34d399; }
+
+/* --- 9. NOUVEL ONGLET DÉDIÉ : RACCOURCIS WEB & FAVORIS --- */
+.bookmarks-full-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.bookmarks-view-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1.4rem;
+  border-radius: 18px;
+  background: var(--surface, rgba(14, 18, 28, 0.72));
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.bookmarks-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.bookmarks-title-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(var(--accent-primary-rgb, 49, 225, 247), 0.18), rgba(var(--accent-secondary-rgb, 181, 95, 230), 0.18));
+  border: 1px solid var(--border-highlight, rgba(49, 225, 247, 0.4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: var(--accent-primary, #31e1f7);
+}
+
+.bookmarks-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  line-height: 1.2;
+}
+
+.bookmarks-subtitle {
+  font-size: 0.74rem;
+  color: var(--text-muted, #7c859e);
+}
+
+.bookmarks-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.bookmarks-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 99px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+  color: var(--text-main, #eef2f6);
+  transition: all 0.22s ease;
+  user-select: none;
+}
+
+.bookmarks-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.bookmarks-action-btn.primary {
+  background: var(--accent-primary, #31e1f7);
+  border-color: var(--accent-primary, #31e1f7);
+  color: #06040e;
+  font-weight: 700;
+  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.35);
+}
+
+.bookmarks-action-btn.primary:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.bookmarks-view-body {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 10. RESPONSIVE MEDIA QUERIES --- */
+@media (max-width: 1180px) {
+  .dash-kpi-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dash-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dash-kpi-row {
+    grid-template-columns: 1fr;
+  }
+  .dash-market-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .dash-hero-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dash-weather-hero {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .dash-quick-actions-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
