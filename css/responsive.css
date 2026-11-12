@@ -86,8 +86,7 @@ body.dim-mode .bg-wallpaper {
   }
 
   .hub-themes-grid,
-  .backup-cards-grid,
-  .glass-variants-grid {
+  .backup-cards-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 

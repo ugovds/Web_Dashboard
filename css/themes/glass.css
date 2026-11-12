@@ -1,191 +1,52 @@
 /* ========================================================
-   Thème 5 : Apple Liquid Glass (Verre Liquide & VisionOS)
-   - Verre dépoli gris fumé translucide (Smoke Crystal)
-   - Silhouette "Effet Bulle" Apple : Squircles généreux & Pilules 9999px
-   - Optique bulle : Ménisque liquide, biseau spéculaire doux (non éblouissant)
-   - Performance GPU 60-120 FPS avec translate3d fluide
-   - Couverture universelle : Cockpit, Marchés, Agenda, Météo, Feeds, Studio, Bookmarks, Modals
-   - 8 Variantes de contraste : Violet, Bleu, Vert, Transparent, Rouge, Ambre, Cyan, Rose
+   Thème 5 : Pure Transparent Liquid Glass (Apple VisionOS)
+   Adapté d'après les shaders et architectures optiques Liquid Glass
+   - Verre ultra-transparent & cristallin (Pure Crystal Clear)
+   - Réfraction multi-couches à lentille spéculaire (Multi-Offset Inset Shadows)
+   - Ménisques liquides physiques & biseaux optiques asymétriques
+   - Silhouette "Bulle Liquide" Apple : Squircles 26px & Capsules 9999px
+   - Performance GPU 60-120 FPS
    ======================================================== */
 
 :root {
-  --glass-wallpaper-blur: 32px;
+  --glass-wallpaper-blur: 26px;
 }
 
 /* ========================================================
-   1. VARIABLES FONDAMENTALES DU THÈME GLASS (VISIONOS NEUTRAL SMOKED)
+   1. VARIABLES DU THÈME LIQUID GLASS TRANSPARENT
    ======================================================== */
 body[data-theme="5"] {
-  /* Fond et surface gris fumé translucide authentique Apple (non opaque, non teinté violet foncé) */
   --bg-deep: #08090d;
-  --surface: rgba(30, 32, 40, 0.38);
-  --surface-strong: rgba(40, 42, 52, 0.58);
-  --surface-subtle: rgba(255, 255, 255, 0.05);
-  --surface-pill: rgba(255, 255, 255, 0.07);
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-strong: rgba(255, 255, 255, 0.07);
+  --surface-subtle: rgba(255, 255, 255, 0.025);
+  --surface-pill: rgba(255, 255, 255, 0.05);
   --border-subtle: rgba(255, 255, 255, 0.10);
-  --border-highlight: rgba(255, 255, 255, 0.28);
-  --accent-primary: #c084fc;
-  --accent-primary-rgb: 192, 132, 252;
-  --accent-secondary: #a855f7;
-  --accent-secondary-rgb: 168, 85, 247;
+  --border-highlight: rgba(255, 255, 255, 0.35);
+  --accent-primary: #ffffff;
+  --accent-primary-rgb: 255, 255, 255;
+  --accent-secondary: #cbd5e1;
+  --accent-secondary-rgb: 203, 213, 225;
   --accent-white: #ffffff;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
 
-  /* Orbes liquides sous la surface */
-  --orb-1: rgba(192, 132, 252, 0.35);
-  --orb-2: rgba(168, 85, 247, 0.28);
-  --orb-3: rgba(216, 180, 254, 0.22);
+  /* Orbes liquides d'ambiance cristalline */
+  --orb-1: rgba(255, 255, 255, 0.18);
+  --orb-2: rgba(148, 163, 184, 0.16);
+  --orb-3: rgba(203, 213, 225, 0.14);
 
-  /* Biseau spéculaire doux simulant la lumière ambiante Apple */
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-border-specular: rgba(255, 255, 255, 0.24);
-  --glass-shadow: rgba(0, 0, 0, 0.45);
-  --glass-sheen: rgba(255, 255, 255, 0.10);
-  --glass-tint-badge: #d8b4fe;
+  --glass-border: rgba(255, 255, 255, 0.11);
+  --glass-border-specular: rgba(255, 255, 255, 0.30);
+  --glass-shadow: rgba(0, 0, 0, 0.50);
 }
 
 /* ========================================================
-   2. VARIANTES DE CONTRASTE LIQUID GLASS (AMETHYSTE, SAPHIR, ETC.)
-   Surfaces neutres translucides, l'ambiance et les accents portent la couleur
-   ======================================================== */
-
-/* --- A. Glass Violet (Améthyste Liquide) --- */
-body[data-theme="5"][data-glass-tint="violet"],
-body[data-theme="5"]:not([data-glass-tint]) {
-  --bg-deep: #08090d;
-  --surface: rgba(30, 31, 42, 0.38);
-  --accent-primary: #c084fc;
-  --accent-primary-rgb: 192, 132, 252;
-  --accent-secondary: #a855f7;
-  --accent-secondary-rgb: 168, 85, 247;
-  --orb-1: rgba(192, 132, 252, 0.36);
-  --orb-2: rgba(168, 85, 247, 0.28);
-  --orb-3: rgba(216, 180, 254, 0.22);
-  --glass-tint-badge: #d8b4fe;
-}
-
-/* --- B. Glass Bleu (Saphir Apple / Azure Liquide) --- */
-body[data-theme="5"][data-glass-tint="bleu"] {
-  --bg-deep: #07090f;
-  --surface: rgba(28, 33, 46, 0.38);
-  --accent-primary: #38bdf8;
-  --accent-primary-rgb: 56, 189, 248;
-  --accent-secondary: #2563eb;
-  --accent-secondary-rgb: 37, 99, 235;
-  --orb-1: rgba(56, 189, 248, 0.38);
-  --orb-2: rgba(37, 99, 235, 0.28);
-  --orb-3: rgba(125, 211, 252, 0.22);
-  --glass-tint-badge: #7dd3fc;
-}
-
-/* --- C. Glass Vert (Émeraude / Mint Liquide) --- */
-body[data-theme="5"][data-glass-tint="vert"] {
-  --bg-deep: #070c0a;
-  --surface: rgba(26, 36, 32, 0.38);
-  --accent-primary: #34d399;
-  --accent-primary-rgb: 52, 211, 153;
-  --accent-secondary: #059669;
-  --accent-secondary-rgb: 5, 150, 105;
-  --orb-1: rgba(52, 211, 153, 0.36);
-  --orb-2: rgba(5, 150, 105, 0.26);
-  --orb-3: rgba(110, 231, 183, 0.20);
-  --glass-tint-badge: #6ee7b7;
-}
-
-/* --- D. Glass Transparent (Crystal Pur / VisionOS Ultra Clear) --- */
-body[data-theme="5"][data-glass-tint="transparent"] {
-  --bg-deep: #060709;
-  --surface: rgba(255, 255, 255, 0.05);
-  --surface-strong: rgba(255, 255, 255, 0.09);
-  --surface-pill: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(255, 255, 255, 0.12);
-  --border-highlight: rgba(255, 255, 255, 0.45);
-  --accent-primary: #f8fafc;
-  --accent-primary-rgb: 248, 250, 252;
-  --accent-secondary: #94a3b8;
-  --accent-secondary-rgb: 148, 163, 184;
-  --orb-1: rgba(255, 255, 255, 0.22);
-  --orb-2: rgba(148, 163, 184, 0.18);
-  --orb-3: rgba(226, 232, 240, 0.16);
-  --glass-border: rgba(255, 255, 255, 0.15);
-  --glass-border-specular: rgba(255, 255, 255, 0.35);
-  --glass-tint-badge: #ffffff;
-}
-
-/* --- E. Glass Rouge (Rubis Liquide / Sunset) --- */
-body[data-theme="5"][data-glass-tint="rouge"] {
-  --bg-deep: #0d0608;
-  --surface: rgba(38, 28, 32, 0.38);
-  --accent-primary: #f43f5e;
-  --accent-primary-rgb: 244, 63, 94;
-  --accent-secondary: #e11d48;
-  --accent-secondary-rgb: 225, 29, 72;
-  --orb-1: rgba(244, 63, 94, 0.36);
-  --orb-2: rgba(225, 29, 72, 0.28);
-  --orb-3: rgba(253, 164, 175, 0.20);
-  --glass-tint-badge: #fda4af;
-}
-
-/* --- F. Glass Ambre (Ambre Doré / Miel) --- */
-body[data-theme="5"][data-glass-tint="ambre"] {
-  --bg-deep: #0c0905;
-  --surface: rgba(38, 33, 26, 0.38);
-  --accent-primary: #fbbf24;
-  --accent-primary-rgb: 251, 191, 36;
-  --accent-secondary: #d97706;
-  --accent-secondary-rgb: 217, 119, 6;
-  --orb-1: rgba(251, 191, 36, 0.36);
-  --orb-2: rgba(217, 119, 6, 0.26);
-  --orb-3: rgba(253, 230, 138, 0.20);
-  --glass-tint-badge: #fde68a;
-}
-
-/* --- G. Glass Cyan (Aqua / Glace Polaire) --- */
-body[data-theme="5"][data-glass-tint="cyan"] {
-  --bg-deep: #050b0e;
-  --surface: rgba(26, 35, 42, 0.38);
-  --accent-primary: #22d3ee;
-  --accent-primary-rgb: 34, 211, 238;
-  --accent-secondary: #0891b2;
-  --accent-secondary-rgb: 8, 145, 178;
-  --orb-1: rgba(34, 211, 238, 0.36);
-  --orb-2: rgba(8, 145, 178, 0.28);
-  --orb-3: rgba(165, 243, 252, 0.20);
-  --glass-tint-badge: #a5f3fc;
-}
-
-/* --- H. Glass Rose (Quartz / Néon Pastel) --- */
-body[data-theme="5"][data-glass-tint="rose"] {
-  --bg-deep: #0c060b;
-  --surface: rgba(38, 28, 36, 0.38);
-  --accent-primary: #f472b6;
-  --accent-primary-rgb: 244, 114, 182;
-  --accent-secondary: #db2777;
-  --accent-secondary-rgb: 219, 39, 119;
-  --orb-1: rgba(244, 114, 182, 0.36);
-  --orb-2: rgba(219, 39, 119, 0.28);
-  --orb-3: rgba(251, 207, 232, 0.20);
-  --glass-tint-badge: #fbcfe8;
-}
-
-/* ========================================================
-   3. ARRIÈRE-PLAN & ORBES ACCÉLÉRÉS GPU
+   2. ARRIÈRE-PLAN & ORBES ACCÉLÉRÉS GPU
    ======================================================== */
 
 body[data-theme="5"] {
   background: var(--bg-deep) !important;
-}
-
-/* Micro-texture physique de verre dépoli ultra-fine */
-body[data-theme="5"]::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.02;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 body[data-theme="5"] .ambilight-container {
@@ -194,13 +55,13 @@ body[data-theme="5"] .ambilight-container {
 }
 
 body[data-theme="5"] .bg-wallpaper {
-  opacity: 0.48;
-  filter: blur(var(--glass-wallpaper-blur, 32px)) saturate(1.8) brightness(1.05);
+  opacity: 0.55;
+  filter: blur(var(--glass-wallpaper-blur, 26px)) saturate(1.7) brightness(1.08);
   transform: scale(1.06);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Animations d'orbes fluides GPU (translate3d sans reflow CPU) */
+/* Orbes liquides en mouvement fluide translate3d GPU */
 @keyframes liquidOrbMove1 {
   0% { transform: translate3d(0, 0, 0) scale(1); }
   33% { transform: translate3d(70px, 40px, 0) scale(1.10); }
@@ -223,39 +84,39 @@ body[data-theme="5"] .bg-wallpaper {
 
 body[data-theme="5"] .ambient-orb {
   border-radius: 50% !important;
-  filter: blur(50px);
+  filter: blur(55px);
   will-change: transform;
   contain: layout style;
 }
 
 body[data-theme="5"] .orb-primary {
-  width: 540px;
-  height: 540px;
+  width: 550px;
+  height: 550px;
   top: -100px;
   left: -70px;
-  background: radial-gradient(circle, var(--orb-1) 0%, rgba(var(--accent-primary-rgb), 0.10) 50%, transparent 70%);
+  background: radial-gradient(circle, var(--orb-1) 0%, rgba(255, 255, 255, 0.08) 50%, transparent 70%);
   animation: liquidOrbMove1 24s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 body[data-theme="5"] .orb-secondary {
-  width: 600px;
-  height: 600px;
+  width: 620px;
+  height: 620px;
   bottom: -160px;
   right: -90px;
-  background: radial-gradient(circle, var(--orb-2) 0%, rgba(var(--accent-secondary-rgb), 0.10) 50%, transparent 70%);
+  background: radial-gradient(circle, var(--orb-2) 0%, rgba(148, 163, 184, 0.08) 50%, transparent 70%);
   animation: liquidOrbMove2 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
 body[data-theme="5"] .orb-tertiary {
   display: block;
   position: absolute;
-  width: 400px;
-  height: 400px;
+  width: 420px;
+  height: 420px;
   top: 32%;
   right: 22%;
   border-radius: 50% !important;
   background: radial-gradient(circle, var(--orb-3) 0%, transparent 68%);
-  filter: blur(55px);
+  filter: blur(60px);
   animation: liquidOrbMove3 22s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
@@ -267,15 +128,15 @@ body:not([data-theme="5"]) .orb-tertiary {
 }
 
 body[data-theme="5"] .bg-scanlines {
-  opacity: 0.08;
+  opacity: 0.06;
 }
 
 /* ========================================================
-   4. STRUCTURE UNIVERSELLE "EFFET BULLE" (APPLE VISIONOS)
-   Toutes les cartes, conteneurs et fenêtres du dashboard
+   3. ARCHITECTURE OPTIQUE LIQUID GLASS UNIVERSELLE
+   Système de multi-ombres internes reproduisant la réfraction
+   physique de verre liquide (Inspiré des exemples CSS/SVG)
    ======================================================== */
 
-/* Règle maîtresse : Cartes et Surfaces Principales en Verre Fumé Translucide */
 body[data-theme="5"] .dashboard-topbar,
 body[data-theme="5"] .dashboard-sidebar,
 body[data-theme="5"] .dash-card,
@@ -304,30 +165,41 @@ body[data-theme="5"] .customize-deck-panel,
 body[data-theme="5"] .custom-hub-container,
 body[data-theme="5"] .command-palette-card,
 body[data-theme="5"] .modal-content {
-  border-radius: 26px !important; /* Squircle Apple généreux */
+  border-radius: 26px !important;
   background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.07) 0%,
-    rgba(255, 255, 255, 0.015) 50%,
-    rgba(0, 0, 0, 0.12) 100%
-  ), var(--surface) !important;
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid var(--glass-border) !important;
-  border-top: 1px solid var(--glass-border-specular) !important;
+    140deg,
+    rgba(255, 255, 255, 0.065) 0%,
+    rgba(255, 255, 255, 0.012) 45%,
+    rgba(0, 0, 0, 0.06) 100%
+  ) !important;
+  backdrop-filter: blur(16px) saturate(160%) brightness(1.03);
+  -webkit-backdrop-filter: blur(16px) saturate(160%) brightness(1.03);
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
   box-shadow:
-    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.35),
-    inset 0 0 20px 0 rgba(255, 255, 255, 0.015),
-    0 18px 44px -12px var(--glass-shadow),
-    0 2px 6px -1px rgba(0, 0, 0, 0.25) !important;
+    /* Contour fin étanche */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    /* Réfraction zénithale haut-gauche */
+    inset 1.8px 3px 0px -2px rgba(255, 255, 255, 0.85),
+    /* Rebond lumineux bas-droite */
+    inset -2px -2px 0px -2px rgba(255, 255, 255, 0.45),
+    /* Biseau spéculaire inférieur */
+    inset -3px -8px 1px -6px rgba(255, 255, 255, 0.30),
+    /* Ombre interne ménisque (épaisseur physique du verre) */
+    inset 0px 3px 4px -2px rgba(0, 0, 0, 0.40),
+    inset 2px -6.5px 1px -4px rgba(0, 0, 0, 0.20),
+    inset -1.5px 2.5px 0px -2px rgba(0, 0, 0, 0.20),
+    inset -0.3px -1px 4px 0px rgba(0, 0, 0, 0.15),
+    /* Ombre de contact */
+    0px 2px 8px 0px rgba(0, 0, 0, 0.22),
+    /* Ombre d'apesanteur */
+    0px 18px 44px -8px rgba(0, 0, 0, 0.50) !important;
   position: relative;
   transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1),
               border-color 0.24s ease,
               box-shadow 0.24s ease !important;
 }
 
-/* Survol doux et élastique sans flash blanc agressif */
+/* Survol tactile élastique */
 body[data-theme="5"] .dash-card:hover,
 body[data-theme="5"] .dash-kpi-card:hover,
 body[data-theme="5"] .category-card:hover,
@@ -337,17 +209,18 @@ body[data-theme="5"] .market-bento-box:hover,
 body[data-theme="5"] .news-card:hover,
 body[data-theme="5"] .pomodoro-card:hover {
   transform: translateY(-2px) scale(1.004);
-  border-color: rgba(255, 255, 255, 0.18) !important;
-  border-top-color: rgba(255, 255, 255, 0.34) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
   box-shadow:
-    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.26),
-    inset 0 0 24px 0 rgba(255, 255, 255, 0.025),
-    0 22px 50px -10px var(--glass-shadow),
-    0 0 18px -4px rgba(var(--accent-primary-rgb), 0.20) !important;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),
+    inset 2.2px 3.5px 0px -2px rgba(255, 255, 255, 0.95),
+    inset -2px -2px 0px -2px rgba(255, 255, 255, 0.55),
+    inset 0px 3px 4px -2px rgba(0, 0, 0, 0.35),
+    0px 4px 12px rgba(0, 0, 0, 0.25),
+    0px 22px 50px -10px rgba(0, 0, 0, 0.55) !important;
 }
 
 /* ========================================================
-   5. TOPBAR & SIDEBAR EN VERRE LIQUIDE FLUIDE
+   4. TOPBAR & SIDEBAR EN VERRE LIQUIDE FLUIDE
    ======================================================== */
 
 body[data-theme="5"] .dashboard-topbar {
@@ -356,18 +229,22 @@ body[data-theme="5"] .dashboard-topbar {
 
 body[data-theme="5"] .dashboard-sidebar {
   border-radius: 24px !important;
-  border-right: 1px solid var(--glass-border) !important;
   transition: width 0.28s cubic-bezier(0.2, 0.9, 0.3, 1),
               box-shadow 0.28s ease,
               border-radius 0.25s ease,
               background 0.25s ease !important;
 }
 
+/* Sphère bulle liquide pour l'avatar de la sidebar */
 body[data-theme="5"] .sidebar-brand-avatar {
-  border-radius: 50% !important; /* Bulle sphérique */
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
+    inset 0 0 2px rgba(0, 0, 0, 0.50),
+    0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 body[data-theme="5"] .sidebar-nav-item,
@@ -379,106 +256,114 @@ body[data-theme="5"] .sidebar-nav .deck-nav-btn {
 body[data-theme="5"] .sidebar-nav-item.active,
 body[data-theme="5"] .sidebar-nav .deck-nav-btn.active {
   background: rgba(255, 255, 255, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.3),
-    0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.80),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.40),
+    0 4px 14px rgba(0, 0, 0, 0.30) !important;
   color: #ffffff !important;
 }
 
 body[data-theme="5"] .sidebar-indicator {
   border-radius: 16px !important;
-  background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary)) !important;
-  box-shadow: 0 0 14px var(--accent-primary) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  box-shadow:
+    inset 1px 1px 1px rgba(255, 255, 255, 0.6),
+    0 0 14px rgba(255, 255, 255, 0.25) !important;
 }
 
-/* Bouton Paramètres dans la topbar : Capsule bulle */
-body[data-theme="5"] .topbar-right .topbar-config-btn {
+/* Boutons de la topbar : Capsules bulles de verre */
+body[data-theme="5"] .topbar-right .topbar-config-btn,
+body[data-theme="5"] .topbar-home-btn {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.26) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-  backdrop-filter: blur(14px) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.75),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.40),
+    0 3px 8px rgba(0, 0, 0, 0.20) !important;
+  backdrop-filter: blur(12px) !important;
 }
 
-body[data-theme="5"] .topbar-right .topbar-config-btn:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
+body[data-theme="5"] .topbar-right .topbar-config-btn:hover,
+body[data-theme="5"] .topbar-home-btn:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
   transform: translateY(-1px);
 }
 
-body[data-theme="5"] .topbar-home-btn {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-}
-
 /* ========================================================
-   6. COCKPIT HERO & OMNIBOX BULLE (PHOTO 1 DU USER)
+   5. COCKPIT HERO & OMNIBOX CAPSULE (PHOTO 1)
    ======================================================== */
 
-/* Avatar icône "Bon après-midi" : Goutte bulle circulaire */
+/* Goutte bulle circulaire pour l'icône de salutation */
 body[data-theme="5"] .dash-greeting-avatar {
   border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.22), 0 4px 12px rgba(0, 0, 0, 0.25) !important;
-  color: var(--accent-primary) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
+    inset 0 0 2px rgba(0, 0, 0, 0.50),
+    0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #ffffff !important;
 }
 
 /* Badges de télémétrie Hero (Système En Ligne, Date, Heure) : Capsules bulles */
 body[data-theme="5"] .dash-tele-chip {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.24) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.20) !important;
   backdrop-filter: blur(12px) !important;
-  -webkit-backdrop-filter: blur(12px) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
 }
 
 /* Barre de Recherche Omnibox : Forme bulle capsule géante */
 body[data-theme="5"] .dash-hero-search .search-box {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.065) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
-  backdrop-filter: blur(16px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  backdrop-filter: blur(16px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
   box-shadow:
-    inset 0 1.5px 2px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 1.8px 2.5px 0px -1px rgba(255, 255, 255, 0.75),
+    inset -1.8px -1.8px 0px -1px rgba(255, 255, 255, 0.40),
+    inset 0px 3px 4px -2px rgba(0, 0, 0, 0.35),
     0 4px 14px rgba(0, 0, 0, 0.25) !important;
 }
 
 body[data-theme="5"] .dash-hero-search .search-box:focus-within {
-  background: rgba(255, 255, 255, 0.09) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  border-top-color: rgba(255, 255, 255, 0.45) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
   box-shadow:
-    0 0 0 3px rgba(var(--accent-primary-rgb), 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 2px 3px 0px -1px rgba(255, 255, 255, 0.90),
+    0 0 0 3px rgba(255, 255, 255, 0.15) !important;
 }
 
 body[data-theme="5"] .engine-badge {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.25) !important;
 }
 
 body[data-theme="5"] .search-kbd-hint,
 body[data-theme="5"] .dash-search-shortcut {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 /* ========================================================
-   7. KPI CARDS & BULLES D'ICÔNES (PHOTO 3 DU USER)
-   Remplacement des carrés colorés saturés par des bulles de verre fumé
+   6. KPI CARDS & BULLES D'ICÔNES SPHÉRIQUES
    ======================================================== */
 
 body[data-theme="5"] .dash-kpi-card {
@@ -486,33 +371,15 @@ body[data-theme="5"] .dash-kpi-card {
 }
 
 body[data-theme="5"] .dash-kpi-icon {
-  border-radius: 50% !important; /* Sphère bulle liquide */
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.30) !important;
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
   box-shadow:
-    inset 0 1.5px 2px rgba(255, 255, 255, 0.22),
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
+    inset 0 0 2px rgba(0, 0, 0, 0.50),
     0 4px 12px rgba(0, 0, 0, 0.25) !important;
-}
-
-body[data-theme="5"] .dash-kpi-card.kpi-weather .dash-kpi-icon {
-  color: #38bdf8 !important;
-  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.25), 0 0 12px rgba(56, 189, 248, 0.15) !important;
-}
-
-body[data-theme="5"] .dash-kpi-card.kpi-market .dash-kpi-icon {
-  color: #34d399 !important;
-  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.25), 0 0 12px rgba(52, 211, 153, 0.15) !important;
-}
-
-body[data-theme="5"] .dash-kpi-card.kpi-agenda .dash-kpi-icon {
-  color: #c084fc !important;
-  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.25), 0 0 12px rgba(192, 132, 252, 0.15) !important;
-}
-
-body[data-theme="5"] .dash-kpi-card.kpi-history .dash-kpi-icon {
-  color: #fbbf24 !important;
-  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.25), 0 0 12px rgba(251, 191, 36, 0.15) !important;
+  color: #ffffff !important;
 }
 
 body[data-theme="5"] .dash-kpi-badge {
@@ -521,85 +388,94 @@ body[data-theme="5"] .dash-kpi-badge {
 }
 
 /* ========================================================
-   8. CARTES DU COCKPIT (MARCHÉS, AGENDA, MÉTÉO, HISTORIQUE)
-   Suppression des formes asymétriques étranges & fonds opaques
+   7. CARTES DU COCKPIT (MARCHÉS, AGENDA, MÉTÉO, HISTORIQUE)
    ======================================================== */
 
 body[data-theme="5"] .dash-card-markets,
 body[data-theme="5"] .dash-card-weather,
 body[data-theme="5"] .dash-card-agenda,
 body[data-theme="5"] .dash-card-history {
-  border-radius: 26px !important; /* Uniformisation complète en squircles */
+  border-radius: 26px !important;
 }
 
-/* Bulles sphériques pour toutes les icônes d'en-tête de module */
+/* Bulles sphériques pour toutes les icônes d'en-tête */
 body[data-theme="5"] .dash-card-icon-box {
   border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
-  box-shadow: inset 0 1.5px 2px rgba(255, 255, 255, 0.22), 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
+    inset 0 0 2px rgba(0, 0, 0, 0.50),
+    0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  color: #ffffff !important;
 }
 
-/* Liens d'action d'en-tête ("Terminal Marchés ->", "Agenda Plein ->") : Capsules bulles */
+/* Liens d'action d'en-tête : Capsules bulles */
 body[data-theme="5"] .dash-card-link-btn,
 body[data-theme="5"] .dash-card-action-btn {
   border-radius: 9999px !important;
   padding: 0.32rem 0.85rem !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.24) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35),
+    0 2px 8px rgba(0, 0, 0, 0.20) !important;
   backdrop-filter: blur(10px) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
   font-size: 0.72rem !important;
   font-weight: 600 !important;
-  color: var(--text-main) !important;
+  color: #ffffff !important;
   transition: all 0.2s ease !important;
 }
 
 body[data-theme="5"] .dash-card-link-btn:hover,
 body[data-theme="5"] .dash-card-action-btn:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
   transform: translateY(-1px);
 }
 
 /* --- Module Marchés : Liste d'actifs & Barre d'aperçu (Photo 2) --- */
 body[data-theme="5"] .dash-market-asset-item {
   border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.20) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  box-shadow:
+    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
+    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25) !important;
 }
 
 body[data-theme="5"] .dash-market-asset-item:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.22) !important;
-  border-top-color: rgba(255, 255, 255, 0.35) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
 }
 
 body[data-theme="5"] .dash-market-asset-item.is-selected {
   background: rgba(255, 255, 255, 0.10) !important;
-  border-color: var(--accent-primary) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.3),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.85),
     0 4px 14px rgba(0, 0, 0, 0.25) !important;
 }
 
 body[data-theme="5"] .dash-asset-preview-bar {
   border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.055) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
+  border: 1px solid rgba(255, 255, 255, 0.11) !important;
   backdrop-filter: blur(14px) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35),
+    0 4px 14px rgba(0, 0, 0, 0.25) !important;
 }
 
 /* Boutons de période Marchés (24H, 7J, 1M, 1A) : Capsules bulles */
 body[data-theme="5"] .dash-timeframe-toggles {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.10) !important;
   padding: 3px !important;
 }
@@ -612,62 +488,66 @@ body[data-theme="5"] .dash-tf-btn {
 
 body[data-theme="5"] .dash-tf-btn.active,
 body[data-theme="5"] .dash-tf-btn:hover {
-  background: rgba(255, 255, 255, 0.16) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
   color: #ffffff !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4) !important;
 }
 
 /* --- Module Agenda : Pilules de jours & Liste de tâches --- */
 body[data-theme="5"] .dash-week-day-pill {
   border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.045) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.20) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  box-shadow:
+    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
+    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25) !important;
   transition: all 0.2s ease !important;
 }
 
 body[data-theme="5"] .dash-week-day-pill:hover {
   background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.20) !important;
 }
 
-/* Jour sélectionné : Goutte de verre fluide lumineuse, pas un aplat opaque */
+/* Jour sélectionné : Goutte de verre pure lumineuse */
 body[data-theme="5"] .dash-week-day-pill.selected {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: 1px solid var(--accent-primary) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.45) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
   box-shadow:
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.35),
-    0 4px 14px rgba(var(--accent-primary-rgb), 0.25) !important;
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 1.8px 2.5px 0px -1px rgba(255, 255, 255, 0.95),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.50),
+    0 4px 14px rgba(0, 0, 0, 0.30) !important;
 }
 
-/* Badge de nombre de tâches : Verre translucide pur (Élimine le carré noir #040914) */
+/* Badge de nombre de tâches : Verre translucide pur */
 body[data-theme="5"] .dash-day-task-count {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
   color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.20) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4) !important;
 }
 
 body[data-theme="5"] .dash-task-item {
   border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  box-shadow:
+    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
+    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.20) !important;
 }
 
 body[data-theme="5"] .dash-task-item:hover {
   background: rgba(255, 255, 255, 0.07) !important;
-  border-color: rgba(255, 255, 255, 0.20) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
 
 body[data-theme="5"] .dash-task-checkbox {
   border-radius: 8px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3) !important;
 }
 
 body[data-theme="5"] .dash-task-priority-pill,
@@ -678,16 +558,18 @@ body[data-theme="5"] .dash-task-deadline {
 
 body[data-theme="5"] .dash-task-delete-btn {
   border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 body[data-theme="5"] .dash-task-fast-form {
   border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(255, 255, 255, 0.045) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.22) !important;
   backdrop-filter: blur(12px) !important;
+  box-shadow:
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35) !important;
 }
 
 body[data-theme="5"] .dash-task-fast-form input {
@@ -701,36 +583,33 @@ body[data-theme="5"] .dash-weather-hour-pill {
   border: 1px solid rgba(255, 255, 255, 0.10) !important;
 }
 
-/* Tooltip des graphiques : Bulle de verre foncé ultra-net */
+/* Tooltip des graphiques : Verre fumé sombre ultra-net */
 body[data-theme="5"] .dash-chart-tooltip {
   border-radius: 14px !important;
-  background: rgba(18, 20, 26, 0.82) !important;
-  border: 1px solid rgba(255, 255, 255, 0.16) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+  background: rgba(14, 16, 22, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   backdrop-filter: blur(16px) !important;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45) !important;
+  box-shadow:
+    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.6),
+    0 12px 28px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* ========================================================
-   9. VUES ÉTENDUES DU DASHBOARD (BOOKMARKS, AGENDA, MÉTÉO, MARCHÉS, NOTES...)
-   Garantit que le thème Liquid Glass s'applique PARTOUT
+   8. VUES ÉTENDUES DU DASHBOARD (BOOKMARKS, AGENDA, MÉTÉO, MARCHÉS, NOTES...)
    ======================================================== */
 
 /* Bookmarks Full View */
 body[data-theme="5"] .customize-toolbar {
   border-radius: 20px !important;
-  background: var(--surface) !important;
-  border: 1px solid var(--glass-border) !important;
-  border-top: 1px solid var(--glass-border-specular) !important;
-  backdrop-filter: blur(20px) !important;
 }
 
 body[data-theme="5"] .bookmark-card {
   border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.045) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
   border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.20) !important;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  box-shadow:
+    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
+    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25) !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
@@ -743,39 +622,39 @@ body[data-theme="5"] .bookmark-card:hover {
 
 body[data-theme="5"] .bookmark-icon-wrap {
   border-radius: 12px !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 /* Calendar & Agenda Full View */
 body[data-theme="5"] .cal-nav-btn,
 body[data-theme="5"] .cal-today-btn {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: var(--text-main) !important;
 }
 
 body[data-theme="5"] .cal-day {
   border-radius: 14px !important;
-  background: rgba(255, 255, 255, 0.035) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
 body[data-theme="5"] .cal-day.today {
-  border-color: var(--accent-primary) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
   background: rgba(255, 255, 255, 0.07) !important;
 }
 
 body[data-theme="5"] .cal-day.selected {
   background: rgba(255, 255, 255, 0.12) !important;
-  border-color: var(--accent-primary) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4) !important;
 }
 
 body[data-theme="5"] .cal-task-pill {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.07) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
@@ -783,15 +662,15 @@ body[data-theme="5"] .cal-task-pill {
 body[data-theme="5"] .weather-action-btn,
 body[data-theme="5"] .weather-fav-chip {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: var(--text-main) !important;
 }
 
 body[data-theme="5"] .weather-search-input-wrap {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 /* Markets Full View */
@@ -799,15 +678,15 @@ body[data-theme="5"] .market-btn-primary,
 body[data-theme="5"] .market-btn-secondary,
 body[data-theme="5"] .market-index-pill {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: var(--text-main) !important;
 }
 
 body[data-theme="5"] .markets-search-box {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 /* News & Feeds Full View */
@@ -816,15 +695,15 @@ body[data-theme="5"] .news-tab-btn,
 body[data-theme="5"] .news-action-btn,
 body[data-theme="5"] .news-live-badge {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: var(--text-main) !important;
 }
 
 body[data-theme="5"] .news-tab-btn.active {
   background: rgba(255, 255, 255, 0.14) !important;
-  border-color: rgba(255, 255, 255, 0.28) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.35) !important;
 }
 
 /* Studio & Notes Full View */
@@ -833,7 +712,7 @@ body[data-theme="5"] .studio-select,
 body[data-theme="5"] .studio-btn-run,
 body[data-theme="5"] .studio-status-pill {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: var(--text-main) !important;
 }
@@ -843,20 +722,20 @@ body[data-theme="5"] .studio-terminal-col,
 body[data-theme="5"] .notes-sidebar,
 body[data-theme="5"] .note-card-item {
   border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
 }
 
 /* Pomodoro Full View */
 body[data-theme="5"] .pomodoro-control-btn,
 body[data-theme="5"] .sound-tile {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
 }
 
 /* ========================================================
-   10. MODALS, INPUTS & COMMAND PALETTE BULLE
+   9. MODALS, INPUTS & COMMAND PALETTE
    ======================================================== */
 
 body[data-theme="5"] .modal-content,
@@ -867,269 +746,51 @@ body[data-theme="5"] .command-palette-card {
 body[data-theme="5"] .modal-btn {
   border-radius: 9999px !important;
   padding: 0.55rem 1.25rem !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.28) !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  box-shadow:
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35) !important;
   color: var(--text-main) !important;
   transition: all 0.2s ease !important;
 }
 
 body[data-theme="5"] .modal-btn:hover {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.30) !important;
 }
 
 body[data-theme="5"] .modal-btn.primary {
-  background: linear-gradient(135deg, rgba(var(--accent-primary-rgb), 0.32) 0%, rgba(var(--accent-secondary-rgb), 0.2) 100%) !important;
-  border-color: var(--glass-border-specular) !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.40) !important;
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.35),
-    0 4px 14px rgba(var(--accent-primary-rgb), 0.25) !important;
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.90),
+    0 4px 14px rgba(0, 0, 0, 0.25) !important;
 }
 
 body[data-theme="5"] .config-input,
 body[data-theme="5"] .task-input,
 body[data-theme="5"] .command-palette-input {
   border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.26) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   backdrop-filter: blur(12px) !important;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18) !important;
+  box-shadow:
+    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.60),
+    inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
   color: var(--text-main) !important;
 }
 
 body[data-theme="5"] .config-input:focus,
 body[data-theme="5"] .task-input:focus,
 body[data-theme="5"] .command-palette-input:focus {
-  border-color: var(--accent-primary) !important;
-  box-shadow: 0 0 0 3px rgba(var(--accent-primary-rgb), 0.22) !important;
-}
-
-/* ========================================================
-   11. SÉLECTEUR DE VARIANTES DE CONTRASTE LIQUID GLASS
-   ======================================================== */
-
-.glass-variants-section {
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 1rem;
-  padding: 1.15rem;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.12));
-  border-top: 1px solid var(--glass-border-specular, rgba(255, 255, 255, 0.24));
-  backdrop-filter: blur(16px);
-  position: relative;
-  overflow: hidden;
-}
-
-.glass-variants-section.is-hidden {
-  display: none !important;
-}
-
-.glass-variants-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.glass-variants-title {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-main, #f8fafc);
-  letter-spacing: 0.02em;
-}
-
-.glass-variants-title i {
-  color: var(--accent-primary, #c084fc);
-}
-
-.glass-variants-subtitle {
-  font-size: 0.72rem;
-  color: var(--text-muted, #94a3b8);
-}
-
-.glass-variants-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 0.75rem;
-}
-
-.glass-variant-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.85rem 0.65rem;
-  border-radius: 18px; /* Bulle squircle */
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-top: 1px solid rgba(255, 255, 255, 0.20);
-  cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
-  overflow: hidden;
-  text-align: center;
-}
-
-.glass-variant-btn::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  pointer-events: none;
-}
-
-.glass-variant-btn:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
-}
-
-.glass-variant-btn:hover::before {
-  opacity: 1;
-}
-
-.glass-variant-btn.active {
-  border-color: var(--variant-primary, var(--accent-primary));
-  background: rgba(255, 255, 255, 0.10);
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.35),
-    0 0 14px var(--variant-glow, rgba(var(--accent-primary-rgb), 0.30));
-}
-
-.glass-variant-swatch {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.5),
-    0 4px 10px rgba(0, 0, 0, 0.3);
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-}
-
-.glass-variant-swatch::after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  left: 7px;
-  width: 12px;
-  height: 7px;
-  border-radius: 50%;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.7), transparent);
-}
-
-.glass-variant-label {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: var(--text-main, #f8fafc);
-}
-
-.glass-variant-desc {
-  font-size: 0.64rem;
-  color: var(--text-muted, #94a3b8);
-}
-
-/* Couleurs spécifiques des swatches */
-.glass-variant-btn[data-glass-variant="violet"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #d8b4fe 0%, #b55fe6 50%, #6b21a8 100%);
-  --variant-primary: #c084fc;
-  --variant-glow: rgba(192, 132, 252, 0.35);
-}
-
-.glass-variant-btn[data-glass-variant="bleu"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #7dd3fc 0%, #38bdf8 50%, #1e40af 100%);
-  --variant-primary: #38bdf8;
-  --variant-glow: rgba(56, 189, 248, 0.35);
-}
-
-.glass-variant-btn[data-glass-variant="vert"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #6ee7b7 0%, #34d399 50%, #065f46 100%);
-  --variant-primary: #34d399;
-  --variant-glow: rgba(52, 211, 153, 0.35);
-}
-
-.glass-variant-btn[data-glass-variant="transparent"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 50%, #475569 100%);
-  --variant-primary: #ffffff;
-  --variant-glow: rgba(255, 255, 255, 0.35);
-}
-
-.glass-variant-btn[data-glass-variant="rouge"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #fda4af 0%, #f43f5e 50%, #9f1239 100%);
-  --variant-primary: #f43f5e;
-  --variant-glow: rgba(244, 63, 94, 0.35);
-}
-
-.glass-variant-btn[data-glass-variant="ambre"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #fde68a 0%, #fbbf24 50%, #b45309 100%);
-  --variant-primary: #fbbf24;
-  --variant-glow: rgba(251, 191, 36, 0.35);
-}
-
-.glass-variant-btn[data-glass-variant="cyan"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #22d3ee 50%, #155e75 100%);
-  --variant-primary: #22d3ee;
-  --variant-glow: rgba(34, 211, 238, 0.35);
-}
-
-.glass-variant-btn[data-glass-variant="rose"] .glass-variant-swatch {
-  background: radial-gradient(circle at 35% 35%, #fbcfe8 0%, #f472b6 50%, #86198f 100%);
-  --variant-primary: #f472b6;
-  --variant-glow: rgba(244, 114, 182, 0.35);
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18) !important;
 }
 
 /* Aperçu couleur dans la carte thème 5 du hub */
-.theme-preview-color.glass-color {
-  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #38bdf8 45%, #c084fc 80%, #08090d 100%);
-  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(192, 132, 252, 0.35);
-}
-
-/* Pilule de variante active rapide dans la topbar */
-.glass-quick-tint-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.28rem 0.75rem;
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid var(--glass-border-specular);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: var(--accent-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2);
-}
-
-.glass-quick-tint-pill:hover {
-  background: rgba(255, 255, 255, 0.14);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-
-.glass-quick-tint-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  box-shadow: 0 0 6px var(--accent-primary);
-}
-
-body:not([data-theme="5"]) .glass-quick-tint-pill {
-  display: none !important;
+.theme-preview-color.glass-color,
+.theme-preview-color.glass-color-transparent {
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #cbd5e1 45%, #64748b 80%, #08090d 100%) !important;
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(255, 255, 255, 0.35) !important;
 }

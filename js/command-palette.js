@@ -98,27 +98,6 @@ function getPaletteItems() {
     });
   }
 
-  // 4. Variantes de contraste Liquid Glass
-  if (typeof GLASS_VARIANTS !== 'undefined') {
-    Object.entries(GLASS_VARIANTS).forEach(([vId, vCfg]) => {
-      items.push({
-        type: 'action',
-        title: `Liquid Glass : ${vCfg.name}`,
-        category: 'Liquid Glass (Nuances)',
-        url: vCfg.desc,
-        icon: 'fa-solid fa-gem',
-        action: () => {
-          if (typeof applyTheme === 'function' && typeof currentTheme !== 'undefined' && currentTheme !== '5') {
-            applyTheme('5');
-          }
-          if (typeof applyGlassTint === 'function') {
-            applyGlassTint(vId, true);
-          }
-        }
-      });
-    });
-  }
-
   return items;
 }
 
