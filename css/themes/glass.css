@@ -4,12 +4,13 @@
    - Verre ultra-transparent & cristallin (Pure Crystal Clear)
    - Réfraction multi-couches à lentille spéculaire (Multi-Offset Inset Shadows)
    - Ménisques liquides physiques & biseaux optiques asymétriques
-   - Silhouette "Bulle Liquide" Apple : Squircles 26px & Capsules 9999px
+   - Silhouette "Bulle Liquide" Apple : Squircles 26px, 16px & Capsules 9999px
+   - Zéro opacité résiduelle : tous les blocs et blocs imbriqués sont en verre liquide
    - Performance GPU 60-120 FPS
    ======================================================== */
 
 :root {
-  --glass-wallpaper-blur: 26px;
+  --glass-wallpaper-blur: 24px;
 }
 
 /* ========================================================
@@ -32,17 +33,17 @@ body[data-theme="5"] {
   --text-muted: #94a3b8;
 
   /* Orbes liquides d'ambiance cristalline */
-  --orb-1: rgba(255, 255, 255, 0.09);
-  --orb-2: rgba(180, 190, 205, 0.07);
-  --orb-3: rgba(220, 230, 245, 0.06);
+  --orb-1: rgba(255, 255, 255, 0.08);
+  --orb-2: rgba(180, 190, 205, 0.06);
+  --orb-3: rgba(220, 230, 245, 0.05);
 
   --glass-border: rgba(255, 255, 255, 0.11);
   --glass-border-specular: rgba(255, 255, 255, 0.30);
-  --glass-shadow: rgba(0, 0, 0, 0.50);
+  --glass-shadow: rgba(0, 0, 0, 0.45);
 }
 
 /* ========================================================
-   2. ARRIÈRE-PLAN & ORBES ACCÉLÉRÉS GPU
+   2. FOND DU DASHBOARD & ORBES VOLUMÉTRIQUES GPU
    ======================================================== */
 
 body[data-theme="5"] {
@@ -55,8 +56,8 @@ body[data-theme="5"] .ambilight-container {
 }
 
 body[data-theme="5"] .bg-wallpaper {
-  opacity: 0.40;
-  filter: blur(var(--glass-wallpaper-blur, 20px)) grayscale(0.7) brightness(1.04);
+  opacity: 0.35 !important;
+  filter: blur(var(--glass-wallpaper-blur, 24px)) grayscale(0.7) brightness(1.04) !important;
   transform: scale(1.04);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -94,7 +95,7 @@ body[data-theme="5"] .orb-primary {
   height: 550px;
   top: -100px;
   left: -70px;
-  background: radial-gradient(circle, var(--orb-1) 0%, rgba(255, 255, 255, 0.04) 50%, transparent 70%);
+  background: radial-gradient(circle, var(--orb-1) 0%, rgba(255, 255, 255, 0.03) 50%, transparent 70%);
   animation: liquidOrbMove1 24s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
@@ -103,7 +104,7 @@ body[data-theme="5"] .orb-secondary {
   height: 620px;
   bottom: -160px;
   right: -90px;
-  background: radial-gradient(circle, var(--orb-2) 0%, rgba(180, 190, 205, 0.03) 50%, transparent 70%);
+  background: radial-gradient(circle, var(--orb-2) 0%, rgba(180, 190, 205, 0.02) 50%, transparent 70%);
   animation: liquidOrbMove2 28s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 
@@ -128,52 +129,70 @@ body:not([data-theme="5"]) .orb-tertiary {
 }
 
 body[data-theme="5"] .bg-scanlines {
-  opacity: 0.06;
+  opacity: 0.05;
 }
 
 /* ========================================================
-   3. ARCHITECTURE OPTIQUE LIQUID GLASS UNIVERSELLE
+   3. ARCHITECTURE OPTIQUE LIQUID GLASS : CONTENEURS PRINCIPAUX
    Système de multi-ombres internes reproduisant la réfraction
-   physique de verre liquide (Inspiré des exemples CSS/SVG)
+   physique de verre liquide (Apple VisionOS / Liquid Glass Lens)
    ======================================================== */
 
 body[data-theme="5"] .dashboard-topbar,
 body[data-theme="5"] .dashboard-sidebar,
+body[data-theme="5"] .dash-hero-card,
 body[data-theme="5"] .dash-card,
 body[data-theme="5"] .dash-card-markets,
 body[data-theme="5"] .dash-card-weather,
 body[data-theme="5"] .dash-card-agenda,
 body[data-theme="5"] .dash-card-history,
-body[data-theme="5"] .dash-hero-card,
 body[data-theme="5"] .dash-kpi-card,
 body[data-theme="5"] .unified-deck-card,
 body[data-theme="5"] .category-card,
+body[data-theme="5"] .agenda-full-view .merged-calendar-section,
+body[data-theme="5"] .agenda-full-view .merged-tasks-section,
 body[data-theme="5"] .weather-search-card,
-body[data-theme="5"] .weather-radar-card,
-body[data-theme="5"] .weather-forecast-card,
+body[data-theme="5"] .samsung-hero-card,
+body[data-theme="5"] .samsung-card,
+body[data-theme="5"] .samsung-alert-card,
+body[data-theme="5"] .samsung-hourly-card,
+body[data-theme="5"] .samsung-daily-card,
+body[data-theme="5"] .samsung-radar-card,
+body[data-theme="5"] .samsung-bento-tile,
+body[data-theme="5"] .samsung-air-card,
+body[data-theme="5"] .markets-header,
 body[data-theme="5"] .market-bento-hero,
 body[data-theme="5"] .market-bento-box,
+body[data-theme="5"] .market-chart-card,
+body[data-theme="5"] .market-watchlist-card,
+body[data-theme="5"] .market-table-card,
 body[data-theme="5"] .news-header,
 body[data-theme="5"] .news-card,
 body[data-theme="5"] .article-card,
 body[data-theme="5"] .studio-container,
 body[data-theme="5"] .studio-header,
+body[data-theme="5"] .studio-editor-col,
+body[data-theme="5"] .studio-terminal-col,
+body[data-theme="5"] .cyber-terminal-card,
+body[data-theme="5"] .studio-cheatsheet-card,
 body[data-theme="5"] .pomodoro-card,
 body[data-theme="5"] .ambient-sound-card,
 body[data-theme="5"] .quote-card,
 body[data-theme="5"] .customize-deck-panel,
 body[data-theme="5"] .custom-hub-container,
 body[data-theme="5"] .command-palette-card,
-body[data-theme="5"] .modal-content {
+body[data-theme="5"] .modal-content,
+body[data-theme="5"] .config-card,
+body[data-theme="5"] .config-group {
   border-radius: 26px !important;
   background: linear-gradient(
     140deg,
     rgba(255, 255, 255, 0.065) 0%,
-    rgba(255, 255, 255, 0.012) 45%,
+    rgba(255, 255, 255, 0.015) 45%,
     rgba(0, 0, 0, 0.06) 100%
   ) !important;
-  backdrop-filter: blur(16px) saturate(160%) brightness(1.03);
-  -webkit-backdrop-filter: blur(16px) saturate(160%) brightness(1.03);
+  backdrop-filter: blur(18px) saturate(160%) brightness(1.02);
+  -webkit-backdrop-filter: blur(18px) saturate(160%) brightness(1.02);
   border: 1px solid rgba(255, 255, 255, 0.10) !important;
   box-shadow:
     /* Contour fin étanche */
@@ -199,7 +218,15 @@ body[data-theme="5"] .modal-content {
               box-shadow 0.24s ease !important;
 }
 
-/* Survol tactile élastique */
+/* Neutralisation des barres néon / dégradés opaques en ::before */
+body[data-theme="5"] .dash-hero-card::before,
+body[data-theme="5"] .market-bento-hero::before,
+body[data-theme="5"] .studio-header::before,
+body[data-theme="5"] .studio-container::before {
+  display: none !important;
+}
+
+/* Survol tactile élastique des cartes */
 body[data-theme="5"] .dash-card:hover,
 body[data-theme="5"] .dash-kpi-card:hover,
 body[data-theme="5"] .category-card:hover,
@@ -220,7 +247,361 @@ body[data-theme="5"] .pomodoro-card:hover {
 }
 
 /* ========================================================
-   4. TOPBAR & SIDEBAR EN VERRE LIQUIDE FLUIDE
+   4. SOUS-BLOCS & CELLULES IMBRIQUÉES (BLOCS DANS LES BLOCS)
+   Cellules de calendrier, lignes de tâches, tuiles d'actifs,
+   raccourcis favoris, snippets code, widgets météo
+   ======================================================== */
+
+body[data-theme="5"] .cal-day,
+body[data-theme="5"] .todo-item,
+body[data-theme="5"] .dash-task-item,
+body[data-theme="5"] .todo-input-card,
+body[data-theme="5"] .dash-task-fast-form,
+body[data-theme="5"] .dash-market-asset-item,
+body[data-theme="5"] .market-asset-row,
+body[data-theme="5"] .dash-asset-preview-bar,
+body[data-theme="5"] .link-item,
+body[data-theme="5"] .memo-snippet-box,
+body[data-theme="5"] .samsung-hourly-chip,
+body[data-theme="5"] .dash-weather-hour-pill,
+body[data-theme="5"] .dash-history-item,
+body[data-theme="5"] .note-card-item {
+  border-radius: 16px !important;
+  background: rgba(255, 255, 255, 0.038) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.55),
+    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25),
+    inset 0px 2px 3px -1px rgba(0, 0, 0, 0.25),
+    0px 2px 6px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body[data-theme="5"] .cal-day:hover:not(.empty),
+body[data-theme="5"] .todo-item:hover,
+body[data-theme="5"] .dash-task-item:hover,
+body[data-theme="5"] .dash-market-asset-item:hover,
+body[data-theme="5"] .market-asset-row:hover,
+body[data-theme="5"] .link-item:hover,
+body[data-theme="5"] .memo-snippet-box:hover {
+  background: rgba(255, 255, 255, 0.075) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.80),
+    inset -1.2px -1.2px 0px -1px rgba(255, 255, 255, 0.35),
+    0px 4px 14px rgba(0, 0, 0, 0.25) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Cellules sélectionnées / actives */
+body[data-theme="5"] .cal-day.today,
+body[data-theme="5"] .cal-day.selected,
+body[data-theme="5"] .dash-week-day-pill.selected,
+body[data-theme="5"] .dash-market-asset-item.is-selected {
+  background: rgba(255, 255, 255, 0.13) !important;
+  border-color: rgba(255, 255, 255, 0.40) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 1.8px 2.5px 0px -1px rgba(255, 255, 255, 0.95),
+    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.45),
+    0 4px 16px rgba(0, 0, 0, 0.28) !important;
+}
+
+/* ========================================================
+   5. CAPSULES, PILULES DE BOUTONS & CONTRÔLES TACTILES (9999px)
+   ======================================================== */
+
+body[data-theme="5"] .cal-nav-btn,
+body[data-theme="5"] .cal-today-btn,
+body[data-theme="5"] .task-filter-btn,
+body[data-theme="5"] .task-action-chip,
+body[data-theme="5"] .filter-chip,
+body[data-theme="5"] .todo-add-btn,
+body[data-theme="5"] .dash-week-day-pill,
+body[data-theme="5"] .dash-tf-btn,
+body[data-theme="5"] .weather-action-btn,
+body[data-theme="5"] .weather-fav-chip,
+body[data-theme="5"] .market-btn-primary,
+body[data-theme="5"] .market-btn-secondary,
+body[data-theme="5"] .market-index-pill,
+body[data-theme="5"] .market-tab-btn,
+body[data-theme="5"] .market-filter-btn,
+body[data-theme="5"] .news-tab-btn,
+body[data-theme="5"] .news-action-btn,
+body[data-theme="5"] .news-btn-icon,
+body[data-theme="5"] .studio-mode-pill,
+body[data-theme="5"] .studio-tab,
+body[data-theme="5"] .lang-tag-chip,
+body[data-theme="5"] .topbar-home-btn,
+body[data-theme="5"] .topbar-config-btn,
+body[data-theme="5"] .dash-card-link-btn,
+body[data-theme="5"] .dash-card-action-btn,
+body[data-theme="5"] .bookmarks-action-btn,
+body[data-theme="5"] .modal-btn {
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--text-main, #ffffff) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 1.2px 1.8px 0px -1px rgba(255, 255, 255, 0.65),
+    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body[data-theme="5"] .cal-nav-btn:hover,
+body[data-theme="5"] .cal-today-btn:hover,
+body[data-theme="5"] .task-filter-btn:hover,
+body[data-theme="5"] .task-action-chip:hover,
+body[data-theme="5"] .todo-add-btn:hover,
+body[data-theme="5"] .dash-week-day-pill:hover,
+body[data-theme="5"] .dash-tf-btn:hover,
+body[data-theme="5"] .weather-action-btn:hover,
+body[data-theme="5"] .market-btn-primary:hover,
+body[data-theme="5"] .market-btn-secondary:hover,
+body[data-theme="5"] .market-index-pill:hover,
+body[data-theme="5"] .news-tab-btn:hover,
+body[data-theme="5"] .studio-tab:hover,
+body[data-theme="5"] .studio-mode-pill:hover,
+body[data-theme="5"] .lang-tag-chip:hover,
+body[data-theme="5"] .topbar-home-btn:hover,
+body[data-theme="5"] .topbar-config-btn:hover,
+body[data-theme="5"] .dash-card-link-btn:hover,
+body[data-theme="5"] .modal-btn:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+/* État Actif des Pilules */
+body[data-theme="5"] .task-filter-btn.active,
+body[data-theme="5"] .news-tab-btn.active,
+body[data-theme="5"] .studio-tab.active,
+body[data-theme="5"] .studio-mode-pill.active,
+body[data-theme="5"] .lang-tag-chip.active,
+body[data-theme="5"] .dash-tf-btn.active,
+body[data-theme="5"] .news-btn-icon.active,
+body[data-theme="5"] .modal-btn.primary,
+body[data-theme="5"] .todo-add-btn,
+body[data-theme="5"] .cal-today-btn {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 1.6px 2.2px 0px -1px rgba(255, 255, 255, 0.85),
+    inset -1.2px -1.2px 0px -1px rgba(255, 255, 255, 0.40),
+    0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Pistes de contrôle capsules */
+body[data-theme="5"] .studio-mode-pills,
+body[data-theme="5"] .dash-timeframe-toggles,
+body[data-theme="5"] .news-view-toggle {
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  padding: 3px !important;
+}
+
+/* ========================================================
+   6. CHAMPS DE SAISIE & MENUS DÉROULANTS (CAPSULES OMNIBOX)
+   ======================================================== */
+
+body[data-theme="5"] .search-box,
+body[data-theme="5"] .dash-hero-search .search-box,
+body[data-theme="5"] .weather-search-input-wrap,
+body[data-theme="5"] .markets-search-box,
+body[data-theme="5"] .news-search-box,
+body[data-theme="5"] .command-palette-search-wrap,
+body[data-theme="5"] .todo-input-card input[type="text"],
+body[data-theme="5"] .todo-priority-select,
+body[data-theme="5"] .todo-date-picker input,
+body[data-theme="5"] .studio-select,
+body[data-theme="5"] .config-input,
+body[data-theme="5"] .command-palette-input {
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.65),
+    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.30),
+    inset 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+  color: #ffffff !important;
+  transition: all 0.22s ease !important;
+}
+
+body[data-theme="5"] .search-box:focus-within,
+body[data-theme="5"] .weather-search-input-wrap:focus-within,
+body[data-theme="5"] .markets-search-box:focus-within,
+body[data-theme="5"] .news-search-box:focus-within,
+body[data-theme="5"] .todo-input-card input[type="text"]:focus,
+body[data-theme="5"] .config-input:focus,
+body[data-theme="5"] .command-palette-input:focus {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 1.8px 2.5px 0px -1px rgba(255, 255, 255, 0.85),
+    0 0 0 3px rgba(255, 255, 255, 0.12) !important;
+}
+
+body[data-theme="5"] input::placeholder,
+body[data-theme="5"] textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
+}
+
+body[data-theme="5"] .engine-badge {
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.25) !important;
+}
+
+/* ========================================================
+   7. BULLES D'ICÔNES SPHÉRIQUES, BADGES & AVATARS
+   ======================================================== */
+
+body[data-theme="5"] .sidebar-brand-avatar,
+body[data-theme="5"] .dash-greeting-avatar,
+body[data-theme="5"] .dash-kpi-icon,
+body[data-theme="5"] .dash-card-icon-box,
+body[data-theme="5"] .hero-icon-bubble,
+body[data-theme="5"] .samsung-alert-icon,
+body[data-theme="5"] .link-icon-box,
+body[data-theme="5"] .bookmark-icon-wrap,
+body[data-theme="5"] .todo-input-icon-wrap {
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow:
+    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
+    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
+    inset 0 0 2px rgba(0, 0, 0, 0.50),
+    0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="5"] .dash-tele-chip,
+body[data-theme="5"] .dash-kpi-badge,
+body[data-theme="5"] .dash-day-task-count,
+body[data-theme="5"] .dash-task-priority-pill,
+body[data-theme="5"] .dash-task-deadline,
+body[data-theme="5"] .tasks-stats-badge,
+body[data-theme="5"] .todo-due-badge,
+body[data-theme="5"] .cal-task-pill,
+body[data-theme="5"] .samsung-card-badge,
+body[data-theme="5"] .markets-status-pill,
+body[data-theme="5"] .studio-status-pill,
+body[data-theme="5"] .term-local-pill,
+body[data-theme="5"] .news-source-badge,
+body[data-theme="5"] .news-time-badge,
+body[data-theme="5"] .memo-insert-pill {
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(8px) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="5"] .dash-task-checkbox,
+body[data-theme="5"] .todo-item input[type="checkbox"] {
+  border-radius: 6px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.20) !important;
+  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3) !important;
+}
+
+body[data-theme="5"] .dash-task-delete-btn,
+body[data-theme="5"] .todo-item .task-delete-btn {
+  border-radius: 50% !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ========================================================
+   8. DÉTAILS SPÉCIFIQUES DEV STUDIO & ÉDITEUR DE CODE
+   Transparence absolue pour laisser traverser le verre
+   ======================================================== */
+
+body[data-theme="5"] .studio-tabs-bar {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body[data-theme="5"] .studio-md-toolbar {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body[data-theme="5"] .md-tool-btn {
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: var(--text-muted) !important;
+}
+
+body[data-theme="5"] .md-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.10) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="5"] .studio-editor-stage {
+  background: transparent !important;
+}
+
+body[data-theme="5"] .studio-line-numbers {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.07) !important;
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+body[data-theme="5"] .notes-editor.studio-code-textarea {
+  background: transparent !important;
+  color: #f8fafc !important;
+}
+
+body[data-theme="5"] .studio-editor-footer {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body[data-theme="5"] .terminal-chrome {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body[data-theme="5"] .terminal-screen {
+  background: transparent !important;
+}
+
+body[data-theme="5"] .terminal-prompt-bar {
+  background: rgba(255, 255, 255, 0.035) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+body[data-theme="5"] .terminal-status-bar {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+body[data-theme="5"] .cheatsheet-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+}
+
+/* ========================================================
+   9. TOPBAR & SIDEBAR FLUIDES
    ======================================================== */
 
 body[data-theme="5"] .dashboard-topbar {
@@ -233,18 +614,6 @@ body[data-theme="5"] .dashboard-sidebar {
               box-shadow 0.28s ease,
               border-radius 0.25s ease,
               background 0.25s ease !important;
-}
-
-/* Sphère bulle liquide pour l'avatar de la sidebar */
-body[data-theme="5"] .sidebar-brand-avatar {
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  box-shadow:
-    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
-    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
-    inset 0 0 2px rgba(0, 0, 0, 0.50),
-    0 4px 12px rgba(0, 0, 0, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
 }
 
 body[data-theme="5"] .sidebar-nav-item,
@@ -273,522 +642,9 @@ body[data-theme="5"] .sidebar-indicator {
     0 0 14px rgba(255, 255, 255, 0.25) !important;
 }
 
-/* Boutons de la topbar : Capsules bulles de verre */
-body[data-theme="5"] .topbar-right .topbar-config-btn,
-body[data-theme="5"] .topbar-home-btn {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.75),
-    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.40),
-    0 3px 8px rgba(0, 0, 0, 0.20) !important;
-  backdrop-filter: blur(12px) !important;
-}
-
-body[data-theme="5"] .topbar-right .topbar-config-btn:hover,
-body[data-theme="5"] .topbar-home-btn:hover {
-  background: rgba(255, 255, 255, 0.10) !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
-  transform: translateY(-1px);
-}
-
 /* ========================================================
-   5. COCKPIT HERO & OMNIBOX CAPSULE (PHOTO 1)
+   10. APERÇU COULEUR DANS LE HUB DES THÈMES
    ======================================================== */
-
-/* Goutte bulle circulaire pour l'icône de salutation */
-body[data-theme="5"] .dash-greeting-avatar {
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  box-shadow:
-    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
-    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
-    inset 0 0 2px rgba(0, 0, 0, 0.50),
-    0 4px 12px rgba(0, 0, 0, 0.25) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: #ffffff !important;
-}
-
-/* Badges de télémétrie Hero (Système En Ligne, Date, Heure) : Capsules bulles */
-body[data-theme="5"] .dash-tele-chip {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
-    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.20) !important;
-  backdrop-filter: blur(12px) !important;
-}
-
-/* Barre de Recherche Omnibox : Forme bulle capsule géante */
-body[data-theme="5"] .dash-hero-search .search-box {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  backdrop-filter: blur(16px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(160%) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 1.8px 2.5px 0px -1px rgba(255, 255, 255, 0.75),
-    inset -1.8px -1.8px 0px -1px rgba(255, 255, 255, 0.40),
-    inset 0px 3px 4px -2px rgba(0, 0, 0, 0.35),
-    0 4px 14px rgba(0, 0, 0, 0.25) !important;
-}
-
-body[data-theme="5"] .dash-hero-search .search-box:focus-within {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
-    inset 2px 3px 0px -1px rgba(255, 255, 255, 0.90),
-    0 0 0 3px rgba(255, 255, 255, 0.15) !important;
-}
-
-body[data-theme="5"] .engine-badge {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.25) !important;
-}
-
-body[data-theme="5"] .search-kbd-hint,
-body[data-theme="5"] .dash-search-shortcut {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.07) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-/* ========================================================
-   6. KPI CARDS & BULLES D'ICÔNES SPHÉRIQUES
-   ======================================================== */
-
-body[data-theme="5"] .dash-kpi-card {
-  border-radius: 20px !important;
-}
-
-body[data-theme="5"] .dash-kpi-icon {
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow:
-    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
-    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
-    inset 0 0 2px rgba(0, 0, 0, 0.50),
-    0 4px 12px rgba(0, 0, 0, 0.25) !important;
-  color: #ffffff !important;
-}
-
-body[data-theme="5"] .dash-kpi-badge {
-  border-radius: 9999px !important;
-  backdrop-filter: blur(8px) !important;
-}
-
-/* ========================================================
-   7. CARTES DU COCKPIT (MARCHÉS, AGENDA, MÉTÉO, HISTORIQUE)
-   ======================================================== */
-
-body[data-theme="5"] .dash-card-markets,
-body[data-theme="5"] .dash-card-weather,
-body[data-theme="5"] .dash-card-agenda,
-body[data-theme="5"] .dash-card-history {
-  border-radius: 26px !important;
-}
-
-/* Bulles sphériques pour toutes les icônes d'en-tête */
-body[data-theme="5"] .dash-card-icon-box {
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow:
-    inset 2px -2px 1px -1px rgba(255, 255, 255, 0.85),
-    inset -2px 2px 1px -1px rgba(255, 255, 255, 0.65),
-    inset 0 0 2px rgba(0, 0, 0, 0.50),
-    0 4px 12px rgba(0, 0, 0, 0.25) !important;
-  color: #ffffff !important;
-}
-
-/* Liens d'action d'en-tête : Capsules bulles */
-body[data-theme="5"] .dash-card-link-btn,
-body[data-theme="5"] .dash-card-action-btn {
-  border-radius: 9999px !important;
-  padding: 0.32rem 0.85rem !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
-    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.20) !important;
-  backdrop-filter: blur(10px) !important;
-  font-size: 0.72rem !important;
-  font-weight: 600 !important;
-  color: #ffffff !important;
-  transition: all 0.2s ease !important;
-}
-
-body[data-theme="5"] .dash-card-link-btn:hover,
-body[data-theme="5"] .dash-card-action-btn:hover {
-  background: rgba(255, 255, 255, 0.10) !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
-  transform: translateY(-1px);
-}
-
-/* --- Module Marchés : Liste d'actifs & Barre d'aperçu (Photo 2) --- */
-body[data-theme="5"] .dash-market-asset-item {
-  border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-  box-shadow:
-    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
-    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25) !important;
-}
-
-body[data-theme="5"] .dash-market-asset-item:hover {
-  background: rgba(255, 255, 255, 0.07) !important;
-  border-color: rgba(255, 255, 255, 0.20) !important;
-}
-
-body[data-theme="5"] .dash-market-asset-item.is-selected {
-  background: rgba(255, 255, 255, 0.10) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  box-shadow:
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.85),
-    0 4px 14px rgba(0, 0, 0, 0.25) !important;
-}
-
-body[data-theme="5"] .dash-asset-preview-bar {
-  border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.045) !important;
-  border: 1px solid rgba(255, 255, 255, 0.11) !important;
-  backdrop-filter: blur(14px) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
-    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35),
-    0 4px 14px rgba(0, 0, 0, 0.25) !important;
-}
-
-/* Boutons de période Marchés (24H, 7J, 1M, 1A) : Capsules bulles */
-body[data-theme="5"] .dash-timeframe-toggles {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  padding: 3px !important;
-}
-
-body[data-theme="5"] .dash-tf-btn {
-  border-radius: 9999px !important;
-  color: var(--text-muted) !important;
-  transition: all 0.18s ease !important;
-}
-
-body[data-theme="5"] .dash-tf-btn.active,
-body[data-theme="5"] .dash-tf-btn:hover {
-  background: rgba(255, 255, 255, 0.14) !important;
-  color: #ffffff !important;
-  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4) !important;
-}
-
-/* --- Module Agenda : Pilules de jours & Liste de tâches --- */
-body[data-theme="5"] .dash-week-day-pill {
-  border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-  box-shadow:
-    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
-    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25) !important;
-  transition: all 0.2s ease !important;
-}
-
-body[data-theme="5"] .dash-week-day-pill:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.20) !important;
-}
-
-/* Jour sélectionné : Goutte de verre pure lumineuse */
-body[data-theme="5"] .dash-week-day-pill.selected {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border: 1px solid rgba(255, 255, 255, 0.35) !important;
-  box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
-    inset 1.8px 2.5px 0px -1px rgba(255, 255, 255, 0.95),
-    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.50),
-    0 4px 14px rgba(0, 0, 0, 0.30) !important;
-}
-
-/* Badge de nombre de tâches : Verre translucide pur */
-body[data-theme="5"] .dash-day-task-count {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.16) !important;
-  color: #ffffff !important;
-  border: 1px solid rgba(255, 255, 255, 0.22) !important;
-  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4) !important;
-}
-
-body[data-theme="5"] .dash-task-item {
-  border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-  box-shadow:
-    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
-    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.20) !important;
-}
-
-body[data-theme="5"] .dash-task-item:hover {
-  background: rgba(255, 255, 255, 0.07) !important;
-  border-color: rgba(255, 255, 255, 0.18) !important;
-}
-
-body[data-theme="5"] .dash-task-checkbox {
-  border-radius: 8px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.18) !important;
-  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3) !important;
-}
-
-body[data-theme="5"] .dash-task-priority-pill,
-body[data-theme="5"] .dash-task-deadline {
-  border-radius: 9999px !important;
-  backdrop-filter: blur(8px) !important;
-}
-
-body[data-theme="5"] .dash-task-delete-btn {
-  border-radius: 50% !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-body[data-theme="5"] .dash-task-fast-form {
-  border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.045) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(12px) !important;
-  box-shadow:
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
-    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35) !important;
-}
-
-body[data-theme="5"] .dash-task-fast-form input {
-  color: var(--text-main) !important;
-}
-
-/* --- Module Météo & Heures : Pilules de prévisions --- */
-body[data-theme="5"] .dash-weather-hour-pill {
-  border-radius: 14px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-}
-
-/* Tooltip des graphiques : Verre fumé sombre ultra-net */
-body[data-theme="5"] .dash-chart-tooltip {
-  border-radius: 14px !important;
-  background: rgba(14, 16, 22, 0.85) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(16px) !important;
-  box-shadow:
-    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.6),
-    0 12px 28px rgba(0, 0, 0, 0.45) !important;
-}
-
-/* ========================================================
-   8. VUES ÉTENDUES DU DASHBOARD (BOOKMARKS, AGENDA, MÉTÉO, MARCHÉS, NOTES...)
-   ======================================================== */
-
-/* Bookmarks Full View */
-body[data-theme="5"] .customize-toolbar {
-  border-radius: 20px !important;
-}
-
-body[data-theme="5"] .bookmark-card {
-  border-radius: 16px !important;
-  background: rgba(255, 255, 255, 0.04) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  box-shadow:
-    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.50),
-    inset -1px -1px 0px -1px rgba(255, 255, 255, 0.25) !important;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-}
-
-body[data-theme="5"] .bookmark-card:hover {
-  transform: translateY(-2px) !important;
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: rgba(255, 255, 255, 0.22) !important;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
-}
-
-body[data-theme="5"] .bookmark-icon-wrap {
-  border-radius: 12px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Calendar & Agenda Full View */
-body[data-theme="5"] .cal-nav-btn,
-body[data-theme="5"] .cal-today-btn {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: var(--text-main) !important;
-}
-
-body[data-theme="5"] .cal-day {
-  border-radius: 14px !important;
-  background: rgba(255, 255, 255, 0.03) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-}
-
-body[data-theme="5"] .cal-day.today {
-  border-color: rgba(255, 255, 255, 0.4) !important;
-  background: rgba(255, 255, 255, 0.07) !important;
-}
-
-body[data-theme="5"] .cal-day.selected {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.4) !important;
-}
-
-body[data-theme="5"] .cal-task-pill {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Weather Full View */
-body[data-theme="5"] .weather-action-btn,
-body[data-theme="5"] .weather-fav-chip {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: var(--text-main) !important;
-}
-
-body[data-theme="5"] .weather-search-input-wrap {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-/* Markets Full View */
-body[data-theme="5"] .market-btn-primary,
-body[data-theme="5"] .market-btn-secondary,
-body[data-theme="5"] .market-index-pill {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: var(--text-main) !important;
-}
-
-body[data-theme="5"] .markets-search-box {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-/* News & Feeds Full View */
-body[data-theme="5"] .news-search-box,
-body[data-theme="5"] .news-tab-btn,
-body[data-theme="5"] .news-action-btn,
-body[data-theme="5"] .news-live-badge {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: var(--text-main) !important;
-}
-
-body[data-theme="5"] .news-tab-btn.active {
-  background: rgba(255, 255, 255, 0.14) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.35) !important;
-}
-
-/* Studio & Notes Full View */
-body[data-theme="5"] .studio-mode-pill,
-body[data-theme="5"] .studio-select,
-body[data-theme="5"] .studio-btn-run,
-body[data-theme="5"] .studio-status-pill {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: var(--text-main) !important;
-}
-
-body[data-theme="5"] .studio-editor-col,
-body[data-theme="5"] .studio-terminal-col,
-body[data-theme="5"] .notes-sidebar,
-body[data-theme="5"] .note-card-item {
-  border-radius: 18px !important;
-  background: rgba(255, 255, 255, 0.035) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-}
-
-/* Pomodoro Full View */
-body[data-theme="5"] .pomodoro-control-btn,
-body[data-theme="5"] .sound-tile {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-}
-
-/* ========================================================
-   9. MODALS, INPUTS & COMMAND PALETTE
-   ======================================================== */
-
-body[data-theme="5"] .modal-content,
-body[data-theme="5"] .command-palette-card {
-  border-radius: 28px !important;
-}
-
-body[data-theme="5"] .modal-btn {
-  border-radius: 9999px !important;
-  padding: 0.55rem 1.25rem !important;
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.14) !important;
-  box-shadow:
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.70),
-    inset -1.5px -1.5px 0px -1px rgba(255, 255, 255, 0.35) !important;
-  color: var(--text-main) !important;
-  transition: all 0.2s ease !important;
-}
-
-body[data-theme="5"] .modal-btn:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border-color: rgba(255, 255, 255, 0.30) !important;
-}
-
-body[data-theme="5"] .modal-btn.primary {
-  background: rgba(255, 255, 255, 0.16) !important;
-  border-color: rgba(255, 255, 255, 0.40) !important;
-  box-shadow:
-    inset 1.5px 2px 0px -1px rgba(255, 255, 255, 0.90),
-    0 4px 14px rgba(0, 0, 0, 0.25) !important;
-}
-
-body[data-theme="5"] .config-input,
-body[data-theme="5"] .task-input,
-body[data-theme="5"] .command-palette-input {
-  border-radius: 9999px !important;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  backdrop-filter: blur(12px) !important;
-  box-shadow:
-    inset 1.2px 1.5px 0px -1px rgba(255, 255, 255, 0.60),
-    inset 0 1px 2px rgba(0, 0, 0, 0.25) !important;
-  color: var(--text-main) !important;
-}
-
-body[data-theme="5"] .config-input:focus,
-body[data-theme="5"] .task-input:focus,
-body[data-theme="5"] .command-palette-input:focus {
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18) !important;
-}
-
-/* Aperçu couleur dans la carte thème 5 du hub */
 .theme-preview-color.glass-color,
 .theme-preview-color.glass-color-transparent {
   background: radial-gradient(circle at 30% 30%, #ffffff 0%, #cbd5e1 45%, #64748b 80%, #08090d 100%) !important;

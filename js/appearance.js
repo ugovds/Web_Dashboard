@@ -84,7 +84,10 @@ function applyAppearance() {
   const wallpaperEl = document.getElementById('bg-wallpaper');
 
   // Application directe sur body pour écraser les sélecteurs body[data-theme="X"]
-  if (currentAppearance.customAccent) {
+  // En Thème 5 (Liquid Glass Pur Transparent), préserver la neutralité cristalline pure
+  const isLiquidGlass = (typeof currentTheme !== 'undefined' && currentTheme === '5') || body.getAttribute('data-theme') === '5';
+
+  if (!isLiquidGlass && currentAppearance.customAccent) {
     body.style.setProperty('--accent-primary', currentAppearance.customAccent);
     root.style.setProperty('--accent-primary', currentAppearance.customAccent);
     body.style.setProperty('--border-highlight', hexToRgba(currentAppearance.customAccent, 0.48));
@@ -96,7 +99,7 @@ function applyAppearance() {
     body.style.removeProperty('--orb-1');
   }
 
-  if (currentAppearance.customAccentSecondary) {
+  if (!isLiquidGlass && currentAppearance.customAccentSecondary) {
     body.style.setProperty('--accent-secondary', currentAppearance.customAccentSecondary);
     root.style.setProperty('--accent-secondary', currentAppearance.customAccentSecondary);
     body.style.setProperty('--orb-2', hexToRgba(currentAppearance.customAccentSecondary, 0.28));
@@ -120,10 +123,15 @@ function applyAppearance() {
 
   // Fond d'écran Ambilight
   if (wallpaperEl) {
-    const blurVal = currentAppearance.wallpaperBlur ?? 55;
-    const opacityVal = (currentAppearance.wallpaperOpacity ?? 56) / 100;
-    wallpaperEl.style.filter = `blur(${blurVal}px) saturate(2.2) brightness(1.15)`;
-    wallpaperEl.style.opacity = opacityVal;
+    if (isLiquidGlass) {
+      wallpaperEl.style.filter = 'blur(24px) grayscale(0.7) brightness(1.04)';
+      wallpaperEl.style.opacity = '0.35';
+    } else {
+      const blurVal = currentAppearance.wallpaperBlur ?? 55;
+      const opacityVal = (currentAppearance.wallpaperOpacity ?? 56) / 100;
+      wallpaperEl.style.filter = `blur(${blurVal}px) saturate(2.2) brightness(1.15)`;
+      wallpaperEl.style.opacity = opacityVal;
+    }
   }
 
   // Mettre à jour l'aperçu et les inputs uniquement si l'onglet configuration est affiché
