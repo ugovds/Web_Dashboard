@@ -837,6 +837,7 @@ function renderMarkdownToHtml(md) {
 
   return `<div class="md-content"><p class="md-p">${text}</p></div>`;
 }
+window.renderMarkdownToHtml = renderMarkdownToHtml;
 
 function updateNotesStats(text) {
   const statsInfoEl = document.getElementById('notes-stats-info');
@@ -855,6 +856,9 @@ function updateNotesStats(text) {
 }
 
 function initNotesWidget() {
+  if (document.querySelector('.studio-container') || window.initStudio) {
+    return;
+  }
   const textarea = document.getElementById('notes-editor') || document.getElementById('notes-textarea');
   const preview = document.getElementById('notes-preview');
   const markdownToggleBtn = document.getElementById('notes-markdown-toggle');

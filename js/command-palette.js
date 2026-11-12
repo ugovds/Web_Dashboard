@@ -58,7 +58,7 @@ function getPaletteItems() {
     { title: 'Ouvrir Actualités en direct', category: 'Navigation', icon: 'fa-solid fa-newspaper', key: 'feeds', shortcut: 'Alt+4' },
     { title: 'Ouvrir Marchés Boursiers & Portefeuille', category: 'Navigation', icon: 'fa-solid fa-chart-line', key: 'system', shortcut: 'Alt+5' },
     { title: 'Ouvrir Studio Focus & Ambiance Lo-Fi', category: 'Navigation', icon: 'fa-solid fa-stopwatch', key: 'pomodoro', shortcut: 'Alt+6' },
-    { title: 'Ouvrir Bloc-Notes Rapide', category: 'Navigation', icon: 'fa-solid fa-note-sticky', key: 'notes', shortcut: 'Alt+7' },
+    { title: 'Ouvrir Dev Studio & Notes (Playground Code)', category: 'Navigation', icon: 'fa-solid fa-laptop-code', key: 'notes', shortcut: 'Alt+7' },
     { title: 'Ouvrir Citations Cyberpunk', category: 'Navigation', icon: 'fa-solid fa-quote-left', key: 'quotes', shortcut: 'Alt+8' },
     { title: 'Ouvrir Configuration & Thèmes', category: 'Navigation', icon: 'fa-solid fa-sliders', key: 'customize', shortcut: 'Alt+9' }
   ];

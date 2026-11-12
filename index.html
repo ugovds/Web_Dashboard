@@ -55,6 +55,7 @@
     <link rel="stylesheet" href="css/weather.css?v=3.1" />
     <link rel="stylesheet" href="css/feeds.css?v=3.2" />
     <link rel="stylesheet" href="css/markets.css?v=3.3" />
+    <link rel="stylesheet" href="css/notes-studio.css?v=1.0" />
     <link rel="stylesheet" href="css/responsive.css?v=3.1" />
     <link rel="stylesheet" href="css/themes/kanagawa.css?v=3.0" />
 
@@ -149,11 +150,11 @@
           </button>
 
           <!-- 7. BLOC-NOTES -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="notes" data-widget-nav="notes" title="Bloc-Notes Markdown (Alt+7)">
-            <div class="nav-icon-wrap"><i class="fa-solid fa-note-sticky"></i></div>
-            <span class="nav-label">Bloc-Notes</span>
+          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="notes" data-widget-nav="notes" title="Dev Studio, Code &amp; Bloc-Notes (Alt+7)">
+            <div class="nav-icon-wrap"><i class="fa-solid fa-laptop-code"></i></div>
+            <span class="nav-label">Notes &amp; Code</span>
             <kbd class="nav-kbd">7</kbd>
-            <div class="sidebar-tooltip">Bloc-Notes <kbd>7</kbd></div>
+            <div class="sidebar-tooltip">Studio &amp; Code <kbd>7</kbd></div>
           </button>
 
           <!-- 8. CITATIONS -->
@@ -1370,917 +1371,208 @@
 
               </div>
 
-              """
-
-index_path = os.path.join(base_dir, "index.html")
-with open(index_path, "r", encoding="utf-8") as f:
-    idx_content = f.read()
-
-s_idx = idx_content.find("<!-- VUE 5 : STUDIO")
-e_idx = idx_content.find("<!-- VUE 6 : BLOC-NOTES RAPIDE")
-assert s_idx != -1 and e_idx != -1
-
-new_idx = idx_content[:s_idx] + html_code + idx_content[e_idx:]
-with open(index_path, "w", encoding="utf-8") as f:
-    f.write(new_idx)
-print("index.html updated!")
-
-
-# ========================================================
-# 2. CSS FOR css/dashboard.css
-# ========================================================
-css_code = """/* ========================================================
-   VUE 5 : STUDIO DE RÉVISIONS & FOCUS (2 Colonnes Épurées)
-   ======================================================== */
-.pomodoro-full-view,
-.deck-slide-view.pomodoro-full-view.active {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1.45fr) minmax(380px, 1fr) !important;
-  gap: clamp(16px, 1.8vw, 24px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  padding: 0 !important;
-  background: transparent !important;
-  border: none !important;
-  border-radius: 0 !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  box-shadow: none !important;
-  overflow: hidden !important;
-}
-
-@media (max-width: 1050px) {
-  .pomodoro-full-view,
-  .deck-slide-view.pomodoro-full-view.active {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto auto !important;
-    height: auto !important;
-    min-height: 100% !important;
-    overflow-y: auto !important;
-  }
-}
-
-/* Les deux grands piliers en verre satiné */
-.revision-timer-col,
-.revision-cockpit-col {
-  background: rgba(13, 17, 28, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: clamp(18px, 2.2vh, 24px);
-  padding: clamp(14px, 2vh, 22px) clamp(16px, 2vw, 24px);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.09);
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  position: relative;
-  overflow: hidden;
-}
-
-@media (max-width: 1050px) {
-  .revision-timer-col,
-  .revision-cockpit-col {
-    height: auto !important;
-    overflow: visible !important;
-  }
-}
-
-/* ========================================================
-   COLONNE GAUCHE : GRAND MINUTEUR DE RÉVISION & COMMANDES
-   ======================================================== */
-.revision-timer-col {
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(10px, 1.4vh, 16px);
-}
-
-.revision-timer-col::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 20%;
-  right: 20%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
-  opacity: 0.8;
-}
-
-.revision-top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 0.75rem;
-}
-
-.revision-subject-picker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 99px;
-  padding: 0.25rem 0.75rem;
-}
-
-.subject-picker-label {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.revision-subject-select {
-  background: transparent;
-  border: none;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  outline: none;
-}
-
-.revision-subject-select option {
-  background: #111624;
-  color: #ffffff;
-}
-
-.revision-program-tag {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--accent-primary);
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
-  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
-  padding: 0.32rem 0.85rem;
-  border-radius: 99px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-/* Barre d'objectif / tâche de révision */
-.revision-task-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  width: min(100%, 480px);
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 0.5rem 0.9rem;
-  box-sizing: border-box;
-  transition: all 0.2s ease;
-}
-
-.revision-task-bar:focus-within {
-  border-color: var(--accent-primary);
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.08);
-  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
-}
-
-.revision-task-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 0.84rem;
-  font-weight: 500;
-}
-
-.revision-task-input::placeholder {
-  color: var(--text-muted);
-  font-size: 0.8rem;
-}
-
-.revision-task-clear {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 6px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-.revision-task-clear.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.revision-task-clear:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* LE GRAND CADRAN CIRCULAIRE XXL */
-.revision-dial-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  width: 100%;
-  flex: 1;
-  min-height: 0;
-  padding: clamp(6px, 1.2vh, 16px) 0;
-}
-
-.revision-dial-circle {
-  position: relative;
-  width: clamp(280px, 42vh, 410px);
-  height: clamp(280px, 42vh, 410px);
-  max-width: 92%;
-  aspect-ratio: 1 / 1;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14) 0%, rgba(9, 12, 22, 0.96) 74%);
-  border: 2px solid rgba(255, 255, 255, 0.09);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.75), inset 0 0 45px rgba(0, 0, 0, 0.9), 0 0 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.revision-dial-circle.running {
-  box-shadow: 0 0 65px rgba(0, 0, 0, 0.85), inset 0 0 50px rgba(0, 0, 0, 0.95), 0 0 42px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.36);
-  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
-}
-
-.revision-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  transform: rotate(-90deg);
-}
-
-.revision-svg-track {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.06);
-  stroke-width: 8;
-}
-
-.revision-svg-arc {
-  fill: none;
-  stroke: var(--accent-primary);
-  stroke-width: 8.5;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.4s ease-out;
-  filter: drop-shadow(0 0 10px var(--accent-primary));
-}
-
-.revision-dial-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  z-index: 2;
-  text-align: center;
-}
-
-/* Chiffres géants du minuteur */
-.revision-time-digits {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: clamp(4.2rem, 6.2vw, 5.6rem);
-  font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  text-shadow: 0 0 32px rgba(255, 255, 255, 0.28);
-}
-
-.revision-status-badge {
-  font-size: 0.78rem;
-  color: var(--accent-primary);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-weight: 800;
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
-  border: 1px solid rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
-  padding: 0.28rem 0.95rem;
-  border-radius: 99px;
-  transition: all 0.2s ease;
-}
-
-.revision-session-hint {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  letter-spacing: 0.03em;
-}
-
-/* Jauge linéaire */
-.revision-progress-bar {
-  width: min(100%, 480px);
-  height: 6px;
-  background: rgba(255, 255, 255, 0.07);
-  border-radius: 99px;
-  overflow: hidden;
-}
-
-.revision-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #38bdf8, var(--accent-primary));
-  border-radius: 99px;
-  transition: width 0.3s ease;
-  box-shadow: 0 0 10px var(--accent-primary);
-}
-
-/* Commandes principales */
-.revision-controls-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  width: min(100%, 480px);
-}
-
-.revision-btn-main {
-  flex: 1;
-  padding: 0.95rem 1.6rem;
-  border-radius: 14px;
-  background: var(--accent-primary);
-  color: #0c0f17;
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 800;
-  border: none;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.7rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 25px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
-  user-select: none;
-}
-
-.revision-btn-main:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 32px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.5);
-}
-
-.revision-btn-main:active {
-  transform: translateY(1px);
-}
-
-.revision-btn-main.running {
-  background: #f59e0b;
-  color: #0c0f17;
-  box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4);
-}
-
-.revision-btn-main * {
-  pointer-events: none;
-}
-
-.revision-btn-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
-  font-size: 1.05rem;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  user-select: none;
-}
-
-.revision-btn-icon:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.22);
-}
-
-.revision-btn-icon:active {
-  transform: scale(0.95);
-}
-
-.revision-btn-icon * {
-  pointer-events: none;
-}
-
-.revision-keyboard-hints {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  padding-top: 0.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.revision-keyboard-hints kbd {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  padding: 0.15rem 0.4rem;
-  font-family: inherit;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-}
-
-/* ========================================================
-   COLONNE DROITE : PROGRAMMES, GRAPHIQUE, HISTORIQUE
-   ======================================================== */
-.revision-cockpit-col {
-  overflow-y: auto;
-  gap: clamp(12px, 1.5vh, 16px);
-  justify-content: flex-start;
-  padding-right: clamp(12px, 1.6vw, 20px);
-}
-
-.revision-cockpit-col::-webkit-scrollbar {
-  width: 6px;
-}
-.revision-cockpit-col::-webkit-scrollbar-track {
-  background: transparent;
-}
-.revision-cockpit-col::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 99px;
-}
-.revision-cockpit-col::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
-}
-
-.revision-card {
-  background: rgba(16, 22, 35, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: clamp(14px, 1.8vh, 18px);
-  padding: clamp(12px, 1.6vh, 16px) clamp(14px, 1.6vw, 18px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  flex-shrink: 0;
-}
-
-.revision-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  padding-bottom: 0.6rem;
-}
-
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  font-size: 0.86rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.revision-card-hint {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  font-weight: 600;
-}
-
-/* Grille des 4 programmes de révision */
-.programs-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-}
-
-.program-card {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.65rem 0.75rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  color: var(--text-secondary);
-  font-family: inherit;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-}
-
-.program-card:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
-}
-
-.program-card.active {
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.14);
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22);
-}
-
-.program-icon-box {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  color: var(--accent-primary);
-  flex-shrink: 0;
-}
-
-.program-card.active .program-icon-box {
-  background: var(--accent-primary);
-  color: #0c0f17;
-}
-
-.program-text {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  overflow: hidden;
-}
-
-.program-text strong {
-  font-size: 0.78rem;
-  color: #ffffff;
-  white-space: nowrap;
-}
-
-.program-text span {
-  font-size: 0.68rem;
-  color: var(--text-muted);
-  white-space: nowrap;
-}
-
-.program-card * {
-  pointer-events: none;
-}
-
-/* Phase switcher */
-.revision-phase-switcher {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 99px;
-  padding: 3px;
-  margin-top: 0.2rem;
-}
-
-.phase-chip {
-  flex: 1;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  padding: 0.42rem 0.5rem;
-  border-radius: 99px;
-  font-size: 0.74rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  font-family: inherit;
-}
-
-.phase-chip:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.phase-chip.active {
-  background: var(--accent-primary);
-  color: #0c0f17;
-  font-weight: 800;
-  box-shadow: 0 4px 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.35);
-}
-
-.phase-chip * {
-  pointer-events: none;
-}
-
-/* Graphique hebdomadaire */
-.revision-week-total {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.12);
-  border: 1px solid rgba(16, 185, 129, 0.26);
-  padding: 0.2rem 0.65rem;
-  border-radius: 99px;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-}
-
-.revision-week-total strong {
-  color: #ffffff;
-}
-
-.revision-svg-chart-wrap {
-  width: 100%;
-  background: rgba(8, 12, 20, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  padding: 8px 10px;
-  box-sizing: border-box;
-}
-
-.revision-weekly-chart {
-  width: 100%;
-  height: 95px;
-  display: block;
-}
-
-.revision-quick-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-}
-
-.quick-stat-box {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  padding: 0.45rem 0.65rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  text-align: center;
-}
-
-.quick-stat-box .stat-lbl {
-  font-size: 0.66rem;
-  color: var(--text-muted);
-}
-
-.quick-stat-box .stat-val {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.88rem;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-/* Historique des révisions */
-.revision-clear-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 0.25rem 0.45rem;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  transition: all 0.2s ease;
-}
-
-.revision-clear-btn:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
-}
-
-.revision-history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  max-height: 170px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.revision-history-list::-webkit-scrollbar {
-  width: 5px;
-}
-.revision-history-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-  border-radius: 99px;
-}
-
-.history-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.45rem 0.65rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  font-size: 0.74rem;
-  transition: all 0.2s ease;
-}
-
-.history-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.history-subj {
-  font-weight: 700;
-  color: #ffffff;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.history-meta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.history-dur-badge {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-  color: var(--accent-primary);
-  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
-  padding: 0.12rem 0.45rem;
-  border-radius: 6px;
-}
-
-.history-empty-msg {
-  text-align: center;
-  font-size: 0.74rem;
-  color: var(--text-muted);
-  padding: 1rem 0.5rem;
-  font-style: italic;
-}
-
-/* Ambiance d'étude */
-.ambient-chips-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.4rem;
-}
-
-.ambient-chip {
-  padding: 0.45rem 0.35rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  font-family: inherit;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.ambient-chip:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.ambient-chip.active {
-  background: rgba(167, 139, 250, 0.16);
-  border-color: #a78bfa;
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.ambient-chip * {
-  pointer-events: none;
-}
-
-.ambient-footer-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.65rem;
-  padding-top: 0.25rem;
-}
-
-.ambient-play-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.45rem 0.85rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  font-size: 0.78rem;
-  font-weight: 700;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.2s ease;
-}
-
-.ambient-play-toggle.playing {
-  background: #10b981;
-  color: #0c0f17;
-  border-color: #10b981;
-}
-
-.ambient-play-toggle * {
-  pointer-events: none;
-}
-
-.ambient-slider-group {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  flex: 1;
-}
-
-.ambient-slider-group input[type="range"] {
-  width: 100%;
-  accent-color: var(--accent-primary);
-  height: 4px;
-}
-
-.chime-test-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  transition: all 0.2s ease;
-}
-
-.chime-test-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-}
-
-.chime-test-btn * {
-  pointer-events: none;
-}
-
-/* ========================================================
-   """
-
-css_path = os.path.join(base_dir, "css", "dashboard.css")
-with open(css_path, "r", encoding="utf-8") as f:
-    css_content = f.read()
-
-c_s = css_content.find("VUE 5 : STUDIO FOCUS POMODORO")
-if c_s == -1:
-    c_s = css_content.find("VUE 5 : STUDIO")
-c_s = css_content.rfind("/*", 0, c_s)
-
-c_e = css_content.find("VUE 7 : BLOC-NOTES SCRATCHPAD")
-assert c_s != -1 and c_e != -1
-
-new_css = css_content[:c_s] + css_code + css_content[c_e:]
-with open(css_path, "w", encoding="utf-8") as f:
-    f.write(new_css)
-print("css/dashboard.css updated!")
-
-              <!-- VUE 6 : BLOC-NOTES RAPIDE (SCRATCHPAD) -->
-              <div id="deck-view-notes" class="deck-slide-view notes-full-view" hidden>
-                <div class="deck-widget-panel notes-panel">
-                  <div class="notes-panel-header">
-                    <span class="notes-stats-info" id="notes-stats-info">0 mot • 0 car.</span>
-                    <div class="notes-actions-group">
-                      <button type="button" id="notes-markdown-toggle" class="deck-icon-action" title="Basculer aperçu Markdown (Lecture / Édition)"><i class="fa-brands fa-markdown"></i></button>
-                      <button type="button" id="notes-copy-btn" class="deck-icon-action" title="Copier le texte"><i class="fa-regular fa-copy"></i></button>
-                      <button type="button" id="notes-download-btn" class="deck-icon-action" title="Télécharger .md"><i class="fa-solid fa-download"></i></button>
-                      <button type="button" id="notes-clear-btn" class="deck-icon-action danger" title="Effacer tout"><i class="fa-regular fa-trash-can"></i></button>
+              <!-- VUE 6 : STUDIO CODE PLAYGROUND & BLOC-NOTES MARKDOWN -->
+              <div id="deck-view-notes" class="deck-slide-view notes-full-view studio-full-view" hidden>
+                <div class="studio-container">
+                  
+                  <!-- 1. HEADER DU STUDIO -->
+                  <header class="studio-header">
+                    <div class="studio-header-left">
+                      <div class="studio-status-pill">
+                        <span class="status-dot pulse-purple"></span>
+                        <span id="studio-mode-status">Mode Code Playground</span>
+                      </div>
+                      <h2 class="studio-title">Dev Studio &amp; Bloc-Notes</h2>
+                      <span class="studio-subtitle">Playground multi-langages (Python, C, Oz, Java, JS), Terminal interactif &amp; Scratchpad Markdown</span>
                     </div>
-                  </div>
 
-                  <textarea id="notes-editor" class="notes-editor" placeholder="Bloc-notes rapide en temps réel... (sauvegarde automatique continue, supporte le Markdown)"></textarea>
-                  <div id="notes-preview" class="notes-preview markdown-body" hidden></div>
+                    <!-- Sélecteur de mode (Pills) -->
+                    <div class="studio-mode-pills" role="tablist">
+                      <button type="button" class="studio-mode-pill active" data-studio-mode="code" title="Playground de Code & Compilateur">
+                        <i class="fa-solid fa-code"></i> <span>Code Playground</span>
+                      </button>
+                      <button type="button" class="studio-mode-pill" data-studio-mode="notes" title="Prise de Notes & Markdown">
+                        <i class="fa-solid fa-file-pen"></i> <span>Bloc-Notes MD</span>
+                      </button>
+                      <button type="button" class="studio-mode-pill" data-studio-mode="split" title="Vue combinée Éditeur & Terminal">
+                        <i class="fa-solid fa-table-columns"></i> <span>Vue Scindée</span>
+                      </button>
+                    </div>
 
-                  <div class="notes-panel-footer">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span id="notes-status-text">Sauvegarde locale active</span>
+                    <!-- Actions d'en-tête : Langues, Snippets & Bouton Run -->
+                    <div class="studio-header-actions">
+                      <div class="studio-lang-picker" id="studio-lang-picker-group">
+                        <select id="studio-lang-select" class="studio-select" title="Choisir le langage de programmation">
+                          <option value="python">🐍 Python (3.11)</option>
+                          <option value="c">⚡ C (GCC 13.2)</option>
+                          <option value="java">☕ Java (OpenJDK 21)</option>
+                          <option value="oz">🧙 Oz (Mozart CTM)</option>
+                          <option value="javascript">💛 JavaScript (V8)</option>
+                          <option value="bash">🐚 Bash Script</option>
+                        </select>
+                      </div>
+
+                      <div class="studio-snippet-picker" id="studio-snippet-picker-group">
+                        <select id="studio-snippet-select" class="studio-select secondary" title="Insérer un modèle d'algorithme">
+                          <option value="" disabled selected>📂 Modèles &amp; Snippets...</option>
+                        </select>
+                      </div>
+
+                      <button type="button" id="studio-run-btn" class="studio-btn-run" title="Exécuter le code (Ctrl+Entrée)">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Exécuter</span>
+                        <kbd>Ctrl+↵</kbd>
+                      </button>
+                    </div>
+                  </header>
+
+                  <!-- 2. CORPS DU STUDIO (2 COLONNES : ÉDITEUR & TERMINAL / TOOLS) -->
+                  <div class="studio-body">
+
+                    <!-- COLONNE GAUCHE (~58%) : L'ÉDITEUR CODE & NOTES -->
+                    <section class="studio-editor-col">
+                      <!-- Barre d'onglets de fichiers / buffers -->
+                      <div class="studio-tabs-bar">
+                        <div class="studio-file-tabs" id="studio-file-tabs">
+                          <!-- Onglets générés dynamiquement en JS (main.py, algo.c, program.oz, notes.md...) -->
+                        </div>
+                        <div class="studio-tabs-controls">
+                          <button type="button" id="studio-new-tab-btn" class="deck-icon-action" title="Nouveau buffer / fichier"><i class="fa-solid fa-plus"></i></button>
+                          <button type="button" id="studio-format-btn" class="deck-icon-action" title="Nettoyer / Formater"><i class="fa-solid fa-align-left"></i></button>
+                          <button type="button" id="notes-markdown-toggle" class="deck-icon-action" title="Basculer aperçu Markdown"><i class="fa-brands fa-markdown"></i></button>
+                          <button type="button" id="notes-copy-btn" class="deck-icon-action" title="Copier le code/texte"><i class="fa-regular fa-copy"></i></button>
+                          <button type="button" id="notes-download-btn" class="deck-icon-action" title="Télécharger le fichier"><i class="fa-solid fa-download"></i></button>
+                          <button type="button" id="notes-clear-btn" class="deck-icon-action danger" title="Effacer"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+                      </div>
+
+                      <!-- Barre d'outils Markdown rapide (affichée en mode notes) -->
+                      <div class="studio-md-toolbar" id="studio-md-toolbar" hidden>
+                        <button type="button" class="md-tool-btn" data-md="bold" title="Gras (**texte**)"><i class="fa-solid fa-bold"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="italic" title="Italique (*texte*)"><i class="fa-solid fa-italic"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="heading" title="Titre (## Titre)"><i class="fa-solid fa-heading"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="code" title="Bloc de code (```lang)"><i class="fa-solid fa-code"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="inline-code" title="Code en ligne (`code`)"><i class="fa-solid fa-terminal"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="link" title="Lien ([titre](url))"><i class="fa-solid fa-link"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="task" title="Case à cocher (- [ ])"><i class="fa-regular fa-square-check"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="list" title="Liste à puces (- item)"><i class="fa-solid fa-list-ul"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="quote" title="Citation (> citation)"><i class="fa-solid fa-quote-left"></i></button>
+                        <button type="button" class="md-tool-btn" data-md="hr" title="Séparateur horizontal (---)"><i class="fa-solid fa-minus"></i></button>
+                        <span class="md-toolbar-sep"></span>
+                        <span class="md-toolbar-hint">Formatage Markdown &amp; Raccourcis actifs</span>
+                      </div>
+
+                      <!-- Zone d'édition avec numéros de lignes -->
+                      <div class="studio-editor-stage">
+                        <div class="studio-line-numbers" id="studio-line-numbers">1</div>
+                        <div class="studio-editor-wrap">
+                          <textarea
+                            id="notes-editor"
+                            class="notes-editor studio-code-textarea"
+                            placeholder="# Tapez votre code ou vos notes ici... Raccourci : Ctrl+Entrée pour exécuter"
+                            spellcheck="false"
+                            autocomplete="off"
+                            autocorrect="off"
+                            autocapitalize="off"
+                          ></textarea>
+                          <!-- Aperçu Markdown plein écran ou scindé -->
+                          <div id="notes-preview" class="notes-preview markdown-body" hidden></div>
+                        </div>
+                      </div>
+
+                      <!-- Footer de l'éditeur : statistiques & statut -->
+                      <footer class="studio-editor-footer">
+                        <div class="studio-cursor-info">
+                          <span id="studio-cursor-pos">Ln 1, Col 1</span>
+                          <span class="footer-bullet">•</span>
+                          <span id="notes-stats-info">0 mot • 0 car.</span>
+                          <span class="footer-bullet">•</span>
+                          <span id="studio-lines-count">1 ligne</span>
+                        </div>
+                        <div class="studio-save-status">
+                          <i class="fa-solid fa-circle-check"></i>
+                          <span id="notes-status-text">Sauvegardé en local</span>
+                        </div>
+                      </footer>
+                    </section>
+
+                    <!-- COLONNE DROITE (~42%) : LE TERMINAL CYBERDECK & AIDE SYNTAXE -->
+                    <section class="studio-terminal-col">
+                      <!-- FENÊTRE DU TERMINAL -->
+                      <div class="cyber-terminal-card">
+                        <div class="terminal-chrome">
+                          <div class="terminal-dots">
+                            <span class="term-dot red"></span>
+                            <span class="term-dot yellow"></span>
+                            <span class="term-dot green"></span>
+                          </div>
+                          <div class="terminal-title">
+                            <i class="fa-solid fa-terminal text-accent"></i>
+                            <span id="terminal-tab-title">tty1 • python@cpython-3.11</span>
+                          </div>
+                          <div class="terminal-actions">
+                            <button type="button" id="terminal-clear-btn" class="term-btn" title="Effacer la console (Ctrl+L)"><i class="fa-solid fa-ban"></i></button>
+                            <button type="button" id="terminal-copy-btn" class="term-btn" title="Copier les logs"><i class="fa-regular fa-copy"></i></button>
+                          </div>
+                        </div>
+
+                        <!-- Écran de sortie -->
+                        <div class="terminal-screen" id="terminal-screen">
+                          <!-- Sorties insérées dynamiquement -->
+                        </div>
+
+                        <!-- Prompt CLI interactif & Stdin -->
+                        <div class="terminal-prompt-bar">
+                          <span class="terminal-prompt-symbol">❯</span>
+                          <input
+                            type="text"
+                            id="terminal-input"
+                            class="terminal-input"
+                            placeholder="Tapez 'run', 'clear', 'help', 'oz', ou une entrée stdin..."
+                            autocomplete="off"
+                          />
+                          <button type="button" id="terminal-send-btn" class="terminal-send-btn" title="Envoyer au terminal">
+                            <i class="fa-solid fa-arrow-turn-down"></i>
+                          </button>
+                        </div>
+
+                        <!-- Barre de statut du terminal -->
+                        <div class="terminal-status-bar">
+                          <div class="term-status-badge ready" id="terminal-status-badge">
+                            <span class="term-status-dot"></span>
+                            <span id="terminal-status-label">Prêt</span>
+                          </div>
+                          <div class="term-runtime-info" id="terminal-runtime-info">
+                            <i class="fa-regular fa-clock"></i> <span id="terminal-exec-time">0 ms</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- PANNEAU CHEATSHEET & MÉMO SYNTAXE RAPIDE (OZ / C / PYTHON / JAVA) -->
+                      <div class="studio-cheatsheet-card">
+                        <div class="cheatsheet-header">
+                          <div class="card-title">
+                            <i class="fa-solid fa-wand-magic-sparkles text-accent"></i>
+                            <span id="cheatsheet-title">Mémo Syntaxe : Oz &amp; Mozart</span>
+                          </div>
+                          <div class="cheatsheet-lang-tags">
+                            <span class="lang-tag-chip active" data-memo-lang="oz">Oz</span>
+                            <span class="lang-tag-chip" data-memo-lang="c">C</span>
+                            <span class="lang-tag-chip" data-memo-lang="python">Python</span>
+                            <span class="lang-tag-chip" data-memo-lang="java">Java</span>
+                          </div>
+                        </div>
+                        <div class="cheatsheet-content" id="cheatsheet-content">
+                          <!-- Rempli dynamiquement en JS avec extraits insérables en 1 clic -->
+                        </div>
+                      </div>
+
+                    </section>
+
                   </div>
                 </div>
               </div>
+
 
               <!-- VUE 7 : CITATIONS CYBERPUNK & MOTIVATION -->
               <div id="deck-view-quotes" class="deck-slide-view quotes-full-view" hidden>
@@ -3252,6 +2544,7 @@ print("css/dashboard.css updated!")
     <script defer src="js/custom-hub.js?v=3.2"></script>
     <script defer src="js/command-palette.js?v=3.2"></script>
     <script defer src="js/shortcuts.js?v=3.2"></script>
+    <script defer src="js/notes-studio.js?v=1.0"></script>
     <script defer src="js/app.js?v=3.2"></script>
   </body>
 </html>
