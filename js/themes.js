@@ -136,7 +136,7 @@ function applyGlassTint(tintKey, notify = false) {
     quickTintLabel.textContent = variant.name;
   }
 
-  // Mettre à jour le badge dans la section du Hub
+  // Mettre à jour le badge dans la section du Hub si présent
   const activeBadge = document.getElementById('active-glass-variant-badge');
   if (activeBadge) {
     activeBadge.textContent = variant.name;
@@ -149,11 +149,22 @@ function applyGlassTint(tintKey, notify = false) {
     btn.classList.toggle('active', btn.dataset.glassVariant === tintKey);
   });
 
+  // Mettre à jour les boutons hub-theme-card-btn qui portent data-glass-tint
+  if (currentTheme === '5') {
+    document.querySelectorAll('.hub-theme-card-btn[data-glass-tint]').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.glassTint === tintKey);
+    });
+  }
+
   // Mettre à jour le sous-titre de l'art-badge quand Liquid Glass est actif
   if (currentTheme === '5') {
     const artBadgeText = document.getElementById('art-badge-text');
     if (artBadgeText) {
       artBadgeText.textContent = `LIQUID GLASS // ${variant.name.toUpperCase()}`;
+    }
+    const topbarThemeText = document.getElementById('topbar-theme-text');
+    if (topbarThemeText) {
+      topbarThemeText.textContent = `Liquid Glass (${variant.name})`;
     }
   }
 
@@ -179,23 +190,24 @@ function cycleGlassTint() {
 
 function updateGlassUIState(themeId) {
   const isGlass = themeId === '5';
-  const variantsSection = document.getElementById('glass-variants-section');
-  if (variantsSection) {
-    variantsSection.classList.toggle('is-hidden', !isGlass);
-  }
-
   const quickTintBtn = document.getElementById('glass-quick-tint-btn');
   if (quickTintBtn) {
     quickTintBtn.style.display = isGlass ? 'inline-flex' : 'none';
   }
 }
 
-function applyTheme(themeId) {
+function applyTheme(themeId, tint = null) {
   const cfg = themesConfig[themeId];
   if (!cfg) return;
 
   currentTheme = themeId;
   document.body.setAttribute('data-theme', themeId);
+
+  // Si on passe une variante de verre spécifique ou qu'on est sur Liquid Glass
+  if (themeId === '5') {
+    const targetTint = tint || getCurrentGlassTint();
+    applyGlassTint(targetTint, false);
+  }
 
   const mainArtImg = document.getElementById('main-art');
   const bgWallpaperEl = document.getElementById('bg-wallpaper');
@@ -203,34 +215,42 @@ function applyTheme(themeId) {
 
   if (mainArtImg) mainArtImg.src = cfg.img;
   if (bgWallpaperEl) bgWallpaperEl.style.backgroundImage = `url("${cfg.img}")`;
+
+  const activeTint = getCurrentGlassTint();
+  const activeVariant = GLASS_VARIANTS[activeTint] || GLASS_VARIANTS.violet;
+
   if (artBadgeText) {
     if (themeId === '5') {
-      const tint = getCurrentGlassTint();
-      const variant = GLASS_VARIANTS[tint] || GLASS_VARIANTS.violet;
-      artBadgeText.textContent = `LIQUID GLASS // ${variant.name.toUpperCase()}`;
+      artBadgeText.textContent = `LIQUID GLASS // ${activeVariant.name.toUpperCase()}`;
     } else {
       artBadgeText.textContent = cfg.badge;
     }
   }
 
   const topbarThemeText = document.getElementById('topbar-theme-text');
-  if (topbarThemeText) topbarThemeText.textContent = cfg.name || cfg.badge.replace(/^.*?\/\/\s*/, '');
+  if (topbarThemeText) {
+    if (themeId === '5') {
+      topbarThemeText.textContent = `Liquid Glass (${activeVariant.name})`;
+    } else {
+      topbarThemeText.textContent = cfg.name || cfg.badge.replace(/^.*?\/\/\s*/, '');
+    }
+  }
 
-  const themeBtns = document.querySelectorAll('.theme-btn');
-  themeBtns.forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.themeBtn === themeId);
-  });
-
+  // Mise à jour de la classe active sur tous les boutons de thème
   const hubThemeBtns = document.querySelectorAll('.hub-theme-card-btn');
   hubThemeBtns.forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.hubTheme === themeId);
+    if (btn.dataset.hubTheme === themeId) {
+      if (themeId === '5' && btn.dataset.glassTint) {
+        btn.classList.toggle('active', btn.dataset.glassTint === activeTint);
+      } else if (themeId !== '5') {
+        btn.classList.add('active');
+      } else {
+        btn.classList.toggle('active', !btn.dataset.glassTint);
+      }
+    } else {
+      btn.classList.remove('active');
+    }
   });
-
-  // Gestion spécifique de Liquid Glass
-  if (themeId === '5') {
-    const tint = getCurrentGlassTint();
-    applyGlassTint(tint, false);
-  }
 
   updateGlassUIState(themeId);
   localStorage.setItem('startpage_theme', themeId);
@@ -255,7 +275,7 @@ function initGlassInteractions() {
     btn.addEventListener('click', () => {
       const variantKey = btn.dataset.glassVariant;
       if (currentTheme !== '5') {
-        applyTheme('5');
+        applyTheme('5', variantKey);
       }
       applyGlassTint(variantKey, true);
     });
@@ -294,9 +314,20 @@ function initThemes() {
   const saved = (urlParam && themesConfig[urlParam]) ? urlParam : (localStorage.getItem('startpage_theme') || '4');
   currentTheme = themesConfig[saved] ? saved : '1';
 
-  const themeBtns = document.querySelectorAll('.theme-btn');
-  themeBtns.forEach((btn) => {
-    btn.addEventListener('click', () => applyTheme(btn.dataset.themeBtn));
+  // Attachement direct des écouteurs sur tous les boutons de thèmes du hub
+  document.querySelectorAll('.hub-theme-card-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tId = btn.dataset.hubTheme;
+      const tint = btn.dataset.glassTint || null;
+      if (tId) {
+        applyTheme(tId, tint);
+        if (tId === '5' && tint) {
+          applyGlassTint(tint, true);
+        } else if (typeof showToast === 'function') {
+          showToast(`Thème appliqué : ${btn.title || tId}`, 'success');
+        }
+      }
+    });
   });
 
   applyTheme(currentTheme);

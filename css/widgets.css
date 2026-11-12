@@ -1667,6 +1667,51 @@
   background: linear-gradient(135deg, #31e1f7, #b55fe6);
 }
 
+.retrowave-color {
+  background: linear-gradient(135deg, #e2ebf5, #1e2430);
+}
+
+.glass-color,
+.glass-color-violet {
+  background: radial-gradient(circle at 35% 35%, #d8b4fe 0%, #b55fe6 50%, #6b21a8 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(181, 95, 230, 0.45);
+}
+
+.glass-color-bleu {
+  background: radial-gradient(circle at 35% 35%, #7dd3fc 0%, #38bdf8 50%, #1e40af 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(56, 189, 248, 0.45);
+}
+
+.glass-color-vert {
+  background: radial-gradient(circle at 35% 35%, #6ee7b7 0%, #34d399 50%, #065f46 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(52, 211, 153, 0.45);
+}
+
+.glass-color-transparent {
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 50%, #475569 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(255, 255, 255, 0.45);
+}
+
+.glass-color-rouge {
+  background: radial-gradient(circle at 35% 35%, #fda4af 0%, #f43f5e 50%, #9f1239 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(244, 63, 94, 0.45);
+}
+
+.glass-color-ambre {
+  background: radial-gradient(circle at 35% 35%, #fde68a 0%, #fbbf24 50%, #b45309 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(251, 191, 36, 0.45);
+}
+
+.glass-color-cyan {
+  background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #22d3ee 50%, #155e75 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(34, 211, 238, 0.45);
+}
+
+.glass-color-rose {
+  background: radial-gradient(circle at 35% 35%, #fbcfe8 0%, #f472b6 50%, #86198f 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 10px rgba(244, 114, 182, 0.45);
+}
+
 .theme-card-name {
   font-size: 0.78rem;
   font-weight: 700;
