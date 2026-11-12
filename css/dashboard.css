@@ -1359,7 +1359,11 @@
 /* ========================================================
    VUE 7 : BLOC-NOTES SCRATCHPAD
    ======================================================== */
-.notes-full-view {
+.notes-full-view[hidden] {
+  display: none !important;
+}
+
+.deck-slide-view.notes-full-view.active:not([hidden]) {
   height: 100%;
   min-height: 0;
   display: flex;

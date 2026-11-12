@@ -322,8 +322,45 @@
   }
 
   // ========================================================
-  // 3. SERVICE D'EXÉCUTION DISTANTE WANDBOX (C, Python, Java, Bash)
+  // 2b. MOTEUR PYTHON EMBARQUÉ CLIENT (SKULPT 100% LOCAL)
   // ========================================================
+  function executeInBrowserPython(code, printFn) {
+    return new Promise((resolve, reject) => {
+      if (!window.Sk) {
+        reject(new Error('Moteur Python embarqué (Skulpt) non initialisé.'));
+        return;
+      }
+
+      let lineBuffer = '';
+      window.Sk.configure({
+        output: (text) => {
+          lineBuffer += text;
+          if (lineBuffer.endsWith('\n')) {
+            printFn(lineBuffer.replace(/\n$/, ''), 'stdout');
+            lineBuffer = '';
+          }
+        },
+        read: (x) => {
+          if (window.Sk.builtinFiles === undefined || window.Sk.builtinFiles['files'][x] === undefined) {
+            throw new Error(`Module Python introuvable : ${x}`);
+          }
+          return window.Sk.builtinFiles['files'][x];
+        },
+        __future__: window.Sk.python3
+      });
+
+      window.Sk.misceval.asyncToPromise(() => {
+        return window.Sk.importMainWithBody('<stdin>', false, code, true);
+      }).then(() => {
+        if (lineBuffer.length > 0) {
+          printFn(lineBuffer, 'stdout');
+        }
+        resolve();
+      }).catch(err => {
+        reject(err);
+      });
+    });
+  }
   async function executeWandbox(compiler, code, stdin = '') {
     const payload = {
       compiler: compiler,
@@ -817,8 +854,16 @@
         const elapsed = Math.round(performance.now() - startTime);
         setExecutionStatus('success', elapsed);
         printToTerminal(`✔ Exécution JS terminée en ${elapsed} ms.`, 'success');
+      } else if (currentLang === 'python') {
+        // Exécution Python locale embarquée via Skulpt (zéro délai réseau, ~20ms)
+        await executeInBrowserPython(code, (msg, type) => {
+          printToTerminal(msg, type);
+        });
+        const elapsed = Math.round(performance.now() - startTime);
+        setExecutionStatus('success', elapsed);
+        printToTerminal(`✔ Programme Python exécuté avec succès en ${elapsed} ms (moteur local).`, 'success');
       } else {
-        // 3. FALLBACK 2 : Cloud Wandbox pour C, Java, Python (si runner local pas allumé)
+        // 3. FALLBACK 2 : Cloud Wandbox pour C et Java (si runner local pas allumé)
         printToTerminal(`[Mode Cloud] Moteur local non détecté. Connexion au cluster distant...`, 'system');
         printToTerminal(`💡 Pour exécuter directement sur votre machine en 10ms (comme VS Code) : lancez './runner.py' dans votre terminal !`, 'system');
 

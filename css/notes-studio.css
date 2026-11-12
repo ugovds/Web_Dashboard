@@ -4,8 +4,17 @@
    ======================================================== */
 
 /* --- CONTENEUR PRINCIPAL DE LA VUE STUDIO --- */
-.notes-full-view.studio-full-view,
-.deck-slide-view.notes-full-view.active {
+/* Masquage absolu lorsque la vue est inactive ou cachée */
+#deck-view-notes[hidden],
+.deck-slide-view.notes-full-view[hidden],
+.notes-full-view.studio-full-view[hidden],
+.deck-slide-view.studio-full-view[hidden] {
+  display: none !important;
+}
+
+/* Affichage uniquement lorsque l'onglet est actif ET non masqué */
+.deck-slide-view.notes-full-view.active:not([hidden]),
+.deck-slide-view.studio-full-view.active:not([hidden]) {
   display: flex !important;
   flex-direction: column !important;
   gap: clamp(12px, 1.5vh, 18px) !important;
