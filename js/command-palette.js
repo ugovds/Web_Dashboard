@@ -79,6 +79,46 @@ function getPaletteItems() {
     });
   });
 
+  // 3. Actions Thèmes et Liquid Glass Apple
+  if (typeof themesConfig !== 'undefined') {
+    Object.entries(themesConfig).forEach(([tId, tCfg]) => {
+      items.push({
+        type: 'action',
+        title: `Thème : ${tCfg.name}`,
+        category: 'Thèmes Visuels',
+        url: `Touche ${tId}`,
+        icon: 'fa-solid fa-palette',
+        action: () => {
+          if (typeof applyTheme === 'function') {
+            applyTheme(tId);
+            if (typeof showToast === 'function') showToast(`Thème appliqué : ${tCfg.name}`, 'success');
+          }
+        }
+      });
+    });
+  }
+
+  // 4. Variantes de contraste Liquid Glass
+  if (typeof GLASS_VARIANTS !== 'undefined') {
+    Object.entries(GLASS_VARIANTS).forEach(([vId, vCfg]) => {
+      items.push({
+        type: 'action',
+        title: `Liquid Glass : ${vCfg.name}`,
+        category: 'Liquid Glass (Nuances)',
+        url: vCfg.desc,
+        icon: 'fa-solid fa-gem',
+        action: () => {
+          if (typeof applyTheme === 'function' && typeof currentTheme !== 'undefined' && currentTheme !== '5') {
+            applyTheme('5');
+          }
+          if (typeof applyGlassTint === 'function') {
+            applyGlassTint(vId, true);
+          }
+        }
+      });
+    });
+  }
+
   return items;
 }
 

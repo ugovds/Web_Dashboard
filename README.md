@@ -20,12 +20,30 @@
 
 ## 📸 Thèmes Visuels
 
-La startpage intègre 4 thèmes visuels avec éclairage ambiant (Ambilight), orbes lumineux et scanlines rétro, sélectionnables via les raccourcis clavier (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd>) ou dans le centre de configuration :
+La startpage intègre **5 thèmes visuels** avec éclairage ambiant (Ambilight), orbes lumineux et animations spécialisées, sélectionnables via les raccourcis clavier (<kbd>1</kbd>, <kbd>2</kbd>, <kbd>3</kbd>, <kbd>4</kbd>, <kbd>5</kbd>) ou dans le centre de configuration :
 
-| Thème 1 : Kanagawa 🌊 | Thème 2 : Sakura 🌸 | Thème 3 : Cyberdeck ⚡ | Thème 4 : Retro Wave 🎮 |
-| :---: | :---: | :---: | :---: |
-| <img src="images/gif.gif" width="190" /> | <img src="images/gif2.gif" width="190" /> | <img src="images/gif3.gif" width="190" /> | <img src="images/gif4.gif" width="190" /> |
-| *Palette Cyan & Menthe froide* | *Palette Rose & Néo-Pastel* | *Palette Cyberpunk Violet & Néon* | *Palette Monochrome Ukiyo & 8-Bit* |
+| Thème 1 : Kanagawa 🌊 | Thème 2 : Sakura 🌸 | Thème 3 : Cyberdeck ⚡ | Thème 4 : Retro Wave 🎮 | Thème 5 : Liquid Glass 💎 |
+| :---: | :---: | :---: | :---: | :---: |
+| <img src="images/gif.gif" width="150" /> | <img src="images/gif2.gif" width="150" /> | <img src="images/gif3.gif" width="150" /> | <img src="images/gif4.gif" width="150" /> | <img src="images/glass.svg" width="150" /> |
+| *Cyan & Menthe froide* | *Rose & Néo-Pastel* | *Violet & Néon Cyberdeck* | *Monochrome Ukiyo & 8-Bit* | *Apple Liquid Glass & Reflets* |
+
+### 💎 Mode Apple Liquid Glass (Thème 5)
+Inspiré du design **Apple Liquid Glass / VisionOS** :
+- **Matériaux en verre dépoli ultra-translucide** (`backdrop-filter: blur(28px) saturate(210%)`), reflets spéculaires intérieurs et bordures prismatiques.
+- **Animations spécialisées** :
+  - *Morphing d'orbes liquides* organiques (`liquidOrbMorph`) dérivant en arrière-plan.
+  - *Balayage spéculaire caustique* (`liquidSpecularSweep`) lumineux survolant les cartes.
+  - *Respiration en apesanteur* (`liquidGlassFloat`) des surfaces en verre.
+  - *Ondulation liquide interactive* (`glass-click-ripple`) au clic sur les éléments.
+- **Variantes de contraste intégrées** ("Thèmes dans le thème") :
+  - 🟣 **Glass Violet** (Améthyste liquide)
+  - 🔵 **Glass Bleu** (Saphir Apple / Azure)
+  - 🟢 **Glass Vert** (Émeraude / Mint liquide)
+  - ⚪ **Glass Transparent** (Pur Crystal VisionOS ultra-clair)
+  - 🔴 **Glass Rouge** (Rubis liquide / Sunset)
+  - 🟡 **Glass Ambre** (Or & Miel champagne)
+  - 🌐 **Glass Cyan** (Lagon glacé)
+  - 🌸 **Glass Rose** (Quartz néon liquide)
 
 ---
 
@@ -173,7 +191,12 @@ violet-startpage/
 │       ├── kanagawa.css        # Thème 1 : Kanagawa (Cyan / Menthe froide)
 │       ├── sakura.css          # Thème 2 : Sakura (Rose / Néo-pastel)
 │       ├── cyberdeck.css       # Thème 3 : Cyberdeck (Néon violet & cyan)
-│       └── retrowave.css       # Thème 4 : Retro Wave (Monochrome Ukiyo & 8-Bit)
+│       ├── retrowave.css       # Thème 4 : Retro Wave (Monochrome Ukiyo & 8-Bit)
+│       └── glass.css           # Thème 5 : Apple Liquid Glass & nuances de contraste
+│
+├── images/                     # Graphismes et artworks des thèmes
+│   ├── glass.svg               # Artwork vectoriel Liquid Glass
+│   └── gif*.gif                # Fonds et badges animés des thèmes 1-4
 │
 ├── js/                         # Modules JavaScript
 │   ├── app.js                  # Point d'entrée de l'application

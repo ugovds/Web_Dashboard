@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background glow filter -->
+    <filter id="glassGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="16" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+
+    <!-- Refraction blur -->
+    <filter id="softBlur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="8" />
+    </filter>
+
+    <!-- Liquid Background Gradient -->
+    <radialGradient id="liquidBg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9" />
+      <stop offset="35%" stop-color="#818cf8" stop-opacity="0.85" />
+      <stop offset="65%" stop-color="#c084fc" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.95" />
+    </radialGradient>
+
+    <!-- Inner Core Liquid Glow -->
+    <radialGradient id="liquidCore" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+      <stop offset="25%" stop-color="#c084fc" stop-opacity="0.65" />
+      <stop offset="60%" stop-color="#6366f1" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#38bdf8" stop-opacity="0" />
+    </radialGradient>
+
+    <!-- Glass Surface Specular Sheen (Top Crescent) -->
+    <linearGradient id="specularTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.4" />
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Bottom Bounce Light / Caustic -->
+    <linearGradient id="causticBottom" x1="50%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.7" />
+      <stop offset="40%" stop-color="#a855f7" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+
+    <!-- Border Ring Iridescence -->
+    <linearGradient id="borderRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="25%" stop-color="#38bdf8" stop-opacity="0.6" />
+      <stop offset="50%" stop-color="#e879f9" stop-opacity="0.75" />
+      <stop offset="75%" stop-color="#818cf8" stop-opacity="0.5" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.8" />
+    </linearGradient>
+
+    <!-- Floating Orb Gradient -->
+    <radialGradient id="floatingOrb1" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#f472b6" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#c084fc" stop-opacity="0.1" />
+    </radialGradient>
+
+    <radialGradient id="floatingOrb2" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.1" />
+    </radialGradient>
+
+    <!-- Drop Shadow for Glass Body -->
+    <radialGradient id="ambientShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.6" />
+      <stop offset="70%" stop-color="#000000" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Deep Ambient Glow behind the Glass -->
+  <circle cx="256" cy="256" r="210" fill="url(#ambientShadow)" />
+  <circle cx="210" cy="200" r="140" fill="#a855f7" opacity="0.35" filter="url(#glassGlow)" />
+  <circle cx="310" cy="310" r="130" fill="#38bdf8" opacity="0.32" filter="url(#glassGlow)" />
+
+  <!-- Outer Glass Squircle Base (Apple VisionOS / iOS style continuous curvature) -->
+  <g id="glassSphereGroup">
+    <!-- Liquid Glass Body Back Layer -->
+    <rect x="56" y="56" width="400" height="400" rx="120" ry="120" fill="url(#liquidBg)" opacity="0.88" />
+
+    <!-- Internal Fluid Metaballs / Floating Liquid Blobs -->
+    <path d="M190,140 C240,120 290,160 300,210 C310,260 250,300 200,290 C150,280 140,160 190,140 Z" fill="url(#floatingOrb1)" opacity="0.7" filter="url(#softBlur)" />
+    <circle cx="320" cy="260" r="75" fill="url(#floatingOrb2)" opacity="0.65" filter="url(#softBlur)" />
+    <circle cx="230" cy="330" r="60" fill="#34d399" opacity="0.5" filter="url(#softBlur)" />
+
+    <!-- Internal Refraction Core Light -->
+    <rect x="76" y="76" width="360" height="360" rx="100" ry="100" fill="url(#liquidCore)" />
+
+    <!-- Glass Thickness Internal Rim -->
+    <rect x="66" y="66" width="380" height="380" rx="112" ry="112" fill="none" stroke="url(#borderRing)" stroke-width="2.5" opacity="0.85" />
+
+    <!-- Apple Signature Top-Left Specular Sheen (Curved highlight) -->
+    <path d="M 85,150 C 95,95 140,75 195,68 C 280,58 350,75 410,125 C 380,105 320,85 240,90 C 170,95 115,115 85,150 Z" fill="url(#specularTop)" />
+    <ellipse cx="190" cy="120" rx="90" ry="32" transform="rotate(-22, 190, 120)" fill="url(#specularTop)" opacity="0.85" />
+
+    <!-- Tiny Brilliant Specular Pinpoint Flare -->
+    <circle cx="140" cy="115" r="12" fill="#ffffff" opacity="0.95" />
+    <circle cx="140" cy="115" r="28" fill="#ffffff" opacity="0.3" filter="url(#softBlur)" />
+    <ellipse cx="170" cy="130" r="5" fill="#ffffff" opacity="0.8" />
+
+    <!-- Bottom Secondary Specular / Caustics Reflection -->
+    <path d="M 120,380 C 170,425 240,442 320,435 C 375,430 405,405 425,370 C 390,410 330,425 260,420 C 190,415 145,395 120,380 Z" fill="url(#causticBottom)" opacity="0.75" />
+
+    <!-- Outer Precision Rim with Refractive Border Highlight -->
+    <rect x="56" y="56" width="400" height="400" rx="120" ry="120" fill="none" stroke="rgba(255, 255, 255, 0.45)" stroke-width="1.5" />
+  </g>
+</svg>

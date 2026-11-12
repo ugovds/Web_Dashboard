@@ -66,6 +66,7 @@
     <link rel="stylesheet" href="css/themes/sakura.css?v=3.0" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="css/themes/cyberdeck.css?v=3.0" media="print" onload="this.media='all'" />
     <link rel="stylesheet" href="css/themes/retrowave.css?v=3.0" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="css/themes/glass.css?v=1.0" />
   </head>
 
   <body data-theme="4">
@@ -74,6 +75,7 @@
       <div id="bg-wallpaper" class="bg-wallpaper"></div>
       <div class="ambient-orb orb-primary"></div>
       <div class="ambient-orb orb-secondary"></div>
+      <div class="ambient-orb orb-tertiary"></div>
       <canvas id="weather-canvas" class="weather-canvas"></canvas>
       <div class="bg-scanlines"></div>
     </div>
@@ -195,6 +197,11 @@
           </div>
 
           <div class="topbar-right">
+            <button type="button" class="glass-quick-tint-pill" id="glass-quick-tint-btn" title="Cliquer pour changer de nuance Liquid Glass (Violet, Bleu, Vert, Transparent...)" style="display: none;">
+              <span class="glass-quick-tint-dot"></span>
+              <span id="glass-quick-tint-label">Glass Violet</span>
+              <i class="fa-solid fa-wand-magic-sparkles" style="font-size: 0.65rem;"></i>
+            </button>
             <button type="button" class="deck-nav-btn topbar-config-btn" data-deck-view="customize" title="Paramètres &amp; Personnalisation (Alt+0)">
               <i class="fa-solid fa-sliders"></i>
               <span class="topbar-config-label">Paramètres</span>
@@ -1903,6 +1910,64 @@
                           <span class="theme-card-name">4. Retro Wave</span>
                           <span class="theme-card-desc">Ukiyo & 8-Bit</span>
                         </button>
+                        <button type="button" class="hub-theme-card-btn" data-hub-theme="5" title="Liquid Glass (Apple Glass Translucide, Orbes & Réflexions)">
+                          <span class="theme-preview-color glass-color"></span>
+                          <span class="theme-card-name">5. Liquid Glass</span>
+                          <span class="theme-card-desc">Apple Liquid & Frost</span>
+                        </button>
+                      </div>
+
+                      <!-- Variantes de contraste Liquid Glass (Themes in the Theme) -->
+                      <div id="glass-variants-section" class="glass-variants-section is-hidden">
+                        <div class="glass-variants-header">
+                          <div>
+                            <span class="glass-variants-title"><i class="fa-solid fa-gem"></i> Variantes &amp; Nuances Liquid Glass Apple</span>
+                            <p class="glass-variants-subtitle">Explorez les contrastes de verre liquide avec orbes d'ambiance et reflets adaptés :</p>
+                          </div>
+                          <span class="slider-badge" id="active-glass-variant-badge">Glass Violet</span>
+                        </div>
+                        <div class="glass-variants-grid" id="glass-variants-grid">
+                          <button type="button" class="glass-variant-btn active" data-glass-variant="violet" title="Liquid Glass Violet (Améthyste Liquide)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Violet</span>
+                            <span class="glass-variant-desc">Améthyste</span>
+                          </button>
+                          <button type="button" class="glass-variant-btn" data-glass-variant="bleu" title="Liquid Glass Bleu (Saphir Apple / Azure)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Bleu</span>
+                            <span class="glass-variant-desc">Saphir Apple</span>
+                          </button>
+                          <button type="button" class="glass-variant-btn" data-glass-variant="vert" title="Liquid Glass Vert (Émeraude / Mint Liquide)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Vert</span>
+                            <span class="glass-variant-desc">Émeraude Mint</span>
+                          </button>
+                          <button type="button" class="glass-variant-btn" data-glass-variant="transparent" title="Liquid Glass Transparent (Crystal Pur VisionOS)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Transparent</span>
+                            <span class="glass-variant-desc">Crystal Pur</span>
+                          </button>
+                          <button type="button" class="glass-variant-btn" data-glass-variant="rouge" title="Liquid Glass Rouge (Rubis Liquide / Sunset)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Rouge</span>
+                            <span class="glass-variant-desc">Rubis Sunset</span>
+                          </button>
+                          <button type="button" class="glass-variant-btn" data-glass-variant="ambre" title="Liquid Glass Ambre (Or & Miel Champagne)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Ambre</span>
+                            <span class="glass-variant-desc">Or Champagne</span>
+                          </button>
+                          <button type="button" class="glass-variant-btn" data-glass-variant="cyan" title="Liquid Glass Cyan (Lagon Glacé)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Cyan</span>
+                            <span class="glass-variant-desc">Lagon Glacé</span>
+                          </button>
+                          <button type="button" class="glass-variant-btn" data-glass-variant="rose" title="Liquid Glass Rose (Quartz Néon Liquide)">
+                            <span class="glass-variant-swatch"></span>
+                            <span class="glass-variant-label">Rose</span>
+                            <span class="glass-variant-desc">Quartz Néon</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
 

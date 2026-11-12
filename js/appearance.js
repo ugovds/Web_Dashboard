@@ -23,6 +23,12 @@ const CYBER_PALETTES = [
   { name: 'Sakura Rose', primary: '#ff85c0', secondary: '#ffa39e' },
   { name: 'Cyberdeck Violet', primary: '#31e1f7', secondary: '#b55fe6' },
   { name: 'Retro Wave Monochrome', primary: '#e2ebf5', secondary: '#8295a8' },
+  { name: 'Liquid Glass Violet', primary: '#b55fe6', secondary: '#8b5cf6' },
+  { name: 'Liquid Glass Saphir', primary: '#38bdf8', secondary: '#2563eb' },
+  { name: 'Liquid Glass Émeraude', primary: '#34d399', secondary: '#059669' },
+  { name: 'Liquid Glass Crystal', primary: '#ffffff', secondary: '#94a3b8' },
+  { name: 'Liquid Glass Rubis', primary: '#f43f5e', secondary: '#e11d48' },
+  { name: 'Liquid Glass Ambre', primary: '#fbbf24', secondary: '#d97706' },
   { name: 'Matrix Emerald', primary: '#00ff66', secondary: '#00cc88' },
   { name: 'Tokyo Neon', primary: '#ff007f', secondary: '#00f0ff' },
   { name: 'Synthwave Amber', primary: '#ffb86c', secondary: '#ff79c6' },
@@ -189,7 +195,7 @@ function updateAppearanceLivePreview() {
   const themeTag = document.getElementById('preview-active-theme-tag');
   const activeThemeId = document.body.getAttribute('data-theme') || '1';
   const cfg = (typeof themesConfig !== 'undefined' && themesConfig[activeThemeId]) ? themesConfig[activeThemeId] : null;
-  const themeName = cfg ? cfg.name : (activeThemeId === '2' ? 'Sakura' : (activeThemeId === '3' ? 'Cyberdeck' : (activeThemeId === '4' ? 'Retro Wave' : 'Kanagawa')));
+  const themeName = cfg ? cfg.name : (activeThemeId === '2' ? 'Sakura' : (activeThemeId === '3' ? 'Cyberdeck' : (activeThemeId === '4' ? 'Retro Wave' : (activeThemeId === '5' ? 'Liquid Glass' : 'Kanagawa'))));
 
   if (themeTag) {
     if (currentAppearance.customAccent) {

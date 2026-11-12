@@ -180,7 +180,7 @@ function initSidebarControls() {
   const brandAvatar = document.getElementById('sidebar-brand-avatar');
   if (brandAvatar) {
     brandAvatar.addEventListener('click', () => {
-      const themes = ['1', '2', '3', '4'];
+      const themes = (typeof themesConfig !== 'undefined') ? Object.keys(themesConfig) : ['1', '2', '3', '4', '5'];
       const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
       if (typeof applyTheme === 'function') applyTheme(nextTheme);
     });

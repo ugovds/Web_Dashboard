@@ -2,7 +2,7 @@
  * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache PWA)
  */
 
-const CACHE_NAME = 'violet-startpage-v5.0';
+const CACHE_NAME = 'violet-startpage-v5.1';
 
 const STATIC_ASSETS = [
   './',
@@ -29,6 +29,8 @@ const STATIC_ASSETS = [
   './css/themes/sakura.css',
   './css/themes/cyberdeck.css',
   './css/themes/retrowave.css',
+  './css/themes/glass.css',
+  './images/glass.svg',
   './js/themes.js',
   './js/appearance.js',
   './js/clock.js',

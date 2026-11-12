@@ -1,0 +1,758 @@
+/* ========================================================
+   Thème 5 : Apple Liquid Glass (Verre Liquide Translucide)
+   Inspiré du design Liquid Glass & VisionOS d'Apple
+   - Verre dépoli multi-couches à haute réfraction (blur + saturation)
+   - Reflets spéculaires intérieurs & caustiques liquides animées
+   - Orbes de lumière liquide organiques et fluides
+   - Variantes de contraste : Violet, Bleu, Vert, Transparent, Rouge, Ambre, Cyan, Rose
+   ======================================================== */
+
+:root {
+  --glass-wallpaper-blur: 42px;
+}
+
+/* ========================================================
+   1. VARIABLES DE BASE DU THÈME GLASS (Par défaut : Violet)
+   ======================================================== */
+body[data-theme="5"] {
+  --bg-deep: #06050e;
+  --surface: rgba(18, 14, 32, 0.60);
+  --surface-strong: rgba(26, 18, 46, 0.86);
+  --border-subtle: rgba(255, 255, 255, 0.14);
+  --border-highlight: rgba(181, 95, 230, 0.58);
+  --accent-primary: #b55fe6;
+  --accent-primary-rgb: 181, 95, 230;
+  --accent-secondary: #8b5cf6;
+  --accent-secondary-rgb: 139, 92, 246;
+  --accent-white: #ffffff;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --orb-1: rgba(181, 95, 230, 0.40);
+  --orb-2: rgba(139, 92, 246, 0.34);
+  --orb-3: rgba(216, 180, 254, 0.28);
+  --glass-border: rgba(255, 255, 255, 0.22);
+  --glass-border-specular: rgba(255, 255, 255, 0.48);
+  --glass-shadow: rgba(0, 0, 0, 0.45);
+  --glass-sheen: rgba(255, 255, 255, 0.16);
+  --glass-tint-badge: #d8b4fe;
+}
+
+/* ========================================================
+   2. VARIANTES DE CONTRASTE (Sous-Thèmes Liquid Glass)
+   ======================================================== */
+
+/* --- A. Glass Violet (Améthyste Liquide) --- */
+body[data-theme="5"][data-glass-tint="violet"],
+body[data-theme="5"]:not([data-glass-tint]) {
+  --bg-deep: #06050e;
+  --surface: rgba(20, 14, 36, 0.60);
+  --surface-strong: rgba(28, 18, 50, 0.86);
+  --border-highlight: rgba(181, 95, 230, 0.60);
+  --accent-primary: #b55fe6;
+  --accent-primary-rgb: 181, 95, 230;
+  --accent-secondary: #8b5cf6;
+  --accent-secondary-rgb: 139, 92, 246;
+  --orb-1: rgba(181, 95, 230, 0.42);
+  --orb-2: rgba(139, 92, 246, 0.35);
+  --orb-3: rgba(216, 180, 254, 0.28);
+  --glass-tint-badge: #d8b4fe;
+}
+
+/* --- B. Glass Bleu (Saphir Apple / Azure Liquide) --- */
+body[data-theme="5"][data-glass-tint="bleu"] {
+  --bg-deep: #030814;
+  --surface: rgba(10, 22, 44, 0.60);
+  --surface-strong: rgba(16, 32, 60, 0.86);
+  --border-highlight: rgba(56, 189, 248, 0.60);
+  --accent-primary: #38bdf8;
+  --accent-primary-rgb: 56, 189, 248;
+  --accent-secondary: #2563eb;
+  --accent-secondary-rgb: 37, 99, 235;
+  --orb-1: rgba(56, 189, 248, 0.44);
+  --orb-2: rgba(37, 99, 235, 0.36);
+  --orb-3: rgba(125, 211, 252, 0.28);
+  --glass-tint-badge: #7dd3fc;
+}
+
+/* --- C. Glass Vert (Émeraude / Mint Liquide) --- */
+body[data-theme="5"][data-glass-tint="vert"] {
+  --bg-deep: #020f09;
+  --surface: rgba(8, 28, 20, 0.60);
+  --surface-strong: rgba(14, 40, 28, 0.86);
+  --border-highlight: rgba(52, 211, 153, 0.60);
+  --accent-primary: #34d399;
+  --accent-primary-rgb: 52, 211, 153;
+  --accent-secondary: #059669;
+  --accent-secondary-rgb: 5, 150, 105;
+  --orb-1: rgba(52, 211, 153, 0.42);
+  --orb-2: rgba(5, 150, 105, 0.32);
+  --orb-3: rgba(110, 231, 183, 0.26);
+  --glass-tint-badge: #6ee7b7;
+}
+
+/* --- D. Glass Transparent (Pur Crystal / VisionOS Ultra Clear) --- */
+body[data-theme="5"][data-glass-tint="transparent"] {
+  --bg-deep: #040507;
+  --surface: rgba(22, 26, 34, 0.42); /* Super translucide */
+  --surface-strong: rgba(30, 35, 46, 0.76);
+  --border-subtle: rgba(255, 255, 255, 0.18);
+  --border-highlight: rgba(255, 255, 255, 0.72);
+  --accent-primary: #f8fafc;
+  --accent-primary-rgb: 248, 250, 252;
+  --accent-secondary: #94a3b8;
+  --accent-secondary-rgb: 148, 163, 184;
+  --orb-1: rgba(255, 255, 255, 0.26);
+  --orb-2: rgba(148, 163, 184, 0.26);
+  --orb-3: rgba(226, 232, 240, 0.22);
+  --glass-border: rgba(255, 255, 255, 0.32);
+  --glass-border-specular: rgba(255, 255, 255, 0.75);
+  --glass-tint-badge: #ffffff;
+}
+
+/* --- E. Glass Rouge (Rubis Liquide / Sunset) --- */
+body[data-theme="5"][data-glass-tint="rouge"] {
+  --bg-deep: #100408;
+  --surface: rgba(34, 12, 18, 0.60);
+  --surface-strong: rgba(48, 16, 26, 0.86);
+  --border-highlight: rgba(244, 63, 94, 0.60);
+  --accent-primary: #f43f5e;
+  --accent-primary-rgb: 244, 63, 94;
+  --accent-secondary: #e11d48;
+  --accent-secondary-rgb: 225, 29, 72;
+  --orb-1: rgba(244, 63, 94, 0.44);
+  --orb-2: rgba(225, 29, 72, 0.34);
+  --orb-3: rgba(253, 164, 175, 0.26);
+  --glass-tint-badge: #fda4af;
+}
+
+/* --- F. Glass Ambre (Or & Miel Liquide) --- */
+body[data-theme="5"][data-glass-tint="ambre"] {
+  --bg-deep: #0e0802;
+  --surface: rgba(30, 20, 10, 0.60);
+  --surface-strong: rgba(44, 28, 14, 0.86);
+  --border-highlight: rgba(251, 191, 36, 0.60);
+  --accent-primary: #fbbf24;
+  --accent-primary-rgb: 251, 191, 36;
+  --accent-secondary: #d97706;
+  --accent-secondary-rgb: 217, 119, 6;
+  --orb-1: rgba(251, 191, 36, 0.42);
+  --orb-2: rgba(217, 119, 6, 0.32);
+  --orb-3: rgba(253, 230, 138, 0.24);
+  --glass-tint-badge: #fde68a;
+}
+
+/* --- G. Glass Cyan (Lagon Glacé Liquide) --- */
+body[data-theme="5"][data-glass-tint="cyan"] {
+  --bg-deep: #02090e;
+  --surface: rgba(10, 26, 34, 0.60);
+  --surface-strong: rgba(16, 38, 50, 0.86);
+  --border-highlight: rgba(34, 211, 238, 0.60);
+  --accent-primary: #22d3ee;
+  --accent-primary-rgb: 34, 211, 238;
+  --accent-secondary: #0891b2;
+  --accent-secondary-rgb: 8, 145, 178;
+  --orb-1: rgba(34, 211, 238, 0.44);
+  --orb-2: rgba(8, 145, 178, 0.34);
+  --orb-3: rgba(165, 243, 252, 0.26);
+  --glass-tint-badge: #a5f3fc;
+}
+
+/* --- H. Glass Rose (Quartz Néon Liquide) --- */
+body[data-theme="5"][data-glass-tint="rose"] {
+  --bg-deep: #10040d;
+  --surface: rgba(32, 12, 28, 0.60);
+  --surface-strong: rgba(46, 16, 40, 0.86);
+  --border-highlight: rgba(244, 114, 182, 0.60);
+  --accent-primary: #f472b6;
+  --accent-primary-rgb: 244, 114, 182;
+  --accent-secondary: #c026d3;
+  --accent-secondary-rgb: 192, 38, 211;
+  --orb-1: rgba(244, 114, 182, 0.44);
+  --orb-2: rgba(192, 38, 211, 0.34);
+  --orb-3: rgba(251, 207, 232, 0.24);
+  --glass-tint-badge: #fbcfe8;
+}
+
+/* ========================================================
+   3. ANIMATIONS SPÉCIALISÉES DU THÈME LIQUID GLASS
+   ======================================================== */
+
+/* Animation A : Orbe liquide 1 (Morphing organique et mouvement fluide) */
+@keyframes liquidOrbMorph1 {
+  0% {
+    border-radius: 44% 56% 62% 38% / 46% 40% 60% 54%;
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    border-radius: 65% 35% 42% 58% / 32% 58% 42% 68%;
+    transform: translate(75px, 45px) scale(1.14) rotate(115deg);
+  }
+  66% {
+    border-radius: 38% 62% 55% 45% / 58% 36% 64% 42%;
+    transform: translate(-45px, 80px) scale(0.94) rotate(230deg);
+  }
+  100% {
+    border-radius: 44% 56% 62% 38% / 46% 40% 60% 54%;
+    transform: translate(0px, 0px) scale(1) rotate(360deg);
+  }
+}
+
+/* Animation B : Orbe liquide 2 (Contre-balancement morphant) */
+@keyframes liquidOrbMorph2 {
+  0% {
+    border-radius: 58% 42% 36% 64% / 52% 64% 36% 48%;
+    transform: translate(0px, 0px) scale(1) rotate(0deg);
+  }
+  33% {
+    border-radius: 40% 60% 68% 32% / 60% 38% 62% 40%;
+    transform: translate(-90px, -50px) scale(1.18) rotate(-120deg);
+  }
+  66% {
+    border-radius: 62% 38% 45% 55% / 36% 56% 44% 64%;
+    transform: translate(60px, -70px) scale(0.92) rotate(-240deg);
+  }
+  100% {
+    border-radius: 58% 42% 36% 64% / 52% 64% 36% 48%;
+    transform: translate(0px, 0px) scale(1) rotate(-360deg);
+  }
+}
+
+/* Animation C : Troisième orbe flottant central / orbital */
+@keyframes liquidOrbMorph3 {
+  0% {
+    border-radius: 50% 50% 42% 58% / 44% 56% 44% 56%;
+    transform: translate(0px, 0px) scale(0.9) rotate(0deg);
+  }
+  50% {
+    border-radius: 64% 36% 58% 42% / 56% 42% 58% 44%;
+    transform: translate(110px, -60px) scale(1.22) rotate(180deg);
+  }
+  100% {
+    border-radius: 50% 50% 42% 58% / 44% 56% 44% 56%;
+    transform: translate(0px, 0px) scale(0.9) rotate(360deg);
+  }
+}
+
+/* Animation D : Balayage de lumière spéculaire caustique Apple */
+@keyframes liquidSpecularSweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+/* Animation E : Respiration en apesanteur des cartes Liquid Glass */
+@keyframes liquidGlassFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3.5px);
+  }
+}
+
+/* Animation F : Ondulation iridescente des bordures prismatiques */
+@keyframes liquidPrismaticBorder {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ========================================================
+   4. APPLIQUER LE COMPORTEMENT LIQUID GLASS EN MODE 5
+   ======================================================== */
+
+/* --- Effet d'arrière-plan Ambilight en verre liquide --- */
+body[data-theme="5"] .ambilight-container {
+  overflow: hidden;
+}
+
+body[data-theme="5"] .bg-wallpaper {
+  opacity: 0.65;
+  filter: blur(var(--glass-wallpaper-blur, 42px)) saturate(2.4) brightness(1.15);
+  transform: scale(1.12);
+  transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body[data-theme="5"] .ambient-orb {
+  filter: blur(85px);
+  will-change: transform, border-radius;
+}
+
+body[data-theme="5"] .orb-primary {
+  width: 580px;
+  height: 580px;
+  top: -140px;
+  left: -100px;
+  background: radial-gradient(circle, var(--orb-1) 0%, rgba(var(--accent-primary-rgb), 0.15) 55%, transparent 75%);
+  animation: liquidOrbMorph1 20s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+body[data-theme="5"] .orb-secondary {
+  width: 660px;
+  height: 660px;
+  bottom: -200px;
+  right: -120px;
+  background: radial-gradient(circle, var(--orb-2) 0%, rgba(var(--accent-secondary-rgb), 0.14) 55%, transparent 75%);
+  animation: liquidOrbMorph2 24s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+/* Troisième orbe actif uniquement pour Liquid Glass */
+body[data-theme="5"] .orb-tertiary {
+  display: block;
+  position: absolute;
+  width: 440px;
+  height: 440px;
+  top: 35%;
+  right: 25%;
+  background: radial-gradient(circle, var(--orb-3) 0%, transparent 68%);
+  filter: blur(95px);
+  animation: liquidOrbMorph3 18s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body:not([data-theme="5"]) .orb-tertiary {
+  display: none !important;
+}
+
+/* Atténuation des scanlines rétro dans Glass pour un aspect pur et cristallin */
+body[data-theme="5"] .bg-scanlines {
+  opacity: 0.18;
+}
+
+/* ========================================================
+   5. SURFACES ET CARTES STYLE LIQUID GLASS APPLE
+   ======================================================== */
+
+/* Conteneurs et cartes principales */
+body[data-theme="5"] .dashboard-topbar,
+body[data-theme="5"] .dashboard-sidebar,
+body[data-theme="5"] .dash-card,
+body[data-theme="5"] .dash-hero-card,
+body[data-theme="5"] .dash-kpi-card,
+body[data-theme="5"] .unified-deck-card,
+body[data-theme="5"] .category-card,
+body[data-theme="5"] .notes-studio-container,
+body[data-theme="5"] .markets-board-card,
+body[data-theme="5"] .custom-hub-container,
+body[data-theme="5"] .command-palette-card,
+body[data-theme="5"] .modal-content {
+  background: var(--surface) !important;
+  backdrop-filter: blur(28px) saturate(210%) brightness(1.12);
+  -webkit-backdrop-filter: blur(28px) saturate(210%) brightness(1.12);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow:
+    inset 0 1px 1.5px 0 var(--glass-border-specular),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.05),
+    0 20px 48px -12px var(--glass-shadow),
+    0 0 20px -8px rgba(var(--accent-primary-rgb), 0.15) !important;
+  position: relative;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease,
+              box-shadow 0.35s ease,
+              background 0.35s ease !important;
+}
+
+/* Balayage caustique lumineux au survol (Signature Liquid Glass) */
+body[data-theme="5"] .dash-card::before,
+body[data-theme="5"] .dash-hero-card::before,
+body[data-theme="5"] .dash-kpi-card::before,
+body[data-theme="5"] .unified-deck-card::before,
+body[data-theme="5"] .category-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70%;
+  height: 100%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 40%,
+    var(--glass-sheen) 50%,
+    rgba(255, 255, 255, 0.03) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  z-index: 2;
+  transition: opacity 0.4s ease;
+}
+
+body[data-theme="5"] .dash-card:hover::before,
+body[data-theme="5"] .dash-hero-card:hover::before,
+body[data-theme="5"] .dash-kpi-card:hover::before,
+body[data-theme="5"] .unified-deck-card:hover::before,
+body[data-theme="5"] .category-card:hover::before {
+  animation: liquidSpecularSweep 1.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Élévation élastique fluide au survol */
+body[data-theme="5"] .dash-card:hover,
+body[data-theme="5"] .dash-kpi-card:hover,
+body[data-theme="5"] .category-card:hover {
+  transform: translateY(-4px) scale(1.008);
+  border-color: var(--border-highlight) !important;
+  box-shadow:
+    inset 0 1.5px 2px 0 var(--glass-border-specular),
+    0 24px 56px -10px var(--glass-shadow),
+    0 0 28px rgba(var(--accent-primary-rgb), 0.28) !important;
+}
+
+/* Lente respiration en apesanteur sur la carte Hero en haut */
+body[data-theme="5"] .dash-hero-card {
+  animation: liquidGlassFloat 7s ease-in-out infinite;
+}
+
+/* ========================================================
+   6. TOPBAR, SIDEBAR & ÉLÉMENTS DE COMMANDE LIQUID GLASS
+   ======================================================== */
+
+body[data-theme="5"] .dashboard-topbar {
+  border-radius: 22px;
+  background: var(--surface) !important;
+  box-shadow:
+    inset 0 1px 1.5px 0 var(--glass-border-specular),
+    0 14px 34px -8px var(--glass-shadow),
+    0 0 18px -6px rgba(var(--accent-primary-rgb), 0.2) !important;
+}
+
+body[data-theme="5"] .dashboard-sidebar {
+  background: var(--surface) !important;
+  border-right: 1px solid var(--glass-border) !important;
+}
+
+body[data-theme="5"] .sidebar-nav-item.active {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(var(--accent-primary-rgb), 0.25) 100%) !important;
+  border: 1px solid var(--glass-border-specular) !important;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 4px 18px rgba(var(--accent-primary-rgb), 0.35) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="5"] .sidebar-indicator {
+  background: linear-gradient(to bottom, var(--accent-primary), var(--accent-secondary)) !important;
+  box-shadow: 0 0 16px var(--accent-primary) !important;
+}
+
+/* Pilule de recherche & inputs en verre enfoncé Apple */
+body[data-theme="5"] .dash-hero-search,
+body[data-theme="5"] .search-input-wrap,
+body[data-theme="5"] .config-input,
+body[data-theme="5"] .task-input {
+  background: rgba(0, 0, 0, 0.28) !important;
+  border: 1px solid var(--glass-border) !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.25s ease !important;
+}
+
+body[data-theme="5"] .dash-hero-search:focus-within,
+body[data-theme="5"] .search-input-wrap:focus-within,
+body[data-theme="5"] .config-input:focus,
+body[data-theme="5"] .task-input:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow:
+    0 0 0 3px rgba(var(--accent-primary-rgb), 0.32),
+    inset 0 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Badges & Pilules d'état translucides */
+body[data-theme="5"] .dash-tele-chip,
+body[data-theme="5"] .art-badge,
+body[data-theme="5"] .kpi-badge,
+body[data-theme="5"] .clock-badge-item,
+body[data-theme="5"] .nav-kbd {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+}
+
+body[data-theme="5"] .dash-pulse-dot,
+body[data-theme="5"] .pulse-dot {
+  background: var(--accent-primary) !important;
+  box-shadow: 0 0 12px var(--accent-primary), 0 0 20px var(--accent-primary) !important;
+}
+
+/* Boutons principaux avec finition vernis Apple */
+body[data-theme="5"] .modal-btn.primary,
+body[data-theme="5"] .deck-nav-btn.active,
+body[data-theme="5"] .bookmark-card:hover {
+  background: linear-gradient(135deg, rgba(var(--accent-primary-rgb), 0.32) 0%, rgba(var(--accent-secondary-rgb), 0.22) 100%) !important;
+  border-color: var(--glass-border-specular) !important;
+  box-shadow:
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.45),
+    0 8px 24px -4px rgba(var(--accent-primary-rgb), 0.32) !important;
+}
+
+/* ========================================================
+   7. SÉLECTEUR DE VARIANTES DE CONTRASTE LIQUID GLASS
+   (Interface intégrée dans le Custom Hub)
+   ======================================================== */
+
+.glass-variants-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1rem;
+  padding: 1.15rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.15));
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-variants-section.is-hidden {
+  display: none !important;
+}
+
+.glass-variants-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.glass-variants-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main, #f8fafc);
+  letter-spacing: 0.02em;
+}
+
+.glass-variants-title i {
+  color: var(--accent-primary, #b55fe6);
+}
+
+.glass-variants-subtitle {
+  font-size: 0.72rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.glass-variants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+}
+
+.glass-variant-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 0.65rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.glass-variant-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.glass-variant-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.glass-variant-btn:hover::before {
+  opacity: 1;
+}
+
+.glass-variant-btn.active {
+  border-color: var(--variant-primary, var(--accent-primary));
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.4),
+    0 0 18px var(--variant-glow, rgba(var(--accent-primary-rgb), 0.35));
+}
+
+.glass-variant-swatch {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-variant-swatch::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 7px;
+  width: 14px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), transparent);
+}
+
+.glass-variant-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-main, #f8fafc);
+}
+
+.glass-variant-desc {
+  font-size: 0.64rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+/* Couleurs spécifiques des swatches */
+.glass-variant-btn[data-glass-variant="violet"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #d8b4fe 0%, #b55fe6 50%, #6b21a8 100%);
+  --variant-primary: #b55fe6;
+  --variant-glow: rgba(181, 95, 230, 0.4);
+}
+
+.glass-variant-btn[data-glass-variant="bleu"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #7dd3fc 0%, #38bdf8 50%, #1e40af 100%);
+  --variant-primary: #38bdf8;
+  --variant-glow: rgba(56, 189, 248, 0.4);
+}
+
+.glass-variant-btn[data-glass-variant="vert"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #6ee7b7 0%, #34d399 50%, #065f46 100%);
+  --variant-primary: #34d399;
+  --variant-glow: rgba(52, 211, 153, 0.4);
+}
+
+.glass-variant-btn[data-glass-variant="transparent"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 50%, #475569 100%);
+  --variant-primary: #ffffff;
+  --variant-glow: rgba(255, 255, 255, 0.4);
+}
+
+.glass-variant-btn[data-glass-variant="rouge"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #fda4af 0%, #f43f5e 50%, #9f1239 100%);
+  --variant-primary: #f43f5e;
+  --variant-glow: rgba(244, 63, 94, 0.4);
+}
+
+.glass-variant-btn[data-glass-variant="ambre"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #fde68a 0%, #fbbf24 50%, #b45309 100%);
+  --variant-primary: #fbbf24;
+  --variant-glow: rgba(251, 191, 36, 0.4);
+}
+
+.glass-variant-btn[data-glass-variant="cyan"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #a5f3fc 0%, #22d3ee 50%, #155e75 100%);
+  --variant-primary: #22d3ee;
+  --variant-glow: rgba(34, 211, 238, 0.4);
+}
+
+.glass-variant-btn[data-glass-variant="rose"] .glass-variant-swatch {
+  background: radial-gradient(circle at 35% 35%, #fbcfe8 0%, #f472b6 50%, #86198f 100%);
+  --variant-primary: #f472b6;
+  --variant-glow: rgba(244, 114, 182, 0.4);
+}
+
+/* Aperçu couleur dans la carte thème 5 du hub */
+.theme-preview-color.glass-color {
+  background: radial-gradient(circle at 30% 30%, #ffffff 0%, #38bdf8 45%, #b55fe6 80%, #06050e 100%);
+  box-shadow: inset 0 1px 1px #ffffff, 0 0 12px rgba(181, 95, 230, 0.45);
+}
+
+/* Pilule de variante active rapide dans la topbar */
+.glass-quick-tint-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.24rem 0.65rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border-specular);
+  backdrop-filter: blur(12px);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.glass-quick-tint-pill:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.glass-quick-tint-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-primary);
+}
+
+body:not([data-theme="5"]) .glass-quick-tint-pill {
+  display: none !important;
+}
+
+
+/* ========================================================
+   8. ONDULATION LIQUIDE AU CLIC (RIPPLE EFFECT)
+   ======================================================== */
+.glass-click-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(var(--accent-primary-rgb), 0.25) 45%, transparent 70%);
+  pointer-events: none;
+  transform: scale(0);
+  opacity: 1;
+  animation: liquidRippleSpread 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 10;
+}
+
+@keyframes liquidRippleSpread {
+  0% {
+    transform: scale(0);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
