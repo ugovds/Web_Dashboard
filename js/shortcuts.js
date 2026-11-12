@@ -129,21 +129,24 @@ function initShortcuts() {
     const isSearchEmpty = active === searchInput && searchInput.value.trim() === '';
     const isNotTyping = active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA' && active.tagName !== 'SELECT';
 
-    // Navigation au clavier par touches Flèches Haut & Bas entre les onglets de la sidebar
+    // Navigation au clavier par touches Flèches Haut & Bas exclusivement entre les onglets de la sidebar
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isNotTyping) {
       e.preventDefault();
-      const visibleBtns = Array.from(document.querySelectorAll('.sidebar-nav .deck-nav-btn')).filter(
-        (b) => b.offsetParent !== null && !b.classList.contains('tab-hidden') && b.style.display !== 'none'
-      );
-      if (visibleBtns.length) {
-        const activeIdx = visibleBtns.findIndex((b) => b.classList.contains('active'));
+      const sidebarKeys = ['dashboard', 'agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
+      const sidebarBtns = sidebarKeys
+        .map((k) => document.querySelector(`.sidebar-nav .deck-nav-btn[data-deck-view="${k}"]`))
+        .filter((b) => b && !b.classList.contains('tab-hidden') && b.style.display !== 'none');
+
+      if (sidebarBtns.length) {
+        const activeBtn = document.querySelector('.sidebar-nav .deck-nav-btn.active');
+        const activeIdx = activeBtn ? sidebarBtns.indexOf(activeBtn) : -1;
         let targetIdx;
         if (e.key === 'ArrowDown') {
-          targetIdx = activeIdx < 0 ? 0 : (activeIdx + 1) % visibleBtns.length;
+          targetIdx = (activeIdx < 0 || activeIdx >= sidebarBtns.length - 1) ? 0 : activeIdx + 1;
         } else {
-          targetIdx = activeIdx < 0 ? (visibleBtns.length - 1) : (activeIdx - 1 + visibleBtns.length) % visibleBtns.length;
+          targetIdx = (activeIdx <= 0) ? sidebarBtns.length - 1 : activeIdx - 1;
         }
-        visibleBtns[targetIdx].click();
+        sidebarBtns[targetIdx].click();
       }
       return;
     }

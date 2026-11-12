@@ -237,7 +237,12 @@
   min-height: 0;
 }
 
-.deck-slide-view.active {
+.deck-slide-view[hidden],
+.deck-slide-view:not(.active) {
+  display: none !important;
+}
+
+.deck-slide-view.active:not([hidden]) {
   display: flex;
   flex-direction: column;
 }
@@ -1417,7 +1422,14 @@
 /* ========================================================
    VUE 9 : CITATIONS CYBERPUNK
    ======================================================== */
-.quotes-full-view {
+#deck-view-quotes[hidden],
+.deck-slide-view.quotes-full-view[hidden],
+.quotes-full-view[hidden] {
+  display: none !important;
+}
+
+.deck-slide-view.quotes-full-view.active:not([hidden]),
+.quotes-full-view.active:not([hidden]) {
   height: 100%;
   min-height: 0;
   display: flex;
@@ -1442,13 +1454,20 @@
 /* ========================================================
    VUE 10 : CONFIGURATION & PARAMÈTRES
    ======================================================== */
-.customize-full-view {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  padding: 0;
+#deck-view-customize[hidden],
+.deck-slide-view.customize-full-view[hidden],
+.customize-full-view[hidden] {
+  display: none !important;
+}
+
+.deck-slide-view.customize-full-view.active:not([hidden]),
+.customize-full-view.active:not([hidden]) {
+  height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
+  padding: 0 !important;
 }
 
 .customize-deck-panel {
