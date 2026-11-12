@@ -75,8 +75,9 @@
     { name: 'Gemini', url: 'https://gemini.google.com/app?hl=fr', icon: 'fa-solid fa-wand-magic-sparkles', visitedAt: Date.now() - 1000 * 60 * 12 },
     { name: 'YouTube', url: 'https://www.youtube.com/', icon: 'fa-brands fa-youtube', visitedAt: Date.now() - 1000 * 60 * 45 },
     { name: 'Moodle UCLouvain', url: 'https://moodle.uclouvain.be/my/', icon: 'fa-solid fa-graduation-cap', visitedAt: Date.now() - 1000 * 60 * 130 },
-    { name: 'ChatGPT', url: 'https://chatgpt.com/', icon: 'fa-solid fa-bolt', visitedAt: Date.now() - 1000 * 60 * 360 },
-    { name: 'GitHub', url: 'https://github.com/', icon: 'fa-brands fa-github', visitedAt: Date.now() - 1000 * 60 * 720 }
+    { name: 'ChatGPT', url: 'https://chatgpt.com/', icon: 'fa-solid fa-bolt', visitedAt: Date.now() - 1000 * 60 * 240 },
+    { name: 'GitHub', url: 'https://github.com/', icon: 'fa-brands fa-github', visitedAt: Date.now() - 1000 * 60 * 420 },
+    { name: 'TradingView', url: 'https://fr.tradingview.com/', icon: 'fa-solid fa-chart-line', visitedAt: Date.now() - 1000 * 60 * 780 }
   ];
 
   function getCleanDomain(rawUrl) {
@@ -84,8 +85,75 @@
       const u = new URL(rawUrl);
       return u.hostname.replace(/^www\./, '');
     } catch {
-      return rawUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0] || rawUrl;
+      return String(rawUrl).replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0] || rawUrl;
     }
+  }
+
+  function getSiteVisualTheme(site) {
+    const url = (site.url || '').toLowerCase();
+    const name = (site.name || '').toLowerCase();
+
+    if (url.includes('youtube') || name.includes('youtube')) {
+      return {
+        accent: '#ff334b',
+        bg: 'linear-gradient(135deg, rgba(255, 51, 75, 0.22), rgba(185, 28, 28, 0.08))',
+        border: 'rgba(255, 51, 75, 0.38)',
+        glow: 'rgba(255, 51, 75, 0.35)',
+        icon: 'fa-brands fa-youtube'
+      };
+    }
+    if (url.includes('gemini') || name.includes('gemini')) {
+      return {
+        accent: '#38bdf8',
+        bg: 'linear-gradient(135deg, rgba(56, 189, 248, 0.24), rgba(14, 165, 233, 0.08))',
+        border: 'rgba(56, 189, 248, 0.38)',
+        glow: 'rgba(56, 189, 248, 0.35)',
+        icon: 'fa-solid fa-wand-magic-sparkles'
+      };
+    }
+    if (url.includes('chatgpt') || url.includes('openai') || name.includes('chatgpt')) {
+      return {
+        accent: '#10b981',
+        bg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(5, 150, 105, 0.08))',
+        border: 'rgba(16, 185, 129, 0.38)',
+        glow: 'rgba(16, 185, 129, 0.35)',
+        icon: 'fa-solid fa-bolt'
+      };
+    }
+    if (url.includes('github') || name.includes('github')) {
+      return {
+        accent: '#a78bfa',
+        bg: 'linear-gradient(135deg, rgba(167, 139, 250, 0.22), rgba(124, 58, 237, 0.08))',
+        border: 'rgba(167, 139, 250, 0.38)',
+        glow: 'rgba(167, 139, 250, 0.35)',
+        icon: 'fa-brands fa-github'
+      };
+    }
+    if (url.includes('moodle') || name.includes('moodle') || url.includes('uclouvain')) {
+      return {
+        accent: '#f59e0b',
+        bg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.24), rgba(217, 119, 6, 0.08))',
+        border: 'rgba(245, 158, 11, 0.38)',
+        glow: 'rgba(245, 158, 11, 0.35)',
+        icon: 'fa-solid fa-graduation-cap'
+      };
+    }
+    if (url.includes('tradingview') || name.includes('trading')) {
+      return {
+        accent: '#22c55e',
+        bg: 'linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(22, 163, 74, 0.08))',
+        border: 'rgba(34, 197, 94, 0.38)',
+        glow: 'rgba(34, 197, 94, 0.35)',
+        icon: 'fa-solid fa-chart-line'
+      };
+    }
+    return {
+      accent: '#31e1f7',
+      bg: 'linear-gradient(135deg, rgba(49, 225, 247, 0.18), rgba(181, 95, 230, 0.1))',
+      border: 'rgba(49, 225, 247, 0.32)',
+      glow: 'rgba(49, 225, 247, 0.3)',
+      icon: site.icon || 'fa-solid fa-globe'
+    };
   }
 
   function getVisitedSites() {
@@ -114,8 +182,8 @@
       icon: icon || 'fa-solid fa-globe',
       visitedAt: Date.now()
     });
-    // Conserver les 15 derniers
-    if (history.length > 15) history.pop();
+    // Conserver les 16 derniers
+    if (history.length > 16) history.pop();
     try {
       localStorage.setItem('startpage_visited_sites', JSON.stringify(history));
     } catch {}
@@ -127,7 +195,7 @@
     const diffSec = Math.max(1, Math.floor((Date.now() - ts) / 1000));
     if (diffSec < 60) return "À l'instant";
     const diffMin = Math.floor(diffSec / 60);
-    if (diffMin < 60) return `Il y a ${diffMin} min`;
+    if (diffMin < 60) return `${diffMin} min`;
     const diffHours = Math.floor(diffMin / 60);
     if (diffHours < 24) {
       const d = new Date(ts);
@@ -144,37 +212,53 @@
     const container = document.getElementById('dash-history-list');
     if (!container) return;
 
-    const list = getVisitedSites().slice(0, 5);
+    const list = getVisitedSites().slice(0, 6);
     if (list.length === 0) {
-      container.innerHTML = '<div class="dash-tasks-empty">Aucun site dans l\'historique récent.</div>';
+      container.innerHTML = '<div class="dash-tasks-empty" style="grid-column: 1 / -1;">Aucun site dans l\'historique récent.</div>';
       return;
     }
 
     container.innerHTML = list
-      .map(
-        (site) => `
-      <a href="${site.url}" target="_blank" rel="noopener noreferrer" class="dash-history-item" data-url="${site.url}" data-name="${site.name}">
-        <div class="dash-history-left">
-          <div class="dash-history-icon">
-            <i class="${site.icon || 'fa-solid fa-globe'}"></i>
+      .map((site) => {
+        const theme = getSiteVisualTheme(site);
+        const domain = getCleanDomain(site.url);
+        const relTime = formatRelativeTime(site.visitedAt);
+
+        return `
+        <a
+          href="${site.url}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="dash-history-card-tile"
+          data-url="${site.url}"
+          data-name="${site.name}"
+          style="--tile-accent: ${theme.accent}; --tile-bg: ${theme.bg}; --tile-border: ${theme.border}; --tile-glow: ${theme.glow};"
+          title="Ouvrir ${site.name} (${domain})"
+        >
+          <div class="dash-history-tile-icon-box">
+            <i class="${theme.icon}"></i>
           </div>
-          <div class="dash-history-info">
-            <span class="dash-history-name">${site.name}</span>
-            <span class="dash-history-domain">${getCleanDomain(site.url)}</span>
+          <div class="dash-history-tile-content">
+            <div class="dash-history-tile-top">
+              <span class="dash-history-tile-name">${site.name}</span>
+              <i class="fa-solid fa-arrow-up-right-from-square dash-history-tile-arrow"></i>
+            </div>
+            <div class="dash-history-tile-bottom">
+              <span class="dash-history-tile-domain">${domain}</span>
+              <span class="dash-history-tile-time">${relTime}</span>
+            </div>
           </div>
-        </div>
-        <div class="dash-history-right">
-          <span class="dash-history-time">${formatRelativeTime(site.visitedAt)}</span>
-          <i class="fa-solid fa-arrow-up-right-from-square dash-history-arrow"></i>
-        </div>
-      </a>
-    `
-      )
+        </a>
+      `;
+      })
       .join('');
 
-    // Mise à jour de la carte KPI
+    // Mise à jour de la carte KPI et sous-titre
     const kpiHistoryVal = document.getElementById('kpi-history-val');
     if (kpiHistoryVal) kpiHistoryVal.textContent = `${list.length} récents`;
+
+    const label = document.getElementById('dash-history-count-label');
+    if (label) label.textContent = `${list.length} sites récents • Accès direct`;
   }
 
   /* ========================================================
@@ -655,15 +739,41 @@
      4. MINI AGENDA DE LA SEMAINE & PROCHAINS ÉVÉNEMENTS
      ======================================================== */
   function getDashboardTodos() {
-    if (typeof todos !== 'undefined' && Array.isArray(todos)) {
+    if (typeof todos !== 'undefined' && Array.isArray(todos) && todos.length > 0) {
       return todos;
     }
     try {
       const raw = localStorage.getItem('startpage_todos_v2');
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
+      if (raw !== null) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+
+    // Si aucune donnée n'a jamais été enregistrée (première visite) :
+    const rawCheck = localStorage.getItem('startpage_todos_v2');
+    if (rawCheck === null) {
+      const now = new Date();
+      const d0 = toIso(now);
+      const d1 = new Date(now); d1.setDate(now.getDate() + 1);
+      const d2 = new Date(now); d2.setDate(now.getDate() + 2);
+
+      const seed = [
+        { text: 'Revue de projet & déploiement version 2.0', date: d0, priority: 'urgent', done: false },
+        { text: 'Préparation réunion d’architecture logicielle', date: toIso(d1), priority: 'normal', done: false },
+        { text: 'Exercices et révision sur Moodle UCLouvain', date: toIso(d2), priority: 'normal', done: false }
+      ];
+      try {
+        localStorage.setItem('startpage_todos_v2', JSON.stringify(seed));
+        if (typeof todos !== 'undefined') {
+          todos = seed.slice();
+        }
+      } catch {}
+      return seed;
     }
+
+    return typeof todos !== 'undefined' && Array.isArray(todos) ? todos : [];
   }
 
   function toIso(d) {
@@ -681,6 +791,7 @@
 
     const week = [];
     const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const fullNames = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(monday);
@@ -689,6 +800,7 @@
       week.push({
         iso,
         name: dayNames[i],
+        fullName: fullNames[i],
         num: d.getDate(),
         isToday: iso === toIso(now)
       });
@@ -696,38 +808,75 @@
     return week;
   }
 
+  function getTaskDayBadgeInfo(taskDate, todayIso) {
+    if (!taskDate) {
+      return { label: 'À PLANIFIER', cls: 'badge-no-date', shortName: 'Libre' };
+    }
+    if (taskDate < todayIso) {
+      return { label: 'EN RETARD', cls: 'badge-overdue', shortName: 'Retard' };
+    }
+    if (taskDate === todayIso) {
+      return { label: "AUJOURD'HUI", cls: 'badge-today', shortName: "Aujourd'hui" };
+    }
+
+    // Calculer si c'est demain
+    const today = new Date(todayIso + 'T00:00:00');
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const tomorrowIso = toIso(tomorrow);
+    if (taskDate === tomorrowIso) {
+      return { label: 'DEMAIN', cls: 'badge-tomorrow', shortName: 'Demain' };
+    }
+
+    try {
+      const dt = new Date(taskDate + 'T00:00:00');
+      const dayStr = dt
+        .toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })
+        .toUpperCase()
+        .replace('.', '');
+      return { label: dayStr, cls: 'badge-future', shortName: dayStr };
+    } catch {
+      return { label: taskDate, cls: 'badge-future', shortName: taskDate };
+    }
+  }
+
   function renderDashboardAgenda() {
     const strip = document.getElementById('dash-week-strip');
+    const filterBar = document.getElementById('dash-agenda-filter-bar');
     const listContainer = document.getElementById('dash-upcoming-list');
+    const fastInput = document.getElementById('dash-task-fast-input');
     if (!strip || !listContainer) return;
 
     const allTodos = getDashboardTodos();
     const weekDays = getCurrentWeekDays();
     const todayIso = toIso(new Date());
 
-    // Vérifier les jours contenant des tâches
-    const tasksPerDay = {};
+    // Compter les tâches par date (non terminées)
+    const pendingTasksPerDay = {};
     allTodos.forEach((t) => {
       if (t.date && !t.done) {
-        tasksPerDay[t.date] = (tasksPerDay[t.date] || 0) + 1;
+        pendingTasksPerDay[t.date] = (pendingTasksPerDay[t.date] || 0) + 1;
       }
     });
 
-    // 1. Bandeau de la semaine
+    // 1. Bandeau des 7 jours de la semaine
     strip.innerHTML = weekDays
       .map((day) => {
-        const hasTask = (tasksPerDay[day.iso] || 0) > 0;
-        const isSelected = selectedWeekDayIso ? day.iso === selectedWeekDayIso : day.isToday;
+        const taskCount = pendingTasksPerDay[day.iso] || 0;
+        const isSelected = selectedWeekDayIso === day.iso;
+        const isToday = day.isToday;
 
         return `
         <div
-          class="dash-week-day-pill ${day.isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasTask ? 'has-task' : ''}"
+          class="dash-week-day-pill ${isToday ? 'is-today' : ''} ${isSelected ? 'selected' : ''} ${taskCount > 0 ? 'has-task' : ''}"
           data-date="${day.iso}"
-          title="${day.name} ${day.num} - Cliquer pour filtrer"
+          title="${day.fullName} ${day.num} — Cliquer pour afficher uniquement ce jour"
         >
           <span class="dash-day-short">${day.name}</span>
           <span class="dash-day-num">${day.num}</span>
-          <span class="dash-day-dot"></span>
+          <div class="dash-day-indicator">
+            ${taskCount > 0 ? `<span class="dash-day-task-count">${taskCount}</span>` : `<span class="dash-day-dot"></span>`}
+          </div>
         </div>
       `;
       })
@@ -735,7 +884,10 @@
 
     // 2. Filtrage des tâches selon le jour sélectionné
     let displayTasks = [];
+    let selectedDayObj = null;
+
     if (selectedWeekDayIso) {
+      selectedDayObj = weekDays.find((d) => d.iso === selectedWeekDayIso);
       displayTasks = allTodos.filter((t) => t.date === selectedWeekDayIso);
     } else {
       // Toutes les tâches non terminées, triées par date (prochaines en premier)
@@ -745,41 +897,98 @@
           if (!a.date) return 1;
           if (!b.date) return -1;
           return a.date.localeCompare(b.date);
-        })
-        .slice(0, 5);
+        });
 
-      // Si moins de 5 tâches non terminées, ajouter les plus récentes terminées
+      // Si moins de 5 tâches non terminées, on complète avec les dernières terminées
       if (displayTasks.length < 5) {
         const doneTasks = allTodos.filter((t) => t.done).slice(0, 5 - displayTasks.length);
         displayTasks = displayTasks.concat(doneTasks);
       }
     }
 
+    // 3. Barre de notification du filtre par jour
+    if (filterBar) {
+      if (selectedWeekDayIso) {
+        const formattedDate = new Date(selectedWeekDayIso + 'T00:00:00').toLocaleDateString('fr-FR', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long'
+        });
+        const capitalized = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+        const isTodaySelected = selectedWeekDayIso === todayIso;
+
+        filterBar.innerHTML = `
+          <div class="dash-agenda-filter-active">
+            <div class="dash-agenda-filter-info">
+              <span class="dash-filter-active-dot"></span>
+              <span>Jour filtré : <strong>${capitalized}</strong> ${isTodaySelected ? '<span class="dash-filter-today-tag">AUJOURD’HUI</span>' : ''}</span>
+              <span class="dash-filter-count-chip">${displayTasks.length} tâche${displayTasks.length > 1 ? 's' : ''}</span>
+            </div>
+            <button type="button" id="dash-clear-day-filter-btn" class="dash-filter-reset-pill" title="Afficher toutes les tâches de la semaine">
+              <i class="fa-solid fa-rotate-left"></i> Toute la semaine
+            </button>
+          </div>
+        `;
+      } else {
+        filterBar.innerHTML = `
+          <div class="dash-agenda-filter-all">
+            <div class="dash-agenda-filter-all-left">
+              <i class="fa-regular fa-calendar-days"></i>
+              <span>Vue générale : Toute la semaine</span>
+            </div>
+            <span class="dash-agenda-filter-hint"><i class="fa-solid fa-hand-pointer"></i> Cliquez sur un jour pour filtrer</span>
+          </div>
+        `;
+      }
+    }
+
+    // 4. Placeholder dynamique de l'input rapide
+    if (fastInput) {
+      if (selectedWeekDayIso) {
+        const shortName = weekDays.find((d) => d.iso === selectedWeekDayIso)?.name || 'ce jour';
+        fastInput.placeholder = `+ Ajouter une tâche pour ce ${shortName}... (Entrée)`;
+      } else {
+        fastInput.placeholder = `+ Ajouter une tâche rapide... (Entrée)`;
+      }
+    }
+
+    // 5. Rendu de la liste des tâches
     if (displayTasks.length === 0) {
-      listContainer.innerHTML = `
-        <div class="dash-tasks-empty">
-          <i class="fa-solid fa-circle-check" style="color: #34d399; font-size: 1.4rem; margin-bottom: 6px; display: block;"></i>
-          Aucune tâche prévue ${selectedWeekDayIso ? 'pour ce jour' : 'cette semaine'} — Tout est à jour !
-        </div>
-      `;
+      if (selectedWeekDayIso) {
+        const formattedDate = new Date(selectedWeekDayIso + 'T00:00:00').toLocaleDateString('fr-FR', {
+          weekday: 'long',
+          day: 'numeric'
+        });
+        listContainer.innerHTML = `
+          <div class="dash-tasks-empty">
+            <div class="dash-empty-icon-wrap">
+              <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <p class="dash-empty-title">Aucune tâche prévue pour ce ${formattedDate}</p>
+            <span class="dash-empty-sub">Ajoutez une tâche pour cette journée via le champ ci-dessous.</span>
+          </div>
+        `;
+      } else {
+        listContainer.innerHTML = `
+          <div class="dash-tasks-empty">
+            <div class="dash-empty-icon-wrap">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <p class="dash-empty-title">Toutes vos tâches sont à jour !</p>
+            <span class="dash-empty-sub">Aucune échéance en attente cette semaine.</span>
+          </div>
+        `;
+      }
     } else {
       listContainer.innerHTML = displayTasks
         .map((task) => {
           const originalIdx = allTodos.indexOf(task);
           const prio = task.priority || 'normal';
+          const dayBadge = getTaskDayBadgeInfo(task.date, todayIso);
           const prioLabel = prio === 'urgent' ? '🔴 Urgent' : prio === 'low' ? '🟢 Faible' : '🟡 Normal';
 
-          let dateBadge = '';
-          if (task.date) {
-            if (task.date === todayIso) dateBadge = 'Aujourd’hui';
-            else {
-              const dt = new Date(task.date + 'T00:00:00');
-              dateBadge = dt.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
-            }
-          }
-
           return `
-          <div class="dash-task-item ${task.done ? 'is-done' : ''}" data-idx="${originalIdx}">
+          <div class="dash-task-item priority-${prio} ${task.done ? 'is-done' : ''}" data-idx="${originalIdx}">
             <div class="dash-task-left">
               <input
                 type="checkbox"
@@ -788,19 +997,28 @@
                 ${task.done ? 'checked' : ''}
                 title="${task.done ? 'Marquer comme à faire' : 'Marquer comme fait'}"
               />
-              <span class="dash-task-title">${escapeDashHtml(task.text)}</span>
+              <div class="dash-task-details">
+                <span class="dash-task-title">${escapeDashHtml(task.text)}</span>
+                <div class="dash-task-sub-info">
+                  <span class="dash-task-day-tag ${dayBadge.cls}">
+                    <i class="fa-regular fa-calendar"></i> ${dayBadge.label}
+                  </span>
+                  <span class="dash-task-badge-prio ${prio}">
+                    ${prioLabel}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="dash-task-meta">
-              <span class="dash-task-badge-prio ${prio}">${prioLabel}</span>
-              ${dateBadge ? `<span class="dash-task-badge-date">${dateBadge}</span>` : ''}
-            </div>
+            <button type="button" class="dash-task-delete-btn" data-idx="${originalIdx}" title="Supprimer la tâche">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
           </div>
         `;
         })
         .join('');
     }
 
-    // Mise à jour de la carte KPI Agenda
+    // 6. Mise à jour de la carte KPI Agenda
     const pendingCount = allTodos.filter((t) => !t.done).length;
     const urgentCount = allTodos.filter((t) => !t.done && t.priority === 'urgent').length;
     const kpiAgendaVal = document.getElementById('kpi-agenda-val');
@@ -833,6 +1051,23 @@
     renderDashboardAgenda();
   }
 
+  function deleteDashboardTodo(idx) {
+    if (typeof todos !== 'undefined' && todos[idx] !== undefined) {
+      todos.splice(idx, 1);
+      if (typeof saveAndRenderTodos === 'function') {
+        saveAndRenderTodos();
+      }
+    } else {
+      const stored = getDashboardTodos();
+      if (stored[idx] !== undefined) {
+        stored.splice(idx, 1);
+        localStorage.setItem('startpage_todos_v2', JSON.stringify(stored));
+      }
+    }
+    renderDashboardAgenda();
+    if (typeof showToast === 'function') showToast('Tâche supprimée', 'info');
+  }
+
   function addQuickDashboardTodo(text) {
     if (!text || !text.trim()) return;
     const cleanText = text.trim();
@@ -861,7 +1096,7 @@
 
     renderDashboardAgenda();
     if (typeof showToast === 'function') {
-      showToast(`Tâche ajoutée : "${cleanText}"`, 'success');
+      showToast(`Tâche ajoutée pour le ${date} : "${cleanText}"`, 'success');
     }
   }
 
@@ -915,8 +1150,13 @@
   /* ========================================================
      6. ATTACHEMENT DES ÉVÉNEMENTS UTILISATEURS
      ======================================================== */
+  let dashboardEventsAttached = false;
+
   function attachDashboardEvents() {
-    // 1. Clic sur un actif boursier pour le sélectionner
+    if (dashboardEventsAttached) return;
+    dashboardEventsAttached = true;
+
+    // 1. Clic général délégué
     document.addEventListener('click', (e) => {
       const assetItem = e.target.closest('.dash-market-asset-item');
       if (assetItem) {
@@ -928,20 +1168,38 @@
       // 2. Clic sur un jour de la semaine dans le mini agenda
       const dayPill = e.target.closest('.dash-week-day-pill');
       if (dayPill) {
+        e.preventDefault();
         const dateIso = dayPill.dataset.date;
         selectedWeekDayIso = selectedWeekDayIso === dateIso ? null : dateIso;
         renderDashboardAgenda();
         return;
       }
 
-      // 3. Clic sur la case à cocher d'une tâche
+      // 3. Réinitialisation du filtre par jour (Toute la semaine)
+      if (e.target.closest('#dash-clear-day-filter-btn')) {
+        e.preventDefault();
+        selectedWeekDayIso = null;
+        renderDashboardAgenda();
+        return;
+      }
+
+      // 4. Clic sur la case à cocher d'une tâche
       if (e.target.matches('.dash-task-checkbox')) {
         const idx = Number(e.target.dataset.idx);
         toggleDashboardTodo(idx);
         return;
       }
 
-      // 4. Vider l'historique des sites
+      // 5. Clic sur le bouton de suppression d'une tâche
+      const delTaskBtn = e.target.closest('.dash-task-delete-btn');
+      if (delTaskBtn) {
+        e.preventDefault();
+        const idx = Number(delTaskBtn.dataset.idx);
+        deleteDashboardTodo(idx);
+        return;
+      }
+
+      // 6. Vider l'historique des sites
       if (e.target.closest('#dash-clear-history-btn')) {
         if (confirm('Voulez-vous réinitialiser l’historique des sites récents ?')) {
           localStorage.setItem('startpage_visited_sites', '[]');
@@ -951,11 +1209,11 @@
         return;
       }
 
-      // 5. Enregistrement automatique des clics sur les signets web
-      const bookmarkLink = e.target.closest('a.link-item') || e.target.closest('.dash-history-item');
+      // 7. Enregistrement automatique des clics sur les signets web & cartes de l'historique
+      const bookmarkLink = e.target.closest('a.link-item') || e.target.closest('.dash-history-item') || e.target.closest('.dash-history-card-tile');
       if (bookmarkLink) {
         const url = bookmarkLink.getAttribute('href');
-        const name = bookmarkLink.dataset.name || bookmarkLink.querySelector('.link-name-text')?.textContent || bookmarkLink.textContent.trim();
+        const name = bookmarkLink.dataset.name || bookmarkLink.querySelector('.dash-history-tile-name')?.textContent || bookmarkLink.querySelector('.link-name-text')?.textContent || bookmarkLink.textContent.trim();
         const icon = bookmarkLink.querySelector('i')?.className || 'fa-solid fa-globe';
         if (url && !url.startsWith('#')) {
           recordVisitedSite({ name, url, icon });
@@ -963,7 +1221,7 @@
         return;
       }
 
-      // 6. Navigation par boutons "data-deck-view" dans les cartes du dashboard
+      // 8. Navigation par boutons "data-deck-view" dans les cartes du dashboard
       const navTargetBtn = e.target.closest('[data-deck-view]');
       if (navTargetBtn && !navTargetBtn.classList.contains('deck-nav-btn')) {
         const targetView = navTargetBtn.dataset.deckView;

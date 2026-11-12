@@ -415,7 +415,7 @@
                         </div>
                         <div class="dash-card-title-text">
                           <h3>Agenda de la Semaine</h3>
-                          <span>Prochaines échéances &amp; To-Do</span>
+                          <span id="dash-agenda-header-subtitle">Échéances &amp; Tâches prévues</span>
                         </div>
                       </div>
                       <button type="button" class="dash-card-link-btn" data-deck-view="agenda" title="Ouvrir l'agenda complet">
@@ -425,6 +425,11 @@
 
                     <!-- Bandeau des 7 jours de la semaine (Lun à Dim) -->
                     <div id="dash-week-strip" class="dash-week-strip">
+                      <!-- Rempli dynamiquement -->
+                    </div>
+
+                    <!-- Barre d'état du filtre par jour (visible avec bouton réinitialiser quand un jour est cliqué) -->
+                    <div id="dash-agenda-filter-bar" class="dash-agenda-filter-bar">
                       <!-- Rempli dynamiquement -->
                     </div>
 
@@ -445,7 +450,7 @@
                     </form>
                   </div>
 
-                  <!-- MODULE 4 : HISTORIQUE DES SITES CONSULTÉS (5 DERNIERS) -->
+                  <!-- MODULE 4 : HISTORIQUE DES SITES CONSULTÉS (HAUTE VISIBILITÉ) -->
                   <div class="dash-card dash-card-history">
                     <div class="dash-card-header">
                       <div class="dash-card-title-group">
@@ -453,8 +458,8 @@
                           <i class="fa-solid fa-clock-rotate-left"></i>
                         </div>
                         <div class="dash-card-title-text">
-                          <h3>Sites Récents</h3>
-                          <span>5 derniers sites consultés</span>
+                          <h3>Historique Récent</h3>
+                          <span id="dash-history-count-label">Accès direct aux derniers sites consultés</span>
                         </div>
                       </div>
                       <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -467,31 +472,9 @@
                       </div>
                     </div>
 
-                    <!-- Liste des 5 derniers sites -->
-                    <div id="dash-history-list" class="dash-history-list">
+                    <!-- Grille riche des sites récents (2 colonnes de cartes interactives) -->
+                    <div id="dash-history-list" class="dash-history-grid">
                       <!-- Rempli dynamiquement par renderVisitedSites() -->
-                    </div>
-                  </div>
-
-                  <!-- MODULE 5 : ACTIONS RAPIDES & PRODUCTIVITÉ -->
-                  <div class="dash-card dash-card-shortcuts">
-                    <div class="dash-quick-actions-row">
-                      <button type="button" class="dash-quick-action-card action-pomo" data-deck-view="pomodoro" title="Lancer une session Pomodoro">
-                        <i class="fa-solid fa-stopwatch"></i>
-                        <span>Focus Lo-Fi</span>
-                      </button>
-                      <button type="button" class="dash-quick-action-card action-code" data-deck-view="notes" title="Ouvrir le Dev Studio Code">
-                        <i class="fa-solid fa-laptop-code"></i>
-                        <span>Dev Studio</span>
-                      </button>
-                      <button type="button" class="dash-quick-action-card action-news" data-deck-view="feeds" title="Lire les actualités">
-                        <i class="fa-solid fa-newspaper"></i>
-                        <span>Actualités</span>
-                      </button>
-                      <button type="button" class="dash-quick-action-card action-book" data-deck-view="bookmarks" title="Ouvrir les raccourcis web">
-                        <i class="fa-solid fa-compass"></i>
-                        <span>Raccourcis</span>
-                      </button>
                     </div>
                   </div>
                 </div>

@@ -309,23 +309,93 @@
   min-width: 0;
 }
 
-/* Style de Carte Unifiée Cockpit */
+/* Style de Carte Unifiée Cockpit avec Relief et Formes Variées */
 .dash-card {
-  background: var(--surface, rgba(14, 18, 28, 0.74));
   border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
-  border-radius: 20px;
   padding: 1.25rem 1.4rem;
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 16px 38px -10px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.dash-card:hover {
-  border-color: rgba(255, 255, 255, 0.14);
+/* Module 1 : Marchés boursiers — Forme arrondie symétrique, lueur émeraude / cyan */
+.dash-card-markets {
+  border-radius: 20px;
+  background: linear-gradient(168deg, rgba(14, 25, 34, 0.85) 0%, rgba(9, 14, 22, 0.8) 100%);
+  border-color: rgba(52, 211, 153, 0.2);
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.55), 0 0 24px -12px rgba(52, 211, 153, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.dash-card-markets:hover {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+
+.dash-card-markets .dash-card-icon-box {
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.32);
+  color: #34d399;
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.25);
+}
+
+/* Module 2 : Météo & Graphique 24h — Forme asymétrique élégante, lueur bleu saphir */
+.dash-card-weather {
+  border-radius: 26px 16px 26px 16px;
+  background: linear-gradient(168deg, rgba(12, 23, 44, 0.85) 0%, rgba(8, 14, 28, 0.8) 100%);
+  border-color: rgba(56, 189, 248, 0.2);
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.55), 0 0 24px -12px rgba(56, 189, 248, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.dash-card-weather:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.dash-card-weather .dash-card-icon-box {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.32);
+  color: #38bdf8;
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+}
+
+/* Module 3 : Mini Agenda Semaine — Forme avec coin supérieur droit élancé, lueur violette */
+.dash-card-agenda {
+  border-radius: 18px 28px 18px 18px;
+  background: linear-gradient(168deg, rgba(22, 18, 42, 0.85) 0%, rgba(12, 10, 26, 0.8) 100%);
+  border-color: rgba(167, 139, 250, 0.22);
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.55), 0 0 24px -12px rgba(167, 139, 250, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.dash-card-agenda:hover {
+  border-color: rgba(167, 139, 250, 0.38);
+}
+
+.dash-card-agenda .dash-card-icon-box {
+  background: rgba(167, 139, 250, 0.14);
+  border-color: rgba(167, 139, 250, 0.35);
+  color: #c4b5fd;
+  box-shadow: 0 0 14px rgba(167, 139, 250, 0.28);
+}
+
+/* Module 4 : Historique des sites récents — Forme biseautée moderne, lueur ambre / or */
+.dash-card-history {
+  border-radius: 22px 18px 28px 18px;
+  background: linear-gradient(168deg, rgba(28, 20, 32, 0.85) 0%, rgba(14, 11, 20, 0.8) 100%);
+  border-color: rgba(245, 158, 11, 0.2);
+  box-shadow: 0 18px 40px -10px rgba(0, 0, 0, 0.55), 0 0 24px -12px rgba(245, 158, 11, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.dash-card-history:hover {
+  border-color: rgba(245, 158, 11, 0.36);
+}
+
+.dash-card-history .dash-card-icon-box {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.32);
+  color: #fbbf24;
+  box-shadow: 0 0 14px rgba(245, 158, 11, 0.24);
 }
 
 /* Header de Carte */
@@ -760,79 +830,214 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.45rem;
-  margin-bottom: 0.95rem;
+  margin-bottom: 0.65rem;
 }
 
 .dash-week-day-pill {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0.45rem 0.2rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 0.55rem 0.25rem 0.45rem;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
   user-select: none;
   position: relative;
 }
 
 .dash-week-day-pill:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
-.dash-week-day-pill.today {
+/* Jour actuel (Aujourd'hui) : contour lumineux bleu/cyan distinct */
+.dash-week-day-pill.is-today {
   border-color: var(--accent-primary, #31e1f7);
-  background: rgba(var(--accent-primary-rgb, 49, 225, 247), 0.12);
-  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.2);
+  background: rgba(var(--accent-primary-rgb, 49, 225, 247), 0.1);
+  box-shadow: 0 0 14px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.28), inset 0 0 8px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.1);
 }
 
+.dash-week-day-pill.is-today .dash-day-num {
+  color: var(--accent-primary, #31e1f7);
+}
+
+/* Jour sélectionné par clic : Contraste maximal néon cyan/blanc */
 .dash-week-day-pill.selected {
-  background: var(--accent-primary, #31e1f7);
-  border-color: var(--accent-primary, #31e1f7);
-  color: #06040e !important;
+  background: linear-gradient(135deg, #31e1f7, #06b6d4) !important;
+  border-color: #31e1f7 !important;
+  box-shadow: 0 4px 18px rgba(49, 225, 247, 0.55) !important;
+  transform: translateY(-3px) scale(1.02);
 }
 
 .dash-week-day-pill.selected .dash-day-short,
 .dash-week-day-pill.selected .dash-day-num {
-  color: #06040e !important;
-  font-weight: 800;
+  color: #040914 !important;
+  font-weight: 800 !important;
 }
 
 .dash-day-short {
-  font-size: 0.62rem;
+  font-size: 0.64rem;
   text-transform: uppercase;
   color: var(--text-muted, #7c859e);
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.4px;
 }
 
 .dash-day-num {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--accent-white, #ffffff);
   margin-top: 2px;
+  line-height: 1.1;
+}
+
+.dash-day-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 3px;
+  min-height: 14px;
 }
 
 .dash-day-dot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: var(--accent-secondary, #b55fe6);
-  margin-top: 3px;
-  opacity: 0;
+  background: transparent;
 }
 
 .dash-week-day-pill.has-task .dash-day-dot {
-  opacity: 1;
+  background: var(--accent-secondary, #b55fe6);
+  box-shadow: 0 0 6px var(--accent-secondary, #b55fe6);
 }
 
-/* Liste des prochains événements / tâches */
+.dash-day-task-count {
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 1px 5px;
+  border-radius: 99px;
+  background: rgba(181, 95, 230, 0.35);
+  color: #ffffff;
+  border: 1px solid rgba(181, 95, 230, 0.6);
+}
+
+.dash-week-day-pill.selected .dash-day-task-count {
+  background: #040914;
+  color: #31e1f7;
+  border-color: #040914;
+}
+
+/* Barre de notification de filtrage par jour */
+.dash-agenda-filter-bar {
+  margin-bottom: 0.75rem;
+}
+
+.dash-agenda-filter-active {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 11px;
+  background: rgba(49, 225, 247, 0.08);
+  border: 1px solid rgba(49, 225, 247, 0.32);
+  animation: filterBarSlide 0.22s ease-out;
+}
+
+@keyframes filterBarSlide {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dash-agenda-filter-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  color: var(--text-main, #eef2f6);
+}
+
+.dash-filter-active-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #31e1f7;
+  box-shadow: 0 0 8px #31e1f7;
+}
+
+.dash-filter-today-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(49, 225, 247, 0.25);
+  color: #31e1f7;
+  margin-left: 3px;
+}
+
+.dash-filter-count-chip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.dash-filter-reset-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.24rem 0.7rem;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.dash-filter-reset-pill:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: translateY(-1px);
+}
+
+.dash-agenda-filter-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-muted, #7c859e);
+}
+
+.dash-agenda-filter-all-left {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--text-main, #c5c6c7);
+  font-weight: 600;
+}
+
+.dash-agenda-filter-hint {
+  font-size: 0.68rem;
+  opacity: 0.75;
+}
+
+/* Liste des tâches avec visibilité des jours renforcée */
 .dash-upcoming-list {
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-  max-height: 240px;
+  gap: 0.6rem;
+  max-height: 270px;
   overflow-y: auto;
   padding-right: 4px;
   margin-bottom: 0.85rem;
@@ -842,21 +1047,40 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.65rem;
-  padding: 0.6rem 0.8rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.2s ease;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-left: 3.5px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.22s ease;
+  position: relative;
 }
 
 .dash-task-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.068);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(2px);
+}
+
+.dash-task-item.priority-urgent {
+  border-left-color: #ef4444;
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.dash-task-item.priority-normal {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.dash-task-item.priority-low {
+  border-left-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
 }
 
 .dash-task-item.is-done {
-  opacity: 0.55;
+  opacity: 0.5;
+  border-left-color: #6b7280;
 }
 
 .dash-task-item.is-done .dash-task-title {
@@ -867,7 +1091,7 @@
 .dash-task-left {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: 0.75rem;
   min-width: 0;
   flex: 1;
 }
@@ -875,11 +1099,11 @@
 .dash-task-checkbox {
   appearance: none;
   -webkit-appearance: none;
-  width: 17px;
-  height: 17px;
-  border-radius: 5px;
-  border: 1.5px solid var(--border-subtle, rgba(255, 255, 255, 0.2));
-  background: rgba(255, 255, 255, 0.04);
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border-subtle, rgba(255, 255, 255, 0.25));
+  background: rgba(255, 255, 255, 0.05);
   cursor: pointer;
   position: relative;
   flex-shrink: 0;
@@ -902,25 +1126,83 @@
   font-weight: 800;
 }
 
+.dash-task-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  flex: 1;
+}
+
 .dash-task-title {
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--accent-white, #ffffff);
-  font-weight: 500;
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.25;
 }
 
-.dash-task-meta {
+.dash-task-sub-info {
   display: flex;
   align-items: center;
   gap: 0.45rem;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Badge du jour ultra visible et contrasté */
+.dash-task-day-tag {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  padding: 0.15rem 0.52rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.dash-task-day-tag i {
+  font-size: 0.65rem;
+}
+
+.dash-task-day-tag.badge-today {
+  background: linear-gradient(135deg, rgba(49, 225, 247, 0.25), rgba(6, 182, 212, 0.18));
+  border: 1px solid rgba(49, 225, 247, 0.55);
+  color: #31e1f7;
+  box-shadow: 0 0 10px rgba(49, 225, 247, 0.22);
+}
+
+.dash-task-day-tag.badge-tomorrow {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.25), rgba(139, 92, 246, 0.18));
+  border: 1px solid rgba(167, 139, 250, 0.5);
+  color: #c4b5fd;
+}
+
+.dash-task-day-tag.badge-future {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.dash-task-day-tag.badge-overdue {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.28), rgba(220, 38, 38, 0.18));
+  border: 1px solid rgba(239, 68, 68, 0.65);
+  color: #fca5a5;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.dash-task-day-tag.badge-no-date {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted, #7c859e);
 }
 
 .dash-task-badge-prio {
   font-size: 0.65rem;
-  padding: 0.12rem 0.4rem;
+  padding: 0.12rem 0.42rem;
   border-radius: 4px;
   font-weight: 600;
 }
@@ -941,19 +1223,55 @@
   color: #34d399;
 }
 
-.dash-task-badge-date {
-  font-size: 0.68rem;
+.dash-task-delete-btn {
+  background: transparent;
+  border: none;
   color: var(--text-muted, #7c859e);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.12rem 0.45rem;
-  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.78rem;
+  padding: 0.3rem 0.45rem;
+  border-radius: 6px;
+  opacity: 0.35;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dash-task-item:hover .dash-task-delete-btn {
+  opacity: 1;
+}
+
+.dash-task-delete-btn:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
 }
 
 .dash-tasks-empty {
   text-align: center;
-  padding: 1.5rem 0.5rem;
+  padding: 1.8rem 1rem;
   color: var(--text-muted, #7c859e);
-  font-size: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dash-empty-icon-wrap {
+  font-size: 1.8rem;
+  color: var(--accent-primary, #31e1f7);
+  margin-bottom: 0.25rem;
+  filter: drop-shadow(0 0 10px rgba(var(--accent-primary-rgb, 49, 225, 247), 0.35));
+}
+
+.dash-empty-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--accent-white, #ffffff);
+  margin: 0;
+}
+
+.dash-empty-sub {
+  font-size: 0.72rem;
+  color: var(--text-muted, #7c859e);
 }
 
 /* Formulaire d'ajout rapide de tâche */
@@ -961,9 +1279,9 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.35rem 0.6rem;
-  border-radius: 10px;
-  background: rgba(8, 11, 18, 0.6);
+  padding: 0.38rem 0.65rem;
+  border-radius: 11px;
+  background: rgba(8, 11, 18, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -971,7 +1289,7 @@
   flex: 1;
   background: transparent;
   border: none;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   color: var(--text-main, #eef2f6);
   outline: none;
 }
@@ -989,74 +1307,101 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 800;
   cursor: pointer;
   flex-shrink: 0;
   transition: transform 0.18s ease;
+  border: none;
 }
 
 .dash-task-fast-btn:hover {
   transform: scale(1.08);
 }
 
-/* --- 7. MODULE HISTORIQUE DES SITES CONSULTÉS (5 DERNIERS) --- */
-.dash-history-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
+/* --- 7. MODULE HISTORIQUE DES SITES CONSULTÉS (HAUTE VISIBILITÉ) --- */
+.dash-history-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
 }
 
-.dash-history-item {
+.dash-history-card-tile {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.6rem 0.85rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   text-decoration: none;
   color: inherit;
-  transition: all 0.22s ease;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.dash-history-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: var(--border-highlight, rgba(49, 225, 247, 0.35));
-  transform: translateX(3px);
+.dash-history-card-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tile-bg, transparent);
+  opacity: 0.16;
+  transition: opacity 0.22s ease;
 }
 
-.dash-history-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-  flex: 1;
+.dash-history-card-tile:hover {
+  background: rgba(255, 255, 255, 0.068);
+  border-color: var(--tile-border, rgba(49, 225, 247, 0.4));
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -6px var(--tile-glow, rgba(0,0,0,0.4)), inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-.dash-history-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.dash-history-card-tile:hover::before {
+  opacity: 0.38;
+}
+
+.dash-history-tile-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--tile-bg, rgba(255, 255, 255, 0.06));
+  border: 1.5px solid var(--tile-border, rgba(255, 255, 255, 0.12));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
-  color: var(--accent-primary, #31e1f7);
+  font-size: 1.3rem;
+  color: var(--tile-accent, #31e1f7);
+  box-shadow: 0 0 16px var(--tile-glow, transparent);
   flex-shrink: 0;
+  transition: transform 0.22s ease;
+  position: relative;
+  z-index: 1;
 }
 
-.dash-history-info {
+.dash-history-card-tile:hover .dash-history-tile-icon-box {
+  transform: scale(1.08);
+}
+
+.dash-history-tile-content {
   display: flex;
   flex-direction: column;
+  gap: 0.25rem;
   min-width: 0;
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
-.dash-history-name {
-  font-size: 0.84rem;
+.dash-history-tile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.dash-history-tile-name {
+  font-size: 0.86rem;
   font-weight: 700;
   color: var(--accent-white, #ffffff);
   white-space: nowrap;
@@ -1064,36 +1409,38 @@
   text-overflow: ellipsis;
 }
 
-.dash-history-domain {
-  font-size: 0.7rem;
+.dash-history-tile-arrow {
+  color: var(--text-muted, #7c859e);
+  font-size: 0.68rem;
+  transition: transform 0.2s ease, color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.dash-history-card-tile:hover .dash-history-tile-arrow {
+  color: var(--tile-accent, #31e1f7);
+  transform: translate(2px, -2px);
+}
+
+.dash-history-tile-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.dash-history-tile-domain {
+  font-size: 0.68rem;
   color: var(--text-muted, #7c859e);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.dash-history-right {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  flex-shrink: 0;
-}
-
-.dash-history-time {
-  font-size: 0.68rem;
-  color: var(--text-muted, #7c859e);
+.dash-history-tile-time {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: var(--tile-accent, var(--accent-primary, #31e1f7));
   white-space: nowrap;
-}
-
-.dash-history-arrow {
-  color: var(--text-muted, #7c859e);
-  font-size: 0.72rem;
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.dash-history-item:hover .dash-history-arrow {
-  color: var(--accent-primary, #31e1f7);
-  transform: translate(2px, -2px);
 }
 
 .dash-history-clear-btn {
@@ -1102,62 +1449,15 @@
   color: var(--text-muted, #7c859e);
   cursor: pointer;
   font-size: 0.78rem;
-  padding: 0.2rem 0.4rem;
+  padding: 0.25rem 0.45rem;
   border-radius: 6px;
   transition: all 0.2s ease;
 }
 
 .dash-history-clear-btn:hover {
   color: #f87171;
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(239, 68, 68, 0.14);
 }
-
-/* --- 8. MODULE ACTIONS PRODUCTIVITÉ (QUICK LAUNCH) --- */
-.dash-quick-actions-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.65rem;
-}
-
-.dash-quick-action-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  padding: 0.75rem 0.5rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  text-decoration: none;
-  color: inherit;
-  user-select: none;
-}
-
-.dash-quick-action-card:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: var(--border-highlight, rgba(49, 225, 247, 0.4));
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-}
-
-.dash-quick-action-card i {
-  font-size: 1.15rem;
-}
-
-.dash-quick-action-card span {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--accent-white, #fff);
-  text-align: center;
-}
-
-.dash-quick-action-card.action-pomo i { color: #f43f5e; }
-.dash-quick-action-card.action-code i { color: #a78bfa; }
-.dash-quick-action-card.action-news i { color: #38bdf8; }
-.dash-quick-action-card.action-book i { color: #34d399; }
 
 /* --- 9. NOUVEL ONGLET DÉDIÉ : RACCOURCIS WEB & FAVORIS --- */
 .bookmarks-full-view {
@@ -1291,7 +1591,7 @@
     flex-direction: column;
     align-items: flex-start;
   }
-  .dash-quick-actions-row {
-    grid-template-columns: repeat(2, 1fr);
+  .dash-history-grid {
+    grid-template-columns: 1fr;
   }
 }
