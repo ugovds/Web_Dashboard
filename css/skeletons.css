@@ -169,30 +169,36 @@
 }
 
 /* --- 6. SQUELETTE VUE 3 : AGENDA & TÂCHES FUSIONNÉS --- */
-.agenda-skeleton-container {
-  display: flex;
-  flex-direction: row;
-  gap: 1.25rem;
-  width: 100%;
+.agenda-skeleton-container,
+.agenda-full-view.view-skeleton-view {
+  display: grid !important;
+  grid-template-columns: minmax(0, 2.33fr) minmax(360px, 1fr) !important;
+  gap: clamp(16px, 1.8vw, 28px) !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.agenda-skeleton-cal-col,
+.agenda-full-view.view-skeleton-view .merged-calendar-section {
   height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-radius: clamp(18px, 2.2vh, 26px);
+  padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.8vw, 24px);
   box-sizing: border-box;
 }
 
-.agenda-skeleton-cal-col {
-  flex: 0 0 68%;
+.agenda-skeleton-tasks-col,
+.agenda-full-view.view-skeleton-view .merged-tasks-section {
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  border-radius: 20px;
-  padding: 1.25rem 1.5rem;
-  box-sizing: border-box;
-}
-
-.agenda-skeleton-tasks-col {
-  flex: 0 0 calc(32% - 1.25rem);
-  display: flex;
-  flex-direction: column;
-  border-radius: 20px;
-  padding: 1.25rem 1.4rem;
+  border-radius: clamp(18px, 2.2vh, 26px);
+  padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.8vw, 24px);
   box-sizing: border-box;
 }
 
@@ -308,7 +314,8 @@
 }
 
 /* --- 10. SQUELETTE VUE 7 : FOCUS POMODORO & AMBIANCE --- */
-.pomodoro-skeleton-container {
+.pomodoro-skeleton-container,
+.pomodoro-full-view.view-skeleton-view {
   display: grid !important;
   grid-template-columns: minmax(0, 1.45fr) minmax(380px, 1fr) !important;
   gap: clamp(16px, 1.8vw, 24px) !important;
@@ -318,22 +325,30 @@
   box-sizing: border-box !important;
 }
 
-.pomodoro-skeleton-timer-col {
-  border-radius: 24px;
-  padding: clamp(16px, 2.2vh, 28px) clamp(18px, 2.4vw, 32px);
+.pomodoro-skeleton-timer-col,
+.pomodoro-full-view.view-skeleton-view .revision-timer-col {
+  border-radius: clamp(18px, 2.2vh, 24px);
+  padding: clamp(14px, 2vh, 22px) clamp(16px, 2vw, 24px);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
-.pomodoro-skeleton-ambient-col {
-  border-radius: 24px;
-  padding: clamp(16px, 2.2vh, 24px);
+.pomodoro-skeleton-ambient-col,
+.pomodoro-full-view.view-skeleton-view .revision-cockpit-col {
+  border-radius: clamp(18px, 2.2vh, 24px);
+  padding: clamp(14px, 2vh, 22px) clamp(16px, 2vw, 24px);
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
 /* --- 11. SQUELETTE VUE 8 : DEV STUDIO & BLOC-NOTES --- */
@@ -418,16 +433,23 @@
 
 /* --- 14. ADAPTATIVITÉ MOBILE (RESPONSIVE) --- */
 @media (max-width: 1050px) {
-  .agenda-skeleton-container {
+  .agenda-skeleton-container,
+  .agenda-full-view.view-skeleton-view {
+    display: flex !important;
     flex-direction: column !important;
+    overflow-y: auto !important;
   }
   .agenda-skeleton-cal-col,
-  .agenda-skeleton-tasks-col {
+  .agenda-skeleton-tasks-col,
+  .agenda-full-view.view-skeleton-view .merged-calendar-section,
+  .agenda-full-view.view-skeleton-view .merged-tasks-section {
     flex: 1 1 auto !important;
     width: 100% !important;
   }
-  .pomodoro-skeleton-container {
-    grid-template-columns: 1fr !important;
+  .pomodoro-skeleton-container,
+  .pomodoro-full-view.view-skeleton-view {
+    display: flex !important;
+    flex-direction: column !important;
     overflow-y: auto !important;
   }
   .studio-skeleton-body {

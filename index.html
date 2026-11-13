@@ -698,7 +698,7 @@
           <!-- ==============================================
                VUE 2 : RACCOURCIS WEB & FAVORIS (NOUVEL ONGLET DÉDIÉ)
                ============================================== -->
-          <div id="deck-view-bookmarks" class="deck-slide-view bookmarks-full-view" hidden>
+          <div id="deck-view-bookmarks" class="deck-slide-view" hidden>
             <!-- Squelette Bookmarks -->
             <div id="bookmarks-skeleton-view" class="bookmarks-full-view view-skeleton-view" aria-hidden="true">
               <div class="bookmarks-view-header skel-card">
@@ -820,11 +820,11 @@
           </div>
 
           <!-- VUE 3 : CALENDRIER & TÂCHES FUSIONNÉS (70% AGENDA / 30% TÂCHES) -->
-          <div id="deck-view-agenda" class="deck-slide-view agenda-full-view" hidden>
-            <!-- Squelette Agenda & Tâches -->
-            <div id="agenda-skeleton-view" class="agenda-skeleton-container view-skeleton-view" aria-hidden="true">
-              <!-- Colonne Calendrier (Gauche ~68%) -->
-              <div class="agenda-skeleton-cal-col skel-card">
+          <div id="deck-view-agenda" class="deck-slide-view" hidden>
+            <!-- Squelette Agenda & TÂches -->
+            <div id="agenda-skeleton-view" class="agenda-full-view view-skeleton-view" aria-hidden="true">
+              <!-- Colonne Calendrier (Gauche ~70%) -->
+              <div class="merged-calendar-section skel-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem;">
                   <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div class="skel-elem skel-circle" style="width: 32px; height: 32px;"></div>
@@ -842,7 +842,7 @@
                   <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
                   <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
                 </div>
-                <div class="cal-skeleton-grid">
+                <div class="cal-skeleton-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; flex: 1;">
                   <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
                   <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
                   <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
@@ -881,8 +881,8 @@
                 </div>
               </div>
 
-              <!-- Colonne Tâches (Droite ~32%) -->
-              <div class="agenda-skeleton-tasks-col skel-card">
+              <!-- Colonne Tâches (Droite ~30%) -->
+              <div class="merged-tasks-section skel-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.95rem;">
                   <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
@@ -910,7 +910,7 @@
             </div>
 
             <!-- Contenu Réel Agenda -->
-            <div id="agenda-real-view" class="agenda-skeleton-container view-real-content is-loading">
+            <div id="agenda-real-view" class="agenda-full-view view-real-content is-loading">
               <div class="merged-calendar-section">
               <div class="cal-controls-row">
                 <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
@@ -1919,11 +1919,11 @@
               </div>
 
               <!-- VUE 7 : STUDIO DE RÉVISIONS & FOCUS POMODORO (2 COLONNES) -->
-              <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view" hidden>
+              <div id="deck-view-pomodoro" class="deck-slide-view" hidden>
                 <!-- Squelette Focus Pomodoro -->
-                <div id="pomodoro-skeleton-view" class="pomodoro-skeleton-container view-skeleton-view" aria-hidden="true">
+                <div id="pomodoro-skeleton-view" class="pomodoro-full-view view-skeleton-view" aria-hidden="true">
                   <!-- Colonne Minuteur (Gauche) -->
-                  <div class="pomodoro-skeleton-timer-col skel-card">
+                  <div class="revision-timer-col pomodoro-skeleton-timer-col skel-card">
                     <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
                       <div class="skel-elem skel-squircle" style="width: 180px; height: 36px;"></div>
                       <div class="skel-elem skel-pill" style="width: 200px; height: 32px;"></div>
@@ -1950,7 +1950,7 @@
                   </div>
 
                   <!-- Colonne Ambiance (Droite) -->
-                  <div class="pomodoro-skeleton-ambient-col skel-card">
+                  <div class="revision-cockpit-col pomodoro-skeleton-ambient-col skel-card">
                     <div class="skel-elem skel-bar" style="width: 170px; height: 20px;"></div>
                     <div style="display: flex; gap: 8px;">
                       <div class="skel-elem skel-squircle" style="flex: 1; height: 50px;"></div>
@@ -1971,7 +1971,7 @@
                 </div>
 
                 <!-- Contenu Réel Pomodoro -->
-                <div id="pomodoro-real-view" class="pomodoro-skeleton-container view-real-content is-loading">
+                <div id="pomodoro-real-view" class="pomodoro-full-view view-real-content is-loading">
                   <!-- COLONNE GAUCHE (~56%) : GRAND MINUTEUR DE RÉVISION & COMMANDES -->
                   <div class="revision-timer-col">
                   
