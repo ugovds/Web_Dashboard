@@ -103,13 +103,54 @@ function initDeckViewSlider() {
 
       updateTopbarInfo(target);
 
-      if (target === 'customize') {
-        const activeSubtab = document.querySelector('.hub-tab-btn.active')?.dataset.hubTab || 'appearance';
-        switchHubTab(activeSubtab);
-      } else if (target === 'pomodoro') {
-        if (typeof renderPomoHistoryChart === 'function') renderPomoHistoryChart();
-        if (typeof updatePomoUI === 'function') updatePomoUI();
-        if (typeof drawAmbientVisualizer === 'function') drawAmbientVisualizer();
+      // Rendu coordonné de la vue cible sous son squelette de chargement
+      const renderTargetView = () => {
+        if (target === 'dashboard') {
+          if (typeof initOverviewDashboard === 'function') initOverviewDashboard();
+        } else if (target === 'bookmarks') {
+          if (typeof renderCategories === 'function') renderCategories();
+        } else if (target === 'agenda') {
+          if (typeof renderCalendar === 'function') renderCalendar();
+          if (typeof renderTasks === 'function') renderTasks();
+        } else if (target === 'weather') {
+          if (typeof initWeather === 'function') initWeather();
+          if (typeof getStoredWeatherCache === 'function' && typeof renderWeatherDeckView === 'function') {
+            const c = getStoredWeatherCache();
+            if (c?.data) renderWeatherDeckView(c.data);
+          }
+        } else if (target === 'feeds') {
+          if (typeof initFeeds === 'function') initFeeds();
+          if (typeof loadFeed === 'function') {
+            loadFeed(typeof currentActiveFeedId !== 'undefined' ? currentActiveFeedId : 'all');
+          }
+        } else if (target === 'system') {
+          if (typeof initMarkets === 'function') initMarkets();
+          if (typeof renderIndicesMarquee === 'function') renderIndicesMarquee();
+          if (typeof renderMarketCards === 'function') renderMarketCards();
+          if (typeof renderHeroSpotlight === 'function' && typeof currentHeroAssetId !== 'undefined') {
+            renderHeroSpotlight(currentHeroAssetId);
+          }
+          if (typeof renderMarketBarometer === 'function') renderMarketBarometer();
+          if (typeof renderMarketMovers === 'function') renderMarketMovers();
+          if (typeof renderForexCryptoModule === 'function') renderForexCryptoModule();
+        } else if (target === 'pomodoro') {
+          if (typeof renderPomoHistoryChart === 'function') renderPomoHistoryChart();
+          if (typeof updatePomoUI === 'function') updatePomoUI();
+          if (typeof drawAmbientVisualizer === 'function') drawAmbientVisualizer();
+        } else if (target === 'notes') {
+          if (typeof initStudio === 'function') initStudio();
+        } else if (target === 'quotes') {
+          if (typeof initWidgets === 'function') initWidgets();
+        } else if (target === 'customize') {
+          const activeSubtab = document.querySelector('.hub-tab-btn.active')?.dataset.hubTab || 'appearance';
+          switchHubTab(activeSubtab);
+        }
+      };
+
+      if (window.PageSkeletonManager) {
+        window.PageSkeletonManager.prepareAndRevealView(target, renderTargetView, 220);
+      } else {
+        renderTargetView();
       }
 
       updateIndicator(btn);

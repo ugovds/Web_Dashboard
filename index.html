@@ -48,6 +48,7 @@
     <link rel="stylesheet" href="css/sidebar.css?v=3.0" />
     <link rel="stylesheet" href="css/dashboard.css?v=4.3" />
     <link rel="stylesheet" href="css/dashboard-overview.css?v=1.1" />
+    <link rel="stylesheet" href="css/skeletons.css?v=1.0" />
     <link rel="stylesheet" href="css/clock.css?v=3.0" />
     <link rel="stylesheet" href="css/search.css?v=3.0" />
     <link rel="stylesheet" href="css/bookmarks.css?v=3.1" />
@@ -211,7 +212,7 @@
             <!-- ==============================================
                  SQUELETTE DE TRANSITION INSTANTANÉ (FIRST PAINT 0MS)
                  ============================================== -->
-            <div id="dashboard-skeleton-view" class="dashboard-home-view dashboard-skeleton-view" aria-hidden="true">
+            <div id="dashboard-skeleton-view" class="dashboard-home-view dashboard-skeleton-view view-skeleton-view" aria-hidden="true">
               <!-- Squelette Hero Banner -->
               <div class="dash-hero-card skel-card">
                 <div class="dash-hero-top">
@@ -365,7 +366,7 @@
             </div>
 
             <!-- VRAI CONTENU DU DASHBOARD (RÉVÉLÉ EN TRANSITION FLUIDE) -->
-            <div id="dashboard-real-view" class="dashboard-home-view dashboard-real-content is-loading">
+            <div id="dashboard-real-view" class="dashboard-home-view dashboard-real-content view-real-content is-loading">
               <!-- 1. HERO BANNER : Salutation, État du Système & Barre Omnibox -->
               <div class="dash-hero-card">
                 <div class="dash-hero-top">
@@ -698,35 +699,219 @@
                VUE 2 : RACCOURCIS WEB & FAVORIS (NOUVEL ONGLET DÉDIÉ)
                ============================================== -->
           <div id="deck-view-bookmarks" class="deck-slide-view bookmarks-full-view" hidden>
-            <div class="bookmarks-view-header">
-              <div class="bookmarks-title-group">
-                <div class="bookmarks-title-icon"><i class="fa-solid fa-compass"></i></div>
-                <div>
-                  <h2 class="bookmarks-title">Raccourcis Web &amp; Favoris</h2>
-                  <span class="bookmarks-subtitle">Accès rapide à vos applications et sites web préférés par catégorie</span>
+            <!-- Squelette Bookmarks -->
+            <div id="bookmarks-skeleton-view" class="bookmarks-full-view view-skeleton-view" aria-hidden="true">
+              <div class="bookmarks-view-header skel-card">
+                <div class="bookmarks-title-group">
+                  <div class="skel-elem skel-circle" style="width: 40px; height: 40px;"></div>
+                  <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <div class="skel-elem skel-bar" style="width: 180px; height: 18px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 260px; height: 12px;"></div>
+                  </div>
+                </div>
+                <div class="bookmarks-header-actions">
+                  <div class="skel-elem skel-pill" style="width: 140px; height: 34px;"></div>
+                  <div class="skel-elem skel-pill" style="width: 130px; height: 34px;"></div>
                 </div>
               </div>
-              <div class="bookmarks-header-actions">
-                <button type="button" id="bookmarks-add-link-btn" class="bookmarks-action-btn primary" title="Ajouter un raccourci">
-                  <i class="fa-solid fa-plus"></i> <span>Nouveau Raccourci</span>
-                </button>
-                <button type="button" class="bookmarks-action-btn" data-deck-view="customize" title="Gérer les catégories dans les paramètres">
-                  <i class="fa-solid fa-sliders"></i> <span>Gérer Catégories</span>
-                </button>
+              <div class="bookmarks-view-body">
+                <section class="overview-categories-section">
+                  <div class="categories-grid">
+                    <div class="category-card skel-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                          <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div>
+                        </div>
+                        <div class="skel-elem skel-pill" style="width: 48px; height: 20px;"></div>
+                      </div>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; flex: 1;">
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                      </div>
+                    </div>
+                    <div class="category-card skel-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                          <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 130px; height: 16px;"></div>
+                        </div>
+                        <div class="skel-elem skel-pill" style="width: 48px; height: 20px;"></div>
+                      </div>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; flex: 1;">
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                      </div>
+                    </div>
+                    <div class="category-card skel-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                          <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 100px; height: 16px;"></div>
+                        </div>
+                        <div class="skel-elem skel-pill" style="width: 48px; height: 20px;"></div>
+                      </div>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; flex: 1;">
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                      </div>
+                    </div>
+                    <div class="category-card skel-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.9rem;">
+                        <div style="display: flex; align-items: center; gap: 0.6rem;">
+                          <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 120px; height: 16px;"></div>
+                        </div>
+                        <div class="skel-elem skel-pill" style="width: 48px; height: 20px;"></div>
+                      </div>
+                      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.75rem; flex: 1;">
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
               </div>
             </div>
 
-            <div class="bookmarks-view-body">
-              <!-- Zone principale : Grille des Catégories de Signets -->
-              <section class="overview-categories-section">
-                <div id="categories-container" class="categories-grid"></div>
-              </section>
+            <!-- Contenu Réel Bookmarks -->
+            <div id="bookmarks-real-view" class="bookmarks-full-view view-real-content is-loading">
+              <div class="bookmarks-view-header">
+                <div class="bookmarks-title-group">
+                  <div class="bookmarks-title-icon"><i class="fa-solid fa-compass"></i></div>
+                  <div>
+                    <h2 class="bookmarks-title">Raccourcis Web &amp; Favoris</h2>
+                    <span class="bookmarks-subtitle">Accès rapide à vos applications et sites web préférés par catégorie</span>
+                  </div>
+                </div>
+                <div class="bookmarks-header-actions">
+                  <button type="button" id="bookmarks-add-link-btn" class="bookmarks-action-btn primary" title="Ajouter un raccourci">
+                    <i class="fa-solid fa-plus"></i> <span>Nouveau Raccourci</span>
+                  </button>
+                  <button type="button" class="bookmarks-action-btn" data-deck-view="customize" title="Gérer les catégories dans les paramètres">
+                    <i class="fa-solid fa-sliders"></i> <span>Gérer Catégories</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="bookmarks-view-body">
+                <!-- Zone principale : Grille des Catégories de Signets -->
+                <section class="overview-categories-section">
+                  <div id="categories-container" class="categories-grid"></div>
+                </section>
+              </div>
             </div>
           </div>
 
-          <!-- VUE 2 : CALENDRIER & TÂCHES FUSIONNÉS (70% AGENDA / 30% TÂCHES) -->
+          <!-- VUE 3 : CALENDRIER & TÂCHES FUSIONNÉS (70% AGENDA / 30% TÂCHES) -->
           <div id="deck-view-agenda" class="deck-slide-view agenda-full-view" hidden>
-            <div class="merged-calendar-section">
+            <!-- Squelette Agenda & Tâches -->
+            <div id="agenda-skeleton-view" class="agenda-skeleton-container view-skeleton-view" aria-hidden="true">
+              <!-- Colonne Calendrier (Gauche ~68%) -->
+              <div class="agenda-skeleton-cal-col skel-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.1rem;">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <div class="skel-elem skel-circle" style="width: 32px; height: 32px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 140px; height: 22px;"></div>
+                    <div class="skel-elem skel-circle" style="width: 32px; height: 32px;"></div>
+                  </div>
+                  <div class="skel-elem skel-pill" style="width: 90px; height: 32px;"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 0.8rem;">
+                  <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
+                  <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
+                  <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
+                  <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
+                  <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
+                  <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
+                  <div class="skel-elem skel-bar" style="height: 14px; border-radius: 4px;"></div>
+                </div>
+                <div class="cal-skeleton-grid">
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                  <div class="skel-elem skel-squircle" style="min-height: 52px;"></div>
+                </div>
+              </div>
+
+              <!-- Colonne Tâches (Droite ~32%) -->
+              <div class="agenda-skeleton-tasks-col skel-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.95rem;">
+                  <div style="display: flex; align-items: center; gap: 0.6rem;">
+                    <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                    <div class="skel-elem skel-bar" style="width: 80px; height: 18px;"></div>
+                    <div class="skel-elem skel-pill" style="width: 48px; height: 20px;"></div>
+                  </div>
+                  <div style="display: flex; gap: 6px;">
+                    <div class="skel-elem skel-pill" style="width: 50px; height: 24px;"></div>
+                    <div class="skel-elem skel-pill" style="width: 50px; height: 24px;"></div>
+                  </div>
+                </div>
+                <!-- Mini Progress -->
+                <div class="skel-elem skel-squircle" style="height: 4px; margin-bottom: 1rem;"></div>
+                <!-- Todo Input Card -->
+                <div class="skel-elem skel-squircle" style="height: 84px; margin-bottom: 1rem;"></div>
+                <!-- Liste de tâches -->
+                <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                  <div class="skel-elem skel-squircle" style="height: 46px;"></div>
+                  <div class="skel-elem skel-squircle" style="height: 46px;"></div>
+                  <div class="skel-elem skel-squircle" style="height: 46px;"></div>
+                  <div class="skel-elem skel-squircle" style="height: 46px;"></div>
+                  <div class="skel-elem skel-squircle" style="height: 46px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contenu Réel Agenda -->
+            <div id="agenda-real-view" class="agenda-skeleton-container view-real-content is-loading">
+              <div class="merged-calendar-section">
               <div class="cal-controls-row">
                 <button id="cal-prev" class="cal-nav-btn" title="Mois précédent">
                   <i class="fa-solid fa-chevron-left"></i>
@@ -809,11 +994,89 @@
               <!-- Liste défilante des tâches -->
               <ul id="todo-list" class="todo-list merged-todo-list"></ul>
             </div>
+            </div>
           </div>
 
-              <!-- VUE 2 : MÉTÉO COMPLÈTE & PRÉVISIONS (INSPIRATION SAMSUNG ONE UI) -->
+              <!-- VUE 4 : MÉTÉO COMPLÈTE & PRÉVISIONS (INSPIRATION SAMSUNG ONE UI) -->
               <div id="deck-view-weather" class="deck-slide-view weather-full-view" hidden>
-                <div class="samsung-weather-container">
+                <!-- Squelette Météo Samsung One UI -->
+                <div id="weather-skeleton-view" class="weather-skeleton-container view-skeleton-view" aria-hidden="true">
+                  <!-- Search skeleton -->
+                  <div class="weather-skeleton-search skel-card">
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 46px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <div class="skel-elem skel-pill" style="width: 90px; height: 28px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 100px; height: 28px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 85px; height: 28px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Hero skeleton -->
+                  <div class="weather-skeleton-hero skel-card">
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                      <div class="skel-elem skel-pill" style="width: 160px; height: 26px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 100px; height: 16px;"></div>
+                      <div style="display: flex; align-items: baseline; gap: 1rem; margin-top: 0.5rem;">
+                        <div class="skel-elem skel-squircle" style="width: 130px; height: 72px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div class="skel-elem skel-bar" style="width: 140px; height: 22px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 180px; height: 14px;"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="skel-elem skel-circle" style="width: 90px; height: 90px;"></div>
+                  </div>
+
+                  <!-- Hourly graph skeleton -->
+                  <div class="weather-skeleton-hourly skel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                      <div class="skel-elem skel-bar" style="width: 200px; height: 20px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 120px; height: 26px;"></div>
+                    </div>
+                    <div class="skel-elem skel-squircle" style="height: 120px; margin-bottom: 0.95rem;"></div>
+                    <div style="display: flex; gap: 8px;">
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 42px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- 7-day week forecast skeleton -->
+                  <div class="weather-skeleton-week skel-card">
+                    <div class="skel-elem skel-bar" style="width: 220px; height: 20px; margin-bottom: 1rem;"></div>
+                    <div style="display: flex; gap: 8px;">
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 92px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 92px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 92px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 92px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 92px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 92px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 92px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Bento metrics skeleton -->
+                  <div class="weather-skeleton-bento">
+                    <div class="skel-elem skel-squircle" style="height: 100px;"></div>
+                    <div class="skel-elem skel-squircle" style="height: 100px;"></div>
+                    <div class="skel-elem skel-squircle" style="height: 100px;"></div>
+                    <div class="skel-elem skel-squircle" style="height: 100px;"></div>
+                  </div>
+                </div>
+
+                <!-- Contenu Réel Météo -->
+                <div id="weather-real-view" class="samsung-weather-container view-real-content is-loading">
                   <!-- 1. BARRE DE RECHERCHE FLOTTANTE & FAVORIS -->
                   <div class="weather-search-card">
                     <div class="weather-search-main-row">
@@ -1018,9 +1281,111 @@
                 </div>
               </div>
 
-              <!-- VUE 3 : INFOS / ACTUALITÉS (GRILLE EN DIRECT) -->
+              <!-- VUE 5 : INFOS / ACTUALITÉS (GRILLE EN DIRECT) -->
               <div id="deck-view-feeds" class="deck-slide-view feeds-full-view" hidden>
-                <div class="news-container">
+                <!-- Squelette Feeds -->
+                <div id="feeds-skeleton-view" class="feeds-skeleton-container view-skeleton-view" aria-hidden="true">
+                  <header class="feeds-skeleton-header skel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="skel-elem skel-pill" style="width: 100px; height: 22px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 200px; height: 24px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 320px; height: 13px;"></div>
+                      </div>
+                      <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="skel-elem skel-squircle" style="width: 200px; height: 38px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 110px; height: 38px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 100px; height: 38px;"></div>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; margin-top: 0.5rem;">
+                      <div class="skel-elem skel-pill" style="width: 90px; height: 32px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 95px; height: 32px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 120px; height: 32px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 130px; height: 32px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 85px; height: 32px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 90px; height: 32px;"></div>
+                    </div>
+                  </header>
+
+                  <div class="feeds-skeleton-grid">
+                    <div class="feeds-skeleton-card skel-card">
+                      <div class="skel-elem skel-squircle" style="height: 160px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 70px; height: 20px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 90%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 75%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 100%; height: 12px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 85%; height: 12px;"></div>
+                      <div style="display: flex; justify-content: space-between; margin-top: auto;">
+                        <div class="skel-elem skel-bar" style="width: 80px; height: 12px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 60px; height: 12px;"></div>
+                      </div>
+                    </div>
+                    <div class="feeds-skeleton-card skel-card">
+                      <div class="skel-elem skel-squircle" style="height: 160px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 70px; height: 20px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 85%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 65%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 100%; height: 12px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 80%; height: 12px;"></div>
+                      <div style="display: flex; justify-content: space-between; margin-top: auto;">
+                        <div class="skel-elem skel-bar" style="width: 80px; height: 12px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 60px; height: 12px;"></div>
+                      </div>
+                    </div>
+                    <div class="feeds-skeleton-card skel-card">
+                      <div class="skel-elem skel-squircle" style="height: 160px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 70px; height: 20px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 95%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 70%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 100%; height: 12px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 90%; height: 12px;"></div>
+                      <div style="display: flex; justify-content: space-between; margin-top: auto;">
+                        <div class="skel-elem skel-bar" style="width: 80px; height: 12px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 60px; height: 12px;"></div>
+                      </div>
+                    </div>
+                    <div class="feeds-skeleton-card skel-card">
+                      <div class="skel-elem skel-squircle" style="height: 160px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 70px; height: 20px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 88%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 72%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 100%; height: 12px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 85%; height: 12px;"></div>
+                      <div style="display: flex; justify-content: space-between; margin-top: auto;">
+                        <div class="skel-elem skel-bar" style="width: 80px; height: 12px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 60px; height: 12px;"></div>
+                      </div>
+                    </div>
+                    <div class="feeds-skeleton-card skel-card">
+                      <div class="skel-elem skel-squircle" style="height: 160px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 70px; height: 20px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 90%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 70%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 100%; height: 12px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 75%; height: 12px;"></div>
+                      <div style="display: flex; justify-content: space-between; margin-top: auto;">
+                        <div class="skel-elem skel-bar" style="width: 80px; height: 12px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 60px; height: 12px;"></div>
+                      </div>
+                    </div>
+                    <div class="feeds-skeleton-card skel-card">
+                      <div class="skel-elem skel-squircle" style="height: 160px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 70px; height: 20px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 80%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 60%; height: 18px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 100%; height: 12px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 80%; height: 12px;"></div>
+                      <div style="display: flex; justify-content: space-between; margin-top: auto;">
+                        <div class="skel-elem skel-bar" style="width: 80px; height: 12px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 60px; height: 12px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contenu Réel Feeds -->
+                <div id="feeds-real-view" class="news-container view-real-content is-loading">
                   <!-- En-tête / Barre d'outils du Hub Actualités -->
                   <header class="news-header">
                     <div class="news-header-top">
@@ -1087,9 +1452,75 @@
                 </div>
               </div>
 
-              <!-- VUE 4 : MARCHÉS BOURSIERS, ACTIONS & ETF (STUDIO TRADINGVIEW) -->
+              <!-- VUE 6 : MARCHÉS BOURSIERS, ACTIONS & ETF (STUDIO TRADINGVIEW) -->
               <div id="deck-view-system" class="deck-slide-view system-full-view markets-full-view" hidden>
-                <div class="markets-container">
+                <!-- Squelette Marchés -->
+                <div id="system-skeleton-view" class="markets-skeleton-container view-skeleton-view" aria-hidden="true">
+                  <header class="markets-skeleton-header skel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div class="skel-elem skel-pill" style="width: 170px; height: 26px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 240px; height: 24px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 380px; height: 13px;"></div>
+                      </div>
+                      <div style="display: flex; gap: 8px; align-items: center;">
+                        <div class="skel-elem skel-squircle" style="width: 220px; height: 38px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 100px; height: 38px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 120px; height: 38px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 100px; height: 38px;"></div>
+                      </div>
+                    </div>
+                    <!-- Marquee skeleton -->
+                    <div class="skel-elem skel-pill" style="height: 38px; width: 100%;"></div>
+                  </header>
+
+                  <!-- Hero Spotlight skeleton -->
+                  <div class="markets-skeleton-hero skel-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div class="skel-elem skel-bar" style="width: 180px; height: 22px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 120px; height: 13px;"></div>
+                        </div>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="skel-elem skel-bar" style="width: 130px; height: 32px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 80px; height: 28px;"></div>
+                      </div>
+                    </div>
+                    <div class="skel-elem skel-squircle" style="height: 180px; width: 100%;"></div>
+                    <div style="display: flex; gap: 12px;">
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Watchlist cards grid skeleton -->
+                  <div class="markets-skeleton-grid">
+                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
+                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
+                    </div>
+                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
+                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
+                    </div>
+                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
+                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
+                    </div>
+                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
+                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
+                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contenu Réel Marchés -->
+                <div id="system-real-view" class="markets-container view-real-content is-loading">
                   <!-- 1. HEADER DU HUB MARCHÉS -->
                   <header class="markets-header">
                     <div class="markets-header-top">
@@ -1487,11 +1918,62 @@
                 </div>
               </div>
 
-              <!-- VUE 5 : STUDIO DE RÉVISIONS & FOCUS POMODORO (2 COLONNES) -->
+              <!-- VUE 7 : STUDIO DE RÉVISIONS & FOCUS POMODORO (2 COLONNES) -->
               <div id="deck-view-pomodoro" class="deck-slide-view pomodoro-full-view" hidden>
-                
-                <!-- COLONNE GAUCHE (~56%) : GRAND MINUTEUR DE RÉVISION & COMMANDES -->
-                <div class="revision-timer-col">
+                <!-- Squelette Focus Pomodoro -->
+                <div id="pomodoro-skeleton-view" class="pomodoro-skeleton-container view-skeleton-view" aria-hidden="true">
+                  <!-- Colonne Minuteur (Gauche) -->
+                  <div class="pomodoro-skeleton-timer-col skel-card">
+                    <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                      <div class="skel-elem skel-squircle" style="width: 180px; height: 36px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 200px; height: 32px;"></div>
+                    </div>
+                    <div class="skel-elem skel-squircle" style="width: 100%; height: 42px;"></div>
+                    
+                    <!-- Grand cadran circulaire XXL -->
+                    <div style="display: flex; justify-content: center; align-items: center; width: 100%; margin: 1.5rem 0;">
+                      <div class="skel-elem skel-circle" style="width: 270px; height: 270px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                        <div class="skel-elem skel-bar" style="width: 140px; height: 44px; border-radius: 8px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 110px; height: 22px;"></div>
+                      </div>
+                    </div>
+
+                    <!-- Barre de progression -->
+                    <div class="skel-elem skel-squircle" style="width: 100%; height: 8px;"></div>
+
+                    <!-- Commandes principales -->
+                    <div style="display: flex; gap: 1rem; width: 100%; justify-content: center; align-items: center;">
+                      <div class="skel-elem skel-pill" style="width: 180px; height: 48px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                    </div>
+                  </div>
+
+                  <!-- Colonne Ambiance (Droite) -->
+                  <div class="pomodoro-skeleton-ambient-col skel-card">
+                    <div class="skel-elem skel-bar" style="width: 170px; height: 20px;"></div>
+                    <div style="display: flex; gap: 8px;">
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 50px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 50px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 50px;"></div>
+                    </div>
+                    
+                    <div class="skel-elem skel-bar" style="width: 190px; height: 20px; margin-top: 0.5rem;"></div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                      <div class="skel-elem skel-squircle" style="height: 64px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 64px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 64px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 64px;"></div>
+                    </div>
+
+                    <div class="skel-elem skel-squircle" style="height: 120px; width: 100%; margin-top: auto;"></div>
+                  </div>
+                </div>
+
+                <!-- Contenu Réel Pomodoro -->
+                <div id="pomodoro-real-view" class="pomodoro-skeleton-container view-real-content is-loading">
+                  <!-- COLONNE GAUCHE (~56%) : GRAND MINUTEUR DE RÉVISION & COMMANDES -->
+                  <div class="revision-timer-col">
                   
                   <!-- Barre supérieure : Sujet & Programme actif -->
                   <div class="revision-top-bar">
@@ -1740,13 +2222,87 @@
                   </div>
 
                 </div>
+                </div>
 
               </div>
 
-              <!-- VUE 6 : STUDIO CODE PLAYGROUND & BLOC-NOTES MARKDOWN -->
+              <!-- VUE 8 : STUDIO CODE PLAYGROUND & BLOC-NOTES MARKDOWN -->
               <div id="deck-view-notes" class="deck-slide-view notes-full-view studio-full-view" hidden>
-                <div class="studio-container">
-                  
+                <!-- Squelette Studio -->
+                <div id="notes-skeleton-view" class="studio-skeleton-container view-skeleton-view" aria-hidden="true">
+                  <header class="studio-skeleton-header skel-card">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                      <div class="skel-elem skel-circle" style="width: 32px; height: 32px;"></div>
+                      <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <div class="skel-elem skel-bar" style="width: 180px; height: 18px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 280px; height: 11px;"></div>
+                      </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                      <div class="skel-elem skel-pill" style="width: 110px; height: 32px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 100px; height: 32px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 95px; height: 32px;"></div>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                      <div class="skel-elem skel-squircle" style="width: 120px; height: 36px;"></div>
+                      <div class="skel-elem skel-squircle" style="width: 140px; height: 36px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 110px; height: 36px;"></div>
+                    </div>
+                  </header>
+
+                  <div class="studio-skeleton-body">
+                    <!-- Éditeur Col -->
+                    <div class="studio-skeleton-editor skel-card">
+                      <div style="display: flex; gap: 8px; margin-bottom: 0.6rem;">
+                        <div class="skel-elem skel-pill" style="width: 100px; height: 28px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 90px; height: 28px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 80px; height: 28px;"></div>
+                      </div>
+                      <div style="display: flex; gap: 12px; flex: 1;">
+                        <div style="display: flex; flex-direction: column; gap: 8px; width: 28px;">
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 100%;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 65%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 45%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 80%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 55%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 70%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 35%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 90%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 60%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 75%;"></div>
+                          <div class="skel-elem skel-bar" style="height: 12px; width: 50%;"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Terminal Col -->
+                    <div class="studio-skeleton-terminal skel-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                        <div class="skel-elem skel-bar" style="width: 140px; height: 16px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 80px; height: 22px;"></div>
+                      </div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; background: rgba(0,0,0,0.35); padding: 1rem;">
+                        <div class="skel-elem skel-bar" style="width: 180px; height: 12px; margin-bottom: 8px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 240px; height: 12px; margin-bottom: 8px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 130px; height: 12px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contenu Réel Studio -->
+                <div id="notes-real-view" class="studio-container view-real-content is-loading">
                   <!-- 1. HEADER DU STUDIO -->
                   <header class="studio-header">
                     <div class="studio-header-left">
@@ -1946,9 +2502,32 @@
               </div>
 
 
-              <!-- VUE 7 : CITATIONS CYBERPUNK & MOTIVATION -->
+              <!-- VUE 9 : CITATIONS CYBERPUNK & MOTIVATION -->
               <div id="deck-view-quotes" class="deck-slide-view quotes-full-view" hidden>
-                <div class="deck-widget-panel quotes-panel">
+                <!-- Squelette Quotes -->
+                <div id="quotes-skeleton-view" class="quotes-skeleton-container view-skeleton-view" aria-hidden="true">
+                  <div class="quotes-skeleton-card skel-card">
+                    <div class="skel-elem skel-circle" style="width: 48px; height: 48px;"></div>
+                    <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; align-items: center;">
+                      <div class="skel-elem skel-bar" style="width: 88%; height: 22px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 76%; height: 22px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 52%; height: 22px;"></div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center; margin-top: 0.5rem;">
+                      <div class="skel-elem skel-bar" style="width: 140px; height: 16px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 90px; height: 22px;"></div>
+                    </div>
+                    <div style="display: flex; gap: 12px; margin-top: 0.8rem;">
+                      <div class="skel-elem skel-pill" style="width: 150px; height: 42px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 110px; height: 42px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contenu Réel Quotes -->
+                <div id="quotes-real-view" class="quotes-skeleton-container view-real-content is-loading">
+                  <div class="deck-widget-panel quotes-panel">
                   <div class="quote-card-box">
                     <div class="quote-watermark-icon"><i class="fa-solid fa-quote-left"></i></div>
                     <blockquote id="quote-text" class="quote-content">
@@ -1997,11 +2576,44 @@
                     </form>
                   </div>
                 </div>
+                </div>
               </div>
 
-              <!-- VUE 9 : TOUTE LA PERSONNALISATION INTÉGRÉE DANS LA COLONNE DROITE (CONFIG) -->
+              <!-- VUE 10 : TOUTE LA PERSONNALISATION INTÉGRÉE DANS LA COLONNE DROITE (CONFIG) -->
               <div id="deck-view-customize" class="deck-slide-view customize-full-view" hidden>
-                <div class="deck-widget-panel customize-deck-panel">
+                <!-- Squelette Paramètres -->
+                <div id="customize-skeleton-view" class="customize-skeleton-container view-skeleton-view" aria-hidden="true">
+                  <div class="customize-skeleton-card skel-card">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                      <div class="skel-elem skel-pill" style="width: 120px; height: 38px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 110px; height: 38px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 105px; height: 38px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 110px; height: 38px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 115px; height: 38px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 125px; height: 38px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 120px; height: 38px;"></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px; margin: 0.5rem 0;">
+                      <div class="skel-elem skel-bar" style="width: 220px; height: 22px;"></div>
+                      <div class="skel-elem skel-bar" style="width: 360px; height: 13px;"></div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+                      <div class="skel-elem skel-squircle" style="height: 80px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 80px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 80px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 80px;"></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 0.5rem;">
+                      <div class="skel-elem skel-squircle" style="height: 64px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 64px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 64px;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Contenu Réel Customize -->
+                <div id="customize-real-view" class="customize-skeleton-container view-real-content is-loading">
+                  <div class="deck-widget-panel customize-deck-panel">
                   <!-- Navigation par sous-onglets horizontaux -->
                   <div class="config-subtabs-nav">
                     <button type="button" class="hub-tab-btn config-subtab-btn active" data-hub-tab="appearance">
@@ -2770,7 +3382,6 @@
                 </div>
               </div>
             </div>
-          </div>
         </main>
       </div>
     </div>

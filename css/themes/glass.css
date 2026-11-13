@@ -184,6 +184,7 @@ body[data-theme="5"] .command-palette-card,
 body[data-theme="5"] .modal-content,
 body[data-theme="5"] .config-card,
 body[data-theme="5"] .config-group,
+body[data-theme="5"] .view-skeleton-view .skel-card,
 body[data-theme="5"] .dashboard-skeleton-view .skel-card {
   border-radius: 26px !important;
   background: linear-gradient(
@@ -267,6 +268,7 @@ body[data-theme="5"] .samsung-hourly-chip,
 body[data-theme="5"] .dash-weather-hour-pill,
 body[data-theme="5"] .dash-history-item,
 body[data-theme="5"] .note-card-item,
+body[data-theme="5"] .view-skeleton-view .skel-elem,
 body[data-theme="5"] .dashboard-skeleton-view .skel-elem {
   border-radius: 16px !important;
   background: rgba(255, 255, 255, 0.038) !important;

@@ -1,5 +1,6 @@
 /**
  * app.js - Point d'entrée principal de l'application & utilitaires globaux
+ * Violet Startpage - Cockpit Haute Performance
  */
 
 // Système global de notifications Toast
@@ -40,30 +41,114 @@ function showToast(message, type = 'info') {
   }, 3200);
 }
 
-// Transition fluide depuis le squelette de préchargement vers la page réelle
+/**
+ * ========================================================
+ * PageSkeletonManager - GESTIONNAIRE UNIVERSEL DE PRÉCHARGEMENT
+ * ========================================================
+ * Élimine TOUT décalage ou élément tardif (pop-in à 400ms).
+ * Chaque page s'affiche en squelette puis se révèle d'un seul bloc.
+ */
+const PageSkeletonManager = {
+  activeTransitions: new Map(),
+  revealedViews: new Set(),
+
+  // Réaffiche le squelette et masque le contenu réel pendant la préparation
+  showSkeleton(viewKey) {
+    const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
+    const realView = document.getElementById(`${viewKey}-real-view`);
+    if (!skeleton || !realView) return;
+
+    if (this.activeTransitions.has(viewKey)) {
+      clearTimeout(this.activeTransitions.get(viewKey));
+      this.activeTransitions.delete(viewKey);
+    }
+
+    skeleton.classList.remove('is-hidden', 'is-fading-out');
+    skeleton.removeAttribute('hidden');
+    realView.classList.remove('is-loaded');
+    realView.classList.add('is-loading');
+  },
+
+  // Révèle une vue depuis son squelette de manière synchronisée
+  revealView(viewKey, callback) {
+    const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
+    const realView = document.getElementById(`${viewKey}-real-view`);
+    if (!skeleton || !realView) {
+      if (typeof callback === 'function') callback();
+      return;
+    }
+
+    if (this.activeTransitions.has(viewKey)) {
+      clearTimeout(this.activeTransitions.get(viewKey));
+      this.activeTransitions.delete(viewKey);
+    }
+
+    requestAnimationFrame(() => {
+      skeleton.classList.add('is-fading-out');
+      realView.classList.remove('is-loading');
+      realView.classList.add('is-loaded');
+      this.revealedViews.add(viewKey);
+
+      const timeoutId = setTimeout(() => {
+        skeleton.classList.add('is-hidden');
+        skeleton.setAttribute('hidden', '');
+        if (typeof callback === 'function') callback();
+      }, 380);
+
+      this.activeTransitions.set(viewKey, timeoutId);
+    });
+  },
+
+  // Prépare le rendu sous le squelette puis révèle la vue complète d'un coup
+  prepareAndRevealView(viewKey, onRender, minDelayMs = 240) {
+    const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
+    const realView = document.getElementById(`${viewKey}-real-view`);
+
+    if (!skeleton || !realView) {
+      if (typeof onRender === 'function') {
+        try { onRender(); } catch (err) { console.warn(`Render error on ${viewKey}:`, err); }
+      }
+      return;
+    }
+
+    // Afficher le squelette immédiatement
+    this.showSkeleton(viewKey);
+
+    const t0 = performance.now();
+
+    // Rendu hors-champ pendant que le squelette est visible
+    if (typeof onRender === 'function') {
+      try {
+        onRender();
+      } catch (err) {
+        console.warn(`Render error on ${viewKey}:`, err);
+      }
+    }
+
+    // Ajustement de la temporisation pour garantir une transition fluide et soyeuse
+    const elapsed = performance.now() - t0;
+    const remainingDelay = Math.max(0, minDelayMs - elapsed);
+
+    const timerId = setTimeout(() => {
+      this.revealView(viewKey);
+    }, remainingDelay);
+
+    this.activeTransitions.set(viewKey, timerId);
+  }
+};
+
+window.PageSkeletonManager = PageSkeletonManager;
+
+// Rétrocompatibilité avec les scripts appelant revealDashboardFromSkeleton()
 function revealDashboardFromSkeleton() {
-  const skeleton = document.getElementById('dashboard-skeleton-view');
-  const realView = document.getElementById('dashboard-real-view');
-  if (!skeleton || !realView) return;
-
-  if (realView.classList.contains('is-loaded')) return;
-
-  requestAnimationFrame(() => {
-    skeleton.classList.add('is-fading-out');
-    realView.classList.remove('is-loading');
-    realView.classList.add('is-loaded');
-
-    setTimeout(() => {
-      skeleton.classList.add('is-hidden');
-      skeleton.setAttribute('hidden', '');
-    }, 460);
-  });
+  PageSkeletonManager.revealView('dashboard');
 }
+window.revealDashboardFromSkeleton = revealDashboardFromSkeleton;
 
 document.addEventListener('DOMContentLoaded', () => {
   const loadStart = performance.now();
 
-  // === PHASE 1 : CRITIQUE (Affichage immédiat de l'interface) ===
+  // === PHASE 1 : CRITIQUE & SYNCHRONE (Hydratation complète des données locales) ===
   if (typeof initThemes === 'function') initThemes();
   if (typeof initAppearance === 'function') initAppearance();
   if (typeof initBookmarks === 'function') initBookmarks();
@@ -76,21 +161,30 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof initCustomHub === 'function') initCustomHub();
   if (typeof initShortcuts === 'function') initShortcuts();
   if (typeof initWidgets === 'function') initWidgets();
+
+  // Pré-initialisation synchrone des Marchés et de la Météo locale AVANT la révélation
+  // afin que TOUS les éléments du Cockpit soient déjà calculés et affichés ensemble
+  if (typeof initMarkets === 'function') initMarkets();
+  if (typeof initWeather === 'function') initWeather();
   if (typeof initOverviewDashboard === 'function') initOverviewDashboard();
 
-  // Déclencher la transition fluide du squelette vers le contenu réel
-  // avec un délai minimal perçu (~240ms) pour garantir une transition soyeuse
+  // Révélation coordonnée de la vue initiale complète
+  const activeBtn = document.querySelector('.deck-nav-btn.active');
+  const initialViewKey = activeBtn?.dataset?.deckView || 'dashboard';
+
   const elapsed = performance.now() - loadStart;
-  const minSkeletonDisplayMs = Math.max(0, 240 - elapsed);
-  setTimeout(revealDashboardFromSkeleton, minSkeletonDisplayMs);
+  const minSkeletonDisplayMs = Math.max(0, 260 - elapsed);
+  setTimeout(() => {
+    PageSkeletonManager.revealView(initialViewKey);
+  }, minSkeletonDisplayMs);
 
-  // Sécurité anti-blocage au cas où un script externe tarderait
-  setTimeout(revealDashboardFromSkeleton, 1200);
+  // Sécurité anti-blocage
+  setTimeout(() => {
+    PageSkeletonManager.revealView(initialViewKey);
+  }, 1200);
 
-  // === PHASE 2 : DIFFÉRÉE (Tâches secondaires libérant le thread) ===
+  // === PHASE 2 : DIFFÉRÉE (Tâches réseau d'arrière-plan sans impact sur le layout) ===
   const deferNonCritical = () => {
-    if (typeof initMarkets === 'function') initMarkets();
-    if (typeof initWeather === 'function') initWeather();
     if (typeof initWeatherFx === 'function') initWeatherFx();
     if (typeof initFeeds === 'function') initFeeds();
     if (typeof initCommandPalette === 'function') initCommandPalette();
@@ -104,6 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('requestIdleCallback' in window) {
     requestIdleCallback(deferNonCritical, { timeout: 800 });
   } else {
-    setTimeout(deferNonCritical, 50);
+    setTimeout(deferNonCritical, 80);
   }
 });
