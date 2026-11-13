@@ -112,7 +112,6 @@ function renderCategories() {
           <div class="category-title-wrap">
             <i class="${cat.icon}"></i>
             <h3>${cat.title}</h3>
-            <span class="category-count-badge" title="${cat.links.length} raccourci(s)">${cat.links.length}</span>
           </div>
 
           ${
@@ -149,6 +148,8 @@ function renderCategories() {
               class="link-item"
               data-cat="${catIdx}"
               data-link="${linkIdx}"
+              data-name="${link.name}"
+              title="${link.name}"
               ${isEditMode ? 'draggable="true"' : ''}
             >
               ${
@@ -161,7 +162,6 @@ function renderCategories() {
               </div>
               <div class="link-meta">
                 <span class="link-name-text">${link.name}</span>
-                <span class="link-domain-text">${getCleanDomain(link.url)}</span>
               </div>
               ${
                 isEditMode
