@@ -3,8 +3,18 @@
    TradingView Charts, Watchlist Interactive, Ticker & Sparklines
    ======================================================== */
 
-.deck-slide-view.system-full-view,
-.deck-slide-view.markets-full-view {
+/* Masquage absolu lorsque l'onglet Marchés est inactif ou caché */
+#deck-view-system[hidden],
+.deck-slide-view.system-full-view[hidden],
+.deck-slide-view.markets-full-view[hidden],
+.deck-slide-view.system-full-view:not(.active),
+.deck-slide-view.markets-full-view:not(.active) {
+  display: none !important;
+}
+
+/* Affichage uniquement lorsque l'onglet Marchés est actif ET non masqué */
+.deck-slide-view.system-full-view.active:not([hidden]),
+.deck-slide-view.markets-full-view.active:not([hidden]) {
   width: 100%;
   height: auto !important;
   min-height: 100% !important;
