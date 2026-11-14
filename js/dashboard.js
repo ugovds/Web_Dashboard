@@ -368,21 +368,36 @@
     renderSelectedAssetPreview();
 
     // Mise à jour de la carte KPI Bourse
-    const topAsset = assets.find((a) => a.id === 'nvda') || assets[0];
     const kpiMarketVal = document.getElementById('kpi-market-val');
     const kpiMarketBadge = document.getElementById('kpi-market-badge');
     const kpiMarketSub = document.getElementById('kpi-market-sub');
 
-    if (kpiMarketVal && topAsset) {
-      kpiMarketVal.textContent = `${topAsset.name.split(' ')[0]} ${topAsset.basePrice.toFixed(1)}${topAsset.unit}`;
-    }
-    if (kpiMarketBadge && topAsset) {
-      const isUp = topAsset.baseChange >= 0;
-      kpiMarketBadge.className = `dash-kpi-badge ${isUp ? 'up' : 'down'}`;
-      kpiMarketBadge.textContent = `${isUp ? '+' : ''}${topAsset.baseChange.toFixed(2)}%`;
-    }
-    if (kpiMarketSub && topAsset) {
-      kpiMarketSub.textContent = topAsset.sub || 'Mouvement fort';
+    if (typeof window.calculatePortfolioSummary === 'function') {
+      const pSummary = window.calculatePortfolioSummary();
+      if (kpiMarketVal) {
+        kpiMarketVal.textContent = `${pSummary.totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+      }
+      if (kpiMarketBadge) {
+        const isUp = pSummary.totalChange24hEur >= 0;
+        kpiMarketBadge.className = `dash-kpi-badge ${isUp ? 'up' : 'down'}`;
+        kpiMarketBadge.textContent = `${isUp ? '+' : ''}${pSummary.totalChange24hPct.toFixed(2)}%`;
+      }
+      if (kpiMarketSub) {
+        kpiMarketSub.textContent = 'Portefeuille Global (DCA Actif)';
+      }
+    } else {
+      const topAsset = assets.find((a) => a.id === 'nvda') || assets[0];
+      if (kpiMarketVal && topAsset) {
+        kpiMarketVal.textContent = `${topAsset.name.split(' ')[0]} ${topAsset.basePrice.toFixed(1)}${topAsset.unit}`;
+      }
+      if (kpiMarketBadge && topAsset) {
+        const isUp = topAsset.baseChange >= 0;
+        kpiMarketBadge.className = `dash-kpi-badge ${isUp ? 'up' : 'down'}`;
+        kpiMarketBadge.textContent = `${isUp ? '+' : ''}${topAsset.baseChange.toFixed(2)}%`;
+      }
+      if (kpiMarketSub && topAsset) {
+        kpiMarketSub.textContent = topAsset.sub || 'Mouvement fort';
+      }
     }
   }
 

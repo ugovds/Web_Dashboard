@@ -125,6 +125,8 @@ function initDeckViewSlider() {
           }
         } else if (target === 'system') {
           if (typeof initMarkets === 'function') initMarkets();
+          if (typeof checkAndApplyScheduledDca === 'function') checkAndApplyScheduledDca();
+          if (typeof renderPortfolioModule === 'function') renderPortfolioModule();
           if (typeof renderIndicesMarquee === 'function') renderIndicesMarquee();
           if (typeof renderMarketCards === 'function') renderMarketCards();
           if (typeof renderHeroSpotlight === 'function' && typeof currentHeroAssetId !== 'undefined') {

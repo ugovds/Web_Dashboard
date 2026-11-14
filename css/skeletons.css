@@ -299,6 +299,48 @@
   gap: 1.1rem;
 }
 
+.markets-skeleton-portfolio {
+  border-radius: clamp(18px, 2.4vh, 26px);
+  padding: clamp(18px, 2.4vh, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.portfolio-skel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.portfolio-skel-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.portfolio-skel-holdings {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 1200px) {
+  .portfolio-skel-kpis,
+  .portfolio-skel-holdings {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .portfolio-skel-kpis,
+  .portfolio-skel-holdings {
+    grid-template-columns: 1fr;
+  }
+}
+
 .markets-skeleton-hero {
   border-radius: clamp(18px, 2.4vh, 26px);
   padding: clamp(18px, 2.4vh, 26px);

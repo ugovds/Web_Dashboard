@@ -68,7 +68,7 @@ Le tableau de bord est structuré en **Dashboard moderne de type cockpit** avec 
    - **Agenda & Tâches** : Calendrier mensuel interactif à gauche et To-Do list complète à droite.
    - **Météo & Radar** : Courbe de température & pluie 24h, métriques détaillées, prévisions sur 3j et radar satellite en direct.
    - **Actualités** : Lecteur de flux d'actualités F1, Football, Tech et vos flux RSS sur mesure.
-   - **Système & Marchés** : Latence ping en temps réel (sparkline SVG), batterie, uptime et indices boursiers.
+   - **Système & Marchés** : Suivi indiciel en temps réel, valorisation de portefeuille multi-actifs (10AP, LYP6, XMME, NVDA), moteur d'automatisation DCA du 19 du mois et graphique interactif d'évolution (24h, 1 semaine, 1 mois, 1 an).
    - **Focus Pomodoro** : Minuteur circulaire avec presets, carillon et jalons de session.
    - **Dev Studio & Bloc-Notes** : Playground multi-langages (Python, C, Oz, Java, JS), terminal interactif et moteur d'exécution local ultra-rapide (`./runner.py`).
    - **Ambiance Lo-Fi** : Synthèse audio procédurale et radio avec visualiseur Canvas.
@@ -158,9 +158,39 @@ Le tableau de bord est structuré en **Dashboard moderne de type cockpit** avec 
   - 🍃 Nuit Synthé (Brise nocturne et résonance)
 - Visualiseur de spectre audio animé sur Canvas et réglage précis du volume.
 
-### ⚡ Moniteur Système & Marchés Financiers — `js/widgets.js`
+### 📈 Hub Marchés, Portefeuille & Moteur DCA Automatique — `js/markets.js` & `css/markets.css`
+- **Suivi de Portefeuille Multi-Actifs en Temps Réel** :
+  - **Composition de base** : 4.19 parts d'**Amundi PEA S&P 500** (`10AP`), 1.35 parts d'**Amundi Stoxx Europe 600** (`LYP6`), 4.03 parts de **Xtrackers MSCI Emerging Markets** (`XMME`), et 1 action de **NVIDIA Corporation** (`NVDA`).
+  - **Conversion Forex temps réel** : Prise en compte du taux EUR/USD (via BCE / Frankfurter API) pour valoriser précisément les actifs libellés en dollars (NVDA) dans la valeur globale en euros.
+  - **Indicateurs financiers instantanés** : Calcul automatique de la valeur globale totale du portefeuille (€), du capital investi, de la plus-value latente (€ et %) et de la variation pondérée sur les dernières 24 heures.
+  - **Répartition & Allocation d'actifs** : Jauge visuelle d'allocation et cartes individuelles avec prix unitaire, nombre de parts, valeur de la ligne, poids dans le portefeuille et badge DCA.
+
+- **Moteur d'Automatisation DCA (Dollar-Cost Averaging)** :
+  - **Règle programmée récurrente** : Tous les 19 de chaque mois, réinvestissement automatique de **60,00 €** au total :
+    - **+30,00 €** sur `10AP` (S&P 500)
+    - **+20,00 €** sur `LYP6` (Stoxx Europe 600)
+    - **+10,00 €** sur `XMME` (Marchés Émergents)
+  - **Évolution temporelle dynamique** : Détection automatique de la date système. Lorsque le 19 du mois est atteint, le moteur calcule les parts acquises au cours du jour, incrémente les positions, met à jour le capital investi et consigne la transaction dans l'historique.
+  - **Compte à rebours du prochain versement** : Affichage dynamique du nombre de jours restants jusqu'au prochain 19 du mois.
+  - **Simulation & Gestion manuelle** :
+    - Bouton `⚡ Simuler Versement du 19` pour tester instantanément un apport et observer l'évolution de la courbe et des parts.
+    - Modale de gestion complète pour ajuster les parts détenues, modifier les montants ou le jour du mois, et consulter le journal horodaté des versements.
+    - Bouton de réinitialisation rapide pour revenir aux positions de base.
+
+- **Grand Graphique Vectoriel Multi-Périodes (Courbe SVG Fluide)** :
+  - **4 horizons d'analyse temporelle** :
+    - **24H (24 dernières heures)** : Évolution intra-day en direct combinant les cotations Euronext et Wall Street.
+    - **1 Semaine (7 jours)** : Trajectoire sur les 7 derniers jours glissants.
+    - **1 Mois (30 jours)** : Évolution mensuelle intégrant le palier d'injection de capital du versement DCA du 19.
+    - **1 Année (12 mois)** : Historique annuel complet illustrant l'effet boule de neige du DCA (+720 € investis sur 12 mois) couplé à la performance des indices et actions.
+  - **Interactivité riche** : Tracé Bézier cubique, surface dégradée lumineuse, ligne de référence horizontale, réticule de suivi magnétique et infobulle flottante détaillée avec notes d'événements DCA.
+
+- **Squelettes de Chargement GPU & Zéro Décalage Visuel** :
+  - Intégration dans le système de préchargement coordonné `PageSkeletonManager` (`css/skeletons.css`).
+  - Architecture Bento modulaire asymétrique intégrant le Hero Spotlight, le baromètre de marché, les top variations et le convertisseur de devises.
+
+### ⚡ Moniteur Système & Télémétrie — `js/widgets.js`
 - Télémétrie système : Latence ping réseau (ms), statut d'alimentation (AC / Batterie), nombre de cœurs CPU, mémoire vive (RAM), et temps de session (uptime).
-- Ticker des marchés boursiers : Suivi des indices majeurs (S&P 500, Europe Stoxx 600, Marchés Émergents, NVIDIA...) avec menu de personnalisation pour activer, masquer ou ajouter des actifs.
 
 ### 💬 Citations Cyberpunk & Motivation — `js/widgets.js`
 - Sélection de citations issues de la science-fiction, de la culture hacker et de la philosophie dev (Blade Runner, Ghost in the Shell, Matrix, Neuromancer).
@@ -187,6 +217,8 @@ violet-startpage/
 │
 ├── css/                        # Feuilles de styles
 │   ├── style.css               # Styles de base, Bento Grid, widgets et responsive
+│   ├── markets.css             # Hub Marchés, Portefeuille indiciel & Graphiques SVG
+│   ├── skeletons.css           # Système coordonné de préchargement squelette GPU
 │   └── themes/                 # Thèmes visuels
 │       ├── kanagawa.css        # Thème 1 : Kanagawa (Cyan / Menthe froide)
 │       ├── sakura.css          # Thème 2 : Sakura (Rose / Néo-pastel)
@@ -200,6 +232,7 @@ violet-startpage/
 │
 ├── js/                         # Modules JavaScript
 │   ├── app.js                  # Point d'entrée de l'application
+│   ├── markets.js              # Marchés, valorisation portefeuille & moteur DCA
 │   ├── themes.js               # Gestionnaire des thèmes
 │   ├── appearance.js           # Personnalisation des couleurs, ambilight et scanlines
 │   ├── clock.js                # Station horloge HUD, arc radial, cycle solaire & fuseaux

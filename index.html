@@ -1474,6 +1474,37 @@
                     <div class="skel-elem skel-pill" style="height: 38px; width: 100%;"></div>
                   </header>
 
+                  <!-- Squelette Portefeuille Global & Suivi DCA -->
+                  <div class="markets-skeleton-portfolio skel-card">
+                    <div class="portfolio-skel-head">
+                      <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="skel-elem skel-circle" style="width: 46px; height: 46px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                          <div class="skel-elem skel-bar" style="width: 280px; height: 22px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 420px; height: 13px;"></div>
+                        </div>
+                      </div>
+                      <div style="display: flex; gap: 8px;">
+                        <div class="skel-elem skel-pill" style="width: 160px; height: 38px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 130px; height: 38px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 100px; height: 38px;"></div>
+                      </div>
+                    </div>
+                    <div class="portfolio-skel-kpis">
+                      <div class="skel-elem skel-squircle" style="height: 94px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 94px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 94px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 94px;"></div>
+                    </div>
+                    <div class="skel-elem skel-squircle" style="height: 240px; width: 100%;"></div>
+                    <div class="portfolio-skel-holdings">
+                      <div class="skel-elem skel-squircle" style="height: 105px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 105px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 105px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 105px;"></div>
+                    </div>
+                  </div>
+
                   <!-- Hero Spotlight skeleton -->
                   <div class="markets-skeleton-hero skel-card">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1603,6 +1634,201 @@
                       <button type="button" id="market-add-custom-btn" class="modal-btn primary"><i class="fa-solid fa-plus"></i> Ajouter à la Watchlist</button>
                     </div>
                   </div>
+
+                  <!-- 2.5 SECTION PORTEFEUILLE D'INVESTISSEMENT & DCA -->
+                  <section class="markets-portfolio-hero" id="markets-portfolio-hero">
+                    <!-- En-tête Portefeuille -->
+                    <div class="portfolio-hero-head">
+                      <div class="portfolio-brand">
+                        <div class="portfolio-icon-bubble">
+                          <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div class="portfolio-titles">
+                          <div class="portfolio-title-row">
+                            <h3 class="portfolio-title">Mon Portefeuille d'Investissement</h3>
+                            <span class="portfolio-status-pill" id="portfolio-status-pill">
+                              <span class="status-dot pulse-green"></span> DCA Programmé (19 du mois)
+                            </span>
+                          </div>
+                          <span class="portfolio-subtitle">
+                            Allocation indicielle (10AP, LYP6, XMME, NVDA) • Versements automatiques de 60 € tous les 19 du mois
+                          </span>
+                        </div>
+                      </div>
+
+                      <div class="portfolio-actions">
+                        <button type="button" id="portfolio-trigger-dca-btn" class="portfolio-btn-primary" title="Simuler l'exécution du versement mensuel du 19 (+60 €)">
+                          <i class="fa-solid fa-bolt-lightning"></i>
+                          <span>Simuler Versement du 19</span>
+                        </button>
+                        <button type="button" id="portfolio-manage-btn" class="portfolio-btn-secondary" title="Gérer les positions, montants et historique DCA">
+                          <i class="fa-solid fa-sliders"></i>
+                          <span>Gérer &amp; Historique</span>
+                        </button>
+                        <button type="button" id="portfolio-reset-btn" class="portfolio-btn-secondary" title="Réinitialiser aux valeurs de base (4.19 10AP, 1.35 LYP6, 4.03 XMME, 1 NVDA)">
+                          <i class="fa-solid fa-rotate-left"></i>
+                          <span>Réinitialiser</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Grille des 4 Métriques Clés (KPIs) -->
+                    <div class="portfolio-kpis-grid">
+                      <div class="portfolio-kpi-card">
+                        <div class="portfolio-kpi-label">
+                          <span>Valeur Globale Estimée</span>
+                          <i class="fa-solid fa-chart-pie"></i>
+                        </div>
+                        <div class="portfolio-kpi-val" id="portfolio-total-val">0,00 €</div>
+                        <div class="portfolio-kpi-sub">
+                          <span class="portfolio-badge up" id="portfolio-change-24h">
+                            <i class="fa-solid fa-arrow-trend-up"></i> +0.00% (+0.00 € / 24h)
+                          </span>
+                        </div>
+                      </div>
+
+                      <div class="portfolio-kpi-card">
+                        <div class="portfolio-kpi-label">
+                          <span>Plus-Value Latente Totale</span>
+                          <i class="fa-solid fa-arrow-trend-up text-green" id="portfolio-gain-icon"></i>
+                        </div>
+                        <div class="portfolio-kpi-val text-green" id="portfolio-gain-val">+0,00 €</div>
+                        <div class="portfolio-kpi-sub">
+                          <span>Investi : <strong id="portfolio-invested-val">0,00 €</strong></span>
+                          <span class="portfolio-gain-pct text-green" id="portfolio-gain-pct">(+0.00%)</span>
+                        </div>
+                      </div>
+
+                      <div class="portfolio-kpi-card">
+                        <div class="portfolio-kpi-label">
+                          <span>Prochain Versement DCA</span>
+                          <i class="fa-regular fa-calendar-check text-accent"></i>
+                        </div>
+                        <div class="portfolio-kpi-val" id="portfolio-next-dca-date">19 du mois</div>
+                        <div class="portfolio-kpi-sub">
+                          <span class="portfolio-badge neutral" id="portfolio-next-dca-countdown">
+                            <i class="fa-regular fa-clock"></i> Dans -- jours
+                          </span>
+                          <span>• <strong id="portfolio-next-dca-sum">60,00 €</strong></span>
+                        </div>
+                      </div>
+
+                      <div class="portfolio-kpi-card">
+                        <div class="portfolio-kpi-label">
+                          <span>Règle DCA Mensuelle</span>
+                          <i class="fa-solid fa-coins text-orange"></i>
+                        </div>
+                        <div class="portfolio-kpi-val">60,00 € / mois</div>
+                        <div class="portfolio-kpi-sub">
+                          <span>30€ 10AP • 20€ LYP6 • 10€ XMME (720 €/an)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Grand Graphique Interactif Multi-Périodes (24h, 1 Semaine, 1 Mois, 1 Année) -->
+                    <div class="portfolio-chart-card">
+                      <div class="portfolio-chart-head">
+                        <div class="portfolio-chart-title-group">
+                          <i class="fa-solid fa-chart-area text-accent"></i>
+                          <div>
+                            <h4 class="portfolio-chart-title">Évolution de la Valeur du Portefeuille</h4>
+                            <span class="portfolio-chart-sub" id="portfolio-chart-period-desc">Évolution en direct sur les dernières 24 heures</span>
+                          </div>
+                        </div>
+
+                        <div class="portfolio-chart-controls">
+                          <div class="portfolio-timeframe-switch" id="portfolio-timeframe-switch">
+                            <button type="button" class="portfolio-tf-btn active" data-timeframe="24h">24H</button>
+                            <button type="button" class="portfolio-tf-btn" data-timeframe="1w">1 Semaine</button>
+                            <button type="button" class="portfolio-tf-btn" data-timeframe="1m">1 Mois</button>
+                            <button type="button" class="portfolio-tf-btn" data-timeframe="1y">1 Année</button>
+                          </div>
+
+                          <div class="portfolio-period-pill" id="portfolio-period-stat-pill">
+                            <span class="period-pill-label">Variation période :</span>
+                            <strong id="portfolio-period-change-val" class="text-green">+0.00% (+0.00 €)</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Zone SVG de la courbe interactive -->
+                      <div class="portfolio-chart-stage" id="portfolio-chart-stage">
+                        <svg id="portfolio-chart-svg" class="portfolio-chart-svg" viewBox="0 0 1000 240" preserveAspectRatio="none">
+                          <defs>
+                            <linearGradient id="portfolioGradUp" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stop-color="#10b981" stop-opacity="0.38"></stop>
+                              <stop offset="85%" stop-color="#10b981" stop-opacity="0.04"></stop>
+                              <stop offset="100%" stop-color="#10b981" stop-opacity="0"></stop>
+                            </linearGradient>
+                            <linearGradient id="portfolioGradDown" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.38"></stop>
+                              <stop offset="85%" stop-color="#ef4444" stop-opacity="0.04"></stop>
+                              <stop offset="100%" stop-color="#ef4444" stop-opacity="0"></stop>
+                            </linearGradient>
+                          </defs>
+                          <line id="portfolio-chart-baseline" x1="0" y1="120" x2="1000" y2="120" stroke="rgba(255,255,255,0.12)" stroke-dasharray="4 4" stroke-width="1.5" />
+                          <path id="portfolio-svg-area" d="" fill="url(#portfolioGradUp)"></path>
+                          <path id="portfolio-svg-line" d="" fill="none" stroke="#10b981" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                          <g id="portfolio-hover-tracker" style="display: none;">
+                            <line id="portfolio-hover-line" x1="0" y1="0" x2="0" y2="240" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+                            <circle id="portfolio-hover-dot-halo" cx="0" cy="0" r="10" fill="rgba(16, 185, 129, 0.25)"></circle>
+                            <circle id="portfolio-hover-dot" cx="0" cy="0" r="5" fill="#ffffff" stroke="#10b981" stroke-width="3"></circle>
+                          </g>
+                        </svg>
+
+                        <!-- Infobulle flottante du graphique portefeuille -->
+                        <div id="portfolio-tooltip" class="portfolio-tooltip" style="display: none;">
+                          <div class="tooltip-header" id="portfolio-tooltip-date">--</div>
+                          <div class="tooltip-val" id="portfolio-tooltip-val">-- €</div>
+                          <div class="tooltip-perf" id="portfolio-tooltip-perf">--</div>
+                          <div class="tooltip-dca-note" id="portfolio-tooltip-dca" style="display: none;"></div>
+                        </div>
+
+                        <!-- Labels temporels sous le graphique -->
+                        <div class="portfolio-chart-time-labels">
+                          <span id="portfolio-time-start">Il y a 24h</span>
+                          <span id="portfolio-time-mid">Il y a 12h</span>
+                          <span id="portfolio-time-end">Maintenant (En Direct)</span>
+                        </div>
+                      </div>
+
+                      <!-- Barre de statistiques clés de la période sélectionnée -->
+                      <div class="portfolio-chart-stats-strip">
+                        <div class="portfolio-strip-item">
+                          <span class="strip-label">Plus Bas Période</span>
+                          <strong id="portfolio-stat-low" class="strip-val">-- €</strong>
+                        </div>
+                        <div class="portfolio-strip-item">
+                          <span class="strip-label">Plus Haut Période</span>
+                          <strong id="portfolio-stat-high" class="strip-val">-- €</strong>
+                        </div>
+                        <div class="portfolio-strip-item">
+                          <span class="strip-label">Capital Investi</span>
+                          <strong id="portfolio-stat-invested" class="strip-val">-- €</strong>
+                        </div>
+                        <div class="portfolio-strip-item">
+                          <span class="strip-label">Apports DCA Période</span>
+                          <strong id="portfolio-stat-dca-count" class="strip-val">--</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Barre de répartition globale (Asset Allocation) -->
+                    <div class="portfolio-allocation-wrap">
+                      <div class="allocation-header">
+                        <span class="allocation-title"><i class="fa-solid fa-chart-pie"></i> Répartition des Actifs du Portefeuille</span>
+                        <span class="allocation-legend" id="portfolio-alloc-legend">4 actifs (10AP, LYP6, XMME, NVDA)</span>
+                      </div>
+                      <div class="portfolio-alloc-bar" id="portfolio-alloc-bar">
+                        <!-- Segments injectés dynamiquement -->
+                      </div>
+                    </div>
+
+                    <!-- Grille des 4 Lignes d'Actifs du Portefeuille -->
+                    <div class="portfolio-holdings-grid" id="portfolio-holdings-grid">
+                      <!-- 4 cartes générées dynamiquement par renderPortfolioHoldings() -->
+                    </div>
+                  </section>
 
                   <!-- 3. ARCHITECTURE BENTO ASYMÉTRIQUE MULTI-MODULES -->
                   <div class="markets-bento-layout">
@@ -1913,6 +2139,165 @@
                           <span class="stat-val" id="chart-stat-market">NASDAQ</span>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  <!-- 6. MODALE GESTION DU PORTEFEUILLE & HISTORIQUE DCA -->
+                  <div id="portfolio-manage-modal" class="portfolio-manage-modal is-hidden" hidden style="display: none;">
+                    <div class="portfolio-manage-backdrop" id="portfolio-modal-backdrop"></div>
+                    <div class="portfolio-manage-dialog">
+                      <header class="portfolio-dialog-header">
+                        <div class="portfolio-dialog-brand">
+                          <div class="portfolio-dialog-icon">
+                            <i class="fa-solid fa-sliders"></i>
+                          </div>
+                          <div>
+                            <h3 class="portfolio-dialog-title">Gérer mon Portefeuille &amp; DCA</h3>
+                            <span class="portfolio-dialog-sub">Personnalisez vos parts, modifiez les versements automatiques ou consultez l'historique</span>
+                          </div>
+                        </div>
+                        <button type="button" id="portfolio-modal-close-btn" class="deck-icon-action" title="Fermer (Échap)"><i class="fa-solid fa-xmark"></i></button>
+                      </header>
+
+                      <div class="portfolio-dialog-body">
+                        <!-- Onglets internes de la modale -->
+                        <div class="portfolio-modal-tabs">
+                          <button type="button" class="portfolio-modal-tab active" data-pm-tab="positions">
+                            <i class="fa-solid fa-layer-group"></i> Mes Positions
+                          </button>
+                          <button type="button" class="portfolio-modal-tab" data-pm-tab="dca">
+                            <i class="fa-solid fa-calendar-days"></i> Règles DCA Mensuel
+                          </button>
+                          <button type="button" class="portfolio-modal-tab" data-pm-tab="history">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Historique des Versements
+                          </button>
+                        </div>
+
+                        <!-- TAB 1 : POSITIONS -->
+                        <div class="pm-tab-content active" id="pm-tab-positions">
+                          <p class="pm-section-desc">Modifiez le nombre de parts actuellement détenues pour chaque actif du portefeuille. Ces valeurs sont sauvegardées localement.</p>
+                          <div class="pm-positions-form">
+                            <div class="pm-input-row">
+                              <label for="pm-pos-10ap">
+                                <strong>Amundi S&amp;P 500 (10AP)</strong>
+                                <span>Ticker : EURONEXT:10AP • Base : 4.19 parts</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-pos-10ap" step="any" min="0" value="4.19" />
+                                <span class="unit">parts</span>
+                              </div>
+                            </div>
+
+                            <div class="pm-input-row">
+                              <label for="pm-pos-lyp6">
+                                <strong>Amundi Stoxx 600 (LYP6)</strong>
+                                <span>Ticker : XETR:LYP6 • Base : 1.35 parts</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-pos-lyp6" step="any" min="0" value="1.35" />
+                                <span class="unit">parts</span>
+                              </div>
+                            </div>
+
+                            <div class="pm-input-row">
+                              <label for="pm-pos-xmme">
+                                <strong>Xtrackers MSCI EM (XMME)</strong>
+                                <span>Ticker : XETR:XMME • Base : 4.03 parts</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-pos-xmme" step="any" min="0" value="4.03" />
+                                <span class="unit">parts</span>
+                              </div>
+                            </div>
+
+                            <div class="pm-input-row">
+                              <label for="pm-pos-nvda">
+                                <strong>NVIDIA Corporation (NVDA)</strong>
+                                <span>Ticker : NASDAQ:NVDA • Base : 1.00 action</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-pos-nvda" step="any" min="0" value="1.00" />
+                                <span class="unit">actions</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- TAB 2 : RÈGLES DCA -->
+                        <div class="pm-tab-content" id="pm-tab-dca" hidden>
+                          <p class="pm-section-desc">Définissez le jour d'exécution mensuel et les montants en euros attribués chaque mois à chaque ETF.</p>
+                          <div class="pm-dca-form">
+                            <div class="pm-input-row">
+                              <label for="pm-dca-day">
+                                <strong>Jour du versement chaque mois</strong>
+                                <span>Ex: 19 pour tous les 19 du mois</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-dca-day" min="1" max="31" value="19" />
+                                <span class="unit">du mois</span>
+                              </div>
+                            </div>
+
+                            <div class="pm-input-row">
+                              <label for="pm-dca-10ap">
+                                <strong>Apport mensuel 10AP (S&amp;P 500)</strong>
+                                <span>Défaut : 30 €</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-dca-10ap" min="0" step="any" value="30" />
+                                <span class="unit">€ / mois</span>
+                              </div>
+                            </div>
+
+                            <div class="pm-input-row">
+                              <label for="pm-dca-lyp6">
+                                <strong>Apport mensuel LYP6 (Stoxx 600)</strong>
+                                <span>Défaut : 20 €</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-dca-lyp6" min="0" step="any" value="20" />
+                                <span class="unit">€ / mois</span>
+                              </div>
+                            </div>
+
+                            <div class="pm-input-row">
+                              <label for="pm-dca-xmme">
+                                <strong>Apport mensuel XMME (Emerging Markets)</strong>
+                                <span>Défaut : 10 €</span>
+                              </label>
+                              <div class="pm-input-with-unit">
+                                <input type="number" id="pm-dca-xmme" min="0" step="any" value="10" />
+                                <span class="unit">€ / mois</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- TAB 3 : HISTORIQUE -->
+                        <div class="pm-tab-content" id="pm-tab-history" hidden>
+                          <p class="pm-section-desc">Journal des versements DCA automatiques et simulations enregistrées.</p>
+                          <div class="pm-history-table-wrap">
+                            <table class="pm-history-table">
+                              <thead>
+                                <tr>
+                                  <th>Date</th>
+                                  <th>Type</th>
+                                  <th>Montant</th>
+                                  <th>Détail des achats</th>
+                                </tr>
+                              </thead>
+                              <tbody id="pm-history-tbody">
+                                <!-- Rempli dynamiquement -->
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+
+                      <footer class="portfolio-dialog-footer">
+                        <button type="button" id="pm-save-btn" class="modal-btn primary"><i class="fa-solid fa-check"></i> Enregistrer les modifications</button>
+                        <button type="button" id="pm-cancel-btn" class="modal-btn secondary">Fermer</button>
+                      </footer>
                     </div>
                   </div>
                 </div>

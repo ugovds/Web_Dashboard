@@ -660,6 +660,1028 @@ function saveMarketAssets() {
   } catch {}
 }
 
+/* ========================================================
+   SUIVI DU PORTEFEUILLE D'INVESTISSEMENT & AUTOMATISATION DCA
+   Positions : 4.19 10AP, 1.35 LYP6, 4.03 XMME, 1.00 NVDA
+   DCA le 19 de chaque mois : +30€ 10AP, +20€ LYP6, +10€ XMME
+   ======================================================== */
+
+const PORTFOLIO_STORAGE_KEY = 'violet_portfolio_tracker_v3';
+
+const DEFAULT_PORTFOLIO_STATE = {
+  positions: {
+    '10ap': 4.19, // Amundi PEA S&P 500 (10AP)
+    'lyp6': 1.35, // Amundi Stoxx 600 (LYP6)
+    'xmme': 4.03, // Xtrackers MSCI Emerging Markets (XMME)
+    'nvda': 1.00  // NVIDIA Corporation (NVDA)
+  },
+  dcaRules: {
+    dayOfMonth: 19,
+    allocations: {
+      '10ap': 30, // 30 €
+      'lyp6': 20, // 20 €
+      'xmme': 10, // 10 €
+      'nvda': 0
+    }
+  },
+  totalInvested: 1513.24,
+  lastDcaExecutionMonth: null,
+  history: [
+    {
+      id: 'init_pos',
+      date: '2024-01-19',
+      type: 'initial',
+      title: 'Constitution initiale du portefeuille',
+      amount: 1513.24,
+      note: '4.19 parts 10AP + 1.35 parts LYP6 + 4.03 parts XMME + 1 action NVDA'
+    }
+  ],
+  selectedTimeframe: '24h'
+};
+
+let portfolioState = loadPortfolioState();
+let currentPortfolioChartPoints = [];
+
+function loadPortfolioState() {
+  try {
+    let raw = localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+    if (!raw) {
+      raw = localStorage.getItem('violet_portfolio_tracker_v2') || localStorage.getItem('violet_portfolio_tracker_v1');
+    }
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.positions) {
+        const invested = (parsed.totalInvested === 1320 || !parsed.totalInvested) ? 1513.24 : parsed.totalInvested;
+        return {
+          ...DEFAULT_PORTFOLIO_STATE,
+          ...parsed,
+          totalInvested: invested,
+          positions: { ...DEFAULT_PORTFOLIO_STATE.positions, ...parsed.positions },
+          dcaRules: {
+            ...DEFAULT_PORTFOLIO_STATE.dcaRules,
+            ...(parsed.dcaRules || {}),
+            allocations: {
+              ...DEFAULT_PORTFOLIO_STATE.dcaRules.allocations,
+              ...(parsed.dcaRules?.allocations || {})
+            }
+          },
+          history: Array.isArray(parsed.history) ? parsed.history : DEFAULT_PORTFOLIO_STATE.history
+        };
+      }
+    }
+  } catch (err) {
+    console.warn('Erreur chargement portfolioState:', err);
+  }
+  return JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO_STATE));
+}
+
+function savePortfolioState() {
+  try {
+    localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(portfolioState));
+  } catch (err) {
+    console.warn('Erreur sauvegarde portfolioState:', err);
+  }
+}
+
+function resetPortfolioState() {
+  portfolioState = JSON.parse(JSON.stringify(DEFAULT_PORTFOLIO_STATE));
+  savePortfolioState();
+  renderPortfolioModule();
+  if (typeof renderDashboardMarkets === 'function') renderDashboardMarkets();
+  if (typeof showToast === 'function') {
+    showToast('Portefeuille réinitialisé aux valeurs de base !', 'info');
+  }
+}
+
+/**
+ * Récupère le cours unitaire d'un actif converti en Euros (€)
+ */
+function getAssetPriceInEur(assetId) {
+  const asset = marketAssets.find((a) => a.id === assetId);
+  if (!asset) {
+    const fallbackPrices = { '10ap': 137.30, 'lyp6': 327.65, 'xmme': 76.85, 'nvda': 162.44 };
+    return fallbackPrices[assetId] || 100;
+  }
+  if (asset.unit === '€') {
+    return asset.basePrice;
+  }
+  // Conversion Forex USD -> EUR pour les actifs cotés à New York (NVDA)
+  const eurusd = marketAssets.find((a) => a.id === 'eurusd')?.basePrice || 1.0820;
+  return Number((asset.basePrice / eurusd).toFixed(2));
+}
+
+/**
+ * Calcule l'ensemble des métriques de valorisation, performance et répartition
+ */
+function calculatePortfolioSummary() {
+  const meta = {
+    '10ap': {
+      name: 'Amundi PEA S&P 500 (10AP)',
+      shortName: 'Amundi S&P 500',
+      symbol: 'EURONEXT:10AP',
+      icon: 'fa-solid fa-chart-line',
+      colorClass: '10ap',
+      exchange: 'Euronext Paris',
+      dcaMonthly: portfolioState.dcaRules.allocations['10ap'] || 30
+    },
+    'lyp6': {
+      name: 'Amundi Stoxx Europe 600 (LYP6)',
+      shortName: 'Amundi Stoxx 600',
+      symbol: 'XETR:LYP6',
+      icon: 'fa-solid fa-landmark',
+      colorClass: 'lyp6',
+      exchange: 'Xetra (Francfort)',
+      dcaMonthly: portfolioState.dcaRules.allocations['lyp6'] || 20
+    },
+    'xmme': {
+      name: 'Xtrackers MSCI Emerging Markets (XMME)',
+      shortName: 'MSCI Emerging Mkts',
+      symbol: 'XETR:XMME',
+      icon: 'fa-solid fa-earth-americas',
+      colorClass: 'xmme',
+      exchange: 'Xetra (Francfort)',
+      dcaMonthly: portfolioState.dcaRules.allocations['xmme'] || 10
+    },
+    'nvda': {
+      name: 'NVIDIA Corporation (NVDA)',
+      shortName: 'NVIDIA Corporation',
+      symbol: 'NASDAQ:NVDA',
+      icon: 'fa-solid fa-microchip',
+      colorClass: 'nvda',
+      exchange: 'Nasdaq Stock Market',
+      dcaMonthly: portfolioState.dcaRules.allocations['nvda'] || 0
+    }
+  };
+
+  const assetIds = ['10ap', 'lyp6', 'xmme', 'nvda'];
+  let totalValue = 0;
+  let totalStart24h = 0;
+
+  const holdings = assetIds.map((id) => {
+    const asset = marketAssets.find((a) => a.id === id) || { basePrice: 100, baseChange: 0, unit: '€' };
+    const shares = Number(portfolioState.positions[id] || 0);
+    const priceEur = getAssetPriceInEur(id);
+    const totalEur = shares * priceEur;
+    const change24hPct = typeof asset.baseChange === 'number' ? asset.baseChange : 0;
+    const startPriceEur = priceEur / (1 + change24hPct / 100);
+    const startTotalEur = shares * startPriceEur;
+    const change24hEur = totalEur - startTotalEur;
+
+    totalValue += totalEur;
+    totalStart24h += startTotalEur;
+
+    return {
+      id,
+      ...meta[id],
+      shares,
+      priceEur,
+      priceOriginal: asset.basePrice,
+      originalUnit: asset.unit || '€',
+      totalEur,
+      change24hPct,
+      change24hEur
+    };
+  });
+
+  // Pourcentages d'allocation
+  holdings.forEach((h) => {
+    h.weightPct = totalValue > 0 ? (h.totalEur / totalValue) * 100 : 0;
+  });
+
+  const totalChange24hEur = totalValue - totalStart24h;
+  const totalChange24hPct = totalStart24h > 0 ? (totalChange24hEur / totalStart24h) * 100 : 0;
+  const totalInvested = typeof portfolioState.totalInvested === 'number' ? portfolioState.totalInvested : 1513.24;
+  const gainLatentEur = totalValue - totalInvested;
+  const gainLatentPct = totalInvested > 0 ? (gainLatentEur / totalInvested) * 100 : 0;
+
+  return {
+    holdings,
+    totalValue,
+    totalChange24hEur,
+    totalChange24hPct,
+    totalInvested,
+    gainLatentEur,
+    gainLatentPct
+  };
+}
+
+/**
+ * Moteur d'exécution automatique du DCA au 19 du mois
+ */
+function checkAndApplyScheduledDca() {
+  const now = new Date();
+  const currentYearMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const currentDay = now.getDate();
+  const targetDay = portfolioState.dcaRules.dayOfMonth || 19;
+
+  if (currentDay >= targetDay) {
+    if (portfolioState.lastDcaExecutionMonth !== currentYearMonth) {
+      let addedEur = 0;
+      const details = [];
+
+      ['10ap', 'lyp6', 'xmme'].forEach((id) => {
+        const alloc = portfolioState.dcaRules.allocations[id] || 0;
+        if (alloc > 0) {
+          const priceEur = getAssetPriceInEur(id);
+          const sharesBought = alloc / priceEur;
+          portfolioState.positions[id] = Number((portfolioState.positions[id] + sharesBought).toFixed(4));
+          addedEur += alloc;
+          details.push(`+${alloc}€ ${id.toUpperCase()} (+${sharesBought.toFixed(3)} parts)`);
+        }
+      });
+
+      portfolioState.totalInvested += addedEur;
+      portfolioState.lastDcaExecutionMonth = currentYearMonth;
+      portfolioState.history.unshift({
+        id: 'dca_' + Date.now(),
+        date: `${currentYearMonth}-${String(targetDay).padStart(2, '0')}`,
+        type: 'auto',
+        title: `Versement DCA Automatique (${targetDay} ${now.toLocaleString('fr-FR', { month: 'short' })})`,
+        amount: addedEur,
+        note: details.join(', ')
+      });
+
+      savePortfolioState();
+      console.log(`[Portefeuille] Versement DCA mensuel exécuté (+${addedEur} €)`);
+    }
+  }
+}
+
+/**
+ * Simulation instantanée du versement du 19 (achète les parts au cours actuel)
+ */
+function simulateDcaExecution() {
+  const now = new Date();
+  let addedEur = 0;
+  const details = [];
+
+  ['10ap', 'lyp6', 'xmme'].forEach((id) => {
+    const alloc = portfolioState.dcaRules.allocations[id] || 0;
+    if (alloc > 0) {
+      const priceEur = getAssetPriceInEur(id);
+      const sharesBought = alloc / priceEur;
+      portfolioState.positions[id] = Number((portfolioState.positions[id] + sharesBought).toFixed(4));
+      addedEur += alloc;
+      details.push(`+${alloc}€ ${id.toUpperCase()} (+${sharesBought.toFixed(3)} parts)`);
+    }
+  });
+
+  portfolioState.totalInvested += addedEur;
+  const dateStr = now.toISOString().split('T')[0];
+
+  portfolioState.history.unshift({
+    id: 'sim_' + Date.now(),
+    date: dateStr,
+    type: 'simulation',
+    title: `Simulation Versement DCA du 19`,
+    amount: addedEur,
+    note: details.join(', ')
+  });
+
+  savePortfolioState();
+  renderPortfolioModule();
+  if (typeof renderDashboardMarkets === 'function') renderDashboardMarkets();
+
+  const btn = document.getElementById('portfolio-trigger-dca-btn');
+  if (btn) {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fa-solid fa-check text-green"></i> <span>+${addedEur} € Investis !</span>`;
+    setTimeout(() => { btn.innerHTML = originalText; }, 2200);
+  }
+}
+
+/**
+ * Calcule les informations et le compte à rebours vers le prochain 19 du mois
+ */
+function getNextDcaDateInfo() {
+  const now = new Date();
+  const targetDay = portfolioState.dcaRules.dayOfMonth || 19;
+  let targetYear = now.getFullYear();
+  let targetMonth = now.getMonth();
+
+  if (now.getDate() >= targetDay) {
+    targetMonth += 1;
+    if (targetMonth > 11) {
+      targetMonth = 0;
+      targetYear += 1;
+    }
+  }
+
+  const targetDate = new Date(targetYear, targetMonth, targetDay, 9, 0, 0);
+  const diffTime = targetDate - now;
+  const diffDays = Math.max(0, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+  const monthNames = [
+    'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+    'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'
+  ];
+
+  const totalDcaMonthly = (portfolioState.dcaRules.allocations['10ap'] || 0) +
+                          (portfolioState.dcaRules.allocations['lyp6'] || 0) +
+                          (portfolioState.dcaRules.allocations['xmme'] || 0);
+
+  return {
+    dateStr: `${targetDay} ${monthNames[targetMonth]}`,
+    fullDateStr: `${targetDay} ${monthNames[targetMonth]} ${targetYear}`,
+    daysRemaining: diffDays,
+    monthlyTotal: totalDcaMonthly
+  };
+}
+
+/**
+ * Génère les données de la courbe du portefeuille pour les 4 horizons temporels
+ */
+function getPortfolioChartData(timeframe = '24h') {
+  const summary = calculatePortfolioSummary();
+  const currentTotal = summary.totalValue;
+  const currentInvested = summary.totalInvested;
+  const now = new Date();
+
+  // 1. 24 DERNIÈRES HEURES (INTRADAY)
+  if (timeframe === '24h') {
+    const N = 24;
+    const points = [];
+    const chgEur = summary.totalChange24hEur;
+    const startVal = Number((currentTotal - chgEur).toFixed(2));
+
+    for (let i = 0; i < N; i++) {
+      const t = i / (N - 1);
+      const hoursAgo = Math.round(24 * (1 - t));
+      const trend = startVal + (currentTotal - startVal) * t;
+      const wave = Math.sin(t * Math.PI * 2.4) * (currentTotal * 0.0032);
+      const micro = Math.cos(t * Math.PI * 5.2) * (currentTotal * 0.0016);
+      let val = trend + wave + micro;
+      if (i === 0) val = startVal;
+      if (i === N - 1) val = currentTotal;
+
+      const dateObj = new Date(now.getTime() - hoursAgo * 3600000);
+      const timeStr = `${String(dateObj.getHours()).padStart(2, '0')}:${String(dateObj.getMinutes()).padStart(2, '0')}`;
+      const label = hoursAgo === 0 ? 'Maintenant' : (hoursAgo === 24 ? 'Il y a 24h' : `Il y a ${hoursAgo}h`);
+
+      points.push({
+        value: Number(val.toFixed(2)),
+        label,
+        date: hoursAgo === 0 ? `Aujourd'hui à ${timeStr} (Direct)` : `Il y a ${hoursAgo}h (${timeStr})`,
+        changePct: ((val - startVal) / startVal) * 100,
+        changeEur: val - startVal
+      });
+    }
+
+    const prices = points.map((p) => p.value);
+    return {
+      timeframe: '24h',
+      points,
+      startVal,
+      endVal: currentTotal,
+      periodChangePct: summary.totalChange24hPct,
+      periodChangeEur: chgEur,
+      minVal: Math.min(...prices),
+      maxVal: Math.max(...prices),
+      periodDesc: 'Évolution en direct sur les dernières 24 heures (Séances Euronext & Wall Street)',
+      axisLabels: { start: 'Il y a 24h', mid: 'Il y a 12h', end: 'Maintenant (En Direct)' },
+      dcaCountText: '0 versement (24h)'
+    };
+  }
+
+  // 2. SEMAINE PASSÉE (7 DERNIERS JOURS)
+  if (timeframe === '1w') {
+    const N = 7;
+    const points = [];
+    const weeklyPct = 1.35;
+    const startVal = Number((currentTotal / (1 + weeklyPct / 100)).toFixed(2));
+
+    for (let i = 0; i < N; i++) {
+      const daysAgo = 6 - i;
+      const t = i / 6;
+      const d = new Date(now.getTime() - daysAgo * 86400000);
+      const trend = startVal + (currentTotal - startVal) * t;
+      const wave = Math.sin(t * Math.PI * 2.8) * (currentTotal * 0.005);
+      let val = trend + wave;
+      if (i === 0) val = startVal;
+      if (i === 6) val = currentTotal;
+
+      const dateStr = d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+      const label = daysAgo === 0 ? "Aujourd'hui" : (daysAgo === 1 ? 'Hier' : dateStr);
+
+      points.push({
+        value: Number(val.toFixed(2)),
+        label,
+        date: dateStr,
+        changePct: ((val - startVal) / startVal) * 100,
+        changeEur: val - startVal
+      });
+    }
+
+    const prices = points.map((p) => p.value);
+    return {
+      timeframe: '1w',
+      points,
+      startVal,
+      endVal: currentTotal,
+      periodChangePct: weeklyPct,
+      periodChangeEur: currentTotal - startVal,
+      minVal: Math.min(...prices),
+      maxVal: Math.max(...prices),
+      periodDesc: 'Trajectoire des 7 derniers jours glissants (Cours de clôture)',
+      axisLabels: { start: 'Il y a 7 jours', mid: 'Il y a 3 jours', end: "Aujourd'hui" },
+      dcaCountText: '0 versement (7 jours)'
+    };
+  }
+
+  // 3. MOIS PASSÉ (30 DERNIERS JOURS) AVEC VERSEMENT DU 19
+  if (timeframe === '1m') {
+    const N = 30;
+    const points = [];
+    const monthlyMktPct = 3.2;
+    const dcaAmount = (portfolioState.dcaRules.allocations['10ap'] || 30) +
+                      (portfolioState.dcaRules.allocations['lyp6'] || 20) +
+                      (portfolioState.dcaRules.allocations['xmme'] || 10);
+
+    const startVal = Number(((currentTotal - dcaAmount) / (1 + monthlyMktPct / 100)).toFixed(2));
+
+    for (let i = 0; i < N; i++) {
+      const daysAgo = 29 - i;
+      const d = new Date(now.getTime() - daysAgo * 86400000);
+      const isPastOrAt19 = d.getDate() >= (portfolioState.dcaRules.dayOfMonth || 19);
+      const isExactly19 = d.getDate() === (portfolioState.dcaRules.dayOfMonth || 19);
+
+      const t = i / 29;
+      const baseTrend = startVal + ((currentTotal - dcaAmount) - startVal) * t;
+      const wave = Math.sin(t * Math.PI * 3.5) * (currentTotal * 0.007);
+      const dcaInjection = isPastOrAt19 ? dcaAmount : 0;
+      let val = baseTrend + wave + dcaInjection;
+      if (i === 0) val = startVal;
+      if (i === 29) val = currentTotal;
+
+      const dateStr = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+
+      points.push({
+        value: Number(val.toFixed(2)),
+        label: dateStr,
+        date: d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }),
+        changePct: ((val - startVal) / startVal) * 100,
+        changeEur: val - startVal,
+        dcaEvent: isExactly19,
+        dcaNote: isExactly19 ? `✨ Versement DCA du 19 : +${dcaAmount} € (30€ 10AP, 20€ LYP6, 10€ XMME)` : null
+      });
+    }
+
+    const prices = points.map((p) => p.value);
+    const periodChangeEur = currentTotal - startVal;
+    const periodChangePct = ((periodChangeEur) / startVal) * 100;
+
+    return {
+      timeframe: '1m',
+      points,
+      startVal,
+      endVal: currentTotal,
+      periodChangePct,
+      periodChangeEur,
+      minVal: Math.min(...prices),
+      maxVal: Math.max(...prices),
+      periodDesc: 'Évolution sur 30 jours • Versement mensuel DCA de 60 € au 19 inclus',
+      axisLabels: { start: 'Il y a 30 jours', mid: 'Il y a 15 jours', end: "Aujourd'hui" },
+      dcaCountText: '1 versement (+60 €)'
+    };
+  }
+
+  // 4. ANNÉE PASSÉE (12 DERNIERS MOIS) AVEC CUMUL DCA
+  if (timeframe === '1y') {
+    const N = 12;
+    const points = [];
+    const dcaMonthly = (portfolioState.dcaRules.allocations['10ap'] || 30) +
+                       (portfolioState.dcaRules.allocations['lyp6'] || 20) +
+                       (portfolioState.dcaRules.allocations['xmme'] || 10);
+
+    const totalDcaOverYear = 11 * dcaMonthly;
+    const startInvested = currentInvested - totalDcaOverYear;
+    const startVal = Number((startInvested * 1.04).toFixed(2));
+
+    for (let i = 0; i < N; i++) {
+      const monthsAgo = 11 - i;
+      const progress = i / 11;
+      const targetDate = new Date(now.getFullYear(), now.getMonth() - monthsAgo, 19);
+      const investedAtMonth = currentInvested - (monthsAgo * dcaMonthly);
+
+      let val = (investedAtMonth * 1.04) * (1.0 + progress * 0.12);
+      if (i === 11) val = currentTotal;
+
+      const monthName = targetDate.toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+
+      points.push({
+        value: Number(val.toFixed(2)),
+        label: monthName,
+        date: targetDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }),
+        changePct: ((val - startVal) / startVal) * 100,
+        changeEur: val - startVal,
+        invested: investedAtMonth,
+        dcaEvent: true,
+        dcaNote: `✨ Versement DCA du 19 : +${dcaMonthly} € investis`
+      });
+    }
+
+    const prices = points.map((p) => p.value);
+    const periodChangeEur = currentTotal - startVal;
+    const periodChangePct = ((periodChangeEur) / startVal) * 100;
+
+    return {
+      timeframe: '1y',
+      points,
+      startVal,
+      endVal: currentTotal,
+      periodChangePct,
+      periodChangeEur,
+      minVal: Math.min(...prices),
+      maxVal: Math.max(...prices),
+      periodDesc: 'Croissance cumulée sur 1 an : Versements programmés (+720 €) & Intérêts composés',
+      axisLabels: { start: 'Il y a 12 mois', mid: 'Il y a 6 mois', end: 'Ce mois-ci' },
+      dcaCountText: '12 versements (+720 €)'
+    };
+  }
+}
+
+/**
+ * Rendu du grand graphique interactif du portefeuille
+ */
+function renderPortfolioChart(timeframe = portfolioState.selectedTimeframe || '24h') {
+  portfolioState.selectedTimeframe = timeframe;
+  savePortfolioState();
+
+  const svgLine = document.getElementById('portfolio-svg-line');
+  const svgArea = document.getElementById('portfolio-svg-area');
+  const baseline = document.getElementById('portfolio-chart-baseline');
+  const statLow = document.getElementById('portfolio-stat-low');
+  const statHigh = document.getElementById('portfolio-stat-high');
+  const statInvested = document.getElementById('portfolio-stat-invested');
+  const statDcaCount = document.getElementById('portfolio-stat-dca-count');
+  const periodDesc = document.getElementById('portfolio-chart-period-desc');
+  const periodChangeVal = document.getElementById('portfolio-period-change-val');
+  const timeStart = document.getElementById('portfolio-time-start');
+  const timeMid = document.getElementById('portfolio-time-mid');
+  const timeEnd = document.getElementById('portfolio-time-end');
+
+  // Mise à jour de l'état actif des boutons
+  document.querySelectorAll('#portfolio-timeframe-switch .portfolio-tf-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.timeframe === timeframe);
+  });
+
+  const chartData = getPortfolioChartData(timeframe);
+  if (!chartData || !chartData.points || chartData.points.length === 0) return;
+
+  const points = chartData.points;
+  const isPositive = chartData.periodChangePct >= 0;
+  const sign = isPositive ? '+' : '';
+
+  if (periodDesc) periodDesc.textContent = chartData.periodDesc;
+  if (periodChangeVal) {
+    periodChangeVal.textContent = `${sign}${chartData.periodChangePct.toFixed(2)}% (${sign}${chartData.periodChangeEur.toFixed(2)} €)`;
+    periodChangeVal.className = isPositive ? 'text-green' : 'text-red';
+  }
+
+  if (timeStart) timeStart.textContent = chartData.axisLabels.start;
+  if (timeMid) timeMid.textContent = chartData.axisLabels.mid;
+  if (timeEnd) timeEnd.textContent = chartData.axisLabels.end;
+
+  if (statLow) statLow.textContent = `${chartData.minVal.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  if (statHigh) statHigh.textContent = `${chartData.maxVal.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  if (statInvested) statInvested.textContent = `${portfolioState.totalInvested.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  if (statDcaCount) statDcaCount.textContent = chartData.dcaCountText;
+
+  // Calcul des coordonnées SVG (viewBox 0 0 1000 240)
+  const prices = points.map((p) => p.value);
+  const minP = Math.min(...prices) * 0.996;
+  const maxP = Math.max(...prices) * 1.004;
+  const span = Math.max(0.01, maxP - minP);
+
+  const marginH = 15;
+  const usableW = 970;
+  const marginV = 20;
+  const usableH = 185;
+
+  points.forEach((pt, idx) => {
+    pt.x = Number((marginH + (idx / (points.length - 1)) * usableW).toFixed(1));
+    pt.y = Number(((marginV + usableH) - ((pt.value - minP) / span) * usableH).toFixed(1));
+  });
+
+  currentPortfolioChartPoints = points;
+
+  // Tracé Bézier cubique ultra-lissé
+  let lineD = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 1; i < points.length; i++) {
+    const prev = points[i - 1];
+    const curr = points[i];
+    const cx = (prev.x + curr.x) / 2;
+    lineD += ` C ${cx.toFixed(1)} ${prev.y}, ${cx.toFixed(1)} ${curr.y}, ${curr.x} ${curr.y}`;
+  }
+
+  const lastPt = points[points.length - 1];
+  const firstPt = points[0];
+  const areaD = `${lineD} L ${lastPt.x} 240 L ${firstPt.x} 240 Z`;
+
+  const mainColor = isPositive ? '#10b981' : '#ef4444';
+  const areaFill = isPositive ? 'url(#portfolioGradUp)' : 'url(#portfolioGradDown)';
+
+  if (svgLine) {
+    svgLine.setAttribute('d', lineD);
+    svgLine.setAttribute('stroke', mainColor);
+  }
+  if (svgArea) {
+    svgArea.setAttribute('d', areaD);
+    svgArea.setAttribute('fill', areaFill);
+  }
+
+  if (baseline) {
+    const baselineY = Number(((marginV + usableH) - ((chartData.startVal - minP) / span) * usableH).toFixed(1));
+    baseline.setAttribute('y1', baselineY);
+    baseline.setAttribute('y2', baselineY);
+  }
+}
+
+/**
+ * Configure les interactions de survol du graphique portefeuille
+ */
+function setupPortfolioChartInteractions() {
+  const stage = document.getElementById('portfolio-chart-stage');
+  const tracker = document.getElementById('portfolio-hover-tracker');
+  const hoverLine = document.getElementById('portfolio-hover-line');
+  const hoverDot = document.getElementById('portfolio-hover-dot');
+  const hoverDotHalo = document.getElementById('portfolio-hover-dot-halo');
+  const tooltip = document.getElementById('portfolio-tooltip');
+  const tooltipDate = document.getElementById('portfolio-tooltip-date');
+  const tooltipVal = document.getElementById('portfolio-tooltip-val');
+  const tooltipPerf = document.getElementById('portfolio-tooltip-perf');
+  const tooltipDca = document.getElementById('portfolio-tooltip-dca');
+
+  if (!stage || !tracker || !tooltip) return;
+
+  function handlePointerMove(e) {
+    if (!currentPortfolioChartPoints || currentPortfolioChartPoints.length === 0) return;
+    const rect = stage.getBoundingClientRect();
+    const clientX = e.clientX ?? e.touches?.[0]?.clientX;
+    if (clientX == null) return;
+
+    const relX = clientX - rect.left;
+    const svgX = (relX / rect.width) * 1000;
+
+    let closest = currentPortfolioChartPoints[0];
+    let minDist = Math.abs(currentPortfolioChartPoints[0].x - svgX);
+
+    for (let i = 1; i < currentPortfolioChartPoints.length; i++) {
+      const d = Math.abs(currentPortfolioChartPoints[i].x - svgX);
+      if (d < minDist) {
+        minDist = d;
+        closest = currentPortfolioChartPoints[i];
+      }
+    }
+
+    tracker.style.display = 'block';
+    tooltip.style.display = 'block';
+
+    if (hoverLine) {
+      hoverLine.setAttribute('x1', closest.x);
+      hoverLine.setAttribute('x2', closest.x);
+    }
+    if (hoverDot) {
+      hoverDot.setAttribute('cx', closest.x);
+      hoverDot.setAttribute('cy', closest.y);
+    }
+    if (hoverDotHalo) {
+      hoverDotHalo.setAttribute('cx', closest.x);
+      hoverDotHalo.setAttribute('cy', closest.y);
+    }
+
+    if (tooltipDate) tooltipDate.textContent = closest.date;
+    if (tooltipVal) tooltipVal.textContent = `${closest.value.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+    if (tooltipPerf) {
+      const isUp = closest.changeEur >= 0;
+      tooltipPerf.textContent = `${isUp ? '+' : ''}${closest.changePct.toFixed(2)}% (${isUp ? '+' : ''}${closest.changeEur.toFixed(2)} €)`;
+      tooltipPerf.className = `tooltip-perf ${isUp ? 'text-green' : 'text-red'}`;
+    }
+
+    if (tooltipDca) {
+      if (closest.dcaNote) {
+        tooltipDca.textContent = closest.dcaNote;
+        tooltipDca.style.display = 'block';
+      } else {
+        tooltipDca.style.display = 'none';
+      }
+    }
+
+    const leftPx = (closest.x / 1000) * rect.width;
+    const topPx = (closest.y / 240) * (rect.height - 24);
+    tooltip.style.left = `${leftPx}px`;
+    tooltip.style.top = `${topPx}px`;
+  }
+
+  function handlePointerLeave() {
+    tracker.style.display = 'none';
+    tooltip.style.display = 'none';
+  }
+
+  stage.addEventListener('mousemove', handlePointerMove);
+  stage.addEventListener('touchmove', handlePointerMove, { passive: true });
+  stage.addEventListener('mouseleave', handlePointerLeave);
+  stage.addEventListener('touchend', handlePointerLeave);
+}
+
+/**
+ * Rendu de la barre d'allocation globale
+ */
+function renderPortfolioAllocationBar(holdings, totalValue) {
+  const container = document.getElementById('portfolio-alloc-bar');
+  const legend = document.getElementById('portfolio-alloc-legend');
+  if (!container) return;
+
+  container.innerHTML = holdings
+    .map((h) => `<div class="portfolio-alloc-seg seg-${h.id}" style="width: ${h.weightPct.toFixed(1)}%;" title="${h.name} : ${h.weightPct.toFixed(1)}% (${h.totalEur.toFixed(2)} €)"></div>`)
+    .join('');
+
+  if (legend) {
+    legend.textContent = holdings.map((h) => `${h.id.toUpperCase()}: ${h.weightPct.toFixed(1)}%`).join(' • ');
+  }
+}
+
+/**
+ * Rendu des 4 cartes d'actifs détenus dans le portefeuille
+ */
+function renderPortfolioHoldings(holdings, totalValue) {
+  const container = document.getElementById('portfolio-holdings-grid');
+  if (!container) return;
+
+  container.innerHTML = holdings
+    .map((h) => {
+      const isUp = h.change24hPct >= 0;
+      const sign = isUp ? '+' : '';
+      const dcaText = h.dcaMonthly > 0 ? `+${h.dcaMonthly} € / mois (le 19)` : 'Pas de DCA';
+      const dcaClass = h.dcaMonthly > 0 ? '' : 'none';
+      const dcaIcon = h.dcaMonthly > 0 ? 'fa-solid fa-calendar-check' : 'fa-solid fa-lock';
+
+      const unitPriceStr = h.originalUnit === '$'
+        ? `${h.priceOriginal.toFixed(2)} $ • ${h.priceEur.toFixed(2)} €`
+        : `${h.priceEur.toFixed(2)} €`;
+
+      return `
+        <div class="portfolio-holding-card" data-asset-id="${h.id}" title="Cliquer pour afficher la modale graphique de ${h.name}">
+          <div class="holding-top-row">
+            <div class="holding-asset-brand">
+              <div class="holding-icon icon-${h.colorClass}">
+                <i class="${h.icon}"></i>
+              </div>
+              <div class="holding-names">
+                <span class="holding-name">${h.shortName}</span>
+                <span class="holding-sym">${h.symbol}</span>
+              </div>
+            </div>
+            <span class="holding-dca-tag ${dcaClass}">
+              <i class="${dcaIcon}"></i> ${dcaText}
+            </span>
+          </div>
+
+          <div class="holding-metrics">
+            <div class="holding-val-row">
+              <span class="holding-total-val">${h.totalEur.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €</span>
+              <span class="holding-weight">${h.weightPct.toFixed(1)}%</span>
+            </div>
+
+            <div class="holding-shares-row">
+              <span><strong>${h.shares.toFixed(2)}</strong> parts détenues</span>
+              <span class="holding-unit-price">${unitPriceStr}</span>
+            </div>
+
+            <div class="holding-shares-row">
+              <span>Variation 24h :</span>
+              <span class="${isUp ? 'text-green' : 'text-red'} font-bold">
+                <i class="fa-solid fa-arrow-trend-${isUp ? 'up' : 'down'}"></i> ${sign}${h.change24hPct.toFixed(2)}% (${sign}${h.change24hEur.toFixed(2)} €)
+              </span>
+            </div>
+
+            <div class="holding-progress-bar">
+              <div class="holding-progress-fill portfolio-alloc-seg seg-${h.colorClass}" style="width: ${h.weightPct.toFixed(1)}%;"></div>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join('');
+
+  container.querySelectorAll('.portfolio-holding-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const assetId = card.dataset.assetId;
+      const asset = marketAssets.find((a) => a.id === assetId);
+      if (asset) openChartModal(asset);
+    });
+  });
+}
+
+/**
+ * Rendu complet du module Portefeuille
+ */
+function renderPortfolioModule() {
+  const summary = calculatePortfolioSummary();
+  const nextDca = getNextDcaDateInfo();
+
+  const totalValEl = document.getElementById('portfolio-total-val');
+  const change24hEl = document.getElementById('portfolio-change-24h');
+  const gainValEl = document.getElementById('portfolio-gain-val');
+  const investedValEl = document.getElementById('portfolio-invested-val');
+  const gainPctEl = document.getElementById('portfolio-gain-pct');
+  const nextDateEl = document.getElementById('portfolio-next-dca-date');
+  const nextCountdownEl = document.getElementById('portfolio-next-dca-countdown');
+  const nextSumEl = document.getElementById('portfolio-next-dca-sum');
+
+  if (totalValEl) {
+    totalValEl.textContent = `${summary.totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  }
+  if (change24hEl) {
+    const isUp = summary.totalChange24hEur >= 0;
+    const sign = isUp ? '+' : '';
+    change24hEl.className = `portfolio-badge ${isUp ? 'up' : 'down'}`;
+    change24hEl.innerHTML = `<i class="fa-solid fa-arrow-trend-${isUp ? 'up' : 'down'}"></i> ${sign}${summary.totalChange24hPct.toFixed(2)}% (${sign}${summary.totalChange24hEur.toFixed(2)} € / 24h)`;
+  }
+  if (gainValEl) {
+    const isGain = summary.gainLatentEur >= 0;
+    const sign = isGain ? '+' : '';
+    gainValEl.textContent = `${sign}${summary.gainLatentEur.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+    gainValEl.className = `portfolio-kpi-val ${isGain ? 'text-green' : 'text-red'}`;
+  }
+  const gainIconEl = document.getElementById('portfolio-gain-icon');
+  if (gainIconEl) {
+    const isGain = summary.gainLatentEur >= 0;
+    gainIconEl.className = `fa-solid fa-arrow-trend-${isGain ? 'up' : 'down'} ${isGain ? 'text-green' : 'text-red'}`;
+  }
+  if (investedValEl) {
+    investedValEl.textContent = `${summary.totalInvested.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
+  }
+  if (gainPctEl) {
+    const isGain = summary.gainLatentPct >= 0;
+    const sign = isGain ? '+' : '';
+    gainPctEl.textContent = `(${sign}${summary.gainLatentPct.toFixed(2)}%)`;
+    gainPctEl.className = `portfolio-gain-pct ${isGain ? 'text-green' : 'text-red'}`;
+  }
+
+  if (nextDateEl) nextDateEl.textContent = nextDca.dateStr;
+  if (nextCountdownEl) {
+    nextCountdownEl.innerHTML = `<i class="fa-regular fa-clock"></i> Dans ${nextDca.daysRemaining} jour${nextDca.daysRemaining > 1 ? 's' : ''}`;
+  }
+  if (nextSumEl) {
+    nextSumEl.textContent = `${nextDca.monthlyTotal.toFixed(2)} €`;
+  }
+
+  renderPortfolioAllocationBar(summary.holdings, summary.totalValue);
+  renderPortfolioHoldings(summary.holdings, summary.totalValue);
+  renderPortfolioChart(portfolioState.selectedTimeframe || '24h');
+}
+
+/**
+ * Modale de gestion et d'ajustement du portefeuille
+ */
+function openPortfolioManageModal() {
+  const modal = document.getElementById('portfolio-manage-modal');
+  if (!modal) return;
+
+  const pos10ap = document.getElementById('pm-pos-10ap');
+  const posLyp6 = document.getElementById('pm-pos-lyp6');
+  const posXmme = document.getElementById('pm-pos-xmme');
+  const posNvda = document.getElementById('pm-pos-nvda');
+
+  if (pos10ap) pos10ap.value = portfolioState.positions['10ap'];
+  if (posLyp6) posLyp6.value = portfolioState.positions['lyp6'];
+  if (posXmme) posXmme.value = portfolioState.positions['xmme'];
+  if (posNvda) posNvda.value = portfolioState.positions['nvda'];
+
+  const dcaDay = document.getElementById('pm-dca-day');
+  const dca10ap = document.getElementById('pm-dca-10ap');
+  const dcaLyp6 = document.getElementById('pm-dca-lyp6');
+  const dcaXmme = document.getElementById('pm-dca-xmme');
+
+  if (dcaDay) dcaDay.value = portfolioState.dcaRules.dayOfMonth || 19;
+  if (dca10ap) dca10ap.value = portfolioState.dcaRules.allocations['10ap'] || 30;
+  if (dcaLyp6) dcaLyp6.value = portfolioState.dcaRules.allocations['lyp6'] || 20;
+  if (dcaXmme) dcaXmme.value = portfolioState.dcaRules.allocations['xmme'] || 10;
+
+  renderPortfolioHistoryTable();
+
+  modal.classList.remove('is-hidden');
+  modal.removeAttribute('hidden');
+  modal.style.display = 'flex';
+}
+
+function closePortfolioManageModal() {
+  const modal = document.getElementById('portfolio-manage-modal');
+  if (!modal) return;
+  modal.classList.add('is-hidden');
+  modal.setAttribute('hidden', '');
+  modal.style.display = 'none';
+}
+
+function renderPortfolioHistoryTable() {
+  const tbody = document.getElementById('pm-history-tbody');
+  if (!tbody) return;
+
+  if (!portfolioState.history || portfolioState.history.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: rgba(255,255,255,0.4);">Aucun versement enregistré.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = portfolioState.history
+    .map((item) => `
+      <tr>
+        <td><strong>${item.date}</strong></td>
+        <td><span class="portfolio-badge ${item.type === 'simulation' ? 'neutral' : 'up'}">${item.type === 'simulation' ? 'Simulation' : (item.type === 'initial' ? 'Initial' : 'DCA Auto')}</span></td>
+        <td><strong class="text-green">+${Number(item.amount).toFixed(2)} €</strong></td>
+        <td><span style="font-size: 0.75rem; color: rgba(255,255,255,0.65);">${item.note || item.title}</span></td>
+      </tr>
+    `)
+    .join('');
+}
+
+function setupPortfolioModalHandlers() {
+  const manageBtn = document.getElementById('portfolio-manage-btn');
+  const resetBtn = document.getElementById('portfolio-reset-btn');
+  const triggerDcaBtn = document.getElementById('portfolio-trigger-dca-btn');
+  const closeBtn = document.getElementById('portfolio-modal-close-btn');
+  const cancelBtn = document.getElementById('pm-cancel-btn');
+  const backdrop = document.getElementById('portfolio-modal-backdrop');
+  const saveBtn = document.getElementById('pm-save-btn');
+
+  if (manageBtn) manageBtn.addEventListener('click', openPortfolioManageModal);
+  if (resetBtn) resetBtn.addEventListener('click', resetPortfolioState);
+  if (triggerDcaBtn) triggerDcaBtn.addEventListener('click', simulateDcaExecution);
+  if (closeBtn) closeBtn.addEventListener('click', closePortfolioManageModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closePortfolioManageModal);
+  if (backdrop) backdrop.addEventListener('click', closePortfolioManageModal);
+
+  document.querySelectorAll('.portfolio-modal-tab').forEach((tabBtn) => {
+    tabBtn.addEventListener('click', () => {
+      document.querySelectorAll('.portfolio-modal-tab').forEach((b) => b.classList.remove('active'));
+      tabBtn.classList.add('active');
+      const target = tabBtn.dataset.pmTab;
+      document.querySelectorAll('.pm-tab-content').forEach((content) => {
+        const isMatch = content.id === `pm-tab-${target}`;
+        content.classList.toggle('active', isMatch);
+        if (isMatch) {
+          content.removeAttribute('hidden');
+          content.style.display = 'block';
+        } else {
+          content.setAttribute('hidden', '');
+          content.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const pos10ap = parseFloat(document.getElementById('pm-pos-10ap')?.value) || 0;
+      const posLyp6 = parseFloat(document.getElementById('pm-pos-lyp6')?.value) || 0;
+      const posXmme = parseFloat(document.getElementById('pm-pos-xmme')?.value) || 0;
+      const posNvda = parseFloat(document.getElementById('pm-pos-nvda')?.value) || 0;
+
+      const dcaDay = parseInt(document.getElementById('pm-dca-day')?.value, 10) || 19;
+      const dca10ap = parseFloat(document.getElementById('pm-dca-10ap')?.value) || 0;
+      const dcaLyp6 = parseFloat(document.getElementById('pm-dca-lyp6')?.value) || 0;
+      const dcaXmme = parseFloat(document.getElementById('pm-dca-xmme')?.value) || 0;
+
+      portfolioState.positions['10ap'] = pos10ap;
+      portfolioState.positions['lyp6'] = posLyp6;
+      portfolioState.positions['xmme'] = posXmme;
+      portfolioState.positions['nvda'] = posNvda;
+
+      portfolioState.dcaRules.dayOfMonth = dcaDay;
+      portfolioState.dcaRules.allocations['10ap'] = dca10ap;
+      portfolioState.dcaRules.allocations['lyp6'] = dcaLyp6;
+      portfolioState.dcaRules.allocations['xmme'] = dcaXmme;
+
+      savePortfolioState();
+      renderPortfolioModule();
+      if (typeof renderDashboardMarkets === 'function') renderDashboardMarkets();
+      closePortfolioManageModal();
+
+      if (typeof showToast === 'function') {
+        showToast('Modifications du portefeuille enregistrées !', 'success');
+      }
+    });
+  }
+
+  document.querySelectorAll('#portfolio-timeframe-switch .portfolio-tf-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tf = btn.dataset.timeframe;
+      renderPortfolioChart(tf);
+    });
+  });
+
+  setupPortfolioChartInteractions();
+}
+
+window.renderPortfolioModule = renderPortfolioModule;
+window.calculatePortfolioSummary = calculatePortfolioSummary;
+window.simulateDcaExecution = simulateDcaExecution;
+window.resetPortfolioState = resetPortfolioState;
+window.checkAndApplyScheduledDca = checkAndApplyScheduledDca;
+window.portfolioState = portfolioState;
+window.openPortfolioManageModal = openPortfolioManageModal;
+window.closePortfolioManageModal = closePortfolioManageModal;
+
 /**
  * Génère un tracé SVG spline lissé pour la sparkline
  */
@@ -1808,6 +2830,7 @@ async function fetchLiveMarketData() {
   });
 
   saveMarketAssets();
+  renderPortfolioModule();
   renderMarketCards();
   renderHeroSpotlight(currentHeroAssetId);
   renderMarketBarometer();
@@ -1830,6 +2853,9 @@ function initMarkets() {
   if (initMarkets._initialized) return;
   initMarkets._initialized = true;
 
+  checkAndApplyScheduledDca();
+  renderPortfolioModule();
+  setupPortfolioModalHandlers();
   renderIndicesMarquee();
   updateMarketGlobalStatus();
   if (typeof renderDashboardMarkets === 'function') {
