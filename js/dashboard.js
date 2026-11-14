@@ -10,7 +10,7 @@
 
   // --- ÉTAT GLOBAL DU DASHBOARD ---
   let selectedAssetId = 'nvda';
-  let selectedWeekDayIso = null; // null = toute la semaine
+  let selectedWeekDayIso = 'TODAY'; // 'TODAY' par défaut = affiche directement les événements du jour
 
   // Données de secours fiables si hors-ligne ou avant chargement réseau
   const DEFAULT_DASHBOARD_ASSETS = [
@@ -157,17 +157,25 @@
   }
 
   function getVisitedSites() {
+    let list = [];
     try {
       const raw = localStorage.getItem('startpage_visited_sites');
-      if (!raw) {
-        localStorage.setItem('startpage_visited_sites', JSON.stringify(SEED_VISITED_SITES));
-        return SEED_VISITED_SITES;
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) list = parsed;
       }
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) && parsed.length ? parsed : SEED_VISITED_SITES;
-    } catch {
-      return SEED_VISITED_SITES;
+    } catch {}
+
+    // Compléter avec SEED_VISITED_SITES pour toujours garantir 6 applications utiles (2 lignes de 3)
+    const existingUrls = new Set(list.map((s) => s.url));
+    for (const seed of SEED_VISITED_SITES) {
+      if (list.length >= 6) break;
+      if (!existingUrls.has(seed.url)) {
+        list.push(seed);
+        existingUrls.add(seed.url);
+      }
     }
+    return list.slice(0, 6);
   }
 
   function recordVisitedSite({ name, url, icon }) {
@@ -362,8 +370,8 @@
     if (!points || points.length === 0) return;
 
     const width = container.clientWidth || 460;
-    const height = Math.min(120, Math.max(70, container.clientHeight || 95));
-    const padding = { top: 12, right: 16, bottom: 20, left: 16 };
+    const height = Math.min(65, Math.max(45, container.clientHeight || 52));
+    const padding = { top: 8, right: 14, bottom: 14, left: 14 };
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
 
@@ -617,7 +625,7 @@
     if (!svgContainer) return;
 
     const width = svgContainer.clientWidth || 540;
-    const height = Math.min(130, Math.max(75, svgContainer.clientHeight || 105));
+    const height = Math.min(145, Math.max(75, svgContainer.clientHeight || 115));
     const padding = { top: 16, right: 20, bottom: 22, left: 20 };
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
@@ -917,6 +925,11 @@
     const weekDays = getCurrentWeekDays();
     const todayIso = toIso(new Date());
 
+    // Détermination de la date effective
+    const isShowingAll = selectedWeekDayIso === 'ALL';
+    const effectiveDayIso = (!selectedWeekDayIso || selectedWeekDayIso === 'TODAY') ? todayIso : (isShowingAll ? null : selectedWeekDayIso);
+    const isTodayMode = !isShowingAll && effectiveDayIso === todayIso;
+
     // Compter les tâches par date (non terminées)
     const pendingTasksPerDay = {};
     allTodos.forEach((t) => {
@@ -929,7 +942,7 @@
     strip.innerHTML = weekDays
       .map((day) => {
         const taskCount = pendingTasksPerDay[day.iso] || 0;
-        const isSelected = selectedWeekDayIso === day.iso;
+        const isSelected = effectiveDayIso ? effectiveDayIso === day.iso : false;
         const isToday = day.isToday;
 
         return `
@@ -948,16 +961,150 @@
       })
       .join('');
 
-    // 2. Filtrage des tâches selon le jour sélectionné
-    let displayTasks = [];
-    let selectedDayObj = null;
+    // Fonction de rendu unitaire d'une tâche
+    const renderTaskHtml = (task) => {
+      const originalIdx = allTodos.indexOf(task);
+      const prio = task.priority || 'normal';
+      const dayBadge = getTaskDayBadgeInfo(task.date, todayIso);
+      const prioLabel = prio === 'urgent' ? '🔴 Urgent' : prio === 'low' ? '🟢 Faible' : '🟡 Normal';
 
-    if (selectedWeekDayIso) {
-      selectedDayObj = weekDays.find((d) => d.iso === selectedWeekDayIso);
-      displayTasks = allTodos.filter((t) => t.date === selectedWeekDayIso);
+      return `
+        <div class="dash-task-item priority-${prio} ${task.done ? 'is-done' : ''}" data-idx="${originalIdx}">
+          <div class="dash-task-left">
+            <input
+              type="checkbox"
+              class="dash-task-checkbox"
+              data-idx="${originalIdx}"
+              ${task.done ? 'checked' : ''}
+              title="${task.done ? 'Marquer comme à faire' : 'Marquer comme fait'}"
+            />
+            <div class="dash-task-details">
+              <span class="dash-task-title">${escapeDashHtml(task.text)}</span>
+              <div class="dash-task-sub-info">
+                <span class="dash-task-day-tag ${dayBadge.cls}">
+                  <i class="fa-regular fa-calendar"></i> ${dayBadge.label}
+                </span>
+                <span class="dash-task-badge-prio ${prio}">
+                  ${prioLabel}
+                </span>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="dash-task-delete-btn" data-idx="${originalIdx}" title="Supprimer la tâche">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      `;
+    };
+
+    // 2. Rendu des tâches avec affichage prioritaire des événements du jour
+    let htmlOutput = '';
+
+    if (isTodayMode) {
+      // Par défaut : Tous les événements du jour
+      const todayTasks = allTodos.filter((t) => t.date === todayIso);
+      const upcomingTasks = allTodos
+        .filter((t) => !t.done && t.date && t.date > todayIso)
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      if (todayTasks.length > 0) {
+        htmlOutput += todayTasks.map(renderTaskHtml).join('');
+        if (upcomingTasks.length > 0) {
+          htmlOutput += `
+            <div class="dash-agenda-subhead">
+              <i class="fa-solid fa-arrow-right"></i> Prochaines échéances (${upcomingTasks.length})
+            </div>
+          `;
+          htmlOutput += upcomingTasks.map(renderTaskHtml).join('');
+        }
+      } else {
+        htmlOutput += `
+          <div class="dash-today-empty-card">
+            <i class="fa-solid fa-circle-check" style="color: #34d399; font-size: 0.95rem;"></i>
+            <span>Aucune tâche restante pour aujourd'hui</span>
+          </div>
+        `;
+        if (upcomingTasks.length > 0) {
+          htmlOutput += `
+            <div class="dash-agenda-subhead">
+              <i class="fa-solid fa-arrow-right"></i> Prochaines échéances (${upcomingTasks.length}) :
+            </div>
+          `;
+          htmlOutput += upcomingTasks.map(renderTaskHtml).join('');
+        } else {
+          htmlOutput += `
+            <div class="dash-tasks-empty">
+              <div class="dash-empty-icon-wrap"><i class="fa-solid fa-circle-check"></i></div>
+              <p class="dash-empty-title">Toutes vos tâches sont à jour !</p>
+              <span class="dash-empty-sub">Aucune échéance en attente cette semaine.</span>
+            </div>
+          `;
+        }
+      }
+
+      if (filterBar) {
+        filterBar.innerHTML = `
+          <div class="dash-agenda-filter-active">
+            <div class="dash-agenda-filter-info">
+              <span class="dash-filter-active-dot"></span>
+              <span>Événements : <strong>Aujourd'hui</strong></span>
+              <span class="dash-filter-today-tag">AUJOURD’HUI</span>
+              <span class="dash-filter-count-chip">${todayTasks.length} aujourd'hui</span>
+            </div>
+            <button type="button" id="dash-clear-day-filter-btn" class="dash-filter-reset-pill" title="Afficher toutes les tâches de la semaine">
+              <i class="fa-solid fa-list-ul"></i> Toute la semaine
+            </button>
+          </div>
+        `;
+      }
+    } else if (effectiveDayIso) {
+      // Filtrage strict par un autre jour sélectionné
+      const selectedDayObj = weekDays.find((d) => d.iso === effectiveDayIso);
+      const dayTasks = allTodos.filter((t) => t.date === effectiveDayIso);
+
+      const formattedDate = new Date(effectiveDayIso + 'T00:00:00').toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long'
+      });
+      const capitalized = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+      if (dayTasks.length > 0) {
+        htmlOutput = dayTasks.map(renderTaskHtml).join('');
+      } else {
+        htmlOutput = `
+          <div class="dash-tasks-empty">
+            <div class="dash-empty-icon-wrap">
+              <i class="fa-regular fa-calendar-check"></i>
+            </div>
+            <p class="dash-empty-title">Aucune tâche prévue pour ce ${capitalized}</p>
+            <span class="dash-empty-sub">Ajoutez une tâche pour cette journée via le champ ci-dessous.</span>
+          </div>
+        `;
+      }
+
+      if (filterBar) {
+        filterBar.innerHTML = `
+          <div class="dash-agenda-filter-active">
+            <div class="dash-agenda-filter-info">
+              <span class="dash-filter-active-dot"></span>
+              <span>Jour filtré : <strong>${capitalized}</strong></span>
+              <span class="dash-filter-count-chip">${dayTasks.length} tâche${dayTasks.length > 1 ? 's' : ''}</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <button type="button" id="dash-focus-today-btn" class="dash-filter-reset-pill" style="border-color: rgba(49, 225, 247, 0.4); color: #31e1f7;" title="Revenir à aujourd'hui">
+                <i class="fa-regular fa-calendar-check"></i> Aujourd'hui
+              </button>
+              <button type="button" id="dash-clear-day-filter-btn" class="dash-filter-reset-pill" title="Afficher toutes les tâches de la semaine">
+                <i class="fa-solid fa-list-ul"></i> Toute la semaine
+              </button>
+            </div>
+          </div>
+        `;
+      }
     } else {
-      // Toutes les tâches non terminées, triées par date (prochaines en premier)
-      displayTasks = allTodos
+      // Mode Toute la semaine
+      const pendingTasks = allTodos
         .filter((t) => !t.done)
         .sort((a, b) => {
           if (!a.date) return 1;
@@ -965,77 +1112,10 @@
           return a.date.localeCompare(b.date);
         });
 
-      // Si moins de 5 tâches non terminées, on complète avec les dernières terminées
-      if (displayTasks.length < 5) {
-        const doneTasks = allTodos.filter((t) => t.done).slice(0, 5 - displayTasks.length);
-        displayTasks = displayTasks.concat(doneTasks);
-      }
-    }
-
-    // 3. Barre de notification du filtre par jour
-    if (filterBar) {
-      if (selectedWeekDayIso) {
-        const formattedDate = new Date(selectedWeekDayIso + 'T00:00:00').toLocaleDateString('fr-FR', {
-          weekday: 'long',
-          day: 'numeric',
-          month: 'long'
-        });
-        const capitalized = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-        const isTodaySelected = selectedWeekDayIso === todayIso;
-
-        filterBar.innerHTML = `
-          <div class="dash-agenda-filter-active">
-            <div class="dash-agenda-filter-info">
-              <span class="dash-filter-active-dot"></span>
-              <span>Jour filtré : <strong>${capitalized}</strong> ${isTodaySelected ? '<span class="dash-filter-today-tag">AUJOURD’HUI</span>' : ''}</span>
-              <span class="dash-filter-count-chip">${displayTasks.length} tâche${displayTasks.length > 1 ? 's' : ''}</span>
-            </div>
-            <button type="button" id="dash-clear-day-filter-btn" class="dash-filter-reset-pill" title="Afficher toutes les tâches de la semaine">
-              <i class="fa-solid fa-rotate-left"></i> Toute la semaine
-            </button>
-          </div>
-        `;
+      if (pendingTasks.length > 0) {
+        htmlOutput = pendingTasks.map(renderTaskHtml).join('');
       } else {
-        filterBar.innerHTML = `
-          <div class="dash-agenda-filter-all">
-            <div class="dash-agenda-filter-all-left">
-              <i class="fa-regular fa-calendar-days"></i>
-              <span>Vue générale : Toute la semaine</span>
-            </div>
-            <span class="dash-agenda-filter-hint"><i class="fa-solid fa-hand-pointer"></i> Cliquez sur un jour pour filtrer</span>
-          </div>
-        `;
-      }
-    }
-
-    // 4. Placeholder dynamique de l'input rapide
-    if (fastInput) {
-      if (selectedWeekDayIso) {
-        const shortName = weekDays.find((d) => d.iso === selectedWeekDayIso)?.name || 'ce jour';
-        fastInput.placeholder = `+ Ajouter une tâche pour ce ${shortName}... (Entrée)`;
-      } else {
-        fastInput.placeholder = `+ Ajouter une tâche rapide... (Entrée)`;
-      }
-    }
-
-    // 5. Rendu de la liste des tâches
-    if (displayTasks.length === 0) {
-      if (selectedWeekDayIso) {
-        const formattedDate = new Date(selectedWeekDayIso + 'T00:00:00').toLocaleDateString('fr-FR', {
-          weekday: 'long',
-          day: 'numeric'
-        });
-        listContainer.innerHTML = `
-          <div class="dash-tasks-empty">
-            <div class="dash-empty-icon-wrap">
-              <i class="fa-regular fa-calendar-check"></i>
-            </div>
-            <p class="dash-empty-title">Aucune tâche prévue pour ce ${formattedDate}</p>
-            <span class="dash-empty-sub">Ajoutez une tâche pour cette journée via le champ ci-dessous.</span>
-          </div>
-        `;
-      } else {
-        listContainer.innerHTML = `
+        htmlOutput = `
           <div class="dash-tasks-empty">
             <div class="dash-empty-icon-wrap">
               <i class="fa-solid fa-circle-check"></i>
@@ -1045,43 +1125,34 @@
           </div>
         `;
       }
-    } else {
-      listContainer.innerHTML = displayTasks
-        .map((task) => {
-          const originalIdx = allTodos.indexOf(task);
-          const prio = task.priority || 'normal';
-          const dayBadge = getTaskDayBadgeInfo(task.date, todayIso);
-          const prioLabel = prio === 'urgent' ? '🔴 Urgent' : prio === 'low' ? '🟢 Faible' : '🟡 Normal';
 
-          return `
-          <div class="dash-task-item priority-${prio} ${task.done ? 'is-done' : ''}" data-idx="${originalIdx}">
-            <div class="dash-task-left">
-              <input
-                type="checkbox"
-                class="dash-task-checkbox"
-                data-idx="${originalIdx}"
-                ${task.done ? 'checked' : ''}
-                title="${task.done ? 'Marquer comme à faire' : 'Marquer comme fait'}"
-              />
-              <div class="dash-task-details">
-                <span class="dash-task-title">${escapeDashHtml(task.text)}</span>
-                <div class="dash-task-sub-info">
-                  <span class="dash-task-day-tag ${dayBadge.cls}">
-                    <i class="fa-regular fa-calendar"></i> ${dayBadge.label}
-                  </span>
-                  <span class="dash-task-badge-prio ${prio}">
-                    ${prioLabel}
-                  </span>
-                </div>
-              </div>
+      if (filterBar) {
+        filterBar.innerHTML = `
+          <div class="dash-agenda-filter-all">
+            <div class="dash-agenda-filter-all-left">
+              <i class="fa-regular fa-calendar-days"></i>
+              <span>Vue générale : Toute la semaine (${pendingTasks.length} à faire)</span>
             </div>
-            <button type="button" class="dash-task-delete-btn" data-idx="${originalIdx}" title="Supprimer la tâche">
-              <i class="fa-solid fa-trash-can"></i>
+            <button type="button" id="dash-focus-today-btn" class="dash-filter-reset-pill" style="border-color: rgba(49, 225, 247, 0.4); color: #31e1f7;" title="Revenir aux événements d'aujourd'hui">
+              <i class="fa-regular fa-calendar-check"></i> Aujourd'hui
             </button>
           </div>
         `;
-        })
-        .join('');
+      }
+    }
+
+    listContainer.innerHTML = htmlOutput;
+
+    // 3. Placeholder dynamique de l'input rapide
+    if (fastInput) {
+      if (isTodayMode) {
+        fastInput.placeholder = "+ Ajouter une tâche pour aujourd'hui... (Entrée)";
+      } else if (effectiveDayIso) {
+        const shortName = weekDays.find((d) => d.iso === effectiveDayIso)?.name || 'ce jour';
+        fastInput.placeholder = `+ Ajouter une tâche pour ce ${shortName}... (Entrée)`;
+      } else {
+        fastInput.placeholder = "+ Ajouter une tâche rapide... (Entrée)";
+      }
     }
 
     // 6. Mise à jour de la carte KPI Agenda
@@ -1137,7 +1208,10 @@
   function addQuickDashboardTodo(text) {
     if (!text || !text.trim()) return;
     const cleanText = text.trim();
-    const date = selectedWeekDayIso || toIso(new Date());
+    const todayIso = toIso(new Date());
+    const isShowingAll = selectedWeekDayIso === 'ALL';
+    const effectiveDayIso = (!selectedWeekDayIso || selectedWeekDayIso === 'TODAY') ? todayIso : (isShowingAll ? null : selectedWeekDayIso);
+    const date = effectiveDayIso || todayIso;
 
     if (typeof todos !== 'undefined') {
       todos.unshift({
@@ -1245,15 +1319,28 @@
       if (dayPill) {
         e.preventDefault();
         const dateIso = dayPill.dataset.date;
-        selectedWeekDayIso = selectedWeekDayIso === dateIso ? null : dateIso;
+        const todayIso = toIso(new Date());
+        if (dateIso === todayIso) {
+          selectedWeekDayIso = (selectedWeekDayIso === 'TODAY' || selectedWeekDayIso === todayIso) ? 'ALL' : 'TODAY';
+        } else {
+          selectedWeekDayIso = selectedWeekDayIso === dateIso ? 'TODAY' : dateIso;
+        }
         renderDashboardAgenda();
         return;
       }
 
-      // 3. Réinitialisation du filtre par jour (Toute la semaine)
+      // 3. Réinitialisation du filtre (Toute la semaine)
       if (e.target.closest('#dash-clear-day-filter-btn')) {
         e.preventDefault();
-        selectedWeekDayIso = null;
+        selectedWeekDayIso = 'ALL';
+        renderDashboardAgenda();
+        return;
+      }
+
+      // 3bis. Bouton Revenir à Aujourd'hui
+      if (e.target.closest('#dash-focus-today-btn')) {
+        e.preventDefault();
+        selectedWeekDayIso = 'TODAY';
         renderDashboardAgenda();
         return;
       }

@@ -292,10 +292,9 @@
   overflow: hidden;
 }
 
-/* Répartition équilibrée colonne gauche : Historique en haut, Météo en bas */
+/* Répartition équilibrée colonne gauche : Historique en haut (2 lignes de 3), Météo en bas */
 .dash-col-left .dash-card-history {
   flex: 0 0 auto;
-  max-height: 38%;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -308,17 +307,17 @@
   flex-direction: column;
 }
 
-/* Répartition équilibrée colonne droite : Agenda en haut (hauteur réduite), Portefeuille en bas */
+/* Répartition équilibrée colonne droite : Agenda en haut (étendu avec plus d'événements), Portefeuille en bas (compact) */
 .dash-col-right .dash-card-agenda {
-  flex: 0 0 auto;
-  max-height: 48%;
+  flex: 1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
-.dash-col-right .dash-card-markets {
-  flex: 1 1 0;
+.dash-col-right .dash-card-markets,
+.dash-col-right .dash-card-portfolio {
+  flex: 0 0 auto;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -580,9 +579,9 @@
 }
 
 .dash-portfolio-chart-box {
-  flex: 1 1 0;
-  min-height: 55px;
-  max-height: 105px;
+  flex: 0 0 auto;
+  height: 52px;
+  min-height: 48px;
   position: relative;
   width: 100%;
   display: flex;
@@ -767,8 +766,8 @@
 .dash-weather-svg-container {
   width: 100%;
   flex: 1 1 0;
-  min-height: 55px;
-  max-height: 110px;
+  min-height: 70px;
+  max-height: 145px;
   position: relative;
 }
 
@@ -1028,17 +1027,48 @@
   opacity: 0.75;
 }
 
-/* Liste des tâches avec hauteur optimisée */
+/* Liste des tâches avec hauteur optimisée : prend tout l'espace disponible */
 .dash-upcoming-list {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   flex: 1 1 0;
-  min-height: 45px;
-  max-height: clamp(75px, 11vh, 115px);
+  min-height: 0;
   overflow-y: auto;
   padding-right: 3px;
   margin-bottom: 0.35rem;
+}
+
+.dash-today-empty-card {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 9px;
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.22);
+  color: var(--accent-white, #ffffff);
+  font-size: 0.74rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.dash-agenda-subhead {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted, #7c859e);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0.35rem 0 0.25rem 0;
+  padding-left: 2px;
+}
+
+.dash-agenda-subhead i {
+  color: var(--accent-primary, #31e1f7);
+  font-size: 0.65rem;
 }
 
 .dash-task-item {
@@ -1314,29 +1344,27 @@
   transform: scale(1.08);
 }
 
-/* --- 7. MODULE HISTORIQUE DES SITES CONSULTÉS (EN HAUT À GAUCHE) --- */
+/* --- 7. MODULE HISTORIQUE DES SITES CONSULTÉS (EN HAUT À GAUCHE : 2 LIGNES DE 3) --- */
 .dash-history-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.45rem;
-  overflow-y: auto;
-  flex: 1 1 0;
-  min-height: 0;
-  padding-right: 2px;
+  width: 100%;
 }
 
 .dash-history-card-tile {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  padding: 0.42rem 0.65rem;
-  border-radius: 11px;
+  gap: 0.5rem;
+  padding: 0.38rem 0.55rem;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.07);
   text-decoration: none;
   color: inherit;
   position: relative;
   overflow: hidden;
+  min-width: 0;
   transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -1361,17 +1389,18 @@
 }
 
 .dash-history-tile-icon-box {
-  width: 30px;
-  height: 30px;
-  border-radius: 9px;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  border-radius: 8px;
   background: var(--tile-bg, rgba(255, 255, 255, 0.06));
   border: 1.5px solid var(--tile-border, rgba(255, 255, 255, 0.12));
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.95rem;
+  font-size: 0.86rem;
   color: var(--tile-accent, #31e1f7);
-  box-shadow: 0 0 12px var(--tile-glow, transparent);
+  box-shadow: 0 0 10px var(--tile-glow, transparent);
   flex-shrink: 0;
   transition: transform 0.22s ease;
   position: relative;
@@ -1379,28 +1408,30 @@
 }
 
 .dash-history-card-tile:hover .dash-history-tile-icon-box {
-  transform: scale(1.06);
+  transform: scale(1.08);
 }
 
 .dash-history-tile-content {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.1rem;
   min-width: 0;
   flex: 1;
   position: relative;
   z-index: 1;
+  overflow: hidden;
 }
 
 .dash-history-tile-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.35rem;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
 .dash-history-tile-name {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--accent-white, #ffffff);
   white-space: nowrap;
@@ -1410,7 +1441,7 @@
 
 .dash-history-tile-arrow {
   color: var(--text-muted, #7c859e);
-  font-size: 0.64rem;
+  font-size: 0.58rem;
   transition: transform 0.2s ease, color 0.2s ease;
   flex-shrink: 0;
 }
@@ -1424,36 +1455,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.35rem;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
 .dash-history-tile-domain {
-  font-size: 0.64rem;
-  color: var(--text-muted, #7c859e);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.dash-history-tile-time {
   font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--tile-accent, var(--accent-primary, #31e1f7));
-  white-space: nowrap;
-}
-  color: var(--tile-accent, #31e1f7);
-  transform: translate(2px, -2px);
-}
-
-.dash-history-tile-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
-}
-
-.dash-history-tile-domain {
-  font-size: 0.68rem;
   color: var(--text-muted, #7c859e);
   white-space: nowrap;
   overflow: hidden;
@@ -1461,10 +1468,11 @@
 }
 
 .dash-history-tile-time {
-  font-size: 0.66rem;
+  font-size: 0.6rem;
   font-weight: 600;
   color: var(--tile-accent, var(--accent-primary, #31e1f7));
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .dash-history-clear-btn {
