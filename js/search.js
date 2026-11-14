@@ -285,15 +285,132 @@ function executeSuggestion(item) {
   }
 }
 
+function renderEngineDropdown() {
+  const engineGrid = document.getElementById('engine-dropdown-grid');
+  if (!engineGrid) return;
+
+  const engines = [
+    { prefix: null, name: 'Google', icon: 'fa-brands fa-google', desc: 'Recherche Web standard' },
+    ...Object.entries(searchEngines).map(([prefix, info]) => ({
+      prefix,
+      name: info.name,
+      icon: info.icon,
+      desc: info.desc
+    }))
+  ];
+
+  engineGrid.innerHTML = engines
+    .map((eng) => {
+      const isCurrent = (activePrefix === eng.prefix) || (!activePrefix && eng.prefix === null);
+      const bangBadge = eng.prefix
+        ? `<span class="engine-choice-bang">${eng.prefix}</span>`
+        : `<span class="engine-choice-bang default">Web</span>`;
+
+      return `
+        <button
+          type="button"
+          class="engine-choice-btn ${isCurrent ? 'active' : ''}"
+          data-prefix="${eng.prefix || ''}"
+          data-name="${escapeSearchHtml(eng.name)}"
+          data-icon="${escapeSearchHtml(eng.icon)}"
+          title="${eng.prefix ? `Rechercher sur ${eng.name} (${eng.prefix})` : 'Rechercher sur Google'}"
+        >
+          <div class="engine-choice-icon">
+            <i class="${escapeSearchHtml(eng.icon)}"></i>
+          </div>
+          <div class="engine-choice-info">
+            <span class="engine-choice-title">${escapeSearchHtml(eng.name)}</span>
+            <span class="engine-choice-desc">${escapeSearchHtml(eng.desc)}</span>
+          </div>
+          ${bangBadge}
+        </button>
+      `;
+    })
+    .join('');
+}
+
 function initSearch() {
   const searchForm = document.getElementById('search-form');
   const searchInput = document.getElementById('search-input');
+  const engineBadge = document.getElementById('engine-badge');
+  const engineDropdown = document.getElementById('engine-dropdown-menu');
   const engineName = document.getElementById('engine-name');
   const engineIcon = document.getElementById('engine-icon');
   const calcPreview = document.getElementById('calc-preview');
   const suggestionsBox = document.getElementById('suggestions-box');
 
   if (!searchForm || !searchInput) return;
+
+  // Gestion du menu déroulant au clic sur le bouton Google / Moteur
+  if (engineBadge && engineDropdown) {
+    engineBadge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isHidden = engineDropdown.hidden;
+      if (isHidden) {
+        renderEngineDropdown();
+        engineDropdown.hidden = false;
+        engineBadge.classList.add('menu-open');
+        engineBadge.setAttribute('aria-expanded', 'true');
+        if (suggestionsBox) suggestionsBox.hidden = true;
+      } else {
+        engineDropdown.hidden = true;
+        engineBadge.classList.remove('menu-open');
+        engineBadge.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    engineDropdown.addEventListener('click', (e) => {
+      const btn = e.target.closest('.engine-choice-btn');
+      if (!btn) return;
+      e.stopPropagation();
+
+      const prefix = btn.dataset.prefix || null;
+      const name = btn.dataset.name;
+      const icon = btn.dataset.icon;
+
+      activePrefix = prefix;
+      if (engineName) engineName.textContent = name;
+      if (engineIcon) engineIcon.className = icon;
+
+      // Nettoyer l'ancien préfixe bang du champ
+      let currentVal = searchInput.value.trim();
+      const parts = currentVal.split(' ');
+      if (parts[0] && (searchEngines[parts[0].toLowerCase()] || parts[0].toLowerCase() === '!help')) {
+        currentVal = parts.slice(1).join(' ').trim();
+      }
+
+      if (prefix) {
+        searchInput.value = `${prefix} ${currentVal}`.trimEnd() + (currentVal ? '' : ' ');
+      } else {
+        searchInput.value = currentVal;
+      }
+
+      engineDropdown.hidden = true;
+      engineBadge.classList.remove('menu-open');
+      engineBadge.setAttribute('aria-expanded', 'false');
+      searchInput.focus();
+      searchInput.dispatchEvent(new Event('input'));
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#engine-badge') && !e.target.closest('#engine-dropdown-menu')) {
+        if (!engineDropdown.hidden) {
+          engineDropdown.hidden = true;
+          engineBadge.classList.remove('menu-open');
+          engineBadge.setAttribute('aria-expanded', 'false');
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !engineDropdown.hidden) {
+        engineDropdown.hidden = true;
+        engineBadge.classList.remove('menu-open');
+        engineBadge.setAttribute('aria-expanded', 'false');
+        searchInput.focus();
+      }
+    });
+  }
 
   searchInput.addEventListener('input', () => {
     const val = searchInput.value.trim();

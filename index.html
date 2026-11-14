@@ -213,24 +213,10 @@
                  SQUELETTE DE TRANSITION INSTANTANÉ (FIRST PAINT 0MS)
                  ============================================== -->
             <div id="dashboard-skeleton-view" class="dashboard-home-view dashboard-skeleton-view view-skeleton-view" aria-hidden="true">
-              <!-- Squelette Hero Banner -->
-              <div class="dash-hero-card skel-card">
-                <div class="dash-hero-top">
-                  <div class="dash-greeting-group">
-                    <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                      <div class="skel-elem skel-bar" style="width: 220px; height: 22px;"></div>
-                      <div class="skel-elem skel-bar" style="width: 310px; height: 13px;"></div>
-                    </div>
-                  </div>
-                  <div class="dash-hero-telemetry">
-                    <div class="skel-elem skel-pill" style="width: 125px; height: 32px;"></div>
-                    <div class="skel-elem skel-pill" style="width: 135px; height: 32px;"></div>
-                    <div class="skel-elem skel-pill" style="width: 80px; height: 32px;"></div>
-                  </div>
-                </div>
-                <div class="dash-hero-search">
-                  <div class="skel-elem skel-pill" style="width: 100%; height: 48px;"></div>
+              <!-- Squelette Hero Banner Pleine Largeur -->
+              <div class="dash-hero-card dash-search-hero-bar skel-card">
+                <div class="dash-hero-search full-width-search">
+                  <div class="skel-elem skel-pill" style="width: 100%; height: 46px;"></div>
                 </div>
               </div>
 
@@ -250,13 +236,13 @@
                       </div>
                       <div class="skel-elem skel-pill" style="width: 90px; height: 24px;"></div>
                     </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.45rem;">
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 10px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 10px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 10px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 10px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 10px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 10px;"></div>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem;">
+                      <div class="skel-elem skel-squircle" style="height: 68px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 68px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 68px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 68px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 68px; border-radius: 14px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 68px; border-radius: 14px;"></div>
                     </div>
                   </div>
 
@@ -344,51 +330,51 @@
 
             <!-- VRAI CONTENU DU DASHBOARD (RÉVÉLÉ EN TRANSITION FLUIDE) -->
             <div id="dashboard-real-view" class="dashboard-home-view dashboard-real-content view-real-content is-loading">
-              <!-- 1. HERO BANNER : Salutation, État du Système & Barre Omnibox -->
-              <div class="dash-hero-card">
-                <div class="dash-hero-top">
-                  <div class="dash-greeting-group">
-                    <div class="dash-greeting-avatar">
-                      <i class="fa-solid fa-atom"></i>
-                    </div>
-                    <div class="dash-greeting-text">
-                      <h2 id="dash-greeting-label">Bonjour, Commandant 👋</h2>
-                      <p>Bienvenue sur votre Cyberdeck • Vue cockpit en temps réel</p>
-                    </div>
-                  </div>
-
-                  <div class="dash-hero-telemetry">
-                    <span class="dash-tele-chip status-chip">
-                      <span class="dash-pulse-dot"></span> Système En Ligne
-                    </span>
-                    <span class="dash-tele-chip" id="dash-tele-date">
-                      <i class="fa-regular fa-calendar"></i> Chargement...
-                    </span>
-                    <span class="dash-tele-chip" id="dash-tele-time">
-                      <i class="fa-regular fa-clock"></i> 00:00
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Barre de Recherche Omnibox Intégrée -->
-                <div class="dash-hero-search">
+              <!-- 1. BARRE DE RECHERCHE OMNIBOX PLEINE LARGEUR AVEC SÉLECTEUR DE MOTEUR/SITE -->
+              <div class="dash-hero-card dash-search-hero-bar">
+                <div class="dash-hero-search full-width-search">
                   <div class="search-wrapper">
                     <form id="search-form" class="search-box">
-                      <div id="engine-badge" class="engine-badge">
+                      <!-- Bouton cliquable pour changer de moteur de recherche ou de site -->
+                      <button
+                        type="button"
+                        id="engine-badge"
+                        class="engine-badge is-clickable"
+                        title="Changer de moteur de recherche ou de site (!help)"
+                        aria-label="Choisir le moteur de recherche"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      >
                         <i id="engine-icon" class="fa-brands fa-google"></i>
                         <span id="engine-name">Google</span>
-                      </div>
+                        <i class="fa-solid fa-chevron-down engine-chevron"></i>
+                      </button>
+
                       <span class="prompt-arrow">&gt;</span>
+
                       <input
                         id="search-input"
                         type="text"
-                        placeholder="Rechercher, calculer (12*8) ou taper !help pour les préfixes..."
+                        placeholder="Rechercher sur le Web ou taper ! pour un moteur (!yt, !gh, !w, !d...)"
                         autocomplete="off"
                         autofocus
                       />
+
                       <span id="calc-preview" class="calc-preview" hidden></span>
                       <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
                     </form>
+
+                    <!-- Menu déroulant des moteurs de recherche & sites au clic sur le badge -->
+                    <div id="engine-dropdown-menu" class="engine-dropdown-menu" hidden>
+                      <div class="engine-dropdown-header">
+                        <span><i class="fa-solid fa-layer-group"></i> Moteurs &amp; Raccourcis Disponibles</span>
+                        <span class="engine-dropdown-tip">Cliquer ou taper un préfixe !</span>
+                      </div>
+                      <div class="engine-dropdown-grid" id="engine-dropdown-grid">
+                        <!-- Rempli dynamiquement -->
+                      </div>
+                    </div>
+
                     <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
                   </div>
                 </div>

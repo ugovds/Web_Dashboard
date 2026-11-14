@@ -625,8 +625,8 @@
     if (!svgContainer) return;
 
     const width = svgContainer.clientWidth || 540;
-    const height = Math.min(145, Math.max(75, svgContainer.clientHeight || 115));
-    const padding = { top: 16, right: 20, bottom: 22, left: 20 };
+    const height = Math.min(115, Math.max(70, svgContainer.clientHeight || 100));
+    const padding = { top: 14, right: 18, bottom: 20, left: 18 };
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
 
