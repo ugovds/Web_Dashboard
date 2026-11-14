@@ -16,7 +16,7 @@ const searchEngines = {
 
 let currentSuggestions = [];
 let selectedSuggestionIndex = -1;
-let activePrefix = null;
+let selectedEnginePrefix = null;
 let debounceTimer = null;
 
 function escapeSearchHtml(str) {
@@ -277,9 +277,13 @@ function executeSuggestion(item) {
   if (item.type === 'shortcut') {
     window.open(item.url, '_blank');
   } else {
+    const raw = searchInput.value.trim();
+    const parts = raw.split(' ');
+    const prefixInInput = parts[0].toLowerCase();
+    const effectivePrefix = searchEngines[prefixInInput] ? prefixInInput : selectedEnginePrefix;
     const url =
-      activePrefix && searchEngines[activePrefix]
-        ? searchEngines[activePrefix].url + encodeURIComponent(item.text)
+      effectivePrefix && searchEngines[effectivePrefix]
+        ? searchEngines[effectivePrefix].url + encodeURIComponent(item.text)
         : 'https://www.google.com/search?q=' + encodeURIComponent(item.text);
     window.open(url, '_blank');
   }
@@ -290,39 +294,31 @@ function renderEngineDropdown() {
   if (!engineGrid) return;
 
   const engines = [
-    { prefix: null, name: 'Google', icon: 'fa-brands fa-google', desc: 'Recherche Web standard' },
+    { prefix: null, name: 'Google', icon: 'fa-brands fa-google', tag: 'Web' },
     ...Object.entries(searchEngines).map(([prefix, info]) => ({
       prefix,
       name: info.name,
       icon: info.icon,
-      desc: info.desc
+      tag: prefix
     }))
   ];
 
   engineGrid.innerHTML = engines
     .map((eng) => {
-      const isCurrent = (activePrefix === eng.prefix) || (!activePrefix && eng.prefix === null);
-      const bangBadge = eng.prefix
-        ? `<span class="engine-choice-bang">${eng.prefix}</span>`
-        : `<span class="engine-choice-bang default">Web</span>`;
-
+      const isCurrent = (selectedEnginePrefix === eng.prefix) || (!selectedEnginePrefix && eng.prefix === null);
+      const isDefault = eng.prefix === null;
       return `
         <button
           type="button"
-          class="engine-choice-btn ${isCurrent ? 'active' : ''}"
+          class="engine-bubble-pill ${isCurrent ? 'active' : ''}"
           data-prefix="${eng.prefix || ''}"
           data-name="${escapeSearchHtml(eng.name)}"
           data-icon="${escapeSearchHtml(eng.icon)}"
-          title="${eng.prefix ? `Rechercher sur ${eng.name} (${eng.prefix})` : 'Rechercher sur Google'}"
+          title="${eng.prefix ? `Rechercher sur ${eng.name} (${eng.prefix})` : 'Rechercher sur Google (par défaut)'}"
         >
-          <div class="engine-choice-icon">
-            <i class="${escapeSearchHtml(eng.icon)}"></i>
-          </div>
-          <div class="engine-choice-info">
-            <span class="engine-choice-title">${escapeSearchHtml(eng.name)}</span>
-            <span class="engine-choice-desc">${escapeSearchHtml(eng.desc)}</span>
-          </div>
-          ${bangBadge}
+          <i class="engine-bubble-icon ${escapeSearchHtml(eng.icon)}"></i>
+          <span class="engine-bubble-title">${escapeSearchHtml(eng.name)}</span>
+          <span class="engine-bubble-tag ${isDefault ? 'default' : ''}">${escapeSearchHtml(eng.tag)}</span>
         </button>
       `;
     })
@@ -341,9 +337,23 @@ function initSearch() {
 
   if (!searchForm || !searchInput) return;
 
-  // Gestion du menu déroulant au clic sur le bouton Google / Moteur
+  // Restaurer le moteur choisi si sauvegardé
+  try {
+    const savedEngine = localStorage.getItem('violet_selected_engine');
+    if (savedEngine && searchEngines[savedEngine]) {
+      selectedEnginePrefix = savedEngine;
+      if (engineName) engineName.textContent = searchEngines[savedEngine].name;
+      if (engineIcon) engineIcon.className = searchEngines[savedEngine].icon;
+      searchInput.placeholder = `Rechercher sur ${searchEngines[savedEngine].name}...`;
+    }
+  } catch (err) {
+    console.warn('LocalStorage non disponible pour le moteur de recherche:', err);
+  }
+
+  // Gestion du menu déroulant Liquid Glass au clic sur le bouton Google / Moteur
   if (engineBadge && engineDropdown) {
     engineBadge.addEventListener('click', (e) => {
+      e.preventDefault();
       e.stopPropagation();
       const isHidden = engineDropdown.hidden;
       if (isHidden) {
@@ -360,34 +370,51 @@ function initSearch() {
     });
 
     engineDropdown.addEventListener('click', (e) => {
-      const btn = e.target.closest('.engine-choice-btn');
-      if (!btn) return;
+      const bubble = e.target.closest('.engine-bubble-pill');
+      if (!bubble) return;
+      e.preventDefault();
       e.stopPropagation();
 
-      const prefix = btn.dataset.prefix || null;
-      const name = btn.dataset.name;
-      const icon = btn.dataset.icon;
+      const prefix = bubble.dataset.prefix || null;
+      const name = bubble.dataset.name;
+      const icon = bubble.dataset.icon;
 
-      activePrefix = prefix;
+      selectedEnginePrefix = prefix;
+      try {
+        if (prefix) {
+          localStorage.setItem('violet_selected_engine', prefix);
+        } else {
+          localStorage.removeItem('violet_selected_engine');
+        }
+      } catch (err) {
+        // Ignorer si localStorage restreint
+      }
+
       if (engineName) engineName.textContent = name;
       if (engineIcon) engineIcon.className = icon;
 
-      // Nettoyer l'ancien préfixe bang du champ
+      // Mise à jour visuelle immédiate des bulles
+      const allPills = engineDropdown.querySelectorAll('.engine-bubble-pill');
+      allPills.forEach((p) => p.classList.toggle('active', (p.dataset.prefix || null) === prefix));
+
+      // Nettoyer l'ancien préfixe du champ si présent pour garder la saisie propre
       let currentVal = searchInput.value.trim();
       const parts = currentVal.split(' ');
       if (parts[0] && (searchEngines[parts[0].toLowerCase()] || parts[0].toLowerCase() === '!help')) {
         currentVal = parts.slice(1).join(' ').trim();
+        searchInput.value = currentVal;
       }
 
       if (prefix) {
-        searchInput.value = `${prefix} ${currentVal}`.trimEnd() + (currentVal ? '' : ' ');
+        searchInput.placeholder = `Rechercher sur ${name}...`;
       } else {
-        searchInput.value = currentVal;
+        searchInput.placeholder = `Rechercher sur le Web ou taper ! pour un moteur...`;
       }
 
       engineDropdown.hidden = true;
       engineBadge.classList.remove('menu-open');
       engineBadge.setAttribute('aria-expanded', 'false');
+
       searchInput.focus();
       searchInput.dispatchEvent(new Event('input'));
     });
@@ -425,14 +452,16 @@ function initSearch() {
       return;
     }
 
-    if (searchEngines[prefix]) {
-      activePrefix = prefix;
-      const eng = searchEngines[prefix];
+    // Bang explicite tapé en premier mot ?
+    const inlineBang = searchEngines[prefix] ? prefix : null;
+    const currentPrefix = inlineBang || selectedEnginePrefix;
+
+    if (currentPrefix && searchEngines[currentPrefix]) {
+      const eng = searchEngines[currentPrefix];
       engineName.textContent = eng.name;
       engineIcon.className = eng.icon;
       calcPreview.hidden = true;
     } else {
-      activePrefix = null;
       engineName.textContent = 'Google';
       engineIcon.className = 'fa-brands fa-google';
 
@@ -474,14 +503,14 @@ function initSearch() {
       return;
     }
 
-    const queryForSuggest = activePrefix ? parts.slice(1).join(' ').trim() : val;
+    const queryForSuggest = inlineBang ? parts.slice(1).join(' ').trim() : val;
     if (!queryForSuggest) {
       suggestionsBox.hidden = true;
       return;
     }
 
     const shortcuts = typeof getQuickShortcuts === 'function' ? getQuickShortcuts() : [];
-    const matchedShortcuts = !activePrefix
+    const matchedShortcuts = !currentPrefix
       ? shortcuts
           .filter((s) => s.title.toLowerCase().startsWith(queryForSuggest.toLowerCase()))
           .slice(0, 2)
@@ -502,7 +531,7 @@ function initSearch() {
         .map((w) => ({
           type: 'web',
           text: w,
-          icon: activePrefix ? searchEngines[activePrefix].icon : 'fa-solid fa-magnifying-glass'
+          icon: currentPrefix ? searchEngines[currentPrefix].icon : 'fa-solid fa-magnifying-glass'
         }));
 
       if (searchInput.value.trim()) {
@@ -531,7 +560,10 @@ function initSearch() {
         if (chosen.type === 'help') {
           searchInput.value = chosen.prefix + ' ';
         } else {
-          searchInput.value = activePrefix ? `${activePrefix} ${chosen.text}` : chosen.text;
+          const val = searchInput.value.trim();
+          const parts = val.split(' ');
+          const inlineBang = (parts[0] && searchEngines[parts[0].toLowerCase()]) ? parts[0] : null;
+          searchInput.value = inlineBang ? `${inlineBang} ${chosen.text}` : chosen.text;
         }
         searchInput.dispatchEvent(new Event('input'));
       }
@@ -582,11 +614,14 @@ function initSearch() {
     }
 
     const parts = raw.split(' ');
-    const prefix = parts[0].toLowerCase();
+    const prefixInInput = parts[0].toLowerCase();
+    const effectivePrefix = searchEngines[prefixInInput] ? prefixInInput : selectedEnginePrefix;
 
-    if (searchEngines[prefix]) {
-      const query = parts.slice(1).join(' ');
-      window.open(searchEngines[prefix].url + encodeURIComponent(query), '_blank');
+    if (effectivePrefix && searchEngines[effectivePrefix]) {
+      const query = (effectivePrefix === prefixInInput)
+        ? parts.slice(1).join(' ')
+        : raw;
+      window.open(searchEngines[effectivePrefix].url + encodeURIComponent(query), '_blank');
     } else {
       window.open('https://www.google.com/search?q=' + encodeURIComponent(raw), '_blank');
     }

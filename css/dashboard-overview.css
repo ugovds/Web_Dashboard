@@ -148,6 +148,7 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
   position: relative;
+  z-index: 100;
   overflow: visible;
   box-sizing: border-box;
 }
@@ -172,6 +173,7 @@
 .full-width-search .search-wrapper {
   width: 100%;
   position: relative;
+  z-index: 100;
 }
 
 .full-width-search .search-box {
@@ -243,133 +245,143 @@
   transform: rotate(180deg);
 }
 
-/* Menu déroulant de sélection des moteurs & raccourcis */
+/* Menu déroulant de sélection des moteurs : Style Liquid Glass avec bulles */
+.engine-dropdown-menu.liquid-glass-menu,
 .engine-dropdown-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   left: 0;
-  width: min(580px, 100%);
-  background: rgba(12, 16, 26, 0.96);
-  border: 1px solid rgba(49, 225, 247, 0.35);
-  border-radius: 14px;
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.75), 0 0 25px rgba(49, 225, 247, 0.18);
-  z-index: 1200;
-  padding: 0.65rem;
+  width: min(560px, 92vw);
+  background: rgba(14, 18, 30, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  backdrop-filter: blur(32px) saturate(220%);
+  -webkit-backdrop-filter: blur(32px) saturate(220%);
+  box-shadow:
+    0 24px 50px rgba(0, 0, 0, 0.72),
+    0 0 25px rgba(49, 225, 247, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  z-index: 9999;
+  padding: 0.85rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  animation: engineDropdownFade 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: 0.65rem;
+  animation: liquidGlassPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .engine-dropdown-menu[hidden] {
   display: none !important;
 }
 
-@keyframes engineDropdownFade {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes liquidGlassPop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .engine-dropdown-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
+  color: var(--text-muted, #8e9bb5);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-muted, #7c859e);
-  padding: 0.2rem 0.35rem 0.35rem 0.35rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  letter-spacing: 0.6px;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.engine-dropdown-header span i {
+  color: var(--accent-primary, #31e1f7);
+  margin-right: 0.3rem;
 }
 
 .engine-dropdown-tip {
   color: var(--accent-primary, #31e1f7);
   font-size: 0.64rem;
+  font-weight: 600;
 }
 
-.engine-dropdown-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.4rem;
-  max-height: 290px;
+/* Conteneur des bulles interactives */
+.engine-dropdown-bubbles-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-height: 250px;
   overflow-y: auto;
-  padding-right: 2px;
+  padding: 2px 2px 4px 2px;
 }
 
-.engine-choice-btn {
-  display: flex;
+/* Chaque option est une petite bulle Liquid Glass */
+.engine-bubble-pill {
+  display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.45rem 0.65rem;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.45rem;
+  padding: 0.38rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: var(--text-main, #eef2f6);
-  cursor: pointer;
-  font-family: inherit;
   font-size: 0.78rem;
-  text-align: left;
-  transition: all 0.18s ease;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.25);
+  font-family: inherit;
 }
 
-.engine-choice-btn:hover,
-.engine-choice-btn.active {
-  background: rgba(49, 225, 247, 0.14);
-  border-color: rgba(49, 225, 247, 0.4);
+.engine-bubble-pill:hover {
+  background: linear-gradient(135deg, rgba(49, 225, 247, 0.22), rgba(181, 95, 230, 0.18));
+  border-color: rgba(49, 225, 247, 0.5);
   color: #ffffff;
-  transform: translateY(-1px);
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 18px rgba(49, 225, 247, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.engine-choice-icon {
-  width: 24px;
-  height: 24px;
+.engine-bubble-pill.active {
+  background: linear-gradient(135deg, rgba(49, 225, 247, 0.35), rgba(52, 211, 153, 0.25));
+  border-color: var(--accent-primary, #31e1f7);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(49, 225, 247, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.engine-bubble-icon {
+  font-size: 0.86rem;
+  color: var(--accent-primary, #31e1f7);
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 0.92rem;
-  color: var(--accent-primary, #31e1f7);
-  flex-shrink: 0;
 }
 
-.engine-choice-info {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  flex: 1;
+.engine-bubble-title {
+  color: inherit;
 }
 
-.engine-choice-title {
-  font-weight: 700;
-  font-size: 0.78rem;
-  color: #ffffff;
-}
-
-.engine-choice-desc {
-  font-size: 0.64rem;
-  color: var(--text-muted, #7c859e);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.engine-choice-bang {
+.engine-bubble-tag {
   font-size: 0.64rem;
   font-weight: 700;
+  padding: 0.08rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
   color: var(--accent-primary, #31e1f7);
-  background: rgba(49, 225, 247, 0.12);
-  border: 1px solid rgba(49, 225, 247, 0.25);
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  flex-shrink: 0;
+  opacity: 0.9;
 }
 
-.engine-choice-bang.default {
+.engine-bubble-pill:hover .engine-bubble-tag {
+  background: rgba(49, 225, 247, 0.25);
+  opacity: 1;
+}
+
+.engine-bubble-tag.default {
   color: #34d399;
-  background: rgba(52, 211, 153, 0.12);
-  border-color: rgba(52, 211, 153, 0.25);
 }
 
 /* --- 2. BANDEAU KPI SUPPRIMÉ (ZÉRO ENCOMBREMENT) --- */
