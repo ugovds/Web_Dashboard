@@ -6,10 +6,10 @@
 .deck-slide-view.system-full-view,
 .deck-slide-view.markets-full-view {
   width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  height: auto !important;
+  min-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
   background: transparent !important;
   border: none !important;
   border-radius: 0 !important;
@@ -17,9 +17,9 @@
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   box-shadow: none !important;
-  overflow-y: auto !important;
-  overflow-x: hidden;
-  box-sizing: border-box;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  flex: none !important;
 }
 
 /* Conteneur principal fluide */
@@ -27,11 +27,15 @@
   width: 100%;
   max-width: none;
   margin: 0;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   gap: clamp(16px, 2.2vh, 26px);
-  padding: 0 0 clamp(60px, 8vh, 100px) 0;
+  padding: 0 0 clamp(80px, 10vh, 140px) 0 !important;
   box-sizing: border-box;
+  height: auto !important;
+  min-height: 100% !important;
+  flex: none !important;
+  overflow: visible !important;
 }
 
 /* --- 1. EN-TÊTE DU HUB MARCHÉS --- */
@@ -297,7 +301,10 @@
   gap: clamp(16px, 2vh, 24px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
   position: relative;
-  overflow: hidden;
+  overflow: visible !important;
+  flex-shrink: 0 !important;
+  height: auto !important;
+  min-height: fit-content !important;
 }
 
 .markets-portfolio-hero::before {
@@ -1200,6 +1207,8 @@
   gap: clamp(14px, 1.8vh, 22px);
   align-items: stretch;
   width: 100%;
+  flex-shrink: 0 !important;
+  height: auto !important;
 }
 
 @media (max-width: 1200px) {
@@ -1219,8 +1228,7 @@
   flex-direction: column;
   gap: 1rem;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  height: 100%;
-  max-height: 600px;
+  height: 560px;
   box-sizing: border-box;
 }
 
@@ -1456,6 +1464,8 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .wl-price-val {
@@ -1463,6 +1473,7 @@
   font-weight: 700;
   color: #ffffff;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap !important;
 }
 
 .wl-badge-pill {
@@ -1487,7 +1498,7 @@
 
 /* Colonne droite : Chart Card */
 .watchlist-chart-col {
-  height: 100%;
+  height: 560px;
   display: flex;
   flex-direction: column;
 }
