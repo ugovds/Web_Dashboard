@@ -234,132 +234,107 @@
                 </div>
               </div>
 
-              <!-- Squelette KPI Row -->
-              <div class="dash-kpi-row">
-                <div class="dash-kpi-card skel-card">
-                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
-                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
-                    <div class="skel-elem skel-bar" style="width: 85px; height: 12px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 130px; height: 18px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 110px; height: 11px;"></div>
-                  </div>
-                </div>
-                <div class="dash-kpi-card skel-card">
-                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
-                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
-                    <div class="skel-elem skel-bar" style="width: 95px; height: 12px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 125px; height: 18px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 105px; height: 11px;"></div>
-                  </div>
-                </div>
-                <div class="dash-kpi-card skel-card">
-                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
-                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
-                    <div class="skel-elem skel-bar" style="width: 105px; height: 12px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 90px; height: 18px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 95px; height: 11px;"></div>
-                  </div>
-                </div>
-                <div class="dash-kpi-card skel-card">
-                  <div class="skel-elem skel-circle" style="width: 42px; height: 42px;"></div>
-                  <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
-                    <div class="skel-elem skel-bar" style="width: 115px; height: 12px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 80px; height: 18px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 120px; height: 11px;"></div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Squelette Bento Grid -->
+              <!-- Squelette Bento Grid (2 Colonnes : Historique/Météo & Agenda/Marché) -->
               <div class="dash-grid-layout">
                 <!-- Colonne Gauche -->
                 <div class="dash-col-left">
-                  <!-- Marchés Skeleton -->
-                  <div class="dash-card dash-card-markets skel-card">
-                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.95rem;">
-                      <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                          <div class="skel-elem skel-bar" style="width: 160px; height: 16px;"></div>
-                          <div class="skel-elem skel-bar" style="width: 250px; height: 11px;"></div>
+                  <!-- Historique Skeleton (En haut à gauche) -->
+                  <div class="dash-card dash-card-history skel-card">
+                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                      <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                          <div class="skel-elem skel-bar" style="width: 130px; height: 14px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 170px; height: 10px;"></div>
                         </div>
                       </div>
-                      <div class="skel-elem skel-pill" style="width: 115px; height: 28px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 90px; height: 24px;"></div>
                     </div>
-                    <div class="dash-market-cards-grid">
-                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 86px;"></div>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem;">
+                      <div class="skel-elem skel-squircle" style="height: 48px; border-radius: 11px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 48px; border-radius: 11px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 48px; border-radius: 11px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 48px; border-radius: 11px;"></div>
                     </div>
-                    <div class="skel-elem skel-squircle" style="height: 48px; margin-top: 0.5rem;"></div>
                   </div>
 
-                  <!-- Météo Skeleton -->
+                  <!-- Météo Skeleton (En bas à gauche) -->
                   <div class="dash-card dash-card-weather skel-card">
-                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-                      <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                          <div class="skel-elem skel-bar" style="width: 180px; height: 16px;"></div>
-                          <div class="skel-elem skel-bar" style="width: 140px; height: 11px;"></div>
+                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                          <div class="skel-elem skel-bar" style="width: 150px; height: 14px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 110px; height: 10px;"></div>
                         </div>
                       </div>
-                      <div class="skel-elem skel-pill" style="width: 105px; height: 28px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 95px; height: 24px;"></div>
                     </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0;">
-                      <div style="display: flex; align-items: center; gap: 1.2rem;">
-                        <div class="skel-elem skel-bar" style="width: 72px; height: 46px; border-radius: 10px;"></div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                          <div class="skel-elem skel-bar" style="width: 130px; height: 18px;"></div>
-                          <div class="skel-elem skel-bar" style="width: 170px; height: 12px;"></div>
-                        </div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.2rem 0;">
+                      <div style="display: flex; align-items: center; gap: 0.8rem;">
+                        <div class="skel-elem skel-bar" style="width: 55px; height: 36px; border-radius: 8px;"></div>
+                        <div class="skel-elem skel-bar" style="width: 110px; height: 14px;"></div>
                       </div>
-                      <div class="skel-elem skel-circle" style="width: 50px; height: 50px;"></div>
+                      <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
                     </div>
-                    <div style="display: flex; gap: 8px; margin-top: 0.8rem;">
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 54px;"></div>
+                    <div class="skel-elem skel-squircle" style="height: 80px; margin-top: 0.5rem; border-radius: 10px;"></div>
+                    <div style="display: flex; gap: 6px; margin-top: 0.5rem;">
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 34px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 34px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 34px; border-radius: 8px;"></div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Colonne Droite -->
                 <div class="dash-col-right">
-                  <!-- Agenda Skeleton -->
-                  <div class="dash-card dash-card-agenda skel-card" style="height: 100%;">
-                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
-                      <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                          <div class="skel-elem skel-bar" style="width: 160px; height: 16px;"></div>
-                          <div class="skel-elem skel-bar" style="width: 180px; height: 11px;"></div>
+                  <!-- Agenda Skeleton (En haut à droite, compact) -->
+                  <div class="dash-card dash-card-agenda skel-card">
+                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                          <div class="skel-elem skel-bar" style="width: 140px; height: 14px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 130px; height: 10px;"></div>
                         </div>
                       </div>
-                      <div class="skel-elem skel-pill" style="width: 95px; height: 28px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 85px; height: 24px;"></div>
                     </div>
                     <!-- 7 Jours Pills -->
-                    <div style="display: flex; gap: 6px; margin-bottom: 0.95rem;">
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="flex: 1; height: 52px; border-radius: 14px;"></div>
+                    <div style="display: flex; gap: 4px; margin-bottom: 0.5rem;">
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 38px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="flex: 1; height: 38px; border-radius: 8px;"></div>
                     </div>
-                    <!-- Formulaire d'ajout rapide skeleton -->
-                    <div class="skel-elem skel-squircle" style="height: 44px; margin-bottom: 0.85rem; border-radius: 14px;"></div>
-                    <!-- Liste de tâches shimmer -->
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
-                      <div class="skel-elem skel-squircle" style="height: 44px; border-radius: 14px;"></div>
+                    <!-- Liste de tâches compacte -->
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                      <div class="skel-elem skel-squircle" style="height: 34px; border-radius: 8px;"></div>
+                      <div class="skel-elem skel-squircle" style="height: 34px; border-radius: 8px;"></div>
                     </div>
+                  </div>
+
+                  <!-- Marché / Portefeuille Skeleton (En bas à droite) -->
+                  <div class="dash-card dash-card-markets skel-card">
+                    <div class="dash-card-header" style="justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                      <div style="display: flex; align-items: center; gap: 0.6rem;">
+                        <div class="skel-elem skel-circle" style="width: 28px; height: 28px;"></div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                          <div class="skel-elem skel-bar" style="width: 155px; height: 14px;"></div>
+                          <div class="skel-elem skel-bar" style="width: 180px; height: 10px;"></div>
+                        </div>
+                      </div>
+                      <div class="skel-elem skel-pill" style="width: 95px; height: 24px;"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                      <div class="skel-elem skel-bar" style="width: 120px; height: 24px; border-radius: 6px;"></div>
+                      <div class="skel-elem skel-pill" style="width: 100px; height: 22px;"></div>
+                    </div>
+                    <div class="skel-elem skel-squircle" style="height: 75px; border-radius: 10px;"></div>
+                    <div class="skel-elem skel-squircle" style="height: 30px; margin-top: 0.4rem; border-radius: 8px;"></div>
                   </div>
                 </div>
               </div>
@@ -417,100 +392,39 @@
                 </div>
               </div>
 
-              <!-- 2. BANDEAU DE MÉTRIQUES KPI EN DIRECT (4 CARTES COCKPIT) -->
-              <div class="dash-kpi-row">
-                <!-- KPI 1 : Météo -->
-                <div class="dash-kpi-card kpi-weather" data-deck-view="weather" title="Ouvrir la météo détaillée">
-                  <div class="dash-kpi-icon">
-                    <i class="fa-solid fa-cloud-sun"></i>
-                  </div>
-                  <div class="dash-kpi-content">
-                    <span class="dash-kpi-label">Météo en Direct</span>
-                    <div class="dash-kpi-val-row">
-                      <span class="dash-kpi-val" id="kpi-weather-val">14°C • Éclaircies</span>
-                    </div>
-                    <span class="dash-kpi-sub" id="kpi-weather-sub">Paris • Ressenti 13°C</span>
-                  </div>
-                </div>
-
-                <!-- KPI 2 : Marché Phare -->
-                <div class="dash-kpi-card kpi-market" data-deck-view="system" title="Ouvrir les marchés boursiers">
-                  <div class="dash-kpi-icon">
-                    <i class="fa-solid fa-arrow-trend-up"></i>
-                  </div>
-                  <div class="dash-kpi-content">
-                    <span class="dash-kpi-label">Top Actif Marché</span>
-                    <div class="dash-kpi-val-row">
-                      <span class="dash-kpi-val" id="kpi-market-val">NVDA 175.8$</span>
-                      <span class="dash-kpi-badge up" id="kpi-market-badge">+2.84%</span>
-                    </div>
-                    <span class="dash-kpi-sub" id="kpi-market-sub">Mega-Cap Tech &amp; IA</span>
-                  </div>
-                </div>
-
-                <!-- KPI 3 : Agenda & Tâches -->
-                <div class="dash-kpi-card kpi-agenda" data-deck-view="agenda" title="Ouvrir le calendrier et les tâches">
-                  <div class="dash-kpi-icon">
-                    <i class="fa-regular fa-calendar-check"></i>
-                  </div>
-                  <div class="dash-kpi-content">
-                    <span class="dash-kpi-label">Agenda &amp; Échéances</span>
-                    <div class="dash-kpi-val-row">
-                      <span class="dash-kpi-val" id="kpi-agenda-val">0 à faire</span>
-                      <span class="dash-kpi-badge neutral" id="kpi-agenda-badge">À jour</span>
-                    </div>
-                    <span class="dash-kpi-sub" id="kpi-agenda-sub">Cette semaine</span>
-                  </div>
-                </div>
-
-                <!-- KPI 4 : Historique Récent -->
-                <div class="dash-kpi-card kpi-history" data-deck-view="bookmarks" title="Ouvrir tous les raccourcis">
-                  <div class="dash-kpi-icon">
-                    <i class="fa-solid fa-compass"></i>
-                  </div>
-                  <div class="dash-kpi-content">
-                    <span class="dash-kpi-label">Navigation Récente</span>
-                    <div class="dash-kpi-val-row">
-                      <span class="dash-kpi-val" id="kpi-history-val">5 récents</span>
-                    </div>
-                    <span class="dash-kpi-sub">Accès rapide aux favoris</span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 3. BENTO GRID MODULAIRE DU DASHBOARD -->
+              <!-- 2. BENTO GRID DU DASHBOARD (2 COLONNES SANS DÉFILEMENT) -->
               <div class="dash-grid-layout">
-                <!-- COLONNE GAUCHE (Bourse & Météo Prévisions) -->
+                <!-- COLONNE GAUCHE (Historique en haut, Météo en bas) -->
                 <div class="dash-col-left">
-                  <!-- MODULE 1 : MARCHÉS, ACTIONS & ETF FAVORIS (S&P500, STOXX 600, EM, NVIDIA) -->
-                  <div class="dash-card dash-card-markets">
+                  <!-- MODULE 1 : HISTORIQUE DES SITES CONSULTÉS (EN HAUT À GAUCHE) -->
+                  <div class="dash-card dash-card-history">
                     <div class="dash-card-header">
                       <div class="dash-card-title-group">
                         <div class="dash-card-icon-box">
-                          <i class="fa-solid fa-chart-line"></i>
+                          <i class="fa-solid fa-clock-rotate-left"></i>
                         </div>
                         <div class="dash-card-title-text">
-                          <h3>Marchés &amp; ETF Favoris</h3>
-                          <span>S&amp;P 500 • Europe Stoxx 600 • MSCI Emerging Markets • NVIDIA</span>
+                          <h3>Historique Récent</h3>
+                          <span id="dash-history-count-label">Accès direct aux derniers sites consultés</span>
                         </div>
                       </div>
-                      <button type="button" class="dash-card-link-btn" data-deck-view="system" title="Ouvrir la watchlist complète">
-                        Terminal Marchés <i class="fa-solid fa-arrow-right"></i>
-                      </button>
+                      <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button type="button" id="dash-clear-history-btn" class="dash-history-clear-btn" title="Vider l'historique">
+                          <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <button type="button" class="dash-card-link-btn" data-deck-view="bookmarks" title="Voir tous les raccourcis">
+                          Raccourcis <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                      </div>
                     </div>
 
-                    <!-- Grille des 4 cartes d'actifs spécifiques -->
-                    <div id="dash-market-cards-grid" class="dash-market-cards-grid">
-                      <!-- Rempli dynamiquement par renderDashboardMarkets() -->
-                    </div>
-
-                    <!-- Barre de télémétrie de l'actif sélectionné -->
-                    <div id="dash-asset-preview-bar" class="dash-asset-preview-bar">
-                      <!-- Rempli dynamiquement -->
+                    <!-- Grille riche des sites récents (cartes interactives) -->
+                    <div id="dash-history-list" class="dash-history-grid">
+                      <!-- Rempli dynamiquement par renderVisitedSites() -->
                     </div>
                   </div>
 
-                  <!-- MODULE 2 : MÉTÉO AVEC GRAPHIQUE TEMPÉRATURES / PRÉCIPITATIONS -->
+                  <!-- MODULE 2 : MÉTÉO AVEC GRAPHIQUE TEMPÉRATURES / PRÉCIPITATIONS (EN BAS À GAUCHE) -->
                   <div class="dash-card dash-card-weather">
                     <div class="dash-card-header">
                       <div class="dash-card-title-group">
@@ -562,9 +476,9 @@
                   </div>
                 </div>
 
-                <!-- COLONNE DROITE (Agenda Semaine & Historique Récent) -->
+                <!-- COLONNE DROITE (Agenda en haut, Marché/Portefeuille en bas) -->
                 <div class="dash-col-right">
-                  <!-- MODULE 3 : MINI AGENDA DE LA SEMAINE & PROCHAINS ÉVÉNEMENTS -->
+                  <!-- MODULE 3 : MINI AGENDA DE LA SEMAINE (EN HAUT À DROITE, HAUTEUR RÉDUITE) -->
                   <div class="dash-card dash-card-agenda">
                     <div class="dash-card-header">
                       <div class="dash-card-title-group">
@@ -586,12 +500,12 @@
                       <!-- Rempli dynamiquement -->
                     </div>
 
-                    <!-- Barre d'état du filtre par jour (visible avec bouton réinitialiser quand un jour est cliqué) -->
+                    <!-- Barre d'état du filtre par jour -->
                     <div id="dash-agenda-filter-bar" class="dash-agenda-filter-bar">
                       <!-- Rempli dynamiquement -->
                     </div>
 
-                    <!-- Liste des tâches à venir -->
+                    <!-- Liste des tâches à venir (hauteur optimisée) -->
                     <div id="dash-upcoming-list" class="dash-upcoming-list">
                       <!-- Rempli dynamiquement -->
                     </div>
@@ -608,31 +522,48 @@
                     </form>
                   </div>
 
-                  <!-- MODULE 4 : HISTORIQUE DES SITES CONSULTÉS (HAUTE VISIBILITÉ) -->
-                  <div class="dash-card dash-card-history">
+                  <!-- MODULE 4 : ÉVOLUTION DU PORTEFEUILLE (EN BAS À DROITE) -->
+                  <div class="dash-card dash-card-markets dash-card-portfolio">
                     <div class="dash-card-header">
                       <div class="dash-card-title-group">
                         <div class="dash-card-icon-box">
-                          <i class="fa-solid fa-clock-rotate-left"></i>
+                          <i class="fa-solid fa-chart-line"></i>
                         </div>
                         <div class="dash-card-title-text">
-                          <h3>Historique Récent</h3>
-                          <span id="dash-history-count-label">Accès direct aux derniers sites consultés</span>
+                          <h3>Évolution du Portefeuille</h3>
+                          <span id="dash-portfolio-sub-title">Performance globale &amp; Versements DCA</span>
                         </div>
                       </div>
-                      <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <button type="button" id="dash-clear-history-btn" class="dash-history-clear-btn" title="Vider l'historique">
-                          <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                        <button type="button" class="dash-card-link-btn" data-deck-view="bookmarks" title="Voir tous les raccourcis">
-                          Raccourcis <i class="fa-solid fa-arrow-right"></i>
-                        </button>
+                      <button type="button" class="dash-card-link-btn" data-deck-view="system" title="Ouvrir le terminal marchés &amp; portefeuille">
+                        Terminal Marchés <i class="fa-solid fa-arrow-right"></i>
+                      </button>
+                    </div>
+
+                    <!-- Barre de valorisation & Sélecteur d'horizon temporel -->
+                    <div class="dash-portfolio-header-bar">
+                      <div class="dash-portfolio-metrics">
+                        <span id="dash-portfolio-total-val" class="dash-portfolio-val">--,-- €</span>
+                        <span id="dash-portfolio-chg-badge" class="dash-portfolio-chg up">+0.00%</span>
+                        <span id="dash-portfolio-gain-text" class="dash-portfolio-gain-sub">Plus-value : --</span>
+                      </div>
+                      <div class="dash-timeframe-toggles" id="dash-portfolio-timeframe-toggles">
+                        <button type="button" class="dash-tf-btn active" data-timeframe="24h">24H</button>
+                        <button type="button" class="dash-tf-btn" data-timeframe="1w">7J</button>
+                        <button type="button" class="dash-tf-btn" data-timeframe="1m">1M</button>
+                        <button type="button" class="dash-tf-btn" data-timeframe="1y">1A</button>
                       </div>
                     </div>
 
-                    <!-- Grille riche des sites récents (2 colonnes de cartes interactives) -->
-                    <div id="dash-history-list" class="dash-history-grid">
-                      <!-- Rempli dynamiquement par renderVisitedSites() -->
+                    <!-- Graphique interactif SVG de l'évolution du portefeuille -->
+                    <div id="dash-portfolio-chart-box" class="dash-portfolio-chart-box">
+                      <div id="dash-portfolio-svg-container" class="dash-portfolio-svg-container">
+                        <!-- Rendu dynamique par renderDashboardPortfolio() -->
+                      </div>
+                    </div>
+
+                    <!-- Barre télémétrique compacte du portefeuille -->
+                    <div id="dash-portfolio-footer-bar" class="dash-portfolio-footer-bar">
+                      <!-- Rempli dynamiquement (Total investi, Prochain DCA, Rendement) -->
                     </div>
                   </div>
                 </div>

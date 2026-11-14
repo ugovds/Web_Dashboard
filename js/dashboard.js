@@ -262,184 +262,235 @@
   }
 
   /* ========================================================
-     2. MODULE MARCHÉS & ETF FAVORIS (S&P500, STOXX 600, EM, NVIDIA)
+     2. MODULE MARCHÉ : ÉVOLUTION DU PORTEFEUILLE (PETIT GRAPHIQUE)
      ======================================================== */
-  function getDashboardMarketAssets() {
-    let source = DEFAULT_DASHBOARD_ASSETS;
-    if (typeof marketAssets !== 'undefined' && Array.isArray(marketAssets) && marketAssets.length) {
-      source = [
-        marketAssets.find((a) => a.id === 'sp500' || a.id === '10ap') || DEFAULT_DASHBOARD_ASSETS[0],
-        marketAssets.find((a) => a.id === 'lyp6') || DEFAULT_DASHBOARD_ASSETS[1],
-        marketAssets.find((a) => a.id === 'xmme') || DEFAULT_DASHBOARD_ASSETS[2],
-        marketAssets.find((a) => a.id === 'nvda') || DEFAULT_DASHBOARD_ASSETS[3]
-      ];
+  let currentPortfolioTf = '24h';
+
+  function renderDashboardPortfolio(timeframe = currentPortfolioTf) {
+    currentPortfolioTf = timeframe;
+
+    // Mise à jour de l'état actif des boutons d'horizon
+    const tfButtons = document.querySelectorAll('#dash-portfolio-timeframe-toggles .dash-tf-btn');
+    tfButtons.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.timeframe === timeframe);
+    });
+
+    let summary = null;
+    if (typeof window.calculatePortfolioSummary === 'function') {
+      summary = window.calculatePortfolioSummary();
     }
-    return source.map((item, idx) => ({
-      ...DEFAULT_DASHBOARD_ASSETS[idx],
-      ...item
-    }));
+    if (!summary || typeof summary.totalValue !== 'number') {
+      summary = {
+        totalValue: 1650.42,
+        totalChange24hEur: 12.50,
+        totalChange24hPct: 0.76,
+        totalInvested: 1513.24,
+        gainLatentEur: 137.18,
+        gainLatentPct: 9.07
+      };
+    }
+
+    let chartData = null;
+    if (typeof window.getPortfolioChartData === 'function') {
+      chartData = window.getPortfolioChartData(timeframe);
+    }
+    if (!chartData || !chartData.points || !chartData.points.length) {
+      const pts = [];
+      const count = 16;
+      const baseVal = summary.totalValue / (1 + (summary.totalChange24hPct || 0.76) / 100);
+      for (let i = 0; i < count; i++) {
+        const t = i / (count - 1);
+        const wave = Math.sin(t * Math.PI * 2.2) * (summary.totalValue * 0.0035);
+        const v = baseVal + (summary.totalValue - baseVal) * t + wave;
+        pts.push({
+          value: Number(v.toFixed(2)),
+          label: i === 0 ? 'Début' : i === count - 1 ? 'Direct' : `T-${count - 1 - i}`,
+          date: `Horizon ${timeframe}`
+        });
+      }
+      chartData = {
+        timeframe,
+        points: pts,
+        periodChangePct: summary.totalChange24hPct,
+        periodChangeEur: summary.totalChange24hEur,
+        startVal: baseVal,
+        endVal: summary.totalValue,
+        minVal: Math.min(...pts.map((p) => p.value)),
+        maxVal: Math.max(...pts.map((p) => p.value))
+      };
+    }
+
+    // 1. Valeur globale
+    const valEl = document.getElementById('dash-portfolio-total-val');
+    if (valEl) {
+      valEl.textContent = `${summary.totalValue.toLocaleString('fr-FR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })} €`;
+    }
+
+    // 2. Badge de variation
+    const chgEl = document.getElementById('dash-portfolio-chg-badge');
+    if (chgEl) {
+      const pctVal = chartData.periodChangePct ?? summary.totalChange24hPct ?? 0;
+      const eurVal = chartData.periodChangeEur ?? summary.totalChange24hEur ?? 0;
+      const isUp = pctVal >= 0;
+      chgEl.className = `dash-portfolio-chg ${isUp ? 'up' : 'down'}`;
+      chgEl.textContent = `${isUp ? '+' : ''}${pctVal.toFixed(2)}% (${isUp ? '+' : ''}${eurVal.toFixed(2)} €)`;
+    }
+
+    // 3. Plus-value latente globale
+    const gainEl = document.getElementById('dash-portfolio-gain-text');
+    if (gainEl) {
+      const isGain = (summary.gainLatentEur ?? 0) >= 0;
+      gainEl.textContent = `Plus-value : ${isGain ? '+' : ''}${summary.gainLatentEur.toFixed(2)} € (${isGain ? '+' : ''}${summary.gainLatentPct.toFixed(2)}%)`;
+      gainEl.style.color = isGain ? '#34d399' : '#f87171';
+    }
+
+    // 4. Tracé du petit graphique interactif SVG
+    drawDashboardPortfolioChart(chartData);
+
+    // 5. Barre de pied de carte (Capital, DCA, Rendement)
+    renderDashboardPortfolioFooter(summary);
   }
 
-  function generateDashboardSparklineSvg(basePrice, changePct, isUp, width = 84, height = 28) {
-    const pointsCount = 9;
-    const startPrice = basePrice / (1 + changePct / 100);
-    const minVal = Math.min(startPrice, basePrice) * 0.996;
-    const maxVal = Math.max(startPrice, basePrice) * 1.004;
+  function drawDashboardPortfolioChart(chartData) {
+    const container = document.getElementById('dash-portfolio-svg-container');
+    if (!container) return;
+
+    const points = chartData.points;
+    if (!points || points.length === 0) return;
+
+    const width = container.clientWidth || 460;
+    const height = Math.min(120, Math.max(70, container.clientHeight || 95));
+    const padding = { top: 12, right: 16, bottom: 20, left: 16 };
+    const chartW = width - padding.left - padding.right;
+    const chartH = height - padding.top - padding.bottom;
+
+    const prices = points.map((p) => p.value);
+    const minVal = Math.min(...prices) * 0.998;
+    const maxVal = Math.max(...prices) * 1.002;
     const range = Math.max(0.01, maxVal - minVal);
 
-    const pts = [];
-    for (let i = 0; i < pointsCount; i++) {
-      const progress = i / (pointsCount - 1);
-      const wave = Math.sin(progress * Math.PI * 2.2) * 0.28 * (1 - progress);
-      const val = startPrice + (basePrice - startPrice) * progress + (basePrice - startPrice) * wave;
-      const x = (i / (pointsCount - 1)) * width;
-      const y = height - ((val - minVal) / range) * (height - 6) - 3;
-      pts.push({ x: Number(x.toFixed(1)), y: Math.max(2, Math.min(height - 2, Number(y.toFixed(1)))) });
-    }
+    const isPositive = (chartData.periodChangePct ?? 0) >= 0;
+    const strokeColor = isPositive ? '#34d399' : '#f87171';
 
-    let d = `M ${pts[0].x} ${pts[0].y}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const curr = pts[i];
-      const next = pts[i + 1];
+    const coords = points.map((p, i) => {
+      const x = padding.left + (i / (points.length - 1)) * chartW;
+      const y = padding.top + chartH - ((p.value - minVal) / range) * chartH;
+      return { ...p, x: Number(x.toFixed(1)), y: Number(y.toFixed(1)) };
+    });
+
+    let pathD = `M ${coords[0].x} ${coords[0].y}`;
+    for (let i = 0; i < coords.length - 1; i++) {
+      const curr = coords[i];
+      const next = coords[i + 1];
       const mx = (curr.x + next.x) / 2;
-      d += ` C ${mx} ${curr.y}, ${mx} ${next.y}, ${next.x} ${next.y}`;
+      pathD += ` C ${mx} ${curr.y}, ${mx} ${next.y}, ${next.x} ${next.y}`;
     }
 
-    const strokeColor = isUp ? '#34d399' : '#f87171';
-    const gradientId = `spark-grad-${Math.abs(Math.round(basePrice * 10))}-${isUp ? 'up' : 'down'}`;
+    const last = coords[coords.length - 1];
+    const first = coords[0];
+    const areaD = `${pathD} L ${last.x} ${height - padding.bottom} L ${first.x} ${height - padding.bottom} Z`;
 
-    return `
-      <svg viewBox="0 0 ${width} ${height}" class="dash-asset-sparkline" preserveAspectRatio="none">
+    const baselineY = padding.top + chartH - (((chartData.startVal || first.value) - minVal) / range) * chartH;
+    const gradId = `dashPortGrad-${isPositive ? 'up' : 'down'}`;
+
+    container.innerHTML = `
+      <svg class="dash-portfolio-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="${strokeColor}" stop-opacity="0.32" />
+          <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${strokeColor}" stop-opacity="0.28" />
+            <stop offset="85%" stop-color="${strokeColor}" stop-opacity="0.02" />
             <stop offset="100%" stop-color="${strokeColor}" stop-opacity="0.0" />
           </linearGradient>
         </defs>
-        <path d="${d} L ${width} ${height} L 0 ${height} Z" fill="url(#${gradientId})" />
-        <path d="${d}" fill="none" stroke="${strokeColor}" stroke-width="2" stroke-linecap="round" />
+
+        <line x1="${padding.left}" y1="${baselineY.toFixed(1)}" x2="${(width - padding.right).toFixed(1)}" y2="${baselineY.toFixed(1)}" stroke="rgba(255,255,255,0.08)" stroke-dasharray="3 3" />
+        <path d="${areaD}" fill="url(#${gradId})" />
+        <path d="${pathD}" fill="none" stroke="${strokeColor}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+
+        <circle cx="${first.x}" cy="${first.y}" r="3" fill="${strokeColor}" opacity="0.6" />
+        <circle cx="${last.x}" cy="${last.y}" r="4" fill="${strokeColor}" stroke="#0b101b" stroke-width="2" />
+
+        <text x="${padding.left}" y="${height - 4}" fill="#7c859e" font-size="9" font-weight="600">${first.label || 'Début'}</text>
+        <text x="${(width - padding.right)}" y="${height - 4}" text-anchor="end" fill="#7c859e" font-size="9" font-weight="600">${last.label || 'Direct'}</text>
       </svg>
+      <div id="dash-portfolio-tooltip" class="dash-port-tooltip"></div>
+    `;
+
+    attachPortfolioTooltipEvents(container, coords);
+  }
+
+  function attachPortfolioTooltipEvents(container, coords) {
+    const tooltip = container.querySelector('#dash-portfolio-tooltip');
+    if (!tooltip) return;
+
+    container.addEventListener('mousemove', (e) => {
+      const rect = container.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+
+      let closest = coords[0];
+      let minDiff = Infinity;
+      coords.forEach((p) => {
+        const diff = Math.abs(p.x - mouseX);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closest = p;
+        }
+      });
+
+      if (closest && minDiff < 45) {
+        tooltip.style.display = 'block';
+        const leftX = Math.min(rect.width - 80, Math.max(80, closest.x));
+        tooltip.style.left = `${leftX}px`;
+        const valStr = closest.value.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        tooltip.innerHTML = `<strong>${valStr} €</strong> • <span>${closest.label || closest.date || ''}</span>`;
+      } else {
+        tooltip.style.display = 'none';
+      }
+    });
+
+    container.addEventListener('mouseleave', () => {
+      if (tooltip) tooltip.style.display = 'none';
+    });
+  }
+
+  function renderDashboardPortfolioFooter(summary) {
+    const footer = document.getElementById('dash-portfolio-footer-bar');
+    if (!footer) return;
+
+    const investedStr = (summary.totalInvested || 1513.24).toLocaleString('fr-FR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    let nextDcaStr = '19 du mois (+60 €)';
+    if (typeof window.getNextDcaDateInfo === 'function') {
+      const dcaInfo = window.getNextDcaDateInfo();
+      nextDcaStr = `${dcaInfo.dateStr} (J-${dcaInfo.daysRemaining}) • +${dcaInfo.monthlyTotal} €`;
+    }
+
+    footer.innerHTML = `
+      <div class="dash-port-foot-stat">
+        <span class="dash-port-foot-lbl">Capital Investi</span>
+        <strong>${investedStr} €</strong>
+      </div>
+      <div class="dash-port-foot-stat">
+        <span class="dash-port-foot-lbl">Prochain DCA</span>
+        <strong><i class="fa-solid fa-arrows-rotate" style="color: #31e1f7;"></i> ${nextDcaStr}</strong>
+      </div>
+      <div class="dash-port-foot-stat">
+        <span class="dash-port-foot-lbl">Rendement Global</span>
+        <strong style="color: ${(summary.gainLatentPct ?? 0) >= 0 ? '#34d399' : '#f87171'}">
+          ${(summary.gainLatentPct ?? 0) >= 0 ? '+' : ''}${(summary.gainLatentPct ?? 0).toFixed(2)}%
+        </strong>
+      </div>
     `;
   }
 
   function renderDashboardMarkets() {
-    const grid = document.getElementById('dash-market-cards-grid');
-    if (!grid) return;
-
-    const assets = getDashboardMarketAssets();
-
-    grid.innerHTML = assets
-      .map((asset) => {
-        const isUp = (asset.baseChange ?? 0) >= 0;
-        const sign = isUp ? '+' : '';
-        const unit = asset.unit || '$';
-        const formattedPrice = asset.basePrice.toLocaleString('fr-FR', {
-          minimumFractionDigits: asset.basePrice < 100 ? 2 : 1,
-          maximumFractionDigits: 2
-        });
-        const isSelected = asset.id === selectedAssetId;
-
-        return `
-        <div class="dash-market-asset-item ${isSelected ? 'is-selected' : ''}" data-asset-id="${asset.id}" title="${asset.name} - Cliquer pour afficher le détail">
-          <div class="dash-asset-item-top">
-            <div class="dash-asset-identity">
-              <div class="dash-asset-icon">
-                <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
-              </div>
-              <div class="dash-asset-title-block">
-                <strong>${asset.name.split('(')[0].trim()}</strong>
-                <span>${asset.sub || asset.symbol}</span>
-              </div>
-            </div>
-            <span class="dash-asset-chg-pill ${isUp ? 'up' : 'down'}">
-              ${sign}${Number(asset.baseChange).toFixed(2)}%
-            </span>
-          </div>
-
-          <div class="dash-asset-chart-row">
-            <span class="dash-asset-price-val">${formattedPrice} ${unit}</span>
-            ${generateDashboardSparklineSvg(asset.basePrice, asset.baseChange, isUp)}
-          </div>
-        </div>
-      `;
-      })
-      .join('');
-
-    renderSelectedAssetPreview();
-
-    // Mise à jour de la carte KPI Bourse
-    const kpiMarketVal = document.getElementById('kpi-market-val');
-    const kpiMarketBadge = document.getElementById('kpi-market-badge');
-    const kpiMarketSub = document.getElementById('kpi-market-sub');
-
-    if (typeof window.calculatePortfolioSummary === 'function') {
-      const pSummary = window.calculatePortfolioSummary();
-      if (kpiMarketVal) {
-        kpiMarketVal.textContent = `${pSummary.totalValue.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} €`;
-      }
-      if (kpiMarketBadge) {
-        const isUp = pSummary.totalChange24hEur >= 0;
-        kpiMarketBadge.className = `dash-kpi-badge ${isUp ? 'up' : 'down'}`;
-        kpiMarketBadge.textContent = `${isUp ? '+' : ''}${pSummary.totalChange24hPct.toFixed(2)}%`;
-      }
-      if (kpiMarketSub) {
-        kpiMarketSub.textContent = 'Portefeuille Global (DCA Actif)';
-      }
-    } else {
-      const topAsset = assets.find((a) => a.id === 'nvda') || assets[0];
-      if (kpiMarketVal && topAsset) {
-        kpiMarketVal.textContent = `${topAsset.name.split(' ')[0]} ${topAsset.basePrice.toFixed(1)}${topAsset.unit}`;
-      }
-      if (kpiMarketBadge && topAsset) {
-        const isUp = topAsset.baseChange >= 0;
-        kpiMarketBadge.className = `dash-kpi-badge ${isUp ? 'up' : 'down'}`;
-        kpiMarketBadge.textContent = `${isUp ? '+' : ''}${topAsset.baseChange.toFixed(2)}%`;
-      }
-      if (kpiMarketSub && topAsset) {
-        kpiMarketSub.textContent = topAsset.sub || 'Mouvement fort';
-      }
-    }
-  }
-
-  function renderSelectedAssetPreview() {
-    const previewContainer = document.getElementById('dash-asset-preview-bar');
-    if (!previewContainer) return;
-
-    const assets = getDashboardMarketAssets();
-    const current = assets.find((a) => a.id === selectedAssetId) || assets[0];
-    if (!current) return;
-
-    const dayL = current.dayLow || current.basePrice * 0.985;
-    const dayH = current.dayHigh || current.basePrice * 1.015;
-    const isUp = current.baseChange >= 0;
-
-    previewContainer.innerHTML = `
-      <div class="dash-preview-stats">
-        <div class="dash-stat-item">
-          <label>Actif Sélectionné</label>
-          <strong>${current.name}</strong>
-        </div>
-        <div class="dash-stat-item">
-          <label>Plus Bas (24h)</label>
-          <strong>${dayL.toFixed(2)} ${current.unit}</strong>
-        </div>
-        <div class="dash-stat-item">
-          <label>Plus Haut (24h)</label>
-          <strong>${dayH.toFixed(2)} ${current.unit}</strong>
-        </div>
-        <div class="dash-stat-item">
-          <label>Tendance</label>
-          <strong style="color: ${isUp ? '#34d399' : '#f87171'}">${isUp ? 'Haussier 🟢' : 'Consolidation 🔴'}</strong>
-        </div>
-      </div>
-
-      <div class="dash-timeframe-toggles">
-        <button type="button" class="dash-tf-btn active">24H</button>
-        <button type="button" class="dash-tf-btn">7J</button>
-        <button type="button" class="dash-tf-btn">1M</button>
-        <button type="button" class="dash-tf-btn">1A</button>
-      </div>
-    `;
+    renderDashboardPortfolio(currentPortfolioTf);
   }
 
   /* ========================================================
@@ -566,8 +617,8 @@
     if (!svgContainer) return;
 
     const width = svgContainer.clientWidth || 540;
-    const height = 145;
-    const padding = { top: 24, right: 28, bottom: 28, left: 28 };
+    const height = Math.min(130, Math.max(75, svgContainer.clientHeight || 105));
+    const padding = { top: 16, right: 20, bottom: 22, left: 20 };
     const chartW = width - padding.left - padding.right;
     const chartH = height - padding.top - padding.bottom;
 
@@ -1173,6 +1224,15 @@
 
     // 1. Clic général délégué
     document.addEventListener('click', (e) => {
+      // 1a. Clic sur l'horizon temporel du portefeuille (24H, 7J, 1M, 1A)
+      const portTfBtn = e.target.closest('#dash-portfolio-timeframe-toggles .dash-tf-btn');
+      if (portTfBtn) {
+        e.preventDefault();
+        const tf = portTfBtn.dataset.timeframe || '24h';
+        renderDashboardPortfolio(tf);
+        return;
+      }
+
       const assetItem = e.target.closest('.dash-market-asset-item');
       if (assetItem) {
         selectedAssetId = assetItem.dataset.assetId || 'nvda';
@@ -1290,6 +1350,7 @@
   // Exposition des fonctions pour les hooks d'autres modules (météo, tâches, marchés)
   window.initOverviewDashboard = initOverviewDashboard;
   window.renderDashboardMarkets = renderDashboardMarkets;
+  window.renderDashboardPortfolio = renderDashboardPortfolio;
   window.renderDashboardWeather = renderDashboardWeather;
   window.renderDashboardAgenda = renderDashboardAgenda;
   window.renderVisitedSites = renderVisitedSites;

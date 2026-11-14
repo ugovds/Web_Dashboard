@@ -1675,6 +1675,7 @@ function setupPortfolioModalHandlers() {
 
 window.renderPortfolioModule = renderPortfolioModule;
 window.calculatePortfolioSummary = calculatePortfolioSummary;
+window.getPortfolioChartData = getPortfolioChartData;
 window.simulateDcaExecution = simulateDcaExecution;
 window.resetPortfolioState = resetPortfolioState;
 window.checkAndApplyScheduledDca = checkAndApplyScheduledDca;
