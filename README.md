@@ -158,36 +158,46 @@ Le tableau de bord est structuré en **Dashboard moderne de type cockpit** avec 
   - 🍃 Nuit Synthé (Brise nocturne et résonance)
 - Visualiseur de spectre audio animé sur Canvas et réglage précis du volume.
 
-### 📈 Hub Marchés, Portefeuille & Moteur DCA Automatique — `js/markets.js` & `css/markets.css`
-- **Suivi de Portefeuille Multi-Actifs en Temps Réel** :
-  - **Composition de base** : 4.19 parts d'**Amundi PEA S&P 500** (`10AP`), 1.35 parts d'**Amundi Stoxx Europe 600** (`LYP6`), 4.03 parts de **Xtrackers MSCI Emerging Markets** (`XMME`), et 1 action de **NVIDIA Corporation** (`NVDA`).
-  - **Conversion Forex temps réel** : Prise en compte du taux EUR/USD (via BCE / Frankfurter API) pour valoriser précisément les actifs libellés en dollars (NVDA) dans la valeur globale en euros.
-  - **Indicateurs financiers instantanés** : Calcul automatique de la valeur globale totale du portefeuille (€), du capital investi, de la plus-value latente (€ et %) et de la variation pondérée sur les dernières 24 heures.
-  - **Répartition & Allocation d'actifs** : Jauge visuelle d'allocation et cartes individuelles avec prix unitaire, nombre de parts, valeur de la ligne, poids dans le portefeuille et badge DCA.
+### 📈 Hub Marchés, Watchlist Studio & Portefeuille DCA — `js/markets.js` & `css/markets.css`
+- **Architecture de l'onglet Marchés en 2 sections complémentaires** :
+  1. **Haut de page — Watchlist Studio en 2 colonnes (Façon Terminal Boursier / TradingView)** :
+     - **Colonne Gauche (Liste des actifs & filtres)** :
+       - Recherche textuelle instantanée (`NVDA`, `10AP`, `BTC`...) et filtrage rapide par catégorie (*Tous, Actions, ETF, Indices, Cryptos, Volatiles*).
+       - Badge dynamique du nombre d'actifs suivis.
+       - Accès rapide à la personnalisation de la watchlist et bouton d'actualisation des cotations en direct.
+       - Liste ergonomique et réactive des titres affichant l'icône de type, le nom complet, le symbole boursier, la place de cotation, le dernier cours, la variation 24h et la mini-sparkline vectorielle.
+       - Sélection interactive instantanée : un clic sur n'importe quel actif met la ligne en surbrillance et actualise immédiatement le graphique grand format de la colonne droite.
+     - **Colonne Droite (Graphique interactif correspondant à l'actif sélectionné)** :
+       - En-tête complet du titre sélectionné : icône, nom de l'actif, symbole, badge en direct, place boursière et devise.
+       - Dernier cours grand format, badge de variation 24h et fourchette de séance (plus bas / plus haut) avec jauge de positionnement journalier.
+       - Raccourcis rapides des favoris (`NVDA`, `10AP`, `LYP6`, `XMME`, `BTC`).
+       - Grand graphique SVG 24h interactif avec tracé Bézier cubique, surface dégradée lumineuse, ligne de référence horizontale, réticule de suivi magnétique au survol et infobulle temps réel.
+       - 4 indicateurs clés au pied du graphique : *Volume 24h*, *Capitalisation boursière*, *Séance & Devise*, *Fourchette de séance*.
+       - Bouton `Agrandir` pour ouvrir la modale plein écran détaillée.
 
-- **Moteur d'Automatisation DCA (Dollar-Cost Averaging)** :
-  - **Règle programmée récurrente** : Tous les 19 de chaque mois, réinvestissement automatique de **60,00 €** au total :
-    - **+30,00 €** sur `10AP` (S&P 500)
-    - **+20,00 €** sur `LYP6` (Stoxx Europe 600)
-    - **+10,00 €** sur `XMME` (Marchés Émergents)
-  - **Évolution temporelle dynamique** : Détection automatique de la date système. Lorsque le 19 du mois est atteint, le moteur calcule les parts acquises au cours du jour, incrémente les positions, met à jour le capital investi et consigne la transaction dans l'historique.
-  - **Compte à rebours du prochain versement** : Affichage dynamique du nombre de jours restants jusqu'au prochain 19 du mois.
-  - **Simulation & Gestion manuelle** :
-    - Bouton `⚡ Simuler Versement du 19` pour tester instantanément un apport et observer l'évolution de la courbe et des parts.
-    - Modale de gestion complète pour ajuster les parts détenues, modifier les montants ou le jour du mois, et consulter le journal horodaté des versements.
-    - Bouton de réinitialisation rapide pour revenir aux positions de base.
-
-- **Grand Graphique Vectoriel Multi-Périodes (Courbe SVG Fluide)** :
-  - **4 horizons d'analyse temporelle** :
-    - **24H (24 dernières heures)** : Évolution intra-day en direct combinant les cotations Euronext et Wall Street.
-    - **1 Semaine (7 jours)** : Trajectoire sur les 7 derniers jours glissants.
-    - **1 Mois (30 jours)** : Évolution mensuelle intégrant le palier d'injection de capital du versement DCA du 19.
-    - **1 Année (12 mois)** : Historique annuel complet illustrant l'effet boule de neige du DCA (+720 € investis sur 12 mois) couplé à la performance des indices et actions.
-  - **Interactivité riche** : Tracé Bézier cubique, surface dégradée lumineuse, ligne de référence horizontale, réticule de suivi magnétique et infobulle flottante détaillée avec notes d'événements DCA.
+  2. **Bas de page — Suivi de Portefeuille Multi-Actifs & Moteur DCA Automatique** :
+     - **Indicateurs financiers consolidés (4 KPIs)** :
+       - **Valeur Globale Totale** (€) et variation pondérée sur les dernières 24 heures.
+       - **Plus-Value Latente Totale** (€ et %) calculée avec précision sur les **1 513,24 € d'apports initiaux** investis.
+       - **Prochain Versement DCA** : Date du 19 du mois et décompte dynamique du nombre de jours restants jusqu'au versement de 60,00 €.
+       - **Règle DCA Mensuelle** : Répartition de 60,00 € / mois (30€ 10AP, 20€ LYP6, 10€ XMME, soit 720 € investis par an).
+     - **Grand Graphique Multi-Périodes du Portefeuille** :
+       - 4 horizons d'analyse temporelle : **24H**, **1 Semaine**, **1 Mois** (avec palier d'injection DCA du 19) et **1 Année** (visualisation de l'effet boule de neige du DCA).
+       - Bandeau de statistiques de la période : plus bas, plus haut, capital investi et nombre de versements DCA sur l'horizon sélectionné.
+     - **Répartition & Allocation d'actifs** : Jauge visuelle d'allocation (10AP: 38.6%, LYP6: 29.7%, XMME: 20.8%, NVDA: 10.9%).
+     - **Les 4 fiches de positions détaillées** :
+       - `10AP` (Amundi PEA S&P 500) : 4.19 parts, cours unitaire, valeur totale, plus-value et badge `+30€/mois`.
+       - `LYP6` (Amundi Stoxx Europe 600) : 1.35 parts, cours unitaire, valeur totale, plus-value et badge `+20€/mois`.
+       - `XMME` (Xtrackers MSCI Emerging Markets) : 4.03 parts, cours unitaire, valeur totale, plus-value et badge `+10€/mois`.
+       - `NVDA` (NVIDIA Corporation) : 1 action (position fixe), valorisation en direct intégrant la conversion EUR/USD.
+     - **Actions & Simulation DCA** :
+       - Bouton `⚡ Simuler Versement du 19` pour exécuter immédiatement une mensualité (+60 €).
+       - Modale de gestion avancée pour éditer manuellement les positions et consulter le journal horodaté des versements.
+       - Bouton de réinitialisation pour restaurer les paramètres initiaux.
 
 - **Squelettes de Chargement GPU & Zéro Décalage Visuel** :
   - Intégration dans le système de préchargement coordonné `PageSkeletonManager` (`css/skeletons.css`).
-  - Architecture Bento modulaire asymétrique intégrant le Hero Spotlight, le baromètre de marché, les top variations et le convertisseur de devises.
+  - Squelette reproduisant fidèlement l'agencement 2 colonnes en haut et le bloc portefeuille en bas.
 
 ### ⚡ Moniteur Système & Télémétrie — `js/widgets.js`
 - Télémétrie système : Latence ping réseau (ms), statut d'alimentation (AC / Batterie), nombre de cœurs CPU, mémoire vive (RAM), et temps de session (uptime).

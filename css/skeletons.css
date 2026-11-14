@@ -291,6 +291,27 @@
   box-sizing: border-box;
 }
 
+.markets-skeleton-split {
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  gap: clamp(14px, 1.8vh, 22px);
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .markets-skeleton-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.markets-skel-left {
+  border-radius: clamp(18px, 2.4vh, 26px);
+  padding: clamp(18px, 2.4vh, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 .markets-skeleton-header {
   border-radius: clamp(18px, 2.4vh, 26px);
   padding: clamp(18px, 2.4vh, 26px) clamp(20px, 2.4vw, 36px);

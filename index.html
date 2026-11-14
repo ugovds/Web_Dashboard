@@ -1456,23 +1456,54 @@
               <div id="deck-view-system" class="deck-slide-view system-full-view markets-full-view" hidden>
                 <!-- Squelette Marchés -->
                 <div id="system-skeleton-view" class="markets-skeleton-container view-skeleton-view" aria-hidden="true">
-                  <header class="markets-skeleton-header skel-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <div class="skel-elem skel-pill" style="width: 170px; height: 26px;"></div>
-                        <div class="skel-elem skel-bar" style="width: 240px; height: 24px;"></div>
-                        <div class="skel-elem skel-bar" style="width: 380px; height: 13px;"></div>
+                  <!-- Squelette Split 2 Colonnes -->
+                  <div class="markets-skeleton-split">
+                    <!-- Colonne Gauche -->
+                    <div class="markets-skel-left skel-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="skel-elem skel-bar" style="width: 140px; height: 22px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 80px; height: 24px;"></div>
                       </div>
-                      <div style="display: flex; gap: 8px; align-items: center;">
-                        <div class="skel-elem skel-squircle" style="width: 220px; height: 38px;"></div>
-                        <div class="skel-elem skel-pill" style="width: 100px; height: 38px;"></div>
-                        <div class="skel-elem skel-pill" style="width: 120px; height: 38px;"></div>
-                        <div class="skel-elem skel-pill" style="width: 100px; height: 38px;"></div>
+                      <div class="skel-elem skel-squircle" style="width: 100%; height: 38px;"></div>
+                      <div style="display: flex; gap: 6px;">
+                        <div class="skel-elem skel-pill" style="width: 65px; height: 28px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 65px; height: 28px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 65px; height: 28px;"></div>
+                        <div class="skel-elem skel-pill" style="width: 65px; height: 28px;"></div>
+                      </div>
+                      <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+                        <div class="skel-elem skel-squircle" style="height: 52px; width: 100%;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 52px; width: 100%;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 52px; width: 100%;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 52px; width: 100%;"></div>
+                        <div class="skel-elem skel-squircle" style="height: 52px; width: 100%;"></div>
                       </div>
                     </div>
-                    <!-- Marquee skeleton -->
-                    <div class="skel-elem skel-pill" style="height: 38px; width: 100%;"></div>
-                  </header>
+
+                    <!-- Colonne Droite (Hero Chart) -->
+                    <div class="markets-skeleton-hero skel-card">
+                      <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                          <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
+                          <div style="display: flex; flex-direction: column; gap: 6px;">
+                            <div class="skel-elem skel-bar" style="width: 180px; height: 22px;"></div>
+                            <div class="skel-elem skel-bar" style="width: 120px; height: 13px;"></div>
+                          </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                          <div class="skel-elem skel-bar" style="width: 130px; height: 32px;"></div>
+                          <div class="skel-elem skel-pill" style="width: 80px; height: 28px;"></div>
+                        </div>
+                      </div>
+                      <div class="skel-elem skel-squircle" style="height: 200px; width: 100%;"></div>
+                      <div style="display: flex; gap: 12px;">
+                        <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                        <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                        <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                        <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
+                      </div>
+                    </div>
+                  </div>
 
                   <!-- Squelette Portefeuille Global & Suivi DCA -->
                   <div class="markets-skeleton-portfolio skel-card">
@@ -1504,106 +1535,11 @@
                       <div class="skel-elem skel-squircle" style="height: 105px;"></div>
                     </div>
                   </div>
-
-                  <!-- Hero Spotlight skeleton -->
-                  <div class="markets-skeleton-hero skel-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div class="skel-elem skel-circle" style="width: 44px; height: 44px;"></div>
-                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                          <div class="skel-elem skel-bar" style="width: 180px; height: 22px;"></div>
-                          <div class="skel-elem skel-bar" style="width: 120px; height: 13px;"></div>
-                        </div>
-                      </div>
-                      <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div class="skel-elem skel-bar" style="width: 130px; height: 32px;"></div>
-                        <div class="skel-elem skel-pill" style="width: 80px; height: 28px;"></div>
-                      </div>
-                    </div>
-                    <div class="skel-elem skel-squircle" style="height: 180px; width: 100%;"></div>
-                    <div style="display: flex; gap: 12px;">
-                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
-                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
-                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
-                      <div class="skel-elem skel-pill" style="flex: 1; height: 36px;"></div>
-                    </div>
-                  </div>
-
-                  <!-- Watchlist cards grid skeleton -->
-                  <div class="markets-skeleton-grid">
-                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
-                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
-                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
-                    </div>
-                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
-                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
-                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
-                    </div>
-                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
-                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
-                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
-                    </div>
-                    <div class="skel-elem skel-card" style="height: 110px; border-radius: 18px; padding: 1rem; display: flex; flex-direction: column; justify-content: space-between;">
-                      <div style="display: flex; justify-content: space-between;"><div class="skel-elem skel-bar" style="width: 110px; height: 16px;"></div><div class="skel-elem skel-pill" style="width: 60px; height: 20px;"></div></div>
-                      <div style="display: flex; justify-content: space-between; align-items: flex-end;"><div class="skel-elem skel-bar" style="width: 80px; height: 24px;"></div><div class="skel-elem skel-squircle" style="width: 90px; height: 28px;"></div></div>
-                    </div>
-                  </div>
                 </div>
 
                 <!-- Contenu Réel Marchés -->
                 <div id="system-real-view" class="markets-container view-real-content is-loading">
-                  <!-- 1. HEADER DU HUB MARCHÉS -->
-                  <header class="markets-header">
-                    <div class="markets-header-top">
-                      <div class="markets-brand">
-                        <div class="markets-status-pill" id="markets-global-status">
-                          <span class="status-dot pulse-green"></span>
-                          <span id="market-status-text">Wall Street &amp; Euronext Actifs</span>
-                        </div>
-                        <h2 class="markets-title">Marchés &amp; Portefeuille</h2>
-                        <span class="markets-subtitle">Cotations en temps réel, ETF indiciels (10AP, LYP6, XMME), actions tech &amp; graphiques interactifs</span>
-                      </div>
-
-                      <div class="markets-actions">
-                        <div class="markets-search-box">
-                          <i class="fa-solid fa-magnifying-glass"></i>
-                          <input
-                            type="text"
-                            id="market-search-input"
-                            class="markets-search-input"
-                            placeholder="Rechercher une action, ETF, crypto (NVDA, 10AP, BTC)..."
-                            autocomplete="off"
-                          />
-                          <button type="button" id="market-search-clear" class="markets-search-clear" hidden title="Effacer">&times;</button>
-                        </div>
-
-                        <button type="button" id="market-filter-volatile-btn" class="market-btn-secondary" title="Filtrer les actifs les plus volatiles du jour">
-                          <i class="fa-solid fa-fire"></i>
-                          <span>Volatiles</span>
-                        </button>
-
-                        <button type="button" id="market-config-toggle-btn" class="market-btn-secondary" title="Personnaliser les actifs et la liste">
-                          <i class="fa-solid fa-sliders"></i>
-                          <span>Personnaliser</span>
-                        </button>
-
-                        <button type="button" id="crypto-refresh-btn" class="market-btn-primary" title="Actualiser les cours en direct">
-                          <i class="fa-solid fa-rotate-right"></i>
-                          <span>Actualiser</span>
-                        </button>
-                      </div>
-                    </div>
-
-                    <!-- Bandeau Défilant des Grands Indices Mondiaux -->
-                    <div class="markets-marquee-wrap">
-                      <div class="markets-marquee-track" id="markets-indices-marquee">
-                        <!-- Rempli dynamiquement par renderIndicesMarquee() -->
-                      </div>
-                    </div>
-
-                  </header>
-
-                  <!-- 2. TIROIR DE PERSONNALISATION / AJOUT D'ACTIF -->
+                  <!-- 1. TIROIR DE PERSONNALISATION / AJOUT D'ACTIF -->
                   <div id="market-config-drawer" class="market-config-drawer is-hidden" hidden style="display: none;">
                     <div class="market-drawer-top">
                       <span class="market-drawer-title"><i class="fa-solid fa-sliders"></i> Personnaliser la Watchlist</span>
@@ -1634,6 +1570,171 @@
                       <button type="button" id="market-add-custom-btn" class="modal-btn primary"><i class="fa-solid fa-plus"></i> Ajouter à la Watchlist</button>
                     </div>
                   </div>
+
+                  <!-- 2. SECTION HAUT : WATCHLIST EN 2 COLONNES (GAUCHE: ACTIFS & INFOS, DROITE: GRAPHIQUE CORRESPONDANT) -->
+                  <section class="watchlist-split-section">
+                    <!-- COLONNE GAUCHE : LISTE DES ACTIONS & INFOS -->
+                    <div class="watchlist-left-col">
+                      <div class="watchlist-head-bar">
+                        <div class="watchlist-head-title-row">
+                          <div class="watchlist-main-title">
+                            <i class="fa-solid fa-list-check" style="color: #38bdf8;"></i>
+                            <h3>Watchlist Marchés</h3>
+                            <span class="watchlist-count-badge" id="watchlist-count-badge">--</span>
+                          </div>
+                          <div class="watchlist-quick-actions">
+                            <button type="button" id="market-config-toggle-btn" class="market-btn-secondary" title="Personnaliser les actifs et la liste">
+                              <i class="fa-solid fa-sliders"></i>
+                              <span>Personnaliser</span>
+                            </button>
+                            <button type="button" id="crypto-refresh-btn" class="market-btn-primary" title="Actualiser les cotations en direct">
+                              <i class="fa-solid fa-rotate-right"></i>
+                              <span>Actualiser</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <!-- Recherche & Filtre volatile -->
+                        <div class="watchlist-search-row">
+                          <div class="markets-search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input
+                              type="text"
+                              id="market-search-input"
+                              class="markets-search-input"
+                              placeholder="Filtrer une action, ETF, crypto (NVDA, 10AP, BTC)..."
+                              autocomplete="off"
+                            />
+                            <button type="button" id="market-search-clear" class="markets-search-clear" hidden title="Effacer">&times;</button>
+                          </div>
+                          <button type="button" id="market-filter-volatile-btn" class="market-btn-secondary" title="Filtrer les actifs les plus volatiles">
+                            <i class="fa-solid fa-fire text-orange"></i>
+                            <span>Volatiles</span>
+                          </button>
+                        </div>
+
+                        <!-- Filtres par catégorie -->
+                        <div class="watchlist-filter-pills" id="markets-tab-group">
+                          <button type="button" class="filter-pill active" data-market-category="all"><i class="fa-solid fa-layer-group"></i> Tous</button>
+                          <button type="button" class="filter-pill" data-market-category="stock"><i class="fa-solid fa-building"></i> Actions</button>
+                          <button type="button" class="filter-pill" data-market-category="etf"><i class="fa-solid fa-landmark"></i> ETF</button>
+                          <button type="button" class="filter-pill" data-market-category="index"><i class="fa-solid fa-chart-line"></i> Indices</button>
+                          <button type="button" class="filter-pill" data-market-category="crypto"><i class="fa-brands fa-bitcoin"></i> Cryptos</button>
+                        </div>
+                      </div>
+
+                      <!-- LISTE DÉROULANTE INTERACTIVE DES ACTIFS -->
+                      <div class="watchlist-items-container" id="crypto-ticker-cards">
+                        <!-- Généré dynamiquement par renderMarketCards() -->
+                      </div>
+                    </div>
+
+                    <!-- COLONNE DROITE : GRAPHIQUE CORRESPONDANT À L'ACTIF SÉLECTIONNÉ -->
+                    <div class="watchlist-chart-col">
+                      <div class="market-bento-hero" id="market-hero-module">
+                        <div class="hero-top-row">
+                          <div class="hero-asset-brand">
+                            <div class="hero-icon-bubble" id="hero-asset-icon">
+                              <i class="fa-solid fa-microchip"></i>
+                            </div>
+                            <div class="hero-titles">
+                              <div class="hero-name-row">
+                                <h3 class="hero-asset-name" id="hero-asset-name">NVIDIA Corporation</h3>
+                                <span class="hero-sym-badge" id="hero-asset-sym">NVDA</span>
+                                <span class="hero-live-pill" id="hero-live-pill"><span class="status-dot pulse-green"></span> 24H DIRECT</span>
+                              </div>
+                              <span class="hero-exchange-sub" id="hero-asset-exchange">Nasdaq Stock Market • Marché Actions US</span>
+                            </div>
+                          </div>
+
+                          <div class="hero-pricing-row">
+                            <div class="hero-price-group">
+                              <span class="hero-price-val" id="hero-price-val">175.76 $</span>
+                              <span class="hero-change-badge up" id="hero-change-badge">
+                                <i class="fa-solid fa-arrow-trend-up"></i> +2.84% (24h)
+                              </span>
+                            </div>
+                            <div class="hero-range-mini">
+                              <div class="range-mini-labels">
+                                <span>Bas 24h: <strong id="hero-stat-low">170.10 $</strong></span>
+                                <span>Haut 24h: <strong id="hero-stat-high">178.45 $</strong></span>
+                              </div>
+                              <div class="range-mini-track">
+                                <div class="range-mini-fill" id="hero-range-fill" style="width: 72%;"></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <!-- Barre de sous-contrôles : Raccourcis favoris rapides & Bouton Agrandir -->
+                        <div class="hero-sub-toolbar">
+                          <div class="hero-quick-switch" id="hero-quick-switch">
+                            <span class="quick-switch-label">Favoris :</span>
+                            <button type="button" class="hero-pill-btn active" data-hero-id="nvda">NVDA</button>
+                            <button type="button" class="hero-pill-btn" data-hero-id="10ap">10AP</button>
+                            <button type="button" class="hero-pill-btn" data-hero-id="lyp6">LYP6</button>
+                            <button type="button" class="hero-pill-btn" data-hero-id="xmme">XMME</button>
+                            <button type="button" class="hero-pill-btn" data-hero-id="btc">BTC</button>
+                          </div>
+                          <button type="button" class="hero-expand-btn" id="hero-expand-btn" title="Inspecter dans la modale plein écran">
+                            <i class="fa-solid fa-maximize"></i> <span>Agrandir</span>
+                          </button>
+                        </div>
+
+                        <!-- Grand graphique interactif 24h direct -->
+                        <div class="hero-chart-container" id="hero-chart-container">
+                          <svg id="hero-chart-svg" class="hero-chart-svg" viewBox="0 0 1000 230" preserveAspectRatio="none">
+                            <defs>
+                              <linearGradient id="heroGradientUp" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"></stop>
+                                <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"></stop>
+                              </linearGradient>
+                              <linearGradient id="heroGradientDown" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"></stop>
+                                <stop offset="100%" stop-color="#ef4444" stop-opacity="0.0"></stop>
+                              </linearGradient>
+                            </defs>
+                            <line id="hero-baseline" x1="0" y1="115" x2="1000" y2="115" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4 4" stroke-width="1.5" />
+                            <path id="hero-svg-area" d="" fill="url(#heroGradientUp)"></path>
+                            <path id="hero-svg-line" d="" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+                            <g id="hero-hover-tracker" style="display: none;">
+                              <line id="hero-hover-line" x1="0" y1="0" x2="0" y2="230" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 3"></line>
+                              <circle id="hero-hover-dot" cx="0" cy="0" r="5.5" fill="#ffffff" stroke="#10b981" stroke-width="3"></circle>
+                            </g>
+                          </svg>
+                          <div id="hero-tooltip" class="hero-tooltip" style="display: none;">
+                            <span id="hero-tooltip-price">--</span>
+                            <span id="hero-tooltip-time">--</span>
+                          </div>
+                          <div class="hero-chart-time-labels">
+                            <span>Il y a 24h</span>
+                            <span>Il y a 12h</span>
+                            <span>Maintenant (En Direct)</span>
+                          </div>
+                        </div>
+
+                        <!-- Métriques clés au pied du Hero -->
+                        <div class="hero-metrics-grid">
+                          <div class="hero-metric-item">
+                            <span class="metric-label">Volume 24h (Est.)</span>
+                            <span class="metric-val" id="hero-metric-vol">48.2M titres</span>
+                          </div>
+                          <div class="hero-metric-item">
+                            <span class="metric-label">Capitalisation</span>
+                            <span class="metric-val" id="hero-metric-cap">3.42 B $</span>
+                          </div>
+                          <div class="hero-metric-item">
+                            <span class="metric-label">Séance &amp; Devise</span>
+                            <span class="metric-val" id="hero-metric-session">USD ($) • Ouvert</span>
+                          </div>
+                          <div class="hero-metric-item">
+                            <span class="metric-label">Fourchette 24h</span>
+                            <span class="metric-val" id="hero-metric-range-stat">173.10 $ - 178.45 $</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
 
                   <!-- 2.5 SECTION PORTEFEUILLE D'INVESTISSEMENT & DCA -->
                   <section class="markets-portfolio-hero" id="markets-portfolio-hero">
@@ -1830,216 +1931,7 @@
                     </div>
                   </section>
 
-                  <!-- 3. ARCHITECTURE BENTO ASYMÉTRIQUE MULTI-MODULES -->
-                  <div class="markets-bento-layout">
-                    <!-- MODULE 1 : HERO SPOTLIGHT (Actif Vedette avec grand graphique 24h direct) -->
-                    <div class="market-bento-hero" id="market-hero-module">
-                      <div class="hero-top-row">
-                        <div class="hero-asset-brand">
-                          <div class="hero-icon-bubble" id="hero-asset-icon">
-                            <i class="fa-solid fa-microchip"></i>
-                          </div>
-                          <div class="hero-titles">
-                            <div class="hero-name-row">
-                              <h3 class="hero-asset-name" id="hero-asset-name">NVIDIA Corporation</h3>
-                              <span class="hero-sym-badge" id="hero-asset-sym">NVDA</span>
-                              <span class="hero-live-pill"><span class="status-dot pulse-green"></span> 24H DIRECT</span>
-                            </div>
-                            <span class="hero-exchange-sub" id="hero-asset-exchange">Nasdaq Stock Market • Marché Actions US</span>
-                          </div>
-                        </div>
-                        <!-- Sélecteur rapide des 5 actifs phares -->
-                        <div class="hero-quick-switch" id="hero-quick-switch">
-                          <button type="button" class="hero-pill-btn active" data-hero-id="nvda">NVDA</button>
-                          <button type="button" class="hero-pill-btn" data-hero-id="tsla">TSLA</button>
-                          <button type="button" class="hero-pill-btn" data-hero-id="btc">BTC</button>
-                          <button type="button" class="hero-pill-btn" data-hero-id="sp500">S&amp;P 500</button>
-                          <button type="button" class="hero-pill-btn" data-hero-id="cw8">CW8 (World)</button>
-                        </div>
-                      </div>
-
-                      <div class="hero-pricing-row">
-                        <div class="hero-price-group">
-                          <span class="hero-price-val" id="hero-price-val">175.76 $</span>
-                          <span class="hero-change-badge up" id="hero-change-badge">
-                            <i class="fa-solid fa-arrow-trend-up"></i> +2.84% (24h)
-                          </span>
-                        </div>
-                        <div class="hero-range-mini">
-                          <div class="range-mini-labels">
-                            <span>Bas 24h: <strong id="hero-stat-low">170.10 $</strong></span>
-                            <span>Haut 24h: <strong id="hero-stat-high">178.45 $</strong></span>
-                          </div>
-                          <div class="range-mini-track">
-                            <div class="range-mini-fill" id="hero-range-fill" style="width: 72%;"></div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <!-- Grand graphique interactif 24h direct -->
-                      <div class="hero-chart-container" id="hero-chart-container">
-                        <svg id="hero-chart-svg" class="hero-chart-svg" viewBox="0 0 1000 230" preserveAspectRatio="none">
-                          <defs>
-                            <linearGradient id="heroGradientUp" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="#10b981" stop-opacity="0.35"></stop>
-                              <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"></stop>
-                            </linearGradient>
-                            <linearGradient id="heroGradientDown" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stop-color="#ef4444" stop-opacity="0.35"></stop>
-                              <stop offset="100%" stop-color="#ef4444" stop-opacity="0.0"></stop>
-                            </linearGradient>
-                          </defs>
-                          <line id="hero-baseline" x1="0" y1="115" x2="1000" y2="115" stroke="rgba(255,255,255,0.08)" stroke-dasharray="4 4" stroke-width="1.5" />
-                          <path id="hero-svg-area" d="" fill="url(#heroGradientUp)"></path>
-                          <path id="hero-svg-line" d="" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-                          <g id="hero-hover-tracker" style="display: none;">
-                            <line id="hero-hover-line" x1="0" y1="0" x2="0" y2="230" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-dasharray="3 3"></line>
-                            <circle id="hero-hover-dot" cx="0" cy="0" r="5.5" fill="#ffffff" stroke="#10b981" stroke-width="3"></circle>
-                          </g>
-                        </svg>
-                        <div id="hero-tooltip" class="hero-tooltip" style="display: none;">
-                          <span id="hero-tooltip-price">--</span>
-                          <span id="hero-tooltip-time">--</span>
-                        </div>
-                        <div class="hero-chart-time-labels">
-                          <span>Il y a 24h</span>
-                          <span>Il y a 12h</span>
-                          <span>Maintenant (En Direct)</span>
-                        </div>
-                      </div>
-
-                      <!-- Métriques clés au pied du Hero -->
-                      <div class="hero-metrics-grid">
-                        <div class="hero-metric-item">
-                          <span class="metric-label">Volume 24h (Est.)</span>
-                          <span class="metric-val" id="hero-metric-vol">48.2M titres</span>
-                        </div>
-                        <div class="hero-metric-item">
-                          <span class="metric-label">Capitalisation</span>
-                          <span class="metric-val" id="hero-metric-cap">4.32 B $</span>
-                        </div>
-                        <div class="hero-metric-item">
-                          <span class="metric-label">Séance &amp; Devise</span>
-                          <span class="metric-val" id="hero-metric-session">USD ($) • Ouvert</span>
-                        </div>
-                        <div class="hero-metric-item">
-                          <button type="button" class="hero-expand-btn" id="hero-expand-btn" title="Inspecter dans la modale plein écran">
-                            <i class="fa-solid fa-chart-line"></i> Agrandir
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- MODULE 2 : BAROMÈTRE & INDICES MONDIAUX -->
-                    <div class="market-bento-box bento-barometer" id="market-barometer-module">
-                      <div class="bento-box-head">
-                        <div class="bento-head-title">
-                          <i class="fa-solid fa-compass text-accent"></i>
-                          <span>Baromètre &amp; Piliers Mondiaux</span>
-                        </div>
-                        <span class="bento-badge" id="market-sentiment-tag">76% Haussier</span>
-                      </div>
-                      <div class="barometer-gauge-box">
-                        <div class="gauge-labels">
-                          <span>Climat Général</span>
-                          <strong id="barometer-score-text">Positif / Bullish</strong>
-                        </div>
-                        <div class="barometer-track">
-                          <div class="barometer-fill" id="barometer-fill-bar" style="width: 76%;"></div>
-                        </div>
-                      </div>
-                      <div class="barometer-indices-list" id="barometer-indices-list">
-                        <!-- Injecté dynamiquement (S&P 500, Nasdaq 100, CAC 40, DAX 40) -->
-                      </div>
-                    </div>
-
-                    <!-- MODULE 3 : TOP MOVERS DU JOUR (Hausses vs Replis) -->
-                    <div class="market-bento-box bento-movers" id="market-movers-module">
-                      <div class="bento-box-head">
-                        <div class="bento-head-title">
-                          <i class="fa-solid fa-arrows-up-down text-orange"></i>
-                          <span>Top Movers (Variations 24h)</span>
-                        </div>
-                        <span class="bento-badge">Dynamique</span>
-                      </div>
-                      <div class="movers-dual-columns">
-                        <div class="movers-col">
-                          <span class="movers-col-title text-green"><i class="fa-solid fa-arrow-trend-up"></i> Top Hausses</span>
-                          <div class="movers-items-list" id="movers-gainers-list">
-                            <!-- Injecté dynamiquement -->
-                          </div>
-                        </div>
-                        <div class="movers-col">
-                          <span class="movers-col-title text-red"><i class="fa-solid fa-arrow-trend-down"></i> Replis &amp; Consolidations</span>
-                          <div class="movers-items-list" id="movers-losers-list">
-                            <!-- Injecté dynamiquement -->
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- MODULE 4 : DEVISES (FOREX) & CRYPTO EN DIRECT -->
-                    <div class="market-bento-box bento-forex-crypto" id="market-forex-crypto-module">
-                      <div class="bento-box-head">
-                        <div class="bento-head-title">
-                          <i class="fa-solid fa-money-bill-transfer text-blue"></i>
-                          <span>Taux Forex &amp; Crypto Live</span>
-                        </div>
-                        <span class="bento-badge live-dot-badge"><span class="status-dot pulse-green"></span> BCE &amp; CoinGecko</span>
-                      </div>
-                      <div class="forex-crypto-rows" id="forex-crypto-rows">
-                        <!-- Injecté dynamiquement -->
-                      </div>
-                      <div class="quick-converter-bar">
-                        <div class="conv-input-group">
-                          <input type="number" id="quick-conv-amount" value="100" min="1" step="any" />
-                          <span class="conv-currency">EUR (€)</span>
-                        </div>
-                        <i class="fa-solid fa-arrow-right conv-arrow"></i>
-                        <div class="conv-result-group">
-                          <span id="quick-conv-result">108.20 $</span>
-                          <span class="conv-sub" id="quick-conv-btc">~ 0.00115 BTC</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- 4. SECTION WATCHLIST COMPLÈTE & FILTRABLE (Présentation moderne type Apple Bourse) -->
-                  <div class="markets-watchlist-section">
-                    <div class="watchlist-section-header">
-                      <div class="watchlist-title-col">
-                        <h4 class="watchlist-title"><i class="fa-solid fa-list-check"></i> Watchlist &amp; Cotations Complètes</h4>
-                        <span class="watchlist-subtitle">Tableau de bord exhaustif de vos actions, ETF, indices, forex et cryptos</span>
-                      </div>
-                      <div class="watchlist-tools-row">
-                        <nav class="markets-nav-bar" aria-label="Catégories d'actifs">
-                          <div class="tab-group" id="markets-tab-group">
-                            <button type="button" class="tab-btn active" data-market-category="all"><i class="fa-solid fa-layer-group"></i> Tous</button>
-                            <button type="button" class="tab-btn" data-market-category="stock"><i class="fa-solid fa-building"></i> Actions</button>
-                            <button type="button" class="tab-btn" data-market-category="etf"><i class="fa-solid fa-landmark"></i> ETF &amp; Fonds</button>
-                            <button type="button" class="tab-btn" data-market-category="index"><i class="fa-solid fa-chart-line"></i> Indices</button>
-                            <button type="button" class="tab-btn" data-market-category="forex"><i class="fa-solid fa-money-bill-transfer"></i> Forex</button>
-                            <button type="button" class="tab-btn" data-market-category="commodity"><i class="fa-solid fa-coins"></i> Matières 1ères</button>
-                            <button type="button" class="tab-btn" data-market-category="crypto"><i class="fa-brands fa-bitcoin"></i> Cryptos</button>
-                          </div>
-                        </nav>
-                        <div class="watchlist-view-toggle">
-                          <button type="button" class="view-btn active" id="view-mode-list-btn" title="Vue Tableau / Liste">
-                            <i class="fa-solid fa-bars"></i>
-                          </button>
-                          <button type="button" class="view-btn" id="view-mode-grid-btn" title="Vue Grille">
-                            <i class="fa-solid fa-grip"></i>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="markets-watchlist-body" id="crypto-ticker-cards">
-                      <!-- Cartes ou lignes de tableau injectées dynamiquement -->
-                    </div>
-                  </div>
-
-                  <!-- 5. MODALE / STUDIO DE GRAPHIQUE ÉPURÉ & INSTANTANÉ (24 DERNIÈRES HEURES) -->
+                  <!-- 4. MODALE / STUDIO DE GRAPHIQUE ÉPURÉ & INSTANTANÉ (24 DERNIÈRES HEURES) -->
                   <div id="market-chart-modal" class="market-chart-modal is-hidden" hidden style="display: none;">
                     <div class="market-chart-backdrop"></div>
                     <div class="market-chart-dialog">

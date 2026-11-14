@@ -1908,10 +1908,20 @@ async function renderHeroSpotlight(assetId = currentHeroAssetId) {
     btn.classList.toggle('active', btn.dataset.heroId === asset.id);
   });
 
+  // Synchronisation visuelle de la sélection dans la liste Watchlist à gauche
+  document.querySelectorAll('#crypto-ticker-cards .watchlist-row').forEach((row) => {
+    row.classList.toggle('selected', row.dataset.assetId === asset.id);
+  });
+
   const dayL = asset.dayLow || asset.basePrice * 0.985;
   const dayH = asset.dayHigh || asset.basePrice * 1.015;
   if (lowEl) lowEl.textContent = `${dayL.toFixed(2)} ${unit}`;
   if (highEl) highEl.textContent = `${dayH.toFixed(2)} ${unit}`;
+
+  const rangeStatEl = document.getElementById('hero-metric-range-stat');
+  if (rangeStatEl) {
+    rangeStatEl.textContent = `${dayL.toFixed(2)} ${unit} - ${dayH.toFixed(2)} ${unit}`;
+  }
 
   const span = Math.max(0.01, dayH - dayL);
   const pct = Math.max(5, Math.min(95, ((asset.basePrice - dayL) / span) * 100));
@@ -2243,7 +2253,7 @@ function updateMarketGlobalStatus() {
 }
 
 /**
- * Rendu de la Watchlist Complète (Mode Tableau Liste par défaut, ou Mode Grille)
+ * Rendu de la Watchlist (Colonne Gauche avec sélection active et affichage dynamique du graphique à droite)
  */
 function renderMarketCards() {
   const container = document.getElementById('crypto-ticker-cards');
@@ -2266,11 +2276,17 @@ function renderMarketCards() {
     list = list.filter((a) => a.name.toLowerCase().includes(q) || a.symbol.toLowerCase().includes(q));
   }
 
+  const countBadge = document.getElementById('watchlist-count-badge');
+  if (countBadge) {
+    countBadge.textContent = `${list.length} actif${list.length > 1 ? 's' : ''}`;
+  }
+
   if (list.length === 0) {
+    container.className = 'watchlist-items-container';
     container.innerHTML = `
-      <div class="market-empty-hint" style="grid-column: 1 / -1; padding: 3rem 2rem; text-align: center; color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 20px;">
-        <i class="fa-solid fa-chart-line" style="font-size: 2rem; color: var(--accent-primary); margin-bottom: 0.8rem; display: block;"></i>
-        <span style="font-size: 0.95rem; display: block; margin-bottom: 1rem;">Aucun actif ne correspond à votre filtre.</span>
+      <div class="market-empty-hint" style="grid-column: 1 / -1; padding: 2.5rem 1.5rem; text-align: center; color: var(--text-muted); background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px;">
+        <i class="fa-solid fa-chart-line" style="font-size: 1.8rem; color: var(--accent-primary); margin-bottom: 0.6rem; display: block;"></i>
+        <span style="font-size: 0.88rem; display: block; margin-bottom: 0.8rem;">Aucun actif ne correspond à votre filtre.</span>
         <button type="button" class="market-btn-primary" id="market-open-empty-btn"><i class="fa-solid fa-sliders"></i> Personnaliser la Watchlist</button>
       </div>
     `;
@@ -2278,184 +2294,62 @@ function renderMarketCards() {
     return;
   }
 
-  // A) MODE TABLEAU / LISTE (PAR DÉFAUT - STYLE APPLE BOURSE / REVOLUT)
-  if (currentWatchlistViewMode === 'list') {
-    container.className = 'watchlist-table-container';
-    container.innerHTML = `
-      <div class="watchlist-table-header">
-        <span>Actif &amp; Symbole</span>
-        <span>Tendance 24h</span>
-        <span>Range Journalier</span>
-        <span style="text-align: right;">Dernier Cours</span>
-        <span style="text-align: right;">Variation (24h)</span>
-        <span></span>
-      </div>
-      ${list.map((asset) => {
-        const isPositive = asset.baseChange >= 0;
-        const sign = isPositive ? '+' : '';
-        const unit = asset.unit || '$';
-        const formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
-        const { linePath } = generateSparklinePaths(asset.basePrice, asset.baseChange, isPositive);
-
-        const dayL = asset.dayLow || asset.basePrice * 0.985;
-        const dayH = asset.dayHigh || asset.basePrice * 1.015;
-        const rangeSpan = Math.max(0.01, dayH - dayL);
-        const rangePct = Math.max(5, Math.min(95, ((asset.basePrice - dayL) / rangeSpan) * 100));
-
-        let typeColor = 'var(--accent-primary)';
-        if (asset.type === 'etf') typeColor = '#60a5fa';
-        else if (asset.type === 'stock') typeColor = '#c084fc';
-        else if (asset.type === 'crypto') typeColor = '#fbbf24';
-        else if (asset.type === 'index') typeColor = '#34d399';
-        else if (asset.type === 'forex') typeColor = '#38bdf8';
-        else if (asset.type === 'commodity') typeColor = '#f59e0b';
-
-        const cleanSym = asset.symbol.includes(':') ? asset.symbol.split(':')[1] : asset.symbol;
-
-        return `
-          <div class="watchlist-row" data-asset-id="${asset.id}" title="${asset.name} - Cliquer pour ouvrir la courbe 24h">
-            <div class="wl-asset-cell">
-              <div class="wl-icon-box" style="--asset-color: ${typeColor};">
-                <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
-              </div>
-              <div class="wl-asset-info">
-                <span class="wl-asset-name">${asset.name}</span>
-                <div class="wl-asset-meta">
-                  <span class="wl-ticker">${cleanSym}</span>
-                  <span class="wl-type-tag">${(asset.type || 'actif').toUpperCase()}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="wl-sparkline-cell">
-              <svg viewBox="0 0 100 36" class="wl-sparkline-svg" preserveAspectRatio="none">
-                <path d="${linePath}" fill="none" stroke="${isPositive ? '#10b981' : '#ef4444'}" stroke-width="2.2" />
-              </svg>
-            </div>
-
-            <div class="wl-range-cell">
-              <span class="wl-range-bound">${dayL.toFixed(1)}</span>
-              <div class="wl-range-track">
-                <div class="wl-range-dot" style="left: ${rangePct.toFixed(1)}%;"></div>
-              </div>
-              <span class="wl-range-bound">${dayH.toFixed(1)}</span>
-            </div>
-
-            <div class="wl-price-cell">
-              ${formattedPrice}
-            </div>
-
-            <div class="wl-change-cell">
-              <span class="wl-change-badge ${isPositive ? 'up' : 'down'}">
-                <i class="fa-solid fa-arrow-trend-${isPositive ? 'up' : 'down'}"></i>
-                ${sign}${asset.baseChange.toFixed(2)}%
-              </span>
-            </div>
-
-            <div class="wl-action-cell">
-              <button type="button" title="Afficher la courbe 24h" data-open-chart="${asset.id}">
-                <i class="fa-solid fa-chart-line"></i>
-              </button>
-            </div>
-          </div>
-        `;
-      }).join('')}
-    `;
-
-    container.querySelectorAll('.watchlist-row').forEach((row) => {
-      row.addEventListener('click', () => {
-        const id = row.dataset.assetId;
-        const asset = marketAssets.find((a) => a.id === id);
-        if (asset) openChartModal(asset);
-      });
-    });
-    return;
-  }
-
-  // B) MODE GRILLE CLASSIQUE (COMPACT)
-  container.className = 'markets-grid crypto-ticker-cards';
+  container.className = 'watchlist-items-container';
   container.innerHTML = list.map((asset) => {
+    const isSelected = asset.id === currentHeroAssetId;
     const isPositive = asset.baseChange >= 0;
     const sign = isPositive ? '+' : '';
     const unit = asset.unit || '$';
     const formattedPrice = `${asset.basePrice.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${unit}`;
-    const { linePath, areaPath } = generateSparklinePaths(asset.basePrice, asset.baseChange, isPositive);
+    const { linePath } = generateSparklinePaths(asset.basePrice, asset.baseChange, isPositive);
 
-    const dayL = asset.dayLow || asset.basePrice * 0.985;
-    const dayH = asset.dayHigh || asset.basePrice * 1.015;
-    const rangeSpan = Math.max(0.01, dayH - dayL);
-    const rangePct = Math.max(5, Math.min(95, ((asset.basePrice - dayL) / rangeSpan) * 100));
-
-    let typeColor = 'var(--accent-primary)';
-    if (asset.type === 'etf') typeColor = '#60a5fa';
-    else if (asset.type === 'stock') typeColor = '#c084fc';
-    else if (asset.type === 'crypto') typeColor = '#fbbf24';
-    else if (asset.type === 'index') typeColor = '#34d399';
-    else if (asset.type === 'forex') typeColor = '#38bdf8';
-    else if (asset.type === 'commodity') typeColor = '#f59e0b';
+    let typeColor = '#38bdf8';
+    if (asset.type === 'etf') typeColor = '#a78bfa';
+    else if (asset.type === 'stock') typeColor = '#38bdf8';
+    else if (asset.type === 'crypto') typeColor = '#f59e0b';
+    else if (asset.type === 'index') typeColor = '#10b981';
+    else if (asset.type === 'forex') typeColor = '#34d399';
 
     const cleanSym = asset.symbol.includes(':') ? asset.symbol.split(':')[1] : asset.symbol;
+    const subLabel = asset.exchange ? `${asset.exchange} • ${(asset.type || 'actif').toUpperCase()}` : (asset.type || 'actif').toUpperCase();
 
     return `
-      <div class="market-asset-card" data-asset-id="${asset.id}" title="Cliquer pour afficher la courbe de ${asset.name}">
-        <div class="market-card-top">
-          <div class="market-card-title-info">
-            <div class="market-icon-bubble" style="--asset-color: ${typeColor}">
-              <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
-            </div>
-            <div class="market-name-wrap">
-              <span class="market-name">${asset.name}</span>
-              <div class="market-meta-row">
-                <span class="market-sym">${cleanSym}</span>
-                <span class="market-type-pill ${asset.type}">${(asset.type || 'actif').toUpperCase()}</span>
-              </div>
-            </div>
+      <div class="watchlist-row ${isSelected ? 'selected' : ''}" data-asset-id="${asset.id}" title="${asset.name} - Cliquer pour afficher le graphique">
+        <div class="wl-left-content">
+          <div class="wl-icon-box" style="color: ${typeColor}; border-color: ${typeColor}40; background: ${typeColor}15;">
+            <i class="${asset.icon || 'fa-solid fa-chart-line'}"></i>
           </div>
-          <button type="button" class="market-quick-chart-btn" title="Ouvrir la courbe" data-chart-id="${asset.id}">
-            <i class="fa-solid fa-chart-line"></i>
-          </button>
+          <div class="wl-text-group">
+            <div class="wl-name-sym-row">
+              <span class="wl-asset-name">${asset.name}</span>
+              <span class="wl-ticker-pill">${cleanSym}</span>
+            </div>
+            <span class="wl-asset-sub">${subLabel}</span>
+          </div>
         </div>
 
-        <div class="market-card-middle">
-          <div class="market-price-col">
-            <span class="market-price-val">${formattedPrice}</span>
-            <span class="market-change-badge ${isPositive ? 'up' : 'down'}">
-              <i class="fa-solid fa-arrow-${isPositive ? 'trend-up' : 'trend-down'}"></i>
-              ${sign}${asset.baseChange.toFixed(2)}%
+        <div class="wl-right-content">
+          <svg viewBox="0 0 60 22" class="wl-spark-mini" preserveAspectRatio="none">
+            <path d="${linePath}" fill="none" stroke="${isPositive ? '#10b981' : '#ef4444'}" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+          <div class="wl-price-group">
+            <span class="wl-price-val">${formattedPrice}</span>
+            <span class="wl-badge-pill ${isPositive ? 'up' : 'down'}">
+              <i class="fa-solid fa-arrow-trend-${isPositive ? 'up' : 'down'}"></i> ${sign}${asset.baseChange.toFixed(2)}%
             </span>
-          </div>
-          <div class="market-sparkline-box">
-            <svg viewBox="0 0 100 36" preserveAspectRatio="none" class="market-sparkline-svg">
-              <defs>
-                <linearGradient id="sparkGrad-${asset.id}" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="${isPositive ? '#10b981' : '#ef4444'}" stop-opacity="0.35" />
-                  <stop offset="100%" stop-color="${isPositive ? '#10b981' : '#ef4444'}" stop-opacity="0.0" />
-                </linearGradient>
-              </defs>
-              <path d="${areaPath}" fill="url(#sparkGrad-${asset.id})" />
-              <path d="${linePath}" fill="none" stroke="${isPositive ? '#10b981' : '#ef4444'}" stroke-width="2" />
-            </svg>
-          </div>
-        </div>
-
-        <div class="market-card-bottom">
-          <div class="market-range-info">
-            <span class="range-bound">${dayL.toFixed(2)}</span>
-            <div class="range-track">
-              <div class="range-point" style="left: ${rangePct.toFixed(1)}%;"></div>
-            </div>
-            <span class="range-bound">${dayH.toFixed(2)}</span>
           </div>
         </div>
       </div>
     `;
   }).join('');
 
-  container.querySelectorAll('.market-asset-card').forEach((card) => {
-    card.addEventListener('click', () => {
-      const id = card.dataset.assetId;
-      const asset = marketAssets.find((a) => a.id === id);
-      if (asset) openChartModal(asset);
+  container.querySelectorAll('.watchlist-row').forEach((row) => {
+    row.addEventListener('click', () => {
+      const id = row.dataset.assetId;
+      currentHeroAssetId = id;
+      container.querySelectorAll('.watchlist-row').forEach((r) => r.classList.remove('selected'));
+      row.classList.add('selected');
+      renderHeroSpotlight(id);
     });
   });
 }
@@ -2938,10 +2832,10 @@ function initMarkets() {
     });
   }
 
-  // Filtrage par catégorie (onglets)
-  document.querySelectorAll('#markets-tab-group .tab-btn').forEach((btn) => {
+  // Filtrage par catégorie (onglets / pilules)
+  document.querySelectorAll('#markets-tab-group button').forEach((btn) => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('#markets-tab-group .tab-btn').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('#markets-tab-group button').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       currentMarketCategory = btn.dataset.marketCategory || 'all';
       renderMarketCards();
