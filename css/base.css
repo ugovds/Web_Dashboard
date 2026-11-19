@@ -266,3 +266,72 @@ body {
   color: #ff5555;
 }
 
+/* ========================================================
+   THÈMES VISUELS INTÉGRÉS (Élimine 4 requêtes HTTP bloquantes)
+   ======================================================== */
+
+/* Thème 1 : Kanagawa (Cyan / Menthe Froide) */
+:root,
+body[data-theme="1"] {
+  --bg-deep: #040609;
+  --surface: rgba(11, 16, 23, 0.78);
+  --surface-strong: rgba(18, 26, 37, 0.94);
+  --border-subtle: rgba(168, 230, 240, 0.09);
+  --border-highlight: rgba(168, 230, 240, 0.45);
+  --accent-primary: #a8e6f0;
+  --accent-secondary: #7c9bb0;
+  --accent-white: #f0f4f8;
+  --text-main: #e6edf3;
+  --text-muted: #6e8094;
+  --orb-1: rgba(168, 230, 240, 0.28);
+  --orb-2: rgba(72, 118, 148, 0.32);
+}
+
+/* Thème 2 : Sakura (Rose / Néo-Pastel) */
+body[data-theme="2"] {
+  --bg-deep: #07050c;
+  --surface: rgba(18, 13, 28, 0.78);
+  --surface-strong: rgba(28, 20, 44, 0.94);
+  --border-subtle: rgba(255, 133, 192, 0.11);
+  --border-highlight: rgba(255, 133, 192, 0.48);
+  --accent-primary: #ff85c0;
+  --accent-secondary: #849bff;
+  --accent-white: #fff0f6;
+  --text-main: #f3eaf7;
+  --text-muted: #8c7f9e;
+  --orb-1: rgba(255, 133, 192, 0.3);
+  --orb-2: rgba(105, 125, 235, 0.3);
+}
+
+/* Thème 3 : Cyberdeck (Néon Cyberpunk Violet & Cyan) */
+body[data-theme="3"] {
+  --bg-deep: #06040e;
+  --surface: rgba(15, 11, 28, 0.78);
+  --surface-strong: rgba(25, 18, 44, 0.94);
+  --border-subtle: rgba(181, 95, 230, 0.12);
+  --border-highlight: rgba(49, 225, 247, 0.48);
+  --accent-primary: #31e1f7;
+  --accent-secondary: #b55fe6;
+  --accent-white: #eef2f6;
+  --text-main: #eef2f6;
+  --text-muted: #7c859e;
+  --orb-1: rgba(181, 95, 230, 0.34);
+  --orb-2: rgba(49, 225, 247, 0.28);
+}
+
+/* Thème 4 : Retro Wave (Monochrome Ukiyo-e & 8-Bit) */
+body[data-theme="4"] {
+  --bg-deep: #030406;
+  --surface: rgba(13, 16, 22, 0.82);
+  --surface-strong: rgba(20, 24, 34, 0.96);
+  --border-subtle: rgba(220, 230, 245, 0.11);
+  --border-highlight: rgba(225, 235, 250, 0.52);
+  --accent-primary: #e2ebf5;
+  --accent-secondary: #8295a8;
+  --accent-white: #ffffff;
+  --text-main: #f0f4f8;
+  --text-muted: #78879b;
+  --orb-1: rgba(226, 235, 245, 0.22);
+  --orb-2: rgba(85, 110, 140, 0.28);
+}
+

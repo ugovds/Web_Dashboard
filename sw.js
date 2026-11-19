@@ -1,26 +1,32 @@
 /**
- * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache Instantané PWA)
+ * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache Instantané 0 ms)
  */
 
-const CACHE_NAME = 'violet-startpage-v10.0';
+const CACHE_NAME = 'violet-startpage-v11.0';
 
 const STATIC_ASSETS = [
   './',
   './index.html',
+  './css/fonts.css',
+  './css/fontawesome.min.css',
   './css/base.css',
   './css/dashboard.css',
-  './css/skeletons.css',
   './css/search.css',
   './css/bookmarks.css',
-  './css/deck.css',
   './css/modals.css',
   './css/responsive.css',
-  './css/themes/kanagawa.css',
-  './css/themes/sakura.css',
-  './css/themes/cyberdeck.css',
-  './css/themes/retrowave.css',
   './css/themes/glass.css',
+  './fonts/inter-latin.woff2',
+  './fonts/jetbrains-mono-latin.woff2',
+  './fonts/orbitron-latin.woff2',
+  './webfonts/fa-solid-900.woff2',
+  './webfonts/fa-brands-400.woff2',
+  './webfonts/fa-regular-400.woff2',
   './images/glass.svg',
+  './images/gif.gif',
+  './images/gif2.webp',
+  './images/gif3.webp',
+  './images/gif4.gif',
   './js/themes.js',
   './js/appearance.js',
   './js/search.js',
@@ -28,14 +34,10 @@ const STATIC_ASSETS = [
   './js/custom-hub.js',
   './js/command-palette.js',
   './js/shortcuts.js',
-  './js/app.js',
-  './images/gif.gif',
-  './images/gif2.webp',
-  './images/gif3.webp',
-  './images/gif4.gif'
+  './js/app.js'
 ];
 
-// Installation : pré-mise en cache des fichiers statiques optimisés
+// Installation : mise en cache immédiate de tous les fichiers locaux
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -46,7 +48,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activation : nettoyage immédiat des anciens caches
+// Activation : nettoyage instantané des anciens caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
@@ -61,50 +63,43 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Interception des requêtes : Stale-While-Revalidate pour 0 ms de latence
+// Interception : Stale-While-Revalidate pour un affichage en 0 ms
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
   if (event.request.method !== 'GET') return;
 
-  // Fichiers locaux : Network-First avec mise à jour du cache
+  // Fichiers locaux : Cache-First avec rafraîchissement en arrière-plan (0 ms immédiat)
   if (url.origin === self.location.origin) {
     event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          return caches.match(event.request).then((cachedResponse) => {
-            if (cachedResponse) return cachedResponse;
-            if (event.request.mode === 'navigate') {
-              return caches.match('./index.html');
+      caches.match(event.request).then((cachedResponse) => {
+        const fetchPromise = fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const responseClone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
             }
-          });
-        })
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+
+        return cachedResponse || fetchPromise;
+      })
     );
     return;
   }
 
-  // Polices & Font Awesome : Cache-First
-  if (url.hostname.includes('fonts.googleapis.com') ||
-      url.hostname.includes('fonts.gstatic.com') ||
-      url.hostname.includes('cdnjs.cloudflare.com')) {
-    event.respondWith(
-      caches.match(event.request).then((cached) => {
-        if (cached) return cached;
-        return fetch(event.request).then((res) => {
-          if (res && res.status === 200) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
-          }
-          return res;
-        });
-      })
-    );
-  }
+  // Autres requêtes éventuelles : Cache-First
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request).then((res) => {
+        if (res && res.status === 200) {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
+        }
+        return res;
+      }).catch(() => cached);
+    })
+  );
 });

@@ -5,39 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cyberdeck // Raccourcis</title>
 
-    <!-- Preconnects pour chargement ultrarapide -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+    <!-- Polices locales autohébergées (0 ms, 100% hors-ligne) -->
+    <link rel="stylesheet" href="css/fonts.css" />
+    <link rel="stylesheet" href="css/fontawesome.min.css" />
 
-    <!-- Polices Google : Inter, JetBrains Mono, Orbitron, Share Tech Mono, VT323 -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&family=Orbitron:wght@500;700;800;900&family=Share+Tech+Mono&family=VT323&display=swap"
-    />
-
-    <!-- Font Awesome Icons -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    />
-
-    <!-- Feuilles de styles modulaires -->
-    <link rel="stylesheet" href="css/base.css?v=7.0" />
-    <link rel="stylesheet" href="css/deck.css?v=7.0" />
-    <link rel="stylesheet" href="css/dashboard.css?v=7.0" />
-    <link rel="stylesheet" href="css/skeletons.css?v=7.0" />
-    <link rel="stylesheet" href="css/search.css?v=7.0" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=7.0" />
-    <link rel="stylesheet" href="css/responsive.css?v=7.0" />
-    <link rel="stylesheet" href="css/modals.css?v=7.0" />
-
-    <!-- Thèmes Visuels -->
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=7.0" />
-    <link rel="stylesheet" href="css/themes/sakura.css?v=7.0" />
-    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=7.0" />
-    <link rel="stylesheet" href="css/themes/retrowave.css?v=7.0" />
-    <link rel="stylesheet" href="css/themes/glass.css?v=7.0" />
+    <!-- Feuilles de styles modulaires locales -->
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/search.css" />
+    <link rel="stylesheet" href="css/bookmarks.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <link rel="stylesheet" href="css/modals.css" />
+    <link rel="stylesheet" href="css/themes/glass.css" />
   </head>
 
   <body data-theme="4">
@@ -144,52 +123,249 @@
            2. CANEVAS PRINCIPAL : GRILLE CENTRÉE DES RACCOURCIS
            ============================================== -->
       <main class="startpage-main">
-        <!-- Squelette First Paint -->
-        <div id="startpage-skeleton" class="view-skeleton-view" aria-hidden="true">
-          <div class="categories-grid">
-            <div class="category-card skel-card">
-              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-              </div>
-            </div>
-            <div class="category-card skel-card">
-              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-              </div>
-            </div>
-            <div class="category-card skel-card">
-              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-              </div>
-            </div>
-            <div class="category-card skel-card">
-              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contenu Réel -->
-        <div id="startpage-content" class="startpage-content view-real-content is-loading">
+        <div id="startpage-content" class="startpage-content">
           <section class="overview-categories-section">
-            <div id="categories-container" class="categories-grid"></div>
+            <div id="categories-container" class="categories-grid">
+              <!-- Catégorie 1 : Social -->
+              <div class="category-card density-normal" data-cat="0">
+                <div class="category-header">
+                  <div class="category-title-wrap">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <h3>Social</h3>
+                  </div>
+                </div>
+                <div class="link-list" data-cat="0">
+                  <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="0" data-link="0" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-brands fa-youtube"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">YouTube</span>
+                    </div>
+                  </a>
+                  <a href="https://www.twitch.tv/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="0" data-link="1" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-brands fa-twitch"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Twitch</span>
+                    </div>
+                  </a>
+                  <a href="https://mail.google.com/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="0" data-link="2" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-envelope-open-text"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Gmail</span>
+                    </div>
+                  </a>
+                  <a href="https://x.com/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="0" data-link="3" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-brands fa-x-twitter"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Twitter / X</span>
+                    </div>
+                  </a>
+                  <a href="https://docs.google.com/document/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="0" data-link="4" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-file-lines"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Google Docs</span>
+                    </div>
+                  </a>
+                  <a href="https://docs.google.com/presentation/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="0" data-link="5" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-display"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Google Slides</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Catégorie 2 : Jeux -->
+              <div class="category-card density-normal" data-cat="1">
+                <div class="category-header">
+                  <div class="category-title-wrap">
+                    <i class="fa-solid fa-gamepad"></i>
+                    <h3>Jeux</h3>
+                  </div>
+                </div>
+                <div class="link-list" data-cat="1">
+                  <a href="https://www.chess.com/home" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="1" data-link="0" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-chess-knight"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Chess</span>
+                    </div>
+                  </a>
+                  <a href="https://monkeytype.com/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="1" data-link="1" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-keyboard"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Monkeytype</span>
+                    </div>
+                  </a>
+                  <a href="https://cemantix.certitudes.org/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="1" data-link="2" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-fire-flame-curved"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Cémantix</span>
+                    </div>
+                  </a>
+                  <a href="https://worldle.teuteuf.fr/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="1" data-link="3" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-earth-europe"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Worldle</span>
+                    </div>
+                  </a>
+                  <a href="https://framed.wtf/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="1" data-link="4" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-film"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Framed</span>
+                    </div>
+                  </a>
+                  <a href="https://www.chronophoto.app/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="1" data-link="5" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-camera-retro"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Chronophoto</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Catégorie 3 : IA -->
+              <div class="category-card density-normal" data-cat="2">
+                <div class="category-header">
+                  <div class="category-title-wrap">
+                    <i class="fa-solid fa-microchip"></i>
+                    <h3>IA</h3>
+                  </div>
+                </div>
+                <div class="link-list" data-cat="2">
+                  <a href="https://gemini.google.com/app?hl=fr" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="2" data-link="0" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Gemini</span>
+                    </div>
+                  </a>
+                  <a href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="2" data-link="1" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">ChatGPT</span>
+                    </div>
+                  </a>
+                  <a href="https://notebooklm.google.com/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="2" data-link="2" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-book-open-reader"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">NotebookLM</span>
+                    </div>
+                  </a>
+                  <a href="https://claude.ai/new" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="2" data-link="3" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Claude</span>
+                    </div>
+                  </a>
+                  <a href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="2" data-link="4" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Perplexity</span>
+                    </div>
+                  </a>
+                  <a href="https://chat.deepseek.com/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="2" data-link="5" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-terminal"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">DeepSeek</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Catégorie 4 : Unif -->
+              <div class="category-card density-normal" data-cat="3">
+                <div class="category-header">
+                  <div class="category-title-wrap">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <h3>Unif</h3>
+                  </div>
+                </div>
+                <div class="link-list" data-cat="3">
+                  <a href="https://moodle.uclouvain.be/my/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="3" data-link="0" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-book-bookmark"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Moodle</span>
+                    </div>
+                  </a>
+                  <a href="https://inginious.info.ucl.ac.be/mycourses" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="3" data-link="1" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-code"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">INGInious</span>
+                    </div>
+                  </a>
+                  <a href="https://monhoraire.uclouvain.be/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="3" data-link="2" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-regular fa-calendar-days"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">MonHoraire</span>
+                    </div>
+                  </a>
+                  <a href="https://outlook.office.com/mail/" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="3" data-link="3" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-envelope"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Outlook</span>
+                    </div>
+                  </a>
+                  <a href="https://overleaf.info.ucl.ac.be/project" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="3" data-link="4" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-feather-pointed"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">Overleaf</span>
+                    </div>
+                  </a>
+                  <a href="https://uclouvain.be/fr/myuclouvain" target="_blank" rel="noopener noreferrer" class="link-item" data-cat="3" data-link="5" draggable="false">
+                    <div class="link-icon-box">
+                      <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <div class="link-details">
+                      <span class="link-name-text">MyUCL</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+            </div>
           </section>
         </div>
       </main>

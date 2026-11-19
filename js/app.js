@@ -66,92 +66,18 @@ window.showToast = showToast;
  * Chaque page s'affiche en squelette puis se révèle d'un seul bloc.
  */
 const PageSkeletonManager = {
-  activeTransitions: new Map(),
-  revealedViews: new Set(),
-
-  _getElements(viewKey = 'startpage') {
-    const skeleton = document.getElementById(`${viewKey}-skeleton-view`) || document.getElementById('startpage-skeleton');
-    const realView = document.getElementById(`${viewKey}-real-view`) || document.getElementById('startpage-content');
-    return { skeleton, realView };
+  showSkeleton() {},
+  revealView(viewKey, callback) {
+    if (typeof callback === 'function') callback();
   },
-
-  showSkeleton(viewKey = 'startpage') {
-    const { skeleton, realView } = this._getElements(viewKey);
-    if (!skeleton || !realView) return;
-
-    if (this.activeTransitions.has(viewKey)) {
-      clearTimeout(this.activeTransitions.get(viewKey));
-      this.activeTransitions.delete(viewKey);
-    }
-
-    skeleton.classList.remove('is-hidden', 'is-fading-out');
-    skeleton.removeAttribute('hidden');
-    realView.classList.remove('is-loaded');
-    realView.classList.add('is-loading');
-  },
-
-  revealView(viewKey = 'startpage', callback) {
-    const { skeleton, realView } = this._getElements(viewKey);
-    if (!skeleton || !realView) {
-      if (typeof callback === 'function') callback();
-      return;
-    }
-
-    if (this.activeTransitions.has(viewKey)) {
-      clearTimeout(this.activeTransitions.get(viewKey));
-      this.activeTransitions.delete(viewKey);
-    }
-
-    requestAnimationFrame(() => {
-      skeleton.classList.add('is-fading-out');
-      realView.classList.remove('is-loading');
-      realView.classList.add('is-loaded');
-      this.revealedViews.add(viewKey);
-
-      const timeoutId = setTimeout(() => {
-        skeleton.classList.add('is-hidden');
-        skeleton.setAttribute('hidden', '');
-        if (typeof callback === 'function') callback();
-      }, 120);
-
-      this.activeTransitions.set(viewKey, timeoutId);
-    });
-  },
-
-  prepareAndRevealView(viewKey = 'startpage', onRender, minDelayMs = 0) {
-    const { skeleton, realView } = this._getElements(viewKey);
-
-    if (!skeleton || !realView) {
-      if (typeof onRender === 'function') {
-        try { onRender(); } catch (err) { console.warn(`Render error on ${viewKey}:`, err); }
-      }
-      return;
-    }
-
-    if (typeof onRender === 'function') {
-      try {
-        onRender();
-      } catch (err) {
-        console.warn(`Render error on ${viewKey}:`, err);
-      }
-    }
-
-    if (minDelayMs > 0) {
-      const timerId = setTimeout(() => {
-        this.revealView(viewKey);
-      }, minDelayMs);
-      this.activeTransitions.set(viewKey, timerId);
-    } else {
-      this.revealView(viewKey);
-    }
+  prepareAndRevealView(viewKey, onRender) {
+    if (typeof onRender === 'function') onRender();
   }
 };
 
 window.PageSkeletonManager = PageSkeletonManager;
 
-function revealBookmarksFromSkeleton() {
-  PageSkeletonManager.revealView('startpage');
-}
+function revealBookmarksFromSkeleton() {}
 window.revealBookmarksFromSkeleton = revealBookmarksFromSkeleton;
 window.revealDashboardFromSkeleton = revealBookmarksFromSkeleton;
 
@@ -174,16 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
   safeInit(initCustomHub, 'initCustomHub');
   safeInit(initShortcuts, 'initShortcuts');
 
-  // Révélation immédiate de la startpage
-  requestAnimationFrame(() => {
-    PageSkeletonManager.revealView('startpage');
-  });
-
   // === TÂCHES DIFFÉRÉES ===
   const deferNonCritical = () => {
     safeInit(initCommandPalette, 'initCommandPalette');
 
-    // Enregistrement du Service Worker pour le mode hors-ligne PWA
+    // Enregistrement du Service Worker pour le mode instantané 0 ms
     if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     }
@@ -192,6 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if ('requestIdleCallback' in window) {
     requestIdleCallback(deferNonCritical, { timeout: 800 });
   } else {
-    setTimeout(deferNonCritical, 80);
+    setTimeout(deferNonCritical, 50);
   }
 });
