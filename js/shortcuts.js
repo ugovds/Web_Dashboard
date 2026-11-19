@@ -1,32 +1,23 @@
 /**
  * shortcuts.js - Raccourcis clavier globaux & Navigation rapide
- * - Alt+1 à Alt+9 : Bascule directe entre les vues du deck unifié
- * - T : Cible instantanément le champ d'ajout de tâche (vue Agenda)
+ * - Alt+1 : Onglet Raccourcis
+ * - Alt+2 : Onglet Paramètres
  * - Ctrl+K ou B : Ouvre la palette de commande et recherche de signets
  * - Ctrl+Shift+D : Bascule le mode Nuit / Atténuation HUD
- * - 1, 2, 3 : Changement de thème (quand aucun champ n'est actif)
- * - / : Cible la barre de recherche globale
- * - Échap : Ferme les modales ouvertes ou quitte le champ actif
+ * - 1, 2, 3, 4, 5 : Changement de thème instantané
+ * - / : Cible la barre de recherche Omnibox
+ * - Échap : Ferme les modales ou retourne aux raccourcis
+ * - Ctrl+Z : Annule la suppression du dernier raccourci
  */
 function initShortcuts() {
   const DECK_VIEWS_ORDER = [
-    'dashboard',
     'bookmarks',
-    'agenda',
-    'weather',
-    'feeds',
-    'system',
-    'pomodoro',
-    'notes',
-    'quotes',
     'customize'
   ];
 
   document.addEventListener('keydown', (e) => {
     const active = document.activeElement;
     const searchInput = document.getElementById('search-input');
-    const todoInput = document.getElementById('todo-input');
-    const todoDate = document.getElementById('todo-date');
 
     const editModal = document.getElementById('edit-modal');
     const categoryModal = document.getElementById('category-modal');
@@ -36,7 +27,7 @@ function initShortcuts() {
     const isCategoryModalOpen = categoryModal && !categoryModal.hidden;
     const isPaletteOpen = commandPaletteModal && !commandPaletteModal.hidden;
 
-    // Fermeture des modales avec Échap
+    // Fermeture des modales ou retour avec Échap
     if (e.key === 'Escape') {
       if (isPaletteOpen && typeof closeCommandPalette === 'function') {
         closeCommandPalette();
@@ -48,6 +39,13 @@ function initShortcuts() {
       }
       if (isCategoryModalOpen && typeof closeCategoryModal === 'function') {
         closeCategoryModal();
+        return;
+      }
+      // Si on est dans les paramètres et qu'aucune modale n'est ouverte, retourner aux raccourcis
+      const customView = document.getElementById('deck-view-customize');
+      if (customView && !customView.hidden && customView.classList.contains('active')) {
+        const bookmarksBtn = document.querySelector('.deck-nav-btn[data-deck-view="bookmarks"]');
+        if (bookmarksBtn) bookmarksBtn.click();
         return;
       }
     }
@@ -70,7 +68,7 @@ function initShortcuts() {
       return;
     }
 
-    // Navigation dans le deck via Alt+1 à Alt+9 et Alt+0
+    // Navigation dans le deck via Alt+1 (Raccourcis) et Alt+2 (Paramètres)
     if (e.altKey && !e.ctrlKey && !e.metaKey) {
       let num = null;
       if (e.code.startsWith('Digit')) {
@@ -82,12 +80,12 @@ function initShortcuts() {
       }
 
       if (num !== null) {
-        const targetIdx = num === 0 ? 9 : num - 1;
+        const targetIdx = num - 1;
         if (targetIdx >= 0 && targetIdx < DECK_VIEWS_ORDER.length) {
           e.preventDefault();
           const targetViewKey = DECK_VIEWS_ORDER[targetIdx];
           const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${targetViewKey}"]`);
-          if (navBtn && !navBtn.classList.contains('tab-hidden') && navBtn.style.display !== 'none') {
+          if (navBtn) {
             navBtn.click();
             if (typeof showToast === 'function') {
               const label = navBtn.querySelector('.nav-label')?.textContent || navBtn.querySelector('span')?.textContent || targetViewKey;
@@ -99,27 +97,16 @@ function initShortcuts() {
       }
     }
 
-    const isAnyModalOpen =
-      isEditModalOpen ||
-      isWeatherModalOpen ||
-      isFeedsModalOpen ||
-      isHubModalOpen ||
-      isCategoryModalOpen ||
-      isPaletteOpen;
+    const isAnyModalOpen = isEditModalOpen || isCategoryModalOpen || isPaletteOpen;
     if (isAnyModalOpen) return;
 
-    const isTodoFocused = active === todoInput || active === todoDate;
     const isSearchEmpty = active === searchInput && searchInput.value.trim() === '';
     const isNotTyping = active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA' && active.tagName !== 'SELECT';
 
-    // Navigation au clavier par touches Flèches Haut & Bas exclusivement entre les onglets de la sidebar
+    // Navigation au clavier par touches Flèches Haut & Bas entre Raccourcis et Paramètres
     if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isNotTyping) {
       e.preventDefault();
-      const sidebarKeys = ['dashboard', 'bookmarks', 'agenda', 'weather', 'feeds', 'system', 'pomodoro', 'notes', 'quotes'];
-      const sidebarBtns = sidebarKeys
-        .map((k) => document.querySelector(`.sidebar-nav .deck-nav-btn[data-deck-view="${k}"]`))
-        .filter((b) => b && !b.classList.contains('tab-hidden') && b.style.display !== 'none');
-
+      const sidebarBtns = Array.from(document.querySelectorAll('.sidebar-nav .deck-nav-btn'));
       if (sidebarBtns.length) {
         const activeBtn = document.querySelector('.sidebar-nav .deck-nav-btn.active');
         const activeIdx = activeBtn ? sidebarBtns.indexOf(activeBtn) : -1;
@@ -129,7 +116,7 @@ function initShortcuts() {
         } else {
           targetIdx = (activeIdx <= 0) ? sidebarBtns.length - 1 : activeIdx - 1;
         }
-        sidebarBtns[targetIdx].click();
+        sidebarBtns[targetIdx]?.click();
       }
       return;
     }
@@ -143,27 +130,13 @@ function initShortcuts() {
 
     // Annuler la suppression (Ctrl+Z / Cmd+Z) quand on ne tape pas dans un champ
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && isNotTyping) {
-      if (typeof undoDeleteTask === 'function' && undoDeleteTask()) {
-        e.preventDefault();
-        return;
-      }
       if (typeof undoDeleteBookmark === 'function' && undoDeleteBookmark()) {
         e.preventDefault();
         return;
       }
     }
 
-    // Raccourci T : Ajout rapide de tâche (active la vue Agenda et focus le champ)
-    if ((e.key === 't' || e.key === 'T') && isNotTyping) {
-      e.preventDefault();
-      const agendaBtn = document.querySelector('.deck-nav-btn[data-deck-view="agenda"]');
-      if (agendaBtn) agendaBtn.click();
-      if (todoInput) {
-        setTimeout(() => todoInput.focus(), 80);
-      }
-      return;
-    }
-
+    // Touches 1 à 5 pour changer de thème
     const isThemeKey =
       e.code === 'Numpad1' ||
       e.code === 'Numpad2' ||
@@ -172,7 +145,7 @@ function initShortcuts() {
       e.code === 'Numpad5' ||
       ((isNotTyping || isSearchEmpty) && ['1', '2', '3', '4', '5'].includes(e.key));
 
-    if (isThemeKey && !isTodoFocused && (isNotTyping || isSearchEmpty)) {
+    if (isThemeKey && (isNotTyping || isSearchEmpty)) {
       const num = e.code.startsWith('Numpad') ? e.code.replace('Numpad', '') : e.key;
       if (typeof themesConfig !== 'undefined' && themesConfig[num] && typeof applyTheme === 'function') {
         e.preventDefault();
@@ -181,6 +154,7 @@ function initShortcuts() {
       }
     }
 
+    // Touche / pour cibler le champ de recherche
     if (e.key === '/' && isNotTyping && searchInput) {
       e.preventDefault();
       searchInput.focus();

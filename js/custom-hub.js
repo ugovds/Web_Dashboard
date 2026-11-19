@@ -1,34 +1,24 @@
 /**
- * custom-hub.js - Personnalisation intégrée, navigation Dashboard & Menu Latéral
+ * custom-hub.js - Centre de configuration & navigation entre vues
+ * Cyberdeck - Startpage
  */
 
+const VIEW_KEYS = ['bookmarks', 'customize'];
+
 const VIEW_TITLES = {
-  dashboard: { title: 'Accueil', sub: 'Cockpit & Vue d\'ensemble', icon: 'fa-solid fa-house' },
-  bookmarks: { title: 'Raccourcis Web', sub: 'Favoris, Signets & Catégories', icon: 'fa-solid fa-compass' },
-  agenda: { title: 'Agenda & Tâches', sub: 'Calendrier mensuel & To-Do list', icon: 'fa-regular fa-calendar-check' },
-  weather: { title: 'Météo & Radar', sub: 'Prévisions 24h & Satellite direct', icon: 'fa-solid fa-cloud-sun' },
-  feeds: { title: 'Actualités en Direct', sub: 'F1, Football, Tech & Flux RSS', icon: 'fa-solid fa-newspaper' },
-  system: { title: 'Marchés & Portefeuille', sub: 'Cotations réelles, indices mondiaux & ETF', icon: 'fa-solid fa-chart-line' },
-  pomodoro: { title: 'Studio Focus & Ambiance', sub: 'Minuteur Pomodoro, Intervalles & Sons Lo-Fi', icon: 'fa-solid fa-stopwatch' },
-  notes: { title: 'Bloc-Notes Markdown', sub: 'Éditeur rapide, aperçu en direct & export .md', icon: 'fa-solid fa-file-pen' },
-  quotes: { title: 'Citations & Motivation', sub: 'Philosophie hacker & science-fiction', icon: 'fa-solid fa-quote-left' },
-  customize: { title: 'Paramètres & Hub', sub: 'Thèmes, Couleurs, Horloge & Sauvegarde', icon: 'fa-solid fa-sliders' }
+  bookmarks: {
+    title: 'Raccourcis',
+    sub: 'Navigation & Favoris Web',
+    icon: 'fa-solid fa-compass'
+  },
+  customize: {
+    title: 'Paramètres',
+    sub: 'Thèmes, Raccourcis & Sauvegarde',
+    icon: 'fa-solid fa-sliders'
+  }
 };
 
-const VIEW_KEYS = [
-  'dashboard',
-  'bookmarks',
-  'agenda',
-  'weather',
-  'feeds',
-  'system',
-  'pomodoro',
-  'notes',
-  'quotes',
-  'customize'
-];
-
-let currentDeckTarget = 'dashboard';
+let currentDeckTarget = 'bookmarks';
 let updateDeckIndicator = null;
 
 function initDeckViewSlider() {
@@ -43,9 +33,6 @@ function initDeckViewSlider() {
       indicator.style.height = `${activeBtn.offsetHeight}px`;
       indicator.style.transform = `translateY(${activeBtn.offsetTop}px)`;
       indicator.style.opacity = '1';
-      try {
-        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-      } catch {}
     } else {
       indicator.style.opacity = '0';
     }
@@ -66,13 +53,14 @@ function initDeckViewSlider() {
   navBtns.forEach((btn) => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.deckView;
+      if (!target) return;
+
       const prevIdx = VIEW_KEYS.indexOf(currentDeckTarget);
       const nextIdx = VIEW_KEYS.indexOf(target);
       const direction = (nextIdx !== -1 && prevIdx !== -1 && nextIdx >= prevIdx) ? 'down' : 'up';
       currentDeckTarget = target;
 
-      navBtns.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
+      navBtns.forEach((b) => b.classList.toggle('active', b.dataset.deckView === target));
 
       const animSettings = getAnimationSettings();
       const animStyle = animSettings.style || 'deck-slide';
@@ -84,7 +72,7 @@ function initDeckViewSlider() {
           view.classList.add('active');
 
           view.classList.remove('slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
-          void view.offsetWidth; // Force reflow pour relancer l'animation de défilement
+          void view.offsetWidth;
 
           if (animStyle === 'deck-slide') {
             view.classList.add(direction === 'down' ? 'slide-enter-down' : 'slide-enter-up');
@@ -103,50 +91,9 @@ function initDeckViewSlider() {
 
       updateTopbarInfo(target);
 
-      // Rendu coordonné de la vue cible sous son squelette de chargement
       const renderTargetView = () => {
-        if (target === 'dashboard') {
-          if (typeof initOverviewDashboard === 'function') initOverviewDashboard();
-          if (typeof fetchLiveMarketData === 'function') fetchLiveMarketData();
-        } else if (target === 'bookmarks') {
+        if (target === 'bookmarks') {
           if (typeof renderCategories === 'function') renderCategories();
-        } else if (target === 'agenda') {
-          if (typeof renderCalendar === 'function') renderCalendar();
-          if (typeof renderTasks === 'function') renderTasks();
-        } else if (target === 'weather') {
-          if (typeof initWeather === 'function') initWeather();
-          if (typeof getStoredWeatherCache === 'function' && typeof renderWeatherDeckView === 'function') {
-            const c = getStoredWeatherCache();
-            if (c?.data) renderWeatherDeckView(c.data);
-          }
-        } else if (target === 'feeds') {
-          if (typeof initFeeds === 'function') initFeeds();
-          if (typeof loadFeed === 'function') {
-            loadFeed(typeof currentActiveFeedId !== 'undefined' ? currentActiveFeedId : 'all');
-          }
-        } else if (target === 'system') {
-          if (typeof initMarkets === 'function') initMarkets();
-          if (typeof checkAndApplyScheduledDca === 'function') checkAndApplyScheduledDca();
-          if (typeof renderPortfolioModule === 'function') renderPortfolioModule();
-          if (typeof renderMarketCards === 'function') renderMarketCards();
-          if (typeof renderHeroSpotlight === 'function' && typeof currentHeroAssetId !== 'undefined') {
-            renderHeroSpotlight(currentHeroAssetId);
-          }
-          if (typeof renderMarketBarometer === 'function') renderMarketBarometer();
-          if (typeof renderMarketMovers === 'function') renderMarketMovers();
-          if (typeof renderForexCryptoModule === 'function') renderForexCryptoModule();
-          // Actualisation automatique immédiate des cours en direct
-          if (typeof fetchLiveMarketData === 'function') {
-            fetchLiveMarketData();
-          }
-        } else if (target === 'pomodoro') {
-          if (typeof renderPomoHistoryChart === 'function') renderPomoHistoryChart();
-          if (typeof updatePomoUI === 'function') updatePomoUI();
-          if (typeof drawAmbientVisualizer === 'function') drawAmbientVisualizer();
-        } else if (target === 'notes') {
-          if (typeof initStudio === 'function') initStudio();
-        } else if (target === 'quotes') {
-          if (typeof initWidgets === 'function') initWidgets();
         } else if (target === 'customize') {
           const activeSubtab = document.querySelector('.hub-tab-btn.active')?.dataset.hubTab || 'appearance';
           switchHubTab(activeSubtab);
@@ -154,25 +101,28 @@ function initDeckViewSlider() {
       };
 
       if (window.PageSkeletonManager) {
-        window.PageSkeletonManager.prepareAndRevealView(target, renderTargetView, 220);
+        window.PageSkeletonManager.prepareAndRevealView(target, renderTargetView, 120);
       } else {
         renderTargetView();
       }
 
-      updateIndicator(btn);
+      const activeNavInSidebar = document.querySelector(`.sidebar-nav .deck-nav-btn[data-deck-view="${target}"]`);
+      if (activeNavInSidebar) {
+        updateIndicator(activeNavInSidebar);
+      }
     });
   });
 
-  const initialActive = document.querySelector('.deck-nav-btn.active');
+  const initialActive = document.querySelector('.sidebar-nav .deck-nav-btn.active') || document.querySelector('.deck-nav-btn[data-deck-view="bookmarks"]');
   if (initialActive) {
-    const initialTarget = initialActive.dataset.deckView || 'dashboard';
+    const initialTarget = initialActive.dataset.deckView || 'bookmarks';
     currentDeckTarget = initialTarget;
     updateTopbarInfo(initialTarget);
     setTimeout(() => updateIndicator(initialActive), 80);
   }
 
   window.addEventListener('resize', () => {
-    const curr = document.querySelector('.deck-nav-btn.active');
+    const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
     if (curr) updateIndicator(curr);
   });
 }
@@ -195,7 +145,7 @@ function initSidebarControls() {
       localStorage.setItem('startpage_sidebar_expanded', expanded ? 'true' : 'false');
       toggleBtn.innerHTML = expanded ? '<i class="fa-solid fa-chevron-left"></i>' : '<i class="fa-solid fa-chevron-right"></i>';
 
-      const curr = document.querySelector('.deck-nav-btn.active');
+      const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
       if (curr && typeof updateDeckIndicator === 'function') {
         setTimeout(() => updateDeckIndicator(curr), 80);
       }
@@ -207,7 +157,7 @@ function initSidebarControls() {
     sidebar.addEventListener('mouseenter', () => {
       if (!sidebar.classList.contains('locked-expanded')) {
         sidebar.classList.add('expanded');
-        const curr = document.querySelector('.deck-nav-btn.active');
+        const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
         if (curr && typeof updateDeckIndicator === 'function') {
           setTimeout(() => updateDeckIndicator(curr), 80);
         }
@@ -216,7 +166,7 @@ function initSidebarControls() {
 
     sidebar.addEventListener('mouseleave', () => {
       sidebar.classList.remove('expanded');
-      const curr = document.querySelector('.deck-nav-btn.active');
+      const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
       if (curr && typeof updateDeckIndicator === 'function') {
         setTimeout(() => updateDeckIndicator(curr), 80);
       }
@@ -241,8 +191,8 @@ function openCustomHub(tabName = 'appearance') {
 }
 
 function closeCustomHub() {
-  const homeBtn = document.querySelector('.deck-nav-btn[data-deck-view="dashboard"]');
-  if (homeBtn) homeBtn.click();
+  const bookmarksBtn = document.querySelector('.deck-nav-btn[data-deck-view="bookmarks"]');
+  if (bookmarksBtn) bookmarksBtn.click();
 }
 
 function switchHubTab(tabName) {
@@ -266,10 +216,6 @@ function switchHubTab(tabName) {
     if (typeof renderUserCustomThemes === 'function') renderUserCustomThemes();
     if (typeof updateAppearanceInputs === 'function') updateAppearanceInputs();
     if (typeof updateAppearanceLivePreview === 'function') updateAppearanceLivePreview();
-  } else if (tabName === 'widgets') {
-    if (typeof applyWidgetVisibility === 'function') applyWidgetVisibility();
-  } else if (tabName === 'feeds') {
-    if (typeof renderCustomFeedsModalList === 'function') renderCustomFeedsModalList();
   } else if (tabName === 'animations') {
     if (typeof applyAnimationSettings === 'function' && typeof getAnimationSettings === 'function') {
       applyAnimationSettings(getAnimationSettings());
@@ -304,7 +250,7 @@ function renderHubShortcuts() {
         <div class="hub-cat-header">
           <div class="hub-cat-title-group">
             <i class="${cat.icon}"></i>
-            <h4>${cat.title}</h4>
+            <h4>${escapeHtml(cat.title)}</h4>
             <span class="hub-count-tag">${linkCount} lien(s) • ${densityBadge}</span>
           </div>
           <div class="hub-cat-actions">
@@ -335,8 +281,8 @@ function renderHubShortcuts() {
                   <div class="hub-link-info">
                     <span class="hub-link-icon-box"><i class="${link.icon || 'fa-solid fa-bookmark'}"></i></span>
                     <div class="hub-link-texts">
-                      <span class="hub-link-name">${link.name || link.title || ''}</span>
-                      <span class="hub-link-url">${link.url || ''}</span>
+                      <span class="hub-link-name">${escapeHtml(link.name || link.title || '')}</span>
+                      <span class="hub-link-url">${escapeHtml(link.url || '')}</span>
                     </div>
                   </div>
                   <div class="hub-link-row-actions">
@@ -364,8 +310,6 @@ function renderHubShortcuts() {
       const catIdx = parseInt(btn.dataset.cat, 10);
       if (typeof openEditModal === 'function') {
         openEditModal(catIdx, null);
-      } else if (typeof openAddModal === 'function') {
-        openAddModal(catIdx);
       }
     });
   });
@@ -407,7 +351,7 @@ function renderHubShortcuts() {
     btn.addEventListener('click', () => {
       const catIdx = parseInt(btn.dataset.cat, 10);
       const linkIdx = parseInt(btn.dataset.link, 10);
-      const linkName = categories[catIdx]?.links[linkIdx]?.name || categories[catIdx]?.links[linkIdx]?.title || 'Lien';
+      const linkName = categories[catIdx]?.links[linkIdx]?.name || 'Lien';
       categories[catIdx].links.splice(linkIdx, 1);
       localStorage.setItem('startpage_categories_v1', JSON.stringify(categories));
       if (typeof renderCategories === 'function') renderCategories();
@@ -418,7 +362,7 @@ function renderHubShortcuts() {
 }
 
 // ========================================================
-// GESTIONNAIRE D'ANIMATIONS & DÉFILEMENT (BIBLIOTHÈQUE DU HUB)
+// GESTIONNAIRE D'ANIMATIONS & DÉFILEMENT
 // ========================================================
 const ANIM_STORAGE_KEY = 'startpage_anim_settings';
 const ANIM_DEFAULTS = {
@@ -576,17 +520,13 @@ function initAnimationHubControls() {
           activeView.classList.add('crossfade-enter');
         }
       }
-      const currBtn = document.querySelector('.deck-nav-btn.active');
-      if (currBtn && typeof updateDeckIndicator === 'function') {
-        updateDeckIndicator(currBtn);
-      }
     });
   }
 }
 
-/* ========================================================
-   PERSONNALISATION DE LA BARRE LATÉRALE (DENSITÉ, COURBURE, FINITION)
-   ======================================================== */
+// ========================================================
+// PERSONNALISATION DE LA BARRE LATÉRALE
+// ========================================================
 const defaultSidebarSettings = {
   density: 'normal',
   radius: 'normal',
@@ -657,7 +597,7 @@ function applySidebarSettings(settings = getSidebarSettings()) {
     b.classList.toggle('active', b.dataset.glass === glass);
   });
 
-  const curr = document.querySelector('.deck-nav-btn.active');
+  const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
   if (curr && typeof updateDeckIndicator === 'function') {
     setTimeout(() => updateDeckIndicator(curr), 60);
   }

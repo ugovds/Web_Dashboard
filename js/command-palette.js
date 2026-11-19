@@ -1,7 +1,7 @@
 /**
  * command-palette.js - Palette de commande flottante & recherche de signets (Ctrl+K / B)
  * - Recherche instantanée multi-critères : nom du lien, catégorie, URL
- * - Raccourcis directs vers les vues du deck (Agenda, Météo, Actus, Focus...)
+ * - Raccourcis directs vers les vues et thèmes
  * - Navigation complète au clavier (Haut, Bas, Entrée, Échap)
  * - Style cyberpunk translucide avec badges de catégorie et icônes
  */
@@ -23,7 +23,6 @@ function getPaletteItems() {
         url: '',
         icon: cat.icon || 'fa-solid fa-folder',
         action: () => {
-          // Défiler vers la catégorie si besoin
           const catEl = document.querySelector(`.category-card[data-cat="${catIdx}"]`);
           if (catEl) {
             catEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -53,16 +52,8 @@ function getPaletteItems() {
 
   // 2. Vues du deck (Navigation rapide)
   const deckViews = [
-    { title: 'Ouvrir Accueil (Cockpit & Résumé)', category: 'Navigation', icon: 'fa-solid fa-house', key: 'dashboard', shortcut: 'Alt+1' },
-    { title: 'Ouvrir Raccourcis Web & Favoris', category: 'Navigation', icon: 'fa-solid fa-compass', key: 'bookmarks', shortcut: 'Alt+2' },
-    { title: 'Ouvrir Agenda & Tâches', category: 'Navigation', icon: 'fa-regular fa-calendar-check', key: 'agenda', shortcut: 'Alt+3' },
-    { title: 'Ouvrir Météo & Prévisions', category: 'Navigation', icon: 'fa-solid fa-cloud-sun', key: 'weather', shortcut: 'Alt+4' },
-    { title: 'Ouvrir Actualités en direct', category: 'Navigation', icon: 'fa-solid fa-newspaper', key: 'feeds', shortcut: 'Alt+5' },
-    { title: 'Ouvrir Marchés Boursiers & Portefeuille', category: 'Navigation', icon: 'fa-solid fa-chart-line', key: 'system', shortcut: 'Alt+6' },
-    { title: 'Ouvrir Studio Focus & Ambiance Lo-Fi', category: 'Navigation', icon: 'fa-solid fa-stopwatch', key: 'pomodoro', shortcut: 'Alt+7' },
-    { title: 'Ouvrir Dev Studio & Notes (Playground Code)', category: 'Navigation', icon: 'fa-solid fa-laptop-code', key: 'notes', shortcut: 'Alt+8' },
-    { title: 'Ouvrir Citations Cyberpunk', category: 'Navigation', icon: 'fa-solid fa-quote-left', key: 'quotes', shortcut: 'Alt+9' },
-    { title: 'Ouvrir Configuration & Thèmes', category: 'Navigation', icon: 'fa-solid fa-sliders', key: 'customize', shortcut: 'Alt+0' }
+    { title: 'Ouvrir Raccourcis Web & Favoris', category: 'Navigation', icon: 'fa-solid fa-compass', key: 'bookmarks', shortcut: 'Alt+1' },
+    { title: 'Ouvrir Paramètres & Thèmes', category: 'Navigation', icon: 'fa-solid fa-sliders', key: 'customize', shortcut: 'Alt+2' }
   ];
 
   deckViews.forEach((dv) => {
@@ -79,7 +70,7 @@ function getPaletteItems() {
     });
   });
 
-  // 3. Actions Thèmes et Liquid Glass Apple
+  // 3. Actions Thèmes
   if (typeof themesConfig !== 'undefined') {
     Object.entries(themesConfig).forEach(([tId, tCfg]) => {
       items.push({
@@ -135,7 +126,6 @@ function renderPaletteResults(query) {
   const q = (query || '').trim().toLowerCase();
 
   if (!q) {
-    // Afficher en priorité les signets récents ou les commandes utiles
     paletteResults = allItems.slice(0, 15);
   } else {
     paletteResults = allItems.filter((item) => {
@@ -188,7 +178,6 @@ function renderPaletteResults(query) {
     })
     .join('');
 
-  // S'assurer que l'élément actif est visible lors du défilement
   const activeEl = listEl.children[paletteActiveIndex];
   if (activeEl && typeof activeEl.scrollIntoView === 'function') {
     activeEl.scrollIntoView({ block: 'nearest' });

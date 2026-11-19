@@ -1,7 +1,23 @@
 /**
  * app.js - Point d'entrée principal de l'application & utilitaires globaux
- * Violet Startpage - Cockpit Haute Performance
+ * Cyberdeck - Page de Raccourcis & Favoris Web
  */
+
+// Utilitaire global d'échappement HTML sécurisé
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, (m) => {
+    switch (m) {
+      case '&': return '&amp;';
+      case '<': return '&lt;';
+      case '>': return '&gt;';
+      case '"': return '&quot;';
+      case "'": return '&#039;';
+      default: return m;
+    }
+  });
+}
+window.escapeHtml = escapeHtml;
 
 // Système global de notifications Toast
 function showToast(message, type = 'info') {
@@ -40,19 +56,19 @@ function showToast(message, type = 'info') {
     }, 300);
   }, 3200);
 }
+window.showToast = showToast;
 
 /**
  * ========================================================
  * PageSkeletonManager - GESTIONNAIRE UNIVERSEL DE PRÉCHARGEMENT
  * ========================================================
- * Élimine TOUT décalage ou élément tardif (pop-in à 400ms).
+ * Élimine TOUT décalage ou élément tardif.
  * Chaque page s'affiche en squelette puis se révèle d'un seul bloc.
  */
 const PageSkeletonManager = {
   activeTransitions: new Map(),
   revealedViews: new Set(),
 
-  // Réaffiche le squelette et masque le contenu réel pendant la préparation
   showSkeleton(viewKey) {
     const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
     const realView = document.getElementById(`${viewKey}-real-view`);
@@ -69,7 +85,6 @@ const PageSkeletonManager = {
     realView.classList.add('is-loading');
   },
 
-  // Révèle une vue depuis son squelette de manière instantanée et fluide
   revealView(viewKey, callback) {
     const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
     const realView = document.getElementById(`${viewKey}-real-view`);
@@ -99,7 +114,6 @@ const PageSkeletonManager = {
     });
   },
 
-  // Prépare le rendu sous le squelette puis révèle la vue complète d'un coup
   prepareAndRevealView(viewKey, onRender, minDelayMs = 0) {
     const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
     const realView = document.getElementById(`${viewKey}-real-view`);
@@ -111,7 +125,6 @@ const PageSkeletonManager = {
       return;
     }
 
-    // Rendu immédiat
     if (typeof onRender === 'function') {
       try {
         onRender();
@@ -133,15 +146,13 @@ const PageSkeletonManager = {
 
 window.PageSkeletonManager = PageSkeletonManager;
 
-// Rétrocompatibilité avec les scripts appelant revealDashboardFromSkeleton()
-function revealDashboardFromSkeleton() {
-  PageSkeletonManager.revealView('dashboard');
+function revealBookmarksFromSkeleton() {
+  PageSkeletonManager.revealView('bookmarks');
 }
-window.revealDashboardFromSkeleton = revealDashboardFromSkeleton;
+window.revealBookmarksFromSkeleton = revealBookmarksFromSkeleton;
+window.revealDashboardFromSkeleton = revealBookmarksFromSkeleton;
 
 document.addEventListener('DOMContentLoaded', () => {
-  const loadStart = performance.now();
-
   const safeInit = (fn, name) => {
     if (typeof fn === 'function') {
       try {
@@ -152,36 +163,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // === PHASE 1 : CRITIQUE & SYNCHRONE (Hydratation complète des données locales) ===
+  // === INITIALISATION CRITIQUE & SYNCHRONE ===
   safeInit(initThemes, 'initThemes');
   safeInit(initAppearance, 'initAppearance');
   safeInit(initBookmarks, 'initBookmarks');
-  safeInit(initTasks, 'initTasks');
-  safeInit(initCalendar, 'initCalendar');
   safeInit(initSearch, 'initSearch');
-  safeInit(loadWidgetSettings, 'loadWidgetSettings');
-  safeInit(applyWidgetVisibility, 'applyWidgetVisibility');
   safeInit(initCustomHub, 'initCustomHub');
   safeInit(initShortcuts, 'initShortcuts');
-  safeInit(initWidgets, 'initWidgets');
 
-  // Pré-initialisation synchrone des Marchés et de la Météo locale AVANT la révélation
-  // afin que TOUS les éléments du Cockpit soient déjà calculés et affichés ensemble
-  safeInit(initMarkets, 'initMarkets');
-  safeInit(initWeather, 'initWeather');
-  safeInit(initOverviewDashboard, 'initOverviewDashboard');
-
-  // Révélation immédiate de la vue initiale sans attente artificielle
+  // Révélation immédiate de la vue des raccourcis
   const activeBtn = document.querySelector('.deck-nav-btn.active');
-  const initialViewKey = activeBtn?.dataset?.deckView || 'dashboard';
+  const initialViewKey = activeBtn?.dataset?.deckView || 'bookmarks';
   requestAnimationFrame(() => {
     PageSkeletonManager.revealView(initialViewKey);
   });
 
-  // === PHASE 2 : DIFFÉRÉE (Tâches réseau d'arrière-plan sans impact sur le layout) ===
+  // === TÂCHES DIFFÉRÉES ===
   const deferNonCritical = () => {
-    safeInit(initWeatherFx, 'initWeatherFx');
-    safeInit(initFeeds, 'initFeeds');
     safeInit(initCommandPalette, 'initCommandPalette');
 
     // Enregistrement du Service Worker pour le mode hors-ligne PWA

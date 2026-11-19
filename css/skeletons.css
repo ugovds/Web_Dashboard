@@ -1,10 +1,10 @@
 /* ========================================================
    SKELETONS.CSS - Système Universel de Préchargement Squelette
    Élimine tout pop-in ou décalage de rendu (First-Paint coordonné)
-   Couvre les 10 vues du Cyberdeck Violet Startpage
+   Cyberdeck - Startpage
    ======================================================== */
 
-/* --- 1. CONTENEURS RELATIFS DU VIEWPORT --- */
+/* --- 1. CONTENEURS DU VIEWPORT --- */
 .deck-slide-view {
   position: relative !important;
   width: 100%;
@@ -13,7 +13,7 @@
   box-sizing: border-box;
 }
 
-/* --- 2. COUCHE SQUELETTE UNIFIÉE (AFFICHÉE PENDANT LE CHARGEMENT) --- */
+/* --- 2. COUCHE SQUELETTE (AFFICHÉE PENDANT LE CHARGEMENT) --- */
 .view-skeleton-view {
   position: absolute !important;
   top: 0 !important;
@@ -44,7 +44,7 @@
   display: none !important;
 }
 
-/* --- 3. COUCHE CONTENU RÉEL (MASQUÉE JUSQU'À CHARGEMENT COMPLET) --- */
+/* --- 3. COUCHE CONTENU RÉEL --- */
 .view-real-content {
   width: 100%;
   height: 100%;
@@ -107,7 +107,7 @@
   border-radius: 14px;
 }
 
-/* Balayage Shimmer ultra-fluide GPU 60fps */
+/* Balayage Shimmer GPU 60fps */
 .skel-elem::after {
   content: '';
   position: absolute;
@@ -131,7 +131,7 @@
   100% { transform: translateX(100%); }
 }
 
-/* --- 5. SQUELETTE VUE 2 : FAVORIS & RACCOURCIS (BOOKMARKS) --- */
+/* --- 5. SQUELETTE FAVORIS & RACCOURCIS --- */
 .bookmarks-skeleton-header {
   display: flex;
   align-items: center;
@@ -168,359 +168,23 @@
   flex: 1;
 }
 
-/* --- 6. SQUELETTE VUE 3 : AGENDA & TÂCHES FUSIONNÉS --- */
-.agenda-skeleton-container,
-.agenda-full-view.view-skeleton-view {
-  display: grid !important;
-  grid-template-columns: minmax(0, 2.33fr) minmax(360px, 1fr) !important;
-  gap: clamp(16px, 1.8vw, 28px) !important;
-  width: 100% !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  box-sizing: border-box !important;
-}
-
-.agenda-skeleton-cal-col,
-.agenda-full-view.view-skeleton-view .merged-calendar-section {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border-radius: clamp(18px, 2.2vh, 26px);
-  padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.8vw, 24px);
-  box-sizing: border-box;
-}
-
-.agenda-skeleton-tasks-col,
-.agenda-full-view.view-skeleton-view .merged-tasks-section {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  border-radius: clamp(18px, 2.2vh, 26px);
-  padding: clamp(14px, 1.8vh, 24px) clamp(16px, 1.8vw, 24px);
-  box-sizing: border-box;
-}
-
-.cal-skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-top: 1rem;
-  flex: 1;
-}
-
-/* --- 7. SQUELETTE VUE 4 : MÉTÉO SAMSUNG ONE UI --- */
-.weather-skeleton-container {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 2.2vh, 26px);
-  padding: 0 0 clamp(60px, 8vh, 100px) 0;
-  box-sizing: border-box;
-}
-
-.weather-skeleton-search {
-  border-radius: clamp(18px, 2.4vh, 24px);
-  padding: clamp(12px, 1.6vh, 18px) clamp(16px, 2vw, 24px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-.weather-skeleton-hero {
-  border-radius: clamp(22px, 3vh, 32px);
-  padding: clamp(22px, 3vh, 36px) clamp(24px, 3vw, 40px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.weather-skeleton-hourly {
-  border-radius: clamp(18px, 2.4vh, 26px);
-  padding: clamp(16px, 2.2vh, 24px) clamp(18px, 2.4vw, 28px);
-}
-
-.weather-skeleton-week {
-  border-radius: clamp(18px, 2.4vh, 26px);
-  padding: clamp(16px, 2.2vh, 24px) clamp(18px, 2.4vw, 28px);
-}
-
-.weather-skeleton-bento {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: clamp(12px, 1.6vh, 20px);
-}
-
-/* --- 8. SQUELETTE VUE 5 : ACTUALITÉS & FLUX RSS --- */
-.feeds-skeleton-container {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 2.2vh, 26px);
-  padding: 0 0 clamp(60px, 8vh, 100px) 0;
-  box-sizing: border-box;
-}
-
-.feeds-skeleton-header {
-  border-radius: clamp(18px, 2.4vh, 26px);
-  padding: clamp(18px, 2.4vh, 26px) clamp(20px, 2.4vw, 36px);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.feeds-skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: clamp(16px, 2.2vh, 24px);
-}
-
-.feeds-skeleton-card {
-  border-radius: clamp(16px, 2vh, 22px);
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-}
-
-/* --- 9. SQUELETTE VUE 6 : MARCHÉS, ETF & CRYPTO --- */
-.markets-skeleton-container {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 2.2vh, 26px);
-  padding: 0 0 clamp(60px, 8vh, 100px) 0;
-  box-sizing: border-box;
-}
-
-.markets-skeleton-split {
-  display: grid;
-  grid-template-columns: 460px 1fr;
-  gap: clamp(14px, 1.8vh, 22px);
-  width: 100%;
-}
-
-@media (max-width: 1200px) {
-  .markets-skeleton-split {
-    grid-template-columns: 1fr;
-  }
-}
-
-.markets-skel-left {
-  border-radius: clamp(18px, 2.4vh, 26px);
-  padding: clamp(18px, 2.4vh, 26px);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.markets-skeleton-header {
-  border-radius: clamp(18px, 2.4vh, 26px);
-  padding: clamp(18px, 2.4vh, 26px) clamp(20px, 2.4vw, 36px);
-  display: flex;
-  flex-direction: column;
-  gap: 1.1rem;
-}
-
-.markets-skeleton-portfolio {
-  border-radius: clamp(18px, 2.4vh, 26px);
-  padding: clamp(18px, 2.4vh, 26px);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.portfolio-skel-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.portfolio-skel-kpis {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
-.portfolio-skel-holdings {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-}
-
-@media (max-width: 1200px) {
-  .portfolio-skel-kpis,
-  .portfolio-skel-holdings {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .portfolio-skel-kpis,
-  .portfolio-skel-holdings {
-    grid-template-columns: 1fr;
-  }
-}
-
-.markets-skeleton-hero {
-  border-radius: clamp(18px, 2.4vh, 26px);
-  padding: clamp(18px, 2.4vh, 26px);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.markets-skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-  gap: clamp(14px, 1.8vh, 22px);
-}
-
-/* --- 10. SQUELETTE VUE 7 : FOCUS POMODORO & AMBIANCE --- */
-.pomodoro-skeleton-container,
-.pomodoro-full-view.view-skeleton-view {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1.45fr) minmax(380px, 1fr) !important;
-  gap: clamp(16px, 1.8vw, 24px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-}
-
-.pomodoro-skeleton-timer-col,
-.pomodoro-full-view.view-skeleton-view .revision-timer-col {
-  border-radius: clamp(18px, 2.2vh, 24px);
-  padding: clamp(14px, 2vh, 22px) clamp(16px, 2vw, 24px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  height: 100%;
-  min-height: 0;
-  box-sizing: border-box;
-}
-
-.pomodoro-skeleton-ambient-col,
-.pomodoro-full-view.view-skeleton-view .revision-cockpit-col {
-  border-radius: clamp(18px, 2.2vh, 24px);
-  padding: clamp(14px, 2vh, 22px) clamp(16px, 2vw, 24px);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: 100%;
-  min-height: 0;
-  box-sizing: border-box;
-}
-
-/* --- 11. SQUELETTE VUE 8 : DEV STUDIO & BLOC-NOTES --- */
-.studio-skeleton-container {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 1.4vh, 16px);
-  height: 100%;
-  min-height: 0;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.studio-skeleton-header {
-  border-radius: 16px;
-  padding: 0.85rem 1.25rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.studio-skeleton-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 1fr);
-  gap: 1rem;
-  flex: 1;
-  min-height: 0;
-}
-
-.studio-skeleton-editor {
-  border-radius: 18px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.studio-skeleton-terminal {
-  border-radius: 18px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-/* --- 12. SQUELETTE VUE 9 : CITATIONS CYBERPUNK --- */
-.quotes-skeleton-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.quotes-skeleton-card {
-  max-width: 680px;
-  width: 100%;
-  border-radius: 20px;
-  padding: 2.2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-/* --- 13. SQUELETTE VUE 10 : PARAMÈTRES & CONFIGURATION --- */
-.customize-skeleton-container {
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
-
+/* --- 6. SQUELETTE PARAMÈTRES & CONFIGURATION --- */
 .customize-skeleton-card {
-  border-radius: 20px;
-  padding: 1.5rem 1.85rem;
+  border-radius: clamp(18px, 2.4vh, 28px);
+  padding: clamp(18px, 2.5vh, 28px);
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
 }
 
-/* --- 14. ADAPTATIVITÉ MOBILE (RESPONSIVE) --- */
-@media (max-width: 1050px) {
-  .agenda-skeleton-container,
-  .agenda-full-view.view-skeleton-view {
-    display: flex !important;
-    flex-direction: column !important;
-    overflow-y: auto !important;
-  }
-  .agenda-skeleton-cal-col,
-  .agenda-skeleton-tasks-col,
-  .agenda-full-view.view-skeleton-view .merged-calendar-section,
-  .agenda-full-view.view-skeleton-view .merged-tasks-section {
-    flex: 1 1 auto !important;
-    width: 100% !important;
-  }
-  .pomodoro-skeleton-container,
-  .pomodoro-full-view.view-skeleton-view {
-    display: flex !important;
-    flex-direction: column !important;
-    overflow-y: auto !important;
-  }
-  .studio-skeleton-body {
-    grid-template-columns: 1fr !important;
-    overflow-y: auto !important;
-  }
+/* --- 7. RESPONSIVE --- */
+@media (max-width: 950px), (max-height: 700px) {
   .bookmarks-skeleton-grid {
-    grid-template-columns: 1fr !important;
-    grid-template-rows: auto !important;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
   }
 }

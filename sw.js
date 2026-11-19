@@ -2,7 +2,7 @@
  * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache Instantané PWA)
  */
 
-const CACHE_NAME = 'violet-startpage-v8.3';
+const CACHE_NAME = 'violet-startpage-v9.0';
 
 const STATIC_ASSETS = [
   './',
@@ -10,18 +10,10 @@ const STATIC_ASSETS = [
   './css/base.css',
   './css/sidebar.css',
   './css/dashboard.css',
-  './css/dashboard-overview.css',
   './css/skeletons.css',
   './css/search.css',
   './css/bookmarks.css',
-  './css/calendar.css',
-  './css/tasks.css',
-  './css/weather.css',
-  './css/feeds.css',
-  './css/markets.css',
-  './css/notes-studio.css',
   './css/deck.css',
-  './css/widgets.css',
   './css/modals.css',
   './css/responsive.css',
   './css/themes/kanagawa.css',
@@ -32,20 +24,11 @@ const STATIC_ASSETS = [
   './images/glass.svg',
   './js/themes.js',
   './js/appearance.js',
-  './js/weather-fx.js',
-  './js/weather.js',
-  './js/calendar.js',
-  './js/tasks.js',
   './js/search.js',
-  './js/feeds.js',
   './js/bookmarks.js',
-  './js/markets.js',
-  './js/notes.js',
-  './js/widgets.js',
   './js/custom-hub.js',
   './js/command-palette.js',
   './js/shortcuts.js',
-  './js/dashboard.js',
   './js/app.js',
   './images/gif.gif',
   './images/gif2.webp',
@@ -85,65 +68,44 @@ self.addEventListener('fetch', (event) => {
 
   if (event.request.method !== 'GET') return;
 
-  // 1. Les routes d'API locales ne doivent pas être mises en cache statique
-  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) {
-    return;
-  }
-
-  // 2. Fichiers dynamiques locaux (HTML, JS, CSS) : Network-First avec mise à jour du cache
+  // Fichiers locaux : Network-First avec mise à jour du cache
   if (url.origin === self.location.origin) {
-    const isCodeFile = url.pathname.endsWith('.js') ||
-                       url.pathname.endsWith('.css') ||
-                       url.pathname.endsWith('.html') ||
-                       url.pathname === '/' ||
-                       url.pathname === '';
-
-    if (isCodeFile) {
-      event.respondWith(
-        fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              const clone = networkResponse.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-            }
-            return networkResponse;
-          })
-          .catch(() => caches.match(event.request))
-      );
-      return;
-    }
-
-    // Autres fichiers statiques locaux (images, polices) : Stale-While-Revalidate
     event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        const fetchPromise = fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              const clone = networkResponse.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match(event.request).then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+            if (event.request.mode === 'navigate') {
+              return caches.match('./index.html');
             }
-            return networkResponse;
-          })
-          .catch(() => cachedResponse);
-
-        return cachedResponse || fetchPromise;
-      })
+          });
+        })
     );
     return;
   }
 
-  // 3. Requêtes externes (météo, APIs boursières) : Network-First avec repli sur cache
-  event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
-          const responseClone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone);
-          });
-        }
-        return networkResponse;
+  // Polices & Font Awesome : Cache-First
+  if (url.hostname.includes('fonts.googleapis.com') ||
+      url.hostname.includes('fonts.gstatic.com') ||
+      url.hostname.includes('cdnjs.cloudflare.com')) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        return fetch(event.request).then((res) => {
+          if (res && res.status === 200) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
+          }
+          return res;
+        });
       })
-      .catch(() => caches.match(event.request))
-  );
+    );
+  }
 });
