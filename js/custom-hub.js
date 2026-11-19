@@ -1,199 +1,39 @@
 /**
- * custom-hub.js - Centre de configuration & navigation entre vues
+ * custom-hub.js - Centre de configuration & modale des paramètres
  * Cyberdeck - Startpage
  */
 
-const VIEW_KEYS = ['bookmarks', 'customize'];
-
-const VIEW_TITLES = {
-  bookmarks: {
-    title: 'Raccourcis',
-    sub: 'Navigation & Favoris Web',
-    icon: 'fa-solid fa-compass'
-  },
-  customize: {
-    title: 'Paramètres',
-    sub: 'Thèmes, Raccourcis & Sauvegarde',
-    icon: 'fa-solid fa-sliders'
-  }
-};
-
-let currentDeckTarget = 'bookmarks';
-let updateDeckIndicator = null;
-
-function initDeckViewSlider() {
-  const navBtns = document.querySelectorAll('.deck-nav-btn');
-  const allViews = document.querySelectorAll('.deck-slide-view');
-  const indicator = document.querySelector('.sidebar-indicator') || document.querySelector('.deck-nav-indicator');
-
-  function updateIndicator(activeBtn) {
-    if (!indicator || !activeBtn) return;
-    const isVertical = activeBtn.classList.contains('sidebar-nav-item') || activeBtn.closest('.sidebar-nav');
-    if (isVertical) {
-      indicator.style.height = `${activeBtn.offsetHeight}px`;
-      indicator.style.transform = `translateY(${activeBtn.offsetTop}px)`;
-      indicator.style.opacity = '1';
-    } else {
-      indicator.style.opacity = '0';
-    }
-  }
-
-  updateDeckIndicator = updateIndicator;
-
-  function updateTopbarInfo(targetKey) {
-    const meta = VIEW_TITLES[targetKey] || { title: targetKey, sub: '', icon: 'fa-solid fa-layer-group' };
-    const titleEl = document.getElementById('topbar-view-title');
-    const subEl = document.getElementById('topbar-view-subtitle');
-    const iconEl = document.getElementById('topbar-view-icon');
-    if (titleEl) titleEl.textContent = meta.title;
-    if (subEl) subEl.textContent = meta.sub;
-    if (iconEl) iconEl.innerHTML = `<i class="${meta.icon}"></i>`;
-  }
-
-  navBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const target = btn.dataset.deckView;
-      if (!target) return;
-
-      const prevIdx = VIEW_KEYS.indexOf(currentDeckTarget);
-      const nextIdx = VIEW_KEYS.indexOf(target);
-      const direction = (nextIdx !== -1 && prevIdx !== -1 && nextIdx >= prevIdx) ? 'down' : 'up';
-      currentDeckTarget = target;
-
-      navBtns.forEach((b) => b.classList.toggle('active', b.dataset.deckView === target));
-
-      const animSettings = getAnimationSettings();
-      const animStyle = animSettings.style || 'deck-slide';
-
-      allViews.forEach((view) => {
-        const isTarget = view.id === `deck-view-${target}`;
-        if (isTarget) {
-          view.hidden = false;
-          view.classList.add('active');
-
-          view.classList.remove('slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
-          void view.offsetWidth;
-
-          if (animStyle === 'deck-slide') {
-            view.classList.add(direction === 'down' ? 'slide-enter-down' : 'slide-enter-up');
-          } else if (animStyle === 'page-zoom') {
-            view.classList.add('zoom-enter');
-          } else if (animStyle === 'cyber-glitch') {
-            view.classList.add('glitch-enter');
-          } else if (animStyle === 'crossfade') {
-            view.classList.add('crossfade-enter');
-          }
-        } else {
-          view.hidden = true;
-          view.classList.remove('active', 'slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
-        }
-      });
-
-      updateTopbarInfo(target);
-
-      const renderTargetView = () => {
-        if (target === 'bookmarks') {
-          if (typeof renderCategories === 'function') renderCategories();
-        } else if (target === 'customize') {
-          const activeSubtab = document.querySelector('.hub-tab-btn.active')?.dataset.hubTab || 'appearance';
-          switchHubTab(activeSubtab);
-        }
-      };
-
-      if (window.PageSkeletonManager) {
-        window.PageSkeletonManager.prepareAndRevealView(target, renderTargetView, 120);
-      } else {
-        renderTargetView();
-      }
-
-      const activeNavInSidebar = document.querySelector(`.sidebar-nav .deck-nav-btn[data-deck-view="${target}"]`);
-      if (activeNavInSidebar) {
-        updateIndicator(activeNavInSidebar);
-      }
-    });
-  });
-
-  const initialActive = document.querySelector('.sidebar-nav .deck-nav-btn.active') || document.querySelector('.deck-nav-btn[data-deck-view="bookmarks"]');
-  if (initialActive) {
-    const initialTarget = initialActive.dataset.deckView || 'bookmarks';
-    currentDeckTarget = initialTarget;
-    updateTopbarInfo(initialTarget);
-    setTimeout(() => updateIndicator(initialActive), 80);
-  }
-
-  window.addEventListener('resize', () => {
-    const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
-    if (curr) updateIndicator(curr);
-  });
-}
-
-function initSidebarControls() {
-  const sidebar = document.getElementById('dashboard-sidebar');
-  const toggleBtn = document.getElementById('sidebar-toggle-btn');
-  const isLocked = localStorage.getItem('startpage_sidebar_expanded') === 'true';
-
-  if (sidebar && isLocked) {
-    sidebar.classList.add('locked-expanded');
-    if (toggleBtn) toggleBtn.innerHTML = '<i class="fa-solid fa-chevron-left"></i>';
-  }
-
-  if (toggleBtn && sidebar) {
-    toggleBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sidebar.classList.toggle('locked-expanded');
-      const expanded = sidebar.classList.contains('locked-expanded');
-      localStorage.setItem('startpage_sidebar_expanded', expanded ? 'true' : 'false');
-      toggleBtn.innerHTML = expanded ? '<i class="fa-solid fa-chevron-left"></i>' : '<i class="fa-solid fa-chevron-right"></i>';
-
-      const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
-      if (curr && typeof updateDeckIndicator === 'function') {
-        setTimeout(() => updateDeckIndicator(curr), 80);
-      }
-    });
-  }
-
-  // Expansion fluide au survol si non verrouillée
-  if (sidebar) {
-    sidebar.addEventListener('mouseenter', () => {
-      if (!sidebar.classList.contains('locked-expanded')) {
-        sidebar.classList.add('expanded');
-        const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
-        if (curr && typeof updateDeckIndicator === 'function') {
-          setTimeout(() => updateDeckIndicator(curr), 80);
-        }
-      }
-    });
-
-    sidebar.addEventListener('mouseleave', () => {
-      sidebar.classList.remove('expanded');
-      const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
-      if (curr && typeof updateDeckIndicator === 'function') {
-        setTimeout(() => updateDeckIndicator(curr), 80);
-      }
-    });
-  }
-
-  // Clic sur l'avatar du thème dans la sidebar pour cycler le thème
-  const brandAvatar = document.getElementById('sidebar-brand-avatar');
-  if (brandAvatar) {
-    brandAvatar.addEventListener('click', () => {
-      const themes = (typeof themesConfig !== 'undefined') ? Object.keys(themesConfig) : ['1', '2', '3', '4', '5'];
-      const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
-      if (typeof applyTheme === 'function') applyTheme(nextTheme);
-    });
-  }
-}
-
 function openCustomHub(tabName = 'appearance') {
-  const configBtn = document.querySelector('.deck-nav-btn[data-deck-view="customize"]');
-  if (configBtn) configBtn.click();
+  const modal = document.getElementById('settings-modal');
+  if (modal) {
+    modal.hidden = false;
+    modal.classList.add('visible');
+    document.body.classList.add('modal-open');
+  }
   switchHubTab(tabName);
 }
 
 function closeCustomHub() {
-  const bookmarksBtn = document.querySelector('.deck-nav-btn[data-deck-view="bookmarks"]');
-  if (bookmarksBtn) bookmarksBtn.click();
+  const modal = document.getElementById('settings-modal');
+  if (modal) {
+    modal.hidden = true;
+    modal.classList.remove('visible');
+    document.body.classList.remove('modal-open');
+  }
 }
+
+function toggleCustomHub(tabName = 'appearance') {
+  const modal = document.getElementById('settings-modal');
+  if (modal && !modal.hidden && modal.classList.contains('visible')) {
+    closeCustomHub();
+  } else {
+    openCustomHub(tabName);
+  }
+}
+
+window.openCustomHub = openCustomHub;
+window.closeCustomHub = closeCustomHub;
+window.toggleCustomHub = toggleCustomHub;
 
 function switchHubTab(tabName) {
   const tabBtns = document.querySelectorAll('.hub-tab-btn');
@@ -505,34 +345,27 @@ function initAnimationHubControls() {
   const testBtn = document.getElementById('anim-test-preview-btn');
   if (testBtn) {
     testBtn.addEventListener('click', () => {
-      const activeView = document.querySelector('.deck-slide-view.active');
+      const targetEl = document.getElementById('categories-container') || document.querySelector('.startpage-main');
       const curSettings = getAnimationSettings();
-      if (activeView) {
-        activeView.classList.remove('slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
-        void activeView.offsetWidth;
+      if (targetEl) {
+        targetEl.classList.remove('slide-enter-down', 'slide-enter-up', 'zoom-enter', 'glitch-enter', 'crossfade-enter');
+        void targetEl.offsetWidth;
         if (curSettings.style === 'deck-slide') {
-          activeView.classList.add('slide-enter-down');
+          targetEl.classList.add('slide-enter-down');
         } else if (curSettings.style === 'page-zoom') {
-          activeView.classList.add('zoom-enter');
+          targetEl.classList.add('zoom-enter');
         } else if (curSettings.style === 'cyber-glitch') {
-          activeView.classList.add('glitch-enter');
+          targetEl.classList.add('glitch-enter');
         } else if (curSettings.style === 'crossfade') {
-          activeView.classList.add('crossfade-enter');
+          targetEl.classList.add('crossfade-enter');
         }
       }
     });
   }
 }
 
-// ========================================================
-// PERSONNALISATION DE LA BARRE LATÉRALE
-// ========================================================
-const defaultSidebarSettings = {
-  density: 'normal',
-  radius: 'normal',
-  glass: 'deep'
-};
-
+// Compatibilité avec les fichiers de sauvegarde existants
+const defaultSidebarSettings = { density: 'normal', radius: 'normal', glass: 'deep' };
 function getSidebarSettings() {
   try {
     const raw = localStorage.getItem('startpage_sidebar_custom_settings');
@@ -540,118 +373,48 @@ function getSidebarSettings() {
   } catch {}
   return { ...defaultSidebarSettings };
 }
-
 function saveSidebarSettings(settings) {
-  localStorage.setItem('startpage_sidebar_custom_settings', JSON.stringify(settings));
-  applySidebarSettings(settings);
-}
-
-function applySidebarSettings(settings = getSidebarSettings()) {
-  const sidebar = document.getElementById('dashboard-sidebar');
-  if (!sidebar) return;
-
-  const density = settings.density || 'normal';
-  const radius = settings.radius || 'normal';
-  const glass = settings.glass || 'deep';
-
-  sidebar.classList.remove('sidebar-density-compact', 'sidebar-density-normal', 'sidebar-density-spacious');
-  sidebar.classList.add(`sidebar-density-${density}`);
-
-  sidebar.classList.remove('sidebar-radius-subtle', 'sidebar-radius-normal', 'sidebar-radius-pill');
-  sidebar.classList.add(`sidebar-radius-${radius}`);
-
-  sidebar.classList.remove('sidebar-glass-deep', 'sidebar-glass-crystal', 'sidebar-glass-opaque');
-  sidebar.classList.add(`sidebar-glass-${glass}`);
-
-  const densityBadge = document.getElementById('sidebar-density-badge');
-  const radiusBadge = document.getElementById('sidebar-radius-badge');
-  const glassBadge = document.getElementById('sidebar-glass-badge');
-
-  const densityLabels = {
-    compact: 'Compact (56px)',
-    normal: 'Standard (68px)',
-    spacious: 'Spacieux (82px)'
-  };
-  const radiusLabels = {
-    subtle: 'Discret (12px)',
-    normal: 'Moderne (20px)',
-    pill: 'Pilule (28px)'
-  };
-  const glassLabels = {
-    deep: 'Verre Teinté Sombre',
-    crystal: 'Crystal Neo-Frost',
-    opaque: 'Noir Mat Pur'
-  };
-
-  if (densityBadge) densityBadge.textContent = densityLabels[density] || density;
-  if (radiusBadge) radiusBadge.textContent = radiusLabels[radius] || radius;
-  if (glassBadge) glassBadge.textContent = glassLabels[glass] || glass;
-
-  document.querySelectorAll('.sidebar-density-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.density === density);
-  });
-  document.querySelectorAll('.sidebar-radius-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.radius === radius);
-  });
-  document.querySelectorAll('.sidebar-glass-btn').forEach((b) => {
-    b.classList.toggle('active', b.dataset.glass === glass);
-  });
-
-  const curr = document.querySelector('.sidebar-nav .deck-nav-btn.active');
-  if (curr && typeof updateDeckIndicator === 'function') {
-    setTimeout(() => updateDeckIndicator(curr), 60);
-  }
-}
-
-function initSidebarCustomizationControls() {
-  applySidebarSettings();
-
-  document.querySelectorAll('.sidebar-density-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const cur = getSidebarSettings();
-      cur.density = btn.dataset.density;
-      saveSidebarSettings(cur);
-      if (typeof showToast === 'function') {
-        const name = btn.querySelector('span')?.textContent || cur.density;
-        showToast(`Taille Sidebar : ${name}`, 'info');
-      }
-    });
-  });
-
-  document.querySelectorAll('.sidebar-radius-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const cur = getSidebarSettings();
-      cur.radius = btn.dataset.radius;
-      saveSidebarSettings(cur);
-      if (typeof showToast === 'function') {
-        const name = btn.querySelector('span')?.textContent || cur.radius;
-        showToast(`Courbure : ${name}`, 'info');
-      }
-    });
-  });
-
-  document.querySelectorAll('.sidebar-glass-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const cur = getSidebarSettings();
-      cur.glass = btn.dataset.glass;
-      saveSidebarSettings(cur);
-      if (typeof showToast === 'function') {
-        const name = btn.querySelector('span')?.textContent || cur.glass;
-        showToast(`Finition Verre : ${name}`, 'info');
-      }
-    });
-  });
+  try {
+    localStorage.setItem('startpage_sidebar_custom_settings', JSON.stringify(settings));
+  } catch {}
 }
 
 function initCustomHub() {
   initAnimationHubControls();
-  initSidebarCustomizationControls();
-  initDeckViewSlider();
-  initSidebarControls();
+
+  // Bouton d'ouverture des paramètres (header)
+  const openSettingsBtn = document.getElementById('open-settings-btn');
+  if (openSettingsBtn) {
+    openSettingsBtn.addEventListener('click', () => openCustomHub('appearance'));
+  }
+
+  // Bouton de fermeture de la modale de paramètres
+  const closeSettingsBtn = document.getElementById('settings-modal-close-btn');
+  if (closeSettingsBtn) {
+    closeSettingsBtn.addEventListener('click', closeCustomHub);
+  }
+
+  // Clic sur le fond obscurci pour fermer
+  const settingsModal = document.getElementById('settings-modal');
+  if (settingsModal) {
+    settingsModal.addEventListener('click', (e) => {
+      if (e.target === settingsModal) closeCustomHub();
+    });
+  }
+
+  // Clic sur l'avatar / logo en haut à gauche pour faire défiler les thèmes (1 à 5)
+  const brandCycler = document.getElementById('brand-theme-cycler');
+  if (brandCycler) {
+    brandCycler.addEventListener('click', () => {
+      const themes = (typeof themesConfig !== 'undefined') ? Object.keys(themesConfig) : ['1', '2', '3', '4', '5'];
+      const nextTheme = themes[(themes.indexOf(currentTheme) + 1) % themes.length];
+      if (typeof applyTheme === 'function') applyTheme(nextTheme);
+    });
+  }
 
   const addCategoryBtn = document.getElementById('hub-add-category-btn');
 
-  // Sous-onglets de personnalisation
+  // Navigation dans les sous-onglets de personnalisation
   document.querySelectorAll('.hub-tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       switchHubTab(btn.dataset.hubTab);
@@ -676,7 +439,7 @@ function initCustomHub() {
     });
   });
 
-  // Boutons Export et Import dans l'onglet Backup
+  // Boutons Export et Import dans l'onglet Sauvegarde
   const exportBtn = document.getElementById('hub-export-btn');
   const importBtn = document.getElementById('hub-import-btn');
   const resetBtn = document.getElementById('hub-reset-btn');

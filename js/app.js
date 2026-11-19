@@ -69,9 +69,14 @@ const PageSkeletonManager = {
   activeTransitions: new Map(),
   revealedViews: new Set(),
 
-  showSkeleton(viewKey) {
-    const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
-    const realView = document.getElementById(`${viewKey}-real-view`);
+  _getElements(viewKey = 'startpage') {
+    const skeleton = document.getElementById(`${viewKey}-skeleton-view`) || document.getElementById('startpage-skeleton');
+    const realView = document.getElementById(`${viewKey}-real-view`) || document.getElementById('startpage-content');
+    return { skeleton, realView };
+  },
+
+  showSkeleton(viewKey = 'startpage') {
+    const { skeleton, realView } = this._getElements(viewKey);
     if (!skeleton || !realView) return;
 
     if (this.activeTransitions.has(viewKey)) {
@@ -85,9 +90,8 @@ const PageSkeletonManager = {
     realView.classList.add('is-loading');
   },
 
-  revealView(viewKey, callback) {
-    const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
-    const realView = document.getElementById(`${viewKey}-real-view`);
+  revealView(viewKey = 'startpage', callback) {
+    const { skeleton, realView } = this._getElements(viewKey);
     if (!skeleton || !realView) {
       if (typeof callback === 'function') callback();
       return;
@@ -114,9 +118,8 @@ const PageSkeletonManager = {
     });
   },
 
-  prepareAndRevealView(viewKey, onRender, minDelayMs = 0) {
-    const skeleton = document.getElementById(`${viewKey}-skeleton-view`);
-    const realView = document.getElementById(`${viewKey}-real-view`);
+  prepareAndRevealView(viewKey = 'startpage', onRender, minDelayMs = 0) {
+    const { skeleton, realView } = this._getElements(viewKey);
 
     if (!skeleton || !realView) {
       if (typeof onRender === 'function') {
@@ -147,7 +150,7 @@ const PageSkeletonManager = {
 window.PageSkeletonManager = PageSkeletonManager;
 
 function revealBookmarksFromSkeleton() {
-  PageSkeletonManager.revealView('bookmarks');
+  PageSkeletonManager.revealView('startpage');
 }
 window.revealBookmarksFromSkeleton = revealBookmarksFromSkeleton;
 window.revealDashboardFromSkeleton = revealBookmarksFromSkeleton;
@@ -171,11 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
   safeInit(initCustomHub, 'initCustomHub');
   safeInit(initShortcuts, 'initShortcuts');
 
-  // Révélation immédiate de la vue des raccourcis
-  const activeBtn = document.querySelector('.deck-nav-btn.active');
-  const initialViewKey = activeBtn?.dataset?.deckView || 'bookmarks';
+  // Révélation immédiate de la startpage
   requestAnimationFrame(() => {
-    PageSkeletonManager.revealView(initialViewKey);
+    PageSkeletonManager.revealView('startpage');
   });
 
   // === TÂCHES DIFFÉRÉES ===

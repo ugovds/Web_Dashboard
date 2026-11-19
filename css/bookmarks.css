@@ -183,6 +183,13 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  opacity: 0.3;
+  transition: opacity 0.22s ease;
+}
+
+.category-card:hover .category-tools-group,
+.category-card:focus-within .category-tools-group {
+  opacity: 1;
 }
 
 .cat-tool-btn {
@@ -490,28 +497,39 @@ body.edit-mode-active .link-edit-actions {
 
 .link-edit-badge,
 .link-delete-badge {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
+  display: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.12);
   color: var(--accent-primary);
-  font-size: 0.7rem;
-  display: flex;
+  font-size: 0.72rem;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+body.edit-mode-active .link-delete-badge,
+body.bookmarks-edit-mode .link-delete-badge {
+  display: flex;
 }
 
 .link-delete-badge {
   color: #ff6b6b;
-  background: rgba(255, 107, 107, 0.15);
+  background: rgba(255, 107, 107, 0.18);
+  border: 1px solid rgba(255, 107, 107, 0.3);
 }
 
 .link-delete-badge:hover {
   background: #ff6b6b;
   color: #fff;
-  transform: scale(1.15);
+  transform: translateY(-50%) scale(1.15);
 }
 
 .link-edit-badge:hover {

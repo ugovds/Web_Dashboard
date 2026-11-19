@@ -50,10 +50,26 @@ function getPaletteItems() {
     });
   }
 
-  // 2. Vues du deck (Navigation rapide)
+  // 2. Actions de Navigation rapide
   const deckViews = [
-    { title: 'Ouvrir Raccourcis Web & Favoris', category: 'Navigation', icon: 'fa-solid fa-compass', key: 'bookmarks', shortcut: 'Alt+1' },
-    { title: 'Ouvrir Paramètres & Thèmes', category: 'Navigation', icon: 'fa-solid fa-sliders', key: 'customize', shortcut: 'Alt+2' }
+    {
+      title: 'Afficher les Raccourcis Web',
+      category: 'Navigation',
+      icon: 'fa-solid fa-compass',
+      url: 'Alt+1',
+      action: () => {
+        if (typeof closeCustomHub === 'function') closeCustomHub();
+      }
+    },
+    {
+      title: 'Ouvrir Paramètres & Personnalisation',
+      category: 'Navigation',
+      icon: 'fa-solid fa-sliders',
+      url: 'Alt+2',
+      action: () => {
+        if (typeof openCustomHub === 'function') openCustomHub('appearance');
+      }
+    }
   ];
 
   deckViews.forEach((dv) => {
@@ -61,12 +77,9 @@ function getPaletteItems() {
       type: 'action',
       title: dv.title,
       category: dv.category,
-      url: dv.shortcut,
+      url: dv.url,
       icon: dv.icon,
-      action: () => {
-        const btn = document.querySelector(`.deck-nav-btn[data-deck-view="${dv.key}"]`);
-        if (btn) btn.click();
-      }
+      action: dv.action
     });
   });
 

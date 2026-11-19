@@ -10,11 +10,6 @@
  * - Ctrl+Z : Annule la suppression du dernier raccourci
  */
 function initShortcuts() {
-  const DECK_VIEWS_ORDER = [
-    'bookmarks',
-    'customize'
-  ];
-
   document.addEventListener('keydown', (e) => {
     const active = document.activeElement;
     const searchInput = document.getElementById('search-input');
@@ -22,10 +17,12 @@ function initShortcuts() {
     const editModal = document.getElementById('edit-modal');
     const categoryModal = document.getElementById('category-modal');
     const commandPaletteModal = document.getElementById('command-palette-modal');
+    const settingsModal = document.getElementById('settings-modal');
 
     const isEditModalOpen = editModal && !editModal.hidden;
     const isCategoryModalOpen = categoryModal && !categoryModal.hidden;
     const isPaletteOpen = commandPaletteModal && !commandPaletteModal.hidden;
+    const isSettingsModalOpen = settingsModal && !settingsModal.hidden && settingsModal.classList.contains('visible');
 
     // Fermeture des modales ou retour avec Échap
     if (e.key === 'Escape') {
@@ -41,11 +38,8 @@ function initShortcuts() {
         closeCategoryModal();
         return;
       }
-      // Si on est dans les paramètres et qu'aucune modale n'est ouverte, retourner aux raccourcis
-      const customView = document.getElementById('deck-view-customize');
-      if (customView && !customView.hidden && customView.classList.contains('active')) {
-        const bookmarksBtn = document.querySelector('.deck-nav-btn[data-deck-view="bookmarks"]');
-        if (bookmarksBtn) bookmarksBtn.click();
+      if (isSettingsModalOpen && typeof closeCustomHub === 'function') {
+        closeCustomHub();
         return;
       }
     }
@@ -68,58 +62,26 @@ function initShortcuts() {
       return;
     }
 
-    // Navigation dans le deck via Alt+1 (Raccourcis) et Alt+2 (Paramètres)
+    // Raccourcis Alt+1 (Raccourcis) et Alt+2 (Paramètres)
     if (e.altKey && !e.ctrlKey && !e.metaKey) {
-      let num = null;
-      if (e.code.startsWith('Digit')) {
-        num = parseInt(e.code.replace('Digit', ''), 10);
-      } else if (e.code.startsWith('Numpad')) {
-        num = parseInt(e.code.replace('Numpad', ''), 10);
-      } else if (e.key >= '0' && e.key <= '9') {
-        num = parseInt(e.key, 10);
+      if (e.key === '1' || e.code === 'Digit1' || e.code === 'Numpad1') {
+        e.preventDefault();
+        if (typeof closeCustomHub === 'function') closeCustomHub();
+        if (typeof showToast === 'function') showToast('Vue : Raccourcis (Alt+1)', 'info');
+        return;
       }
-
-      if (num !== null) {
-        const targetIdx = num - 1;
-        if (targetIdx >= 0 && targetIdx < DECK_VIEWS_ORDER.length) {
-          e.preventDefault();
-          const targetViewKey = DECK_VIEWS_ORDER[targetIdx];
-          const navBtn = document.querySelector(`.deck-nav-btn[data-deck-view="${targetViewKey}"]`);
-          if (navBtn) {
-            navBtn.click();
-            if (typeof showToast === 'function') {
-              const label = navBtn.querySelector('.nav-label')?.textContent || navBtn.querySelector('span')?.textContent || targetViewKey;
-              showToast(`Vue : ${label} (Alt+${num})`, 'info');
-            }
-          }
-          return;
-        }
+      if (e.key === '2' || e.code === 'Digit2' || e.code === 'Numpad2') {
+        e.preventDefault();
+        if (typeof toggleCustomHub === 'function') toggleCustomHub('appearance');
+        return;
       }
     }
 
-    const isAnyModalOpen = isEditModalOpen || isCategoryModalOpen || isPaletteOpen;
+    const isAnyModalOpen = isEditModalOpen || isCategoryModalOpen || isPaletteOpen || isSettingsModalOpen;
     if (isAnyModalOpen) return;
 
     const isSearchEmpty = active === searchInput && searchInput.value.trim() === '';
     const isNotTyping = active.tagName !== 'INPUT' && active.tagName !== 'TEXTAREA' && active.tagName !== 'SELECT';
-
-    // Navigation au clavier par touches Flèches Haut & Bas entre Raccourcis et Paramètres
-    if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && isNotTyping) {
-      e.preventDefault();
-      const sidebarBtns = Array.from(document.querySelectorAll('.sidebar-nav .deck-nav-btn'));
-      if (sidebarBtns.length) {
-        const activeBtn = document.querySelector('.sidebar-nav .deck-nav-btn.active');
-        const activeIdx = activeBtn ? sidebarBtns.indexOf(activeBtn) : -1;
-        let targetIdx;
-        if (e.key === 'ArrowDown') {
-          targetIdx = (activeIdx < 0 || activeIdx >= sidebarBtns.length - 1) ? 0 : activeIdx + 1;
-        } else {
-          targetIdx = (activeIdx <= 0) ? sidebarBtns.length - 1 : activeIdx - 1;
-        }
-        sidebarBtns[targetIdx]?.click();
-      }
-      return;
-    }
 
     // Raccourci B : Ouvrir la palette de commande si on ne tape nulle part
     if ((e.key === 'b' || e.key === 'B') && isNotTyping) {

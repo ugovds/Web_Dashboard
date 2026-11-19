@@ -22,23 +22,22 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     />
 
-    <!-- Feuilles de styles modulaires critiques -->
-    <link rel="stylesheet" href="css/base.css?v=6.0" />
-    <link rel="stylesheet" href="css/deck.css?v=6.0" />
-    <link rel="stylesheet" href="css/sidebar.css?v=6.0" />
-    <link rel="stylesheet" href="css/dashboard.css?v=6.0" />
-    <link rel="stylesheet" href="css/skeletons.css?v=6.0" />
-    <link rel="stylesheet" href="css/search.css?v=6.0" />
-    <link rel="stylesheet" href="css/bookmarks.css?v=6.0" />
-    <link rel="stylesheet" href="css/responsive.css?v=6.0" />
-    <link rel="stylesheet" href="css/modals.css?v=6.0" />
+    <!-- Feuilles de styles modulaires -->
+    <link rel="stylesheet" href="css/base.css?v=7.0" />
+    <link rel="stylesheet" href="css/deck.css?v=7.0" />
+    <link rel="stylesheet" href="css/dashboard.css?v=7.0" />
+    <link rel="stylesheet" href="css/skeletons.css?v=7.0" />
+    <link rel="stylesheet" href="css/search.css?v=7.0" />
+    <link rel="stylesheet" href="css/bookmarks.css?v=7.0" />
+    <link rel="stylesheet" href="css/responsive.css?v=7.0" />
+    <link rel="stylesheet" href="css/modals.css?v=7.0" />
 
     <!-- Thèmes Visuels -->
-    <link rel="stylesheet" href="css/themes/kanagawa.css?v=6.0" />
-    <link rel="stylesheet" href="css/themes/sakura.css?v=6.0" />
-    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=6.0" />
-    <link rel="stylesheet" href="css/themes/retrowave.css?v=6.0" />
-    <link rel="stylesheet" href="css/themes/glass.css?v=6.0" />
+    <link rel="stylesheet" href="css/themes/kanagawa.css?v=7.0" />
+    <link rel="stylesheet" href="css/themes/sakura.css?v=7.0" />
+    <link rel="stylesheet" href="css/themes/cyberdeck.css?v=7.0" />
+    <link rel="stylesheet" href="css/themes/retrowave.css?v=7.0" />
+    <link rel="stylesheet" href="css/themes/glass.css?v=7.0" />
   </head>
 
   <body data-theme="4">
@@ -51,565 +50,404 @@
       <div class="bg-scanlines"></div>
     </div>
 
-    <div class="dashboard-layout" id="dashboard-layout">
+    <!-- Application Startpage -->
+    <div class="startpage-container">
       <!-- ==============================================
-           1. MENU LATÉRAL GAUCHE (DOCK COCKPIT RÉTRACTABLE)
+           1. HEADER HUD MINIMALISTE & FLOTTANT
            ============================================== -->
-      <aside class="dashboard-sidebar" id="dashboard-sidebar" aria-label="Menu Principal">
-        <!-- Header / Logo du Dashboard -->
-        <div class="sidebar-header">
-          <div class="sidebar-brand-avatar" id="sidebar-brand-avatar" title="Cliquer pour changer de thème (1-5)">
-            <img id="main-art" src="images/gif4.gif" alt="Theme Artwork" width="40" height="40" fetchpriority="high" />
-            <span class="sidebar-status-dot"></span>
+      <header class="startpage-header">
+        <!-- Logo / Thème Avatar -->
+        <div class="startpage-brand" id="brand-theme-cycler" title="Cliquer pour changer de thème (ou touches 1 à 5)">
+          <div class="brand-avatar-box">
+            <img id="main-art" src="images/gif4.gif" alt="Thème" width="38" height="38" fetchpriority="high" />
+            <span class="brand-status-dot"></span>
           </div>
-          <div class="sidebar-brand-info">
-            <span class="sidebar-brand-title">CYBERDECK</span>
-            <span class="sidebar-brand-sub" id="art-badge-text">RETRO WAVE</span>
+          <div class="brand-meta">
+            <span class="brand-title">CYBERDECK</span>
+            <span class="brand-badge" id="art-badge-text">RETRO WAVE</span>
           </div>
-          <button type="button" id="sidebar-toggle-btn" class="sidebar-toggle-btn" title="Réduire / Déplier le menu">
-            <i class="fa-solid fa-chevron-right"></i>
+        </div>
+
+        <!-- Barre de recherche Omnibox centrée -->
+        <div class="startpage-search-wrap">
+          <div class="search-wrapper">
+            <form id="search-form" class="search-box">
+              <button
+                type="button"
+                id="engine-badge"
+                class="engine-badge is-clickable"
+                title="Changer de moteur de recherche ou de site (!help)"
+                aria-label="Choisir le moteur de recherche"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i id="engine-icon" class="fa-brands fa-google"></i>
+                <span id="engine-name">Google</span>
+                <i class="fa-solid fa-chevron-down engine-chevron"></i>
+              </button>
+
+              <span class="prompt-arrow">&gt;</span>
+
+              <input
+                id="search-input"
+                type="text"
+                placeholder="Rechercher sur le Web ou taper ! pour un moteur (!yt, !gh, !w, !d...)"
+                autocomplete="off"
+                autofocus
+              />
+
+              <span id="calc-preview" class="calc-preview" hidden></span>
+              <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
+            </form>
+
+            <!-- Menu déroulant des moteurs de recherche & raccourcis -->
+            <div id="engine-dropdown-menu" class="engine-dropdown-menu liquid-glass-menu" hidden>
+              <div class="engine-dropdown-header">
+                <span><i class="fa-solid fa-layer-group"></i> Moteur de recherche &amp; Raccourcis</span>
+                <span class="engine-dropdown-tip">Choisissez une bulle</span>
+              </div>
+              <div class="engine-dropdown-bubbles-wrap" id="engine-dropdown-grid"></div>
+            </div>
+
+            <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
+          </div>
+        </div>
+
+        <!-- Actions rapides de droite -->
+        <div class="startpage-actions">
+          <button type="button" id="topbar-add-shortcut-btn" class="startpage-btn primary" title="Ajouter un nouveau raccourci">
+            <i class="fa-solid fa-plus"></i>
+            <span>Nouveau Raccourci</span>
+          </button>
+          <button type="button" id="open-settings-btn" class="startpage-btn" title="Paramètres &amp; Personnalisation (Alt+2)">
+            <i class="fa-solid fa-sliders"></i>
+            <span>Paramètres</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ==============================================
+           2. CANEVAS PRINCIPAL : GRILLE CENTRÉE DES RACCOURCIS
+           ============================================== -->
+      <main class="startpage-main">
+        <!-- Squelette First Paint -->
+        <div id="startpage-skeleton" class="view-skeleton-view" aria-hidden="true">
+          <div class="categories-grid">
+            <div class="category-card skel-card">
+              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+              </div>
+            </div>
+            <div class="category-card skel-card">
+              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+              </div>
+            </div>
+            <div class="category-card skel-card">
+              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+              </div>
+            </div>
+            <div class="category-card skel-card">
+              <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; flex: 1;">
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+                <div class="skel-elem skel-squircle" style="height: 48px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenu Réel -->
+        <div id="startpage-content" class="startpage-content view-real-content is-loading">
+          <section class="overview-categories-section">
+            <div id="categories-container" class="categories-grid"></div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- ==============================================
+         3. MODALE DES PARAMÈTRES & CONFIGURATION
+         ============================================== -->
+    <div id="settings-modal" class="modal-backdrop settings-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" hidden>
+      <div class="settings-modal-box">
+        <div class="settings-modal-header">
+          <div class="settings-modal-title-group">
+            <i class="fa-solid fa-sliders"></i>
+            <h3 id="settings-modal-title">Paramètres &amp; Personnalisation</h3>
+          </div>
+          <button type="button" id="settings-modal-close-btn" class="modal-close" aria-label="Fermer les paramètres">&times;</button>
+        </div>
+
+        <!-- Navigation des sous-onglets horizontaux -->
+        <div class="config-subtabs-nav">
+          <button type="button" class="hub-tab-btn config-subtab-btn active" data-hub-tab="appearance">
+            <i class="fa-solid fa-palette"></i> Apparence
+          </button>
+          <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="shortcuts">
+            <i class="fa-solid fa-link"></i> Signets &amp; Catégories
+          </button>
+          <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="animations">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Animations
+          </button>
+          <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="backup">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Sauvegarde
           </button>
         </div>
 
-        <!-- Navigation Verticale des Onglets -->
-        <nav class="sidebar-nav" id="sidebar-nav">
-          <div class="sidebar-indicator" id="sidebar-indicator"></div>
-
-          <!-- 1. RACCOURCIS WEB & FAVORIS -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item active" data-deck-view="bookmarks" title="Raccourcis Web &amp; Favoris (Alt+1)">
-            <div class="nav-icon-wrap"><i class="fa-solid fa-compass"></i></div>
-            <span class="nav-label">Raccourcis</span>
-            <kbd class="nav-kbd">1</kbd>
-            <div class="sidebar-tooltip">Raccourcis Web <kbd>1</kbd></div>
-          </button>
-
-          <!-- 2. PARAMÈTRES & CONFIGURATION -->
-          <button type="button" class="deck-nav-btn sidebar-nav-item" data-deck-view="customize" title="Paramètres &amp; Personnalisation (Alt+2)">
-            <div class="nav-icon-wrap"><i class="fa-solid fa-sliders"></i></div>
-            <span class="nav-label">Paramètres</span>
-            <kbd class="nav-kbd">2</kbd>
-            <div class="sidebar-tooltip">Paramètres <kbd>2</kbd></div>
-          </button>
-        </nav>
-      </aside>
-
-      <!-- ==============================================
-           2. ESPACE PRINCIPAL (TOPBAR HUD + VIEWPORT)
-           ============================================== -->
-      <div class="dashboard-main-area">
-        <!-- Topbar HUD minimaliste -->
-        <header class="dashboard-topbar">
-          <div class="topbar-left">
-            <div class="topbar-view-info">
-              <div class="topbar-view-icon" id="topbar-view-icon">
-                <i class="fa-solid fa-compass"></i>
-              </div>
-              <div class="topbar-title-group">
-                <span class="topbar-view-title" id="topbar-view-title">Raccourcis</span>
-                <span class="topbar-view-subtitle" id="topbar-view-subtitle">Navigation &amp; Favoris Web</span>
+        <div class="settings-modal-body">
+          <!-- 1. SOUS-ONGLET : APPARENCE & THÈMES -->
+          <div id="hub-tab-appearance" class="hub-tab-panel active">
+            <div class="hub-panel-header">
+              <div>
+                <h4>Thèmes, Couleurs &amp; Ambiance</h4>
+                <p class="panel-hint">Choisissez un thème ou personnalisez vos propres couleurs néon et effets avec aperçu en temps réel.</p>
               </div>
             </div>
-          </div>
 
-          <!-- Zone centrale : Barre de recherche Omnibox -->
-          <div class="topbar-center">
-            <div class="search-wrapper">
-              <form id="search-form" class="search-box">
-                <button
-                  type="button"
-                  id="engine-badge"
-                  class="engine-badge is-clickable"
-                  title="Changer de moteur de recherche ou de site (!help)"
-                  aria-label="Choisir le moteur de recherche"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  <i id="engine-icon" class="fa-brands fa-google"></i>
-                  <span id="engine-name">Google</span>
-                  <i class="fa-solid fa-chevron-down engine-chevron"></i>
+            <!-- Choix des 5 thèmes visuels -->
+            <div class="appearance-section">
+              <label style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
+                Thèmes Rétro &amp; Cyberdeck (Touches 1 à 5) :
+              </label>
+              <div class="hub-themes-grid">
+                <button type="button" class="hub-theme-card-btn" data-hub-theme="1" title="Kanagawa (Cyan / Menthe)">
+                  <div class="hub-theme-thumb">
+                    <img src="images/gif.gif" alt="Kanagawa" />
+                  </div>
+                  <span class="hub-theme-name">1. Kanagawa</span>
+                  <span class="hub-theme-badge">Cyan &amp; Menthe</span>
                 </button>
+                <button type="button" class="hub-theme-card-btn" data-hub-theme="2" title="Sakura (Rose Néo-pastel)">
+                  <div class="hub-theme-thumb">
+                    <img src="images/gif2.webp" alt="Sakura" />
+                  </div>
+                  <span class="hub-theme-name">2. Sakura</span>
+                  <span class="hub-theme-badge">Rose Néo-pastel</span>
+                </button>
+                <button type="button" class="hub-theme-card-btn" data-hub-theme="3" title="Cyberdeck (Violet &amp; Néon)">
+                  <div class="hub-theme-thumb">
+                    <img src="images/gif3.webp" alt="Cyberdeck" />
+                  </div>
+                  <span class="hub-theme-name">3. Cyberdeck</span>
+                  <span class="hub-theme-badge">Violet &amp; Néon</span>
+                </button>
+                <button type="button" class="hub-theme-card-btn" data-hub-theme="4" title="Retro Wave (Ukiyo &amp; 8-Bit)">
+                  <div class="hub-theme-thumb">
+                    <img src="images/gif4.gif" alt="Retro Wave" />
+                  </div>
+                  <span class="hub-theme-name">4. Retro Wave</span>
+                  <span class="hub-theme-badge">Ukiyo &amp; 8-Bit</span>
+                </button>
+                <button type="button" class="hub-theme-card-btn" data-hub-theme="5" title="Liquid Glass (Crystal Pur Apple VisionOS)">
+                  <div class="hub-theme-thumb">
+                    <img src="images/glass.svg" alt="Liquid Glass" />
+                  </div>
+                  <span class="hub-theme-name">5. Liquid Glass</span>
+                  <span class="hub-theme-badge">Crystal VisionOS</span>
+                </button>
+              </div>
+            </div>
 
-                <span class="prompt-arrow">&gt;</span>
+            <!-- Palettes cyberpunk rapides -->
+            <div class="appearance-section">
+              <label style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
+                Palettes Cyberpunk Rapides (Cliquez pour appliquer) :
+              </label>
+              <div id="appearance-palettes-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+            </div>
 
-                <input
-                  id="search-input"
-                  type="text"
-                  placeholder="Rechercher ou taper ! pour un moteur (!yt, !gh, !w, !d...)"
-                  autocomplete="off"
-                />
+            <!-- Thèmes personnalisés -->
+            <div class="appearance-section">
+              <label style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Mes Thèmes Personnalisés :
+              </label>
+              <div class="custom-theme-creator-box">
+                <form id="custom-theme-create-form" style="display: flex; gap: 0.6rem; margin-bottom: 0.75rem;">
+                  <input
+                    type="text"
+                    id="custom-theme-name-input"
+                    placeholder="Enregistrer l'apparence actuelle (ex: Matrix Gold)..."
+                    style="flex: 1; padding: 0.5rem 0.85rem; border-radius: 9px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); color: #fff; font-family: inherit; font-size: 0.85rem;"
+                    required
+                  />
+                  <button type="submit" class="modal-btn primary"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
+                </form>
+                <div id="appearance-custom-themes-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
+              </div>
+            </div>
 
-                <span id="calc-preview" class="calc-preview" hidden></span>
-                <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
-              </form>
-
-              <!-- Menu déroulant des moteurs de recherche & raccourcis -->
-              <div id="engine-dropdown-menu" class="engine-dropdown-menu liquid-glass-menu" hidden>
-                <div class="engine-dropdown-header">
-                  <span><i class="fa-solid fa-layer-group"></i> Moteur de recherche &amp; Raccourcis</span>
-                  <span class="engine-dropdown-tip">Choisissez une bulle</span>
+            <!-- Couleurs personnalisées RGB -->
+            <div class="appearance-section">
+              <label style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
+                Couleurs Personnalisées (Sélecteurs RGB) :
+              </label>
+              <div class="appearance-controls-grid">
+                <div class="appearance-control-box">
+                  <span class="appearance-control-title"><i class="fa-solid fa-palette"></i> Accent Principal</span>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <input type="color" id="appearance-primary-color" value="#a8e6f0" style="width: 44px; height: 36px; border: none; border-radius: 8px; cursor: pointer; background: transparent;" />
+                    <span style="font-size: 0.78rem; color: var(--text-muted);">Néons, bordures &amp; icônes</span>
+                  </div>
                 </div>
-                <div class="engine-dropdown-bubbles-wrap" id="engine-dropdown-grid"></div>
+                <div class="appearance-control-box">
+                  <span class="appearance-control-title"><i class="fa-solid fa-circle-dot"></i> Accent Secondaire</span>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <input type="color" id="appearance-secondary-color" value="#7aa89f" style="width: 44px; height: 36px; border: none; border-radius: 8px; cursor: pointer; background: transparent;" />
+                    <span style="font-size: 0.78rem; color: var(--text-muted);">Orbes d'ambiance &amp; reflets</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ambilight & Scanlines -->
+            <div class="appearance-section">
+              <div class="appearance-controls-grid">
+                <div class="appearance-control-box">
+                  <span class="appearance-control-title"><i class="fa-solid fa-sun"></i> Flou de l'Ambilight</span>
+                  <div class="appearance-slider-row">
+                    <input type="range" id="appearance-blur-slider" min="10" max="100" step="5" value="55" />
+                    <span id="appearance-blur-val" class="slider-val-badge">55px</span>
+                  </div>
+                </div>
+
+                <div class="appearance-control-box">
+                  <span class="appearance-control-title"><i class="fa-solid fa-lightbulb"></i> Intensité Ambiance</span>
+                  <div class="appearance-slider-row">
+                    <input type="range" id="appearance-opacity-slider" min="10" max="90" step="2" value="56" />
+                    <span id="appearance-opacity-val" class="slider-val-badge">56%</span>
+                  </div>
+                </div>
               </div>
 
-              <ul id="suggestions-box" class="suggestions-dropdown" hidden></ul>
+              <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1rem;">
+                <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; color: #fff;">
+                  <input type="checkbox" id="appearance-scanlines-check" checked />
+                  <span>Effet Scanlines rétro (lignes cathodiques)</span>
+                </label>
+                <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; color: #fff;">
+                  <input type="checkbox" id="appearance-dim-check" />
+                  <span>Mode Nuit / Atténuation HUD (Ctrl+Shift+D)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="hub-panel-footer">
+              <button type="button" id="appearance-reset-btn" class="modal-btn danger">
+                Réinitialiser l'apparence par défaut
+              </button>
             </div>
           </div>
 
-          <!-- Actions à droite de la Topbar -->
-          <div class="topbar-right">
-            <button type="button" id="topbar-add-shortcut-btn" class="topbar-add-btn" title="Ajouter un raccourci rapide">
-              <i class="fa-solid fa-plus"></i>
-              <span>Nouveau Raccourci</span>
-            </button>
-            <button type="button" class="deck-nav-btn topbar-config-btn" data-deck-view="customize" title="Paramètres &amp; Personnalisation (Alt+2)">
-              <i class="fa-solid fa-sliders"></i>
-              <span class="topbar-config-label">Paramètres</span>
-            </button>
-          </div>
-        </header>
-
-        <!-- Viewport des vues -->
-        <main class="dashboard-viewport" id="dashboard-viewport">
-          <!-- ==============================================
-               VUE 1 : RACCOURCIS WEB & FAVORIS (ACTIVE PAR DÉFAUT)
-               ============================================== -->
-          <div id="deck-view-bookmarks" class="deck-slide-view active">
-            <!-- Squelette Bookmarks -->
-            <div id="bookmarks-skeleton-view" class="bookmarks-full-view view-skeleton-view" aria-hidden="true">
-              <div class="bookmarks-view-header skel-card">
-                <div class="bookmarks-title-group">
-                  <div class="skel-elem skel-circle" style="width: 36px; height: 36px;"></div>
-                  <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <div class="skel-elem skel-bar" style="width: 180px; height: 16px;"></div>
-                    <div class="skel-elem skel-bar" style="width: 240px; height: 12px;"></div>
-                  </div>
-                </div>
-                <div class="bookmarks-header-actions">
-                  <div class="skel-elem skel-pill" style="width: 130px; height: 32px;"></div>
-                  <div class="skel-elem skel-pill" style="width: 120px; height: 32px;"></div>
-                </div>
+          <!-- 2. SOUS-ONGLET : RACCOURCIS & CATÉGORIES -->
+          <div id="hub-tab-shortcuts" class="hub-tab-panel" hidden>
+            <div class="hub-panel-header">
+              <div>
+                <h4>Gestion des Catégories &amp; Raccourcis</h4>
+                <p class="panel-hint">Ajoutez, modifiez ou supprimez vos catégories et vos liens.</p>
               </div>
-              <div class="bookmarks-view-body">
-                <section class="overview-categories-section">
-                  <div class="categories-grid">
-                    <div class="category-card skel-card">
-                      <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-                      <div class="bookmarks-skeleton-items-grid">
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                      </div>
-                    </div>
-                    <div class="category-card skel-card">
-                      <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-                      <div class="bookmarks-skeleton-items-grid">
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                      </div>
-                    </div>
-                    <div class="category-card skel-card">
-                      <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-                      <div class="bookmarks-skeleton-items-grid">
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                      </div>
-                    </div>
-                    <div class="category-card skel-card">
-                      <div class="skel-elem skel-bar" style="width: 110px; height: 18px; margin-bottom: 12px;"></div>
-                      <div class="bookmarks-skeleton-items-grid">
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                        <div class="skel-elem skel-squircle" style="height: 48px;"></div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
+              <button type="button" id="hub-add-category-btn" class="modal-btn primary">
+                <i class="fa-solid fa-folder-plus"></i> + Nouvelle Catégorie
+              </button>
+            </div>
+
+            <div id="hub-categories-list" class="hub-categories-list"></div>
+          </div>
+
+          <!-- 3. SOUS-ONGLET : ANIMATIONS -->
+          <div id="hub-tab-animations" class="hub-tab-panel" hidden>
+            <div class="hub-panel-header">
+              <div>
+                <h4>Animations &amp; Fluidité</h4>
+                <p class="panel-hint">Personnalisez la vitesse et les effets de flou cinétique.</p>
+              </div>
+              <button type="button" id="anim-test-preview-btn" class="modal-btn primary" title="Tester la transition">
+                <i class="fa-solid fa-play"></i> Tester
+              </button>
+            </div>
+
+            <!-- Vitesse -->
+            <div class="appearance-section">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+                <label style="font-weight: 700; font-size: 0.85rem; color: #fff;">Vitesse d'animation :</label>
+                <span id="anim-speed-val-badge" class="slider-val-badge">420ms (Normale)</span>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="speed-preset-pill" data-speed="slow"><i class="fa-solid fa-film"></i> Lente (550ms)</button>
+                <button type="button" class="speed-preset-pill active" data-speed="normal"><i class="fa-solid fa-gauge"></i> Normale (420ms)</button>
+                <button type="button" class="speed-preset-pill" data-speed="fast"><i class="fa-solid fa-bolt"></i> Rapide (240ms)</button>
               </div>
             </div>
 
-            <!-- Contenu Réel Bookmarks -->
-            <div id="bookmarks-real-view" class="bookmarks-full-view view-real-content is-loading">
-              <div class="bookmarks-view-header">
-                <div class="bookmarks-title-group">
-                  <div class="bookmarks-title-icon"><i class="fa-solid fa-compass"></i></div>
-                  <div>
-                    <h2 class="bookmarks-title">Raccourcis Web &amp; Favoris</h2>
-                    <span class="bookmarks-subtitle">Accès rapide à vos applications et sites web préférés par catégorie</span>
-                  </div>
-                </div>
-                <div class="bookmarks-header-actions">
-                  <button type="button" id="bookmarks-add-link-btn" class="bookmarks-action-btn primary" title="Ajouter un raccourci">
-                    <i class="fa-solid fa-plus"></i> <span>Nouveau Raccourci</span>
-                  </button>
-                  <button type="button" class="bookmarks-action-btn" data-deck-view="customize" title="Gérer les catégories dans les paramètres">
-                    <i class="fa-solid fa-folder-gear"></i> <span>Gérer Catégories</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="bookmarks-view-body">
-                <section class="overview-categories-section">
-                  <div id="categories-container" class="categories-grid"></div>
-                </section>
+            <!-- Flou cinétique -->
+            <div class="appearance-section">
+              <label style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">Flou Cinétique (Motion Blur) :</label>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="blur-preset-pill" data-blur="high">Intense (6px)</button>
+                <button type="button" class="blur-preset-pill active" data-blur="medium">Moyen (3.5px)</button>
+                <button type="button" class="blur-preset-pill" data-blur="subtle">Subtil (1.5px)</button>
+                <button type="button" class="blur-preset-pill" data-blur="none">Désactivé (0px)</button>
               </div>
             </div>
           </div>
 
-          <!-- ==============================================
-               VUE 2 : CONFIGURATION & PARAMÈTRES
-               ============================================== -->
-          <div id="deck-view-customize" class="deck-slide-view customize-full-view" hidden>
-            <!-- Squelette Paramètres -->
-            <div id="customize-skeleton-view" class="customize-skeleton-container view-skeleton-view" aria-hidden="true">
-              <div class="customize-skeleton-card skel-card">
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                  <div class="skel-elem skel-pill" style="width: 120px; height: 38px;"></div>
-                  <div class="skel-elem skel-pill" style="width: 110px; height: 38px;"></div>
-                  <div class="skel-elem skel-pill" style="width: 110px; height: 38px;"></div>
-                  <div class="skel-elem skel-pill" style="width: 125px; height: 38px;"></div>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 1rem;">
-                  <div class="skel-elem skel-squircle" style="height: 80px;"></div>
-                  <div class="skel-elem skel-squircle" style="height: 80px;"></div>
-                  <div class="skel-elem skel-squircle" style="height: 80px;"></div>
-                  <div class="skel-elem skel-squircle" style="height: 80px;"></div>
-                </div>
+          <!-- 4. SOUS-ONGLET : SAUVEGARDE & RESTAURATION -->
+          <div id="hub-tab-backup" class="hub-tab-panel" hidden>
+            <div class="hub-panel-header">
+              <div>
+                <h4>Sauvegarde &amp; Restauration</h4>
+                <p class="panel-hint">Exportez vos signets, thèmes et réglages dans un fichier JSON pour ne jamais rien perdre.</p>
               </div>
             </div>
 
-            <!-- Contenu Réel Customize -->
-            <div id="customize-real-view" class="customize-skeleton-container view-real-content is-loading">
-              <div class="customize-deck-panel">
-                <!-- Navigation par sous-onglets horizontaux -->
-                <div class="config-subtabs-nav">
-                  <button type="button" class="hub-tab-btn config-subtab-btn active" data-hub-tab="appearance">
-                    <i class="fa-solid fa-palette"></i> Apparence
-                  </button>
-                  <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="shortcuts">
-                    <i class="fa-solid fa-link"></i> Signets &amp; Catégories
-                  </button>
-                  <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="animations">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Animations
-                  </button>
-                  <button type="button" class="hub-tab-btn config-subtab-btn" data-hub-tab="backup">
-                    <i class="fa-solid fa-cloud-arrow-down"></i> Sauvegarde
-                  </button>
-                </div>
+            <div class="backup-options-grid">
+              <div class="backup-option-card">
+                <h5><i class="fa-solid fa-file-export" style="color: var(--accent-primary);"></i> Exporter la configuration</h5>
+                <p>Téléchargez un fichier .json contenant l'ensemble de vos raccourcis, catégories et styles.</p>
+                <button type="button" id="hub-export-btn" class="modal-btn primary" style="align-self: flex-start;">
+                  <i class="fa-solid fa-download"></i> Exporter .JSON
+                </button>
+              </div>
 
-                <!-- 1. SOUS-ONGLET : APPARENCE & THÈMES -->
-                <div id="hub-tab-appearance" class="hub-tab-panel active">
-                  <div class="hub-panel-header">
-                    <div>
-                      <h4>Thèmes, Couleurs &amp; Ambiance</h4>
-                      <p class="panel-hint">Choisissez un thème ou personnalisez vos propres couleurs néon et effets avec aperçu en temps réel.</p>
-                    </div>
-                  </div>
+              <div class="backup-option-card">
+                <h5><i class="fa-solid fa-file-import" style="color: var(--accent-primary);"></i> Importer une sauvegarde</h5>
+                <p>Restaurez vos raccourcis et vos thèmes depuis un fichier .json précédemment exporté.</p>
+                <input type="file" id="hub-import-file-input" accept=".json" style="display: none;" />
+                <button type="button" id="hub-import-btn" class="modal-btn secondary" style="align-self: flex-start;">
+                  <i class="fa-solid fa-upload"></i> Choisir un fichier
+                </button>
+              </div>
 
-                  <!-- Choix des thèmes de base -->
-                  <div class="appearance-section">
-                    <label class="section-label" style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
-                      Thèmes Rétro &amp; Cyberdeck (Touches 1 à 5) :
-                    </label>
-                    <div class="hub-themes-grid">
-                      <button type="button" class="hub-theme-card-btn" data-hub-theme="1" title="Kanagawa (Cyan / Menthe)">
-                        <div class="hub-theme-thumb">
-                          <img src="images/gif.gif" alt="Kanagawa" />
-                        </div>
-                        <span class="hub-theme-name">1. Kanagawa</span>
-                        <span class="hub-theme-badge">Cyan &amp; Menthe</span>
-                      </button>
-                      <button type="button" class="hub-theme-card-btn" data-hub-theme="2" title="Sakura (Rose Néo-pastel)">
-                        <div class="hub-theme-thumb">
-                          <img src="images/gif2.webp" alt="Sakura" />
-                        </div>
-                        <span class="hub-theme-name">2. Sakura</span>
-                        <span class="hub-theme-badge">Rose Néo-pastel</span>
-                      </button>
-                      <button type="button" class="hub-theme-card-btn" data-hub-theme="3" title="Cyberdeck (Violet &amp; Néon)">
-                        <div class="hub-theme-thumb">
-                          <img src="images/gif3.webp" alt="Cyberdeck" />
-                        </div>
-                        <span class="hub-theme-name">3. Cyberdeck</span>
-                        <span class="hub-theme-badge">Violet &amp; Néon</span>
-                      </button>
-                      <button type="button" class="hub-theme-card-btn" data-hub-theme="4" title="Retro Wave (Ukiyo &amp; 8-Bit)">
-                        <div class="hub-theme-thumb">
-                          <img src="images/gif4.gif" alt="Retro Wave" />
-                        </div>
-                        <span class="hub-theme-name">4. Retro Wave</span>
-                        <span class="hub-theme-badge">Ukiyo &amp; 8-Bit</span>
-                      </button>
-                      <button type="button" class="hub-theme-card-btn" data-hub-theme="5" title="Liquid Glass (Crystal Pur Apple VisionOS)">
-                        <div class="hub-theme-thumb">
-                          <img src="images/glass.svg" alt="Liquid Glass" />
-                        </div>
-                        <span class="hub-theme-name">5. Liquid Glass</span>
-                        <span class="hub-theme-badge">Crystal VisionOS</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Palettes cyberpunk rapides -->
-                  <div class="appearance-section">
-                    <label class="section-label" style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
-                      Palettes Cyberpunk Rapides (Cliquez pour appliquer) :
-                    </label>
-                    <div id="appearance-palettes-list" class="palettes-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
-                  </div>
-
-                  <!-- Thèmes personnalisés créés par l'utilisateur -->
-                  <div class="appearance-section">
-                    <label class="section-label" style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
-                      <i class="fa-solid fa-wand-magic-sparkles"></i> Mes Thèmes Personnalisés :
-                    </label>
-                    <div class="custom-theme-creator-box">
-                      <form id="custom-theme-create-form" style="display: flex; gap: 0.6rem; margin-bottom: 0.75rem;">
-                        <input
-                          type="text"
-                          id="custom-theme-name-input"
-                          placeholder="Enregistrer l'apparence actuelle (ex: Matrix Gold)..."
-                          style="flex: 1; padding: 0.5rem 0.85rem; border-radius: 9px; background: rgba(255,255,255,0.04); border: 1px solid var(--border-subtle); color: #fff; font-family: inherit; font-size: 0.85rem;"
-                          required
-                        />
-                        <button type="submit" class="modal-btn primary"><i class="fa-solid fa-floppy-disk"></i> Enregistrer</button>
-                      </form>
-                      <div id="appearance-custom-themes-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;"></div>
-                    </div>
-                  </div>
-
-                  <!-- Couleurs personnalisées RGB -->
-                  <div class="appearance-section">
-                    <label class="section-label" style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
-                      Couleurs Personnalisées (Sélecteurs RGB) :
-                    </label>
-                    <div class="appearance-controls-grid">
-                      <div class="appearance-control-box">
-                        <span class="appearance-control-title"><i class="fa-solid fa-palette"></i> Accent Principal</span>
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                          <input type="color" id="appearance-primary-color" value="#a8e6f0" style="width: 44px; height: 36px; border: none; border-radius: 8px; cursor: pointer; background: transparent;" />
-                          <span style="font-size: 0.78rem; color: var(--text-muted);">Néons, bordures &amp; icônes</span>
-                        </div>
-                      </div>
-                      <div class="appearance-control-box">
-                        <span class="appearance-control-title"><i class="fa-solid fa-circle-dot"></i> Accent Secondaire</span>
-                        <div style="display: flex; align-items: center; gap: 0.75rem;">
-                          <input type="color" id="appearance-secondary-color" value="#7aa89f" style="width: 44px; height: 36px; border: none; border-radius: 8px; cursor: pointer; background: transparent;" />
-                          <span style="font-size: 0.78rem; color: var(--text-muted);">Orbes d'ambiance &amp; reflets</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Ambilight & Scanlines -->
-                  <div class="appearance-section">
-                    <div class="appearance-controls-grid">
-                      <div class="appearance-control-box">
-                        <span class="appearance-control-title"><i class="fa-solid fa-sun"></i> Flou de l'Ambilight</span>
-                        <div class="appearance-slider-row">
-                          <input type="range" id="appearance-blur-slider" min="10" max="100" step="5" value="55" />
-                          <span id="appearance-blur-val" class="slider-val-badge">55px</span>
-                        </div>
-                      </div>
-
-                      <div class="appearance-control-box">
-                        <span class="appearance-control-title"><i class="fa-solid fa-lightbulb"></i> Intensité Ambiance</span>
-                        <div class="appearance-slider-row">
-                          <input type="range" id="appearance-opacity-slider" min="10" max="90" step="2" value="56" />
-                          <span id="appearance-opacity-val" class="slider-val-badge">56%</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 1rem;">
-                      <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; color: #fff;">
-                        <input type="checkbox" id="appearance-scanlines-check" checked />
-                        <span>Effet Scanlines rétro (lignes cathodiques)</span>
-                      </label>
-                      <label style="display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.85rem; color: #fff;">
-                        <input type="checkbox" id="appearance-dim-check" />
-                        <span>Mode Nuit / Atténuation HUD (Ctrl+Shift+D)</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <!-- Personnalisation de la Barre Latérale -->
-                  <div class="appearance-section">
-                    <h5 style="margin: 0 0 0.5rem 0; font-size: 0.95rem; color: #fff;"><i class="fa-solid fa-bars-staggered"></i> Personnalisation du Dock Latéral</h5>
-                    <div class="appearance-controls-grid">
-                      <div class="appearance-control-box">
-                        <span class="appearance-control-title">Largeur : <span id="sidebar-density-badge" style="color: var(--accent-primary);">Standard</span></span>
-                        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                          <button type="button" class="sidebar-density-btn" data-density="compact">Compact (56px)</button>
-                          <button type="button" class="sidebar-density-btn active" data-density="normal">Standard (68px)</button>
-                          <button type="button" class="sidebar-density-btn" data-density="spacious">Spacieux (82px)</button>
-                        </div>
-                      </div>
-
-                      <div class="appearance-control-box">
-                        <span class="appearance-control-title">Arrondis : <span id="sidebar-radius-badge" style="color: var(--accent-primary);">Moderne</span></span>
-                        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                          <button type="button" class="sidebar-radius-btn" data-radius="subtle">Discret (12px)</button>
-                          <button type="button" class="sidebar-radius-btn active" data-radius="normal">Moderne (20px)</button>
-                          <button type="button" class="sidebar-radius-btn" data-radius="pill">Pilule (28px)</button>
-                        </div>
-                      </div>
-
-                      <div class="appearance-control-box">
-                        <span class="appearance-control-title">Finition : <span id="sidebar-glass-badge" style="color: var(--accent-primary);">Verre Teinté</span></span>
-                        <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                          <button type="button" class="sidebar-glass-btn active" data-glass="deep">Verre Teinté</button>
-                          <button type="button" class="sidebar-glass-btn" data-glass="crystal">Crystal Neo-Frost</button>
-                          <button type="button" class="sidebar-glass-btn" data-glass="opaque">Noir Mat Pur</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="hub-panel-footer">
-                    <button type="button" id="appearance-reset-btn" class="modal-btn danger">
-                      Réinitialiser l'apparence par défaut
-                    </button>
-                  </div>
-                </div>
-
-                <!-- 2. SOUS-ONGLET : RACCOURCIS & CATÉGORIES -->
-                <div id="hub-tab-shortcuts" class="hub-tab-panel" hidden>
-                  <div class="hub-panel-header">
-                    <div>
-                      <h4>Gestion des Catégories &amp; Raccourcis</h4>
-                      <p class="panel-hint">Ajoutez, modifiez ou organisez vos catégories et liens favoris.</p>
-                    </div>
-                    <button type="button" id="hub-add-category-btn" class="modal-btn primary">
-                      <i class="fa-solid fa-folder-plus"></i> + Nouvelle Catégorie
-                    </button>
-                  </div>
-
-                  <div id="hub-categories-list" class="hub-categories-list"></div>
-                </div>
-
-                <!-- 3. SOUS-ONGLET : ANIMATIONS -->
-                <div id="hub-tab-animations" class="hub-tab-panel" hidden>
-                  <div class="hub-panel-header">
-                    <div>
-                      <h4>Animations &amp; Fluidité</h4>
-                      <p class="panel-hint">Personnalisez les transitions, la vitesse et le style d'animation.</p>
-                    </div>
-                    <button type="button" id="anim-test-preview-btn" class="modal-btn primary" title="Tester la transition">
-                      <i class="fa-solid fa-play"></i> Tester la transition
-                    </button>
-                  </div>
-
-                  <!-- Style de transition -->
-                  <div class="appearance-section">
-                    <label class="section-label" style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">
-                      Transition entre vues :
-                    </label>
-                    <div class="hub-anim-styles-grid">
-                      <button type="button" class="hub-anim-card-btn active" data-anim-style="deck-slide">
-                        <span class="anim-card-title"><i class="fa-solid fa-arrows-up-down"></i> Glissement Deck</span>
-                        <span class="anim-card-desc">Défilement vertical fluide avec flou</span>
-                      </button>
-                      <button type="button" class="hub-anim-card-btn" data-anim-style="page-zoom">
-                        <span class="anim-card-title"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom Éthéré</span>
-                        <span class="anim-card-desc">Agrandissement doux et progressif</span>
-                      </button>
-                      <button type="button" class="hub-anim-card-btn" data-anim-style="cyber-glitch">
-                        <span class="anim-card-title"><i class="fa-solid fa-bolt"></i> Cyber Scan</span>
-                        <span class="anim-card-desc">Micro-décalage futuriste</span>
-                      </button>
-                      <button type="button" class="hub-anim-card-btn" data-anim-style="crossfade">
-                        <span class="anim-card-title"><i class="fa-solid fa-circle-half-stroke"></i> Fondu Soyeux</span>
-                        <span class="anim-card-desc">Transition subtile en opacité</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  <!-- Vitesse -->
-                  <div class="appearance-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
-                      <label style="font-weight: 700; font-size: 0.85rem; color: #fff;">Vitesse d'animation :</label>
-                      <span id="anim-speed-val-badge" class="slider-val-badge">420ms (Normale)</span>
-                    </div>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                      <button type="button" class="speed-preset-pill" data-speed="slow"><i class="fa-solid fa-film"></i> Lente (550ms)</button>
-                      <button type="button" class="speed-preset-pill active" data-speed="normal"><i class="fa-solid fa-gauge"></i> Normale (420ms)</button>
-                      <button type="button" class="speed-preset-pill" data-speed="fast"><i class="fa-solid fa-bolt"></i> Rapide (240ms)</button>
-                    </div>
-                  </div>
-
-                  <!-- Flou cinétique -->
-                  <div class="appearance-section">
-                    <label style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">Flou Cinétique (Motion Blur) :</label>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                      <button type="button" class="blur-preset-pill" data-blur="high">Intense (6px)</button>
-                      <button type="button" class="blur-preset-pill active" data-blur="medium">Moyen (3.5px)</button>
-                      <button type="button" class="blur-preset-pill" data-blur="subtle">Subtil (1.5px)</button>
-                      <button type="button" class="blur-preset-pill" data-blur="none">Désactivé (0px)</button>
-                    </div>
-                  </div>
-
-                  <!-- Surbrillance de l'indicateur -->
-                  <div class="appearance-section">
-                    <label style="display: block; margin-bottom: 0.65rem; font-weight: 700; font-size: 0.85rem; color: #fff;">Style de Surbrillance Sidebar :</label>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                      <button type="button" class="indicator-style-btn active" data-indicator-style="glass">Verre Dépoli (Glass Glow)</button>
-                      <button type="button" class="indicator-style-btn" data-indicator-style="neon">Néon Pulsé (Cyber Neon)</button>
-                      <button type="button" class="indicator-style-btn" data-indicator-style="clean">Minimaliste (Discret)</button>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 4. SOUS-ONGLET : SAUVEGARDE & RESTAURATION -->
-                <div id="hub-tab-backup" class="hub-tab-panel" hidden>
-                  <div class="hub-panel-header">
-                    <div>
-                      <h4>Sauvegarde &amp; Restauration</h4>
-                      <p class="panel-hint">Exportez vos signets, thèmes et réglages dans un fichier JSON pour ne jamais rien perdre.</p>
-                    </div>
-                  </div>
-
-                  <div class="backup-options-grid">
-                    <div class="backup-option-card">
-                      <h5><i class="fa-solid fa-file-export" style="color: var(--accent-primary);"></i> Exporter la configuration</h5>
-                      <p>Téléchargez un fichier .json contenant l'ensemble de vos raccourcis, catégories et styles.</p>
-                      <button type="button" id="hub-export-btn" class="modal-btn primary" style="align-self: flex-start;">
-                        <i class="fa-solid fa-download"></i> Exporter .JSON
-                      </button>
-                    </div>
-
-                    <div class="backup-option-card">
-                      <h5><i class="fa-solid fa-file-import" style="color: var(--accent-primary);"></i> Importer une sauvegarde</h5>
-                      <p>Restaurez vos raccourcis et vos thèmes depuis un fichier .json précédemment exporté.</p>
-                      <input type="file" id="hub-import-file-input" accept=".json" style="display: none;" />
-                      <button type="button" id="hub-import-btn" class="modal-btn secondary" style="align-self: flex-start;">
-                        <i class="fa-solid fa-upload"></i> Choisir un fichier
-                      </button>
-                    </div>
-
-                    <div class="backup-option-card" style="border-color: rgba(255, 107, 107, 0.25);">
-                      <h5 style="color: #ff6b6b;"><i class="fa-solid fa-trash-can"></i> Réinitialisation</h5>
-                      <p>Rétablir les raccourcis et la disposition par défaut de la page.</p>
-                      <button type="button" id="hub-reset-btn" class="modal-btn danger" style="align-self: flex-start;">
-                        Réinitialiser tout
-                      </button>
-                    </div>
-                  </div>
-                </div>
+              <div class="backup-option-card" style="border-color: rgba(255, 107, 107, 0.25);">
+                <h5 style="color: #ff6b6b;"><i class="fa-solid fa-trash-can"></i> Réinitialisation</h5>
+                <p>Rétablir les raccourcis et la disposition par défaut de la page.</p>
+                <button type="button" id="hub-reset-btn" class="modal-btn danger" style="align-self: flex-start;">
+                  Réinitialiser tout
+                </button>
               </div>
             </div>
           </div>
-        </main>
+        </div>
       </div>
     </div>
 
     <!-- ==============================================
-         3. MODALES ET DIALOGUES
+         4. MODALES RACCOURCIS & CATÉGORIES
          ============================================== -->
 
     <!-- MODALE D'ÉDITION D'UN RACCOURCI -->
@@ -762,14 +600,14 @@
       </div>
     </div>
 
-    <!-- Scripts modulaires légers & ordonnés -->
-    <script defer src="js/themes.js?v=6.0"></script>
-    <script defer src="js/appearance.js?v=6.0"></script>
-    <script defer src="js/search.js?v=6.0"></script>
-    <script defer src="js/bookmarks.js?v=6.0"></script>
-    <script defer src="js/custom-hub.js?v=6.0"></script>
-    <script defer src="js/command-palette.js?v=6.0"></script>
-    <script defer src="js/shortcuts.js?v=6.0"></script>
-    <script defer src="js/app.js?v=6.0"></script>
+    <!-- Scripts modulaires ordonnés -->
+    <script defer src="js/themes.js?v=7.0"></script>
+    <script defer src="js/appearance.js?v=7.0"></script>
+    <script defer src="js/search.js?v=7.0"></script>
+    <script defer src="js/bookmarks.js?v=7.0"></script>
+    <script defer src="js/custom-hub.js?v=7.0"></script>
+    <script defer src="js/command-palette.js?v=7.0"></script>
+    <script defer src="js/shortcuts.js?v=7.0"></script>
+    <script defer src="js/app.js?v=7.0"></script>
   </body>
 </html>
