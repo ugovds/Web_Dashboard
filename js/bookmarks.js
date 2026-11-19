@@ -59,6 +59,26 @@ const defaultCategories = [
 
 let categories = [];
 let quickShortcuts = [];
+
+function populateQuickShortcuts() {
+  quickShortcuts = [];
+  const list = (categories && categories.length > 0) ? categories : defaultCategories;
+  list.forEach((cat, catIdx) => {
+    (cat.links || []).forEach((link, linkIdx) => {
+      quickShortcuts.push({
+        catIdx,
+        linkIdx,
+        catTitle: cat.title,
+        title: link.name,
+        name: link.name,
+        url: link.url,
+        icon: link.icon
+      });
+    });
+  });
+}
+populateQuickShortcuts();
+
 let isEditMode = false;
 let currentEditingTarget = { catIdx: null, linkIdx: null }; // linkIdx === null signifie ajout d'un nouveau lien
 let currentEditingCategoryIdx = null; // null = ajout de catégorie
@@ -78,6 +98,9 @@ let draggedData = null;
 let didDragOccur = false;
 
 function getQuickShortcuts() {
+  if (!quickShortcuts || quickShortcuts.length === 0) {
+    populateQuickShortcuts();
+  }
   return quickShortcuts;
 }
 
@@ -155,6 +178,7 @@ function renderCategories() {
                       linkIdx,
                       catTitle: cat.title,
                       name: link.name,
+                      title: link.name,
                       url: link.url,
                       icon: link.icon
                     });

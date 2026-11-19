@@ -2,7 +2,7 @@
  * sw.js - Service Worker pour Violet Startpage (Mode Hors-Ligne & Cache Instantané 0 ms)
  */
 
-const CACHE_NAME = 'violet-startpage-v11.0';
+const CACHE_NAME = 'violet-startpage-v12.0';
 
 const STATIC_ASSETS = [
   './',
@@ -89,17 +89,5 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Autres requêtes éventuelles : Cache-First
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      return fetch(event.request).then((res) => {
-        if (res && res.status === 200) {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((c) => c.put(event.request, clone));
-        }
-        return res;
-      }).catch(() => cached);
-    })
-  );
+  // Les requêtes externes (comme l'API Google Suggest) passent directement par le réseau standard sans interception
 });

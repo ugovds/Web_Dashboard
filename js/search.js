@@ -147,23 +147,29 @@ function tryEvaluateMath(expr) {
 }
 
 function fetchGoogleSuggestions(query) {
+  if (!query || !query.trim()) return Promise.resolve([]);
   return new Promise((resolve) => {
     const cbName = 'google_ac_' + Math.random().toString(36).substring(2, 9);
     const script = document.createElement('script');
+    let finished = false;
+
     const timer = setTimeout(() => {
       cleanup();
       resolve([]);
-    }, 1500);
+    }, 1200);
 
     function cleanup() {
+      if (finished) return;
+      finished = true;
       clearTimeout(timer);
       delete window[cbName];
       if (script.parentNode) script.parentNode.removeChild(script);
     }
 
     window[cbName] = (data) => {
+      const results = Array.isArray(data) && Array.isArray(data[1]) ? data[1] : [];
       cleanup();
-      resolve(Array.isArray(data[1]) ? data[1] : []);
+      resolve(results);
     };
 
     script.src = `https://suggestqueries.google.com/complete/search?client=firefox&hl=fr&q=${encodeURIComponent(query)}&callback=${cbName}`;
@@ -287,6 +293,13 @@ function executeSuggestion(item) {
         : 'https://www.google.com/search?q=' + encodeURIComponent(item.text);
     window.open(url, '_blank');
   }
+
+  const suggestionsBox = document.getElementById('suggestions-box');
+  if (suggestionsBox) {
+    suggestionsBox.hidden = true;
+    suggestionsBox.innerHTML = '';
+  }
+  selectedSuggestionIndex = -1;
 }
 
 function renderEngineDropdown() {
@@ -506,27 +519,46 @@ function initSearch() {
     const queryForSuggest = inlineBang ? parts.slice(1).join(' ').trim() : val;
     if (!queryForSuggest) {
       suggestionsBox.hidden = true;
+      suggestionsBox.innerHTML = '';
       return;
     }
 
     const shortcuts = typeof getQuickShortcuts === 'function' ? getQuickShortcuts() : [];
+    const qLower = queryForSuggest.toLowerCase();
     const matchedShortcuts = !currentPrefix
       ? shortcuts
-          .filter((s) => s.title.toLowerCase().startsWith(queryForSuggest.toLowerCase()))
+          .filter((s) => {
+            const label = (s.title || s.name || '').toLowerCase();
+            return label.startsWith(qLower);
+          })
           .slice(0, 2)
           .map((s) => ({
             type: 'shortcut',
-            text: s.title,
+            text: s.title || s.name,
             url: s.url,
             icon: s.icon
           }))
       : [];
 
+    // Affichage instantané (0 ms) si des raccourcis correspondent
+    if (matchedShortcuts.length > 0) {
+      renderSuggestions(matchedShortcuts, val);
+    }
+
+    const targetQuery = queryForSuggest;
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(async () => {
-      const webSuggestions = await fetchGoogleSuggestions(queryForSuggest);
+      const webSuggestions = await fetchGoogleSuggestions(targetQuery);
+
+      // Si l'utilisateur a changé sa saisie entre-temps, ignorer ce résultat obsolète
+      const currentVal = searchInput.value.trim();
+      const currentParts = currentVal.split(' ');
+      const currentBang = searchEngines[currentParts[0].toLowerCase()] ? currentParts[0].toLowerCase() : null;
+      const expectedQuery = currentBang ? currentParts.slice(1).join(' ').trim() : currentVal;
+      if (expectedQuery !== targetQuery) return;
+
       const filteredWeb = webSuggestions
-        .filter((w) => !matchedShortcuts.some((m) => m.text.toLowerCase() === w.toLowerCase()))
+        .filter((w) => typeof w === 'string' && !matchedShortcuts.some((m) => m.text.toLowerCase() === w.toLowerCase()))
         .slice(0, 6 - matchedShortcuts.length)
         .map((w) => ({
           type: 'web',
@@ -534,10 +566,14 @@ function initSearch() {
           icon: currentPrefix ? searchEngines[currentPrefix].icon : 'fa-solid fa-magnifying-glass'
         }));
 
-      if (searchInput.value.trim()) {
-        renderSuggestions([...matchedShortcuts, ...filteredWeb], val);
+      const finalItems = [...matchedShortcuts, ...filteredWeb];
+      if (finalItems.length > 0 && searchInput.value.trim()) {
+        renderSuggestions(finalItems, currentVal);
+      } else if (!matchedShortcuts.length) {
+        suggestionsBox.hidden = true;
+        suggestionsBox.innerHTML = '';
       }
-    }, 90);
+    }, 70);
   });
 
   searchInput.addEventListener('keydown', (e) => {
@@ -573,14 +609,18 @@ function initSearch() {
     }
   });
 
-  suggestionsBox.addEventListener('mousedown', (e) => {
+  const handleSelectSuggestion = (e) => {
     const li = e.target.closest('.suggestion-item');
     if (!li) return;
+    e.preventDefault();
     const idx = Number(li.dataset.index);
     if (currentSuggestions[idx]) {
       executeSuggestion(currentSuggestions[idx]);
     }
-  });
+  };
+
+  suggestionsBox.addEventListener('mousedown', handleSelectSuggestion);
+  suggestionsBox.addEventListener('touchstart', handleSelectSuggestion, { passive: false });
 
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-wrapper')) {

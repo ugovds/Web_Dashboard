@@ -88,18 +88,20 @@
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  max-height: 340px;
+  max-height: 360px;
   overflow-y: auto;
   list-style: none;
-  background: var(--surface-strong);
+  background: var(--surface-strong, rgba(14, 18, 28, 0.96));
   border: 1px solid var(--border-highlight);
   border-radius: 14px;
   padding: 0.45rem;
-  backdrop-filter: blur(24px);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.06);
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  z-index: 200;
 }
 
 .suggestions-dropdown[hidden] {
@@ -419,6 +421,46 @@ body[data-theme="5"] .engine-bubble-tag {
 }
 
 body[data-theme="5"] .engine-bubble-tag.default {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: #ffffff !important;
+}
+
+/* Haute lisibilité des suggestions Google dans le Thème 5 (Liquid Glass) */
+body[data-theme="5"] .suggestions-dropdown {
+  background: rgba(16, 20, 32, 0.94) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(48px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(220%) !important;
+}
+
+body[data-theme="5"] .suggestion-item {
+  color: #f1f5f9 !important;
+}
+
+body[data-theme="5"] .suggestion-item:hover,
+body[data-theme="5"] .suggestion-item.active {
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="5"] .sug-match {
+  color: #94a3b8 !important;
+}
+
+body[data-theme="5"] .sug-text strong {
+  color: #ffffff !important;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+body[data-theme="5"] .sug-badge {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #e2e8f0 !important;
+}
+
+body[data-theme="5"] .sug-badge.shortcut {
   background: rgba(255, 255, 255, 0.22) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
   color: #ffffff !important;
