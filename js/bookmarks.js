@@ -111,6 +111,218 @@ function getCategoryDensityClass(count) {
   return 'density-scroll';
 }
 
+/* ========================================================
+   SYSTÈME DE COULEURS ET HALOS NÉONS DYNAMIQUES
+   Harmonisé sur tous les 5 thèmes (Kanagawa, Sakura, Cyberdeck, Retro Wave, Liquid Glass)
+   ======================================================== */
+const BRAND_COLORS = {
+  // Vidéo & Streaming
+  youtube: '#ff334b',
+  twitch: '#a855f7',
+  vimeo: '#00adef',
+  dailymotion: '#0066dc',
+  tiktok: '#00f2fe',
+  instagram: '#ec4899',
+  facebook: '#1877f2',
+  twitter: '#38bdf8',
+  x: '#38bdf8',
+  reddit: '#ff4500',
+  discord: '#6366f1',
+  telegram: '#26a5e4',
+  whatsapp: '#25d366',
+  linkedin: '#0a66c2',
+  pinterest: '#e60023',
+  snapchat: '#fffc00',
+  threads: '#e2ebf5',
+  mastodon: '#6364ff',
+  bluesky: '#1185fe',
+
+  // Google Suite
+  gmail: '#ea4335',
+  google: '#4285f4',
+  gemini: '#38bdf8',
+  'google docs': '#4285f4',
+  'google doc': '#4285f4',
+  'docs.google': '#4285f4',
+  'google slides': '#f59e0b',
+  'google slide': '#f59e0b',
+  'slides.google': '#f59e0b',
+  'google sheets': '#10b981',
+  'google sheet': '#10b981',
+  'sheets.google': '#10b981',
+  'google drive': '#34a853',
+  drive: '#34a853',
+  maps: '#34a853',
+  photos: '#ea4335',
+  calendar: '#4285f4',
+  keep: '#f59e0b',
+  meet: '#00ac47',
+  translate: '#4285f4',
+  notebooklm: '#8b5cf6',
+
+  // IA & Dev
+  chatgpt: '#10b981',
+  openai: '#10b981',
+  claude: '#f97316',
+  anthropic: '#f97316',
+  perplexity: '#06b6d4',
+  deepseek: '#3b82f6',
+  mistral: '#ff7000',
+  copilot: '#0078d4',
+  huggingface: '#f59e0b',
+  github: '#a78bfa',
+  gitlab: '#fc6d26',
+  bitbucket: '#0052cc',
+  stackoverflow: '#f48024',
+  npm: '#cb3837',
+  docker: '#2496ed',
+  vercel: '#eef2f6',
+  netlify: '#00c7b7',
+  archlinux: '#1793d1',
+  debian: '#d70a53',
+  ubuntu: '#e95420',
+
+  // Productivité & Design
+  notion: '#a78bfa',
+  obsidian: '#a855f7',
+  figma: '#a855f7',
+  canva: '#00c4cc',
+  trello: '#0079bf',
+  linear: '#5e6ad2',
+  slack: '#4a154b',
+  zoom: '#2d8cff',
+
+  // Université & Éducation (UCLouvain, Moodle...)
+  moodle: '#f59e0b',
+  uclouvain: '#0284c7',
+  inginious: '#10b981',
+  monhoraire: '#38bdf8',
+  outlook: '#0ea5e9',
+  office: '#d83b01',
+  microsoft: '#00a4ef',
+  teams: '#6264a7',
+  overleaf: '#22c55e',
+  myucl: '#0284c7',
+  wikipedia: '#38bdf8',
+  coursera: '#0056d2',
+
+  // Jeux & Mini-jeux
+  chess: '#eab308',
+  lichess: '#edebe9',
+  monkeytype: '#e2b714',
+  cemantix: '#f97316',
+  worldle: '#10b981',
+  framed: '#f43f5e',
+  chronophoto: '#06b6d4',
+  steam: '#1b2838',
+
+  // Finance & Marchés
+  tradingview: '#22c55e',
+  coinmarketcap: '#3861fb',
+  binance: '#f3ba2f',
+  boursorama: '#ec008c',
+  yahoo: '#6001d2',
+
+  // Médias / Musique
+  spotify: '#1db954',
+  deezer: '#ef5466',
+  netflix: '#e50914'
+};
+
+const VIBRANT_ACCENT_PALETTE = [
+  '#38bdf8', // Cyan ciel (style Gemini)
+  '#ef4444', // Rouge vif (style YouTube)
+  '#f59e0b', // Ambre doré (style Moodle)
+  '#10b981', // Émeraude (style ChatGPT)
+  '#a855f7', // Violet électrique (style GitHub)
+  '#22c55e', // Vert lime néon (style TradingView)
+  '#06b6d4', // Cyan profond
+  '#f43f5e', // Rose pourpre
+  '#f97316', // Orange corail
+  '#6366f1', // Indigo néon
+  '#eab308', // Or éclatant
+  '#14b8a6'  // Menthe turquoise
+];
+
+function hexToRgba(hex, alpha) {
+  let c = (hex || '').replace('#', '').trim();
+  if (c.length === 3) c = c.split('').map((x) => x + x).join('');
+  if (c.length !== 6) return `rgba(49, 225, 247, ${alpha})`;
+  const num = parseInt(c, 16);
+  const r = (num >> 16) & 255;
+  const g = (num >> 8) & 255;
+  const b = num & 255;
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function buildTileStyle(accentHex) {
+  return {
+    accent: accentHex,
+    bg: `linear-gradient(135deg, ${hexToRgba(accentHex, 0.22)}, ${hexToRgba(accentHex, 0.07)})`,
+    border: hexToRgba(accentHex, 0.38),
+    glow: hexToRgba(accentHex, 0.38)
+  };
+}
+
+function hashStringToColor(str) {
+  if (!str) return VIBRANT_ACCENT_PALETTE[0];
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  const idx = Math.abs(hash) % VIBRANT_ACCENT_PALETTE.length;
+  return VIBRANT_ACCENT_PALETTE[idx];
+}
+
+function getLinkVisualTheme(link) {
+  if (link && link.color && link.color.startsWith('#')) {
+    return buildTileStyle(link.color);
+  }
+
+  const rawUrl = (link?.url || '').toLowerCase();
+  const rawName = (link?.name || '').toLowerCase();
+  let domain = '';
+  try {
+    domain = new URL(rawUrl).hostname.replace(/^www\./, '').toLowerCase();
+  } catch {
+    domain = rawUrl.replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0].toLowerCase();
+  }
+
+  // Correspondance exacte ou partielle dans les marques reconnues
+  for (const [key, color] of Object.entries(BRAND_COLORS)) {
+    if (domain.includes(key) || rawName.includes(key) || rawUrl.includes(key)) {
+      return buildTileStyle(color);
+    }
+  }
+
+  // Attribution algorithmique déterministe
+  const fallbackColor = hashStringToColor(domain || rawName || 'web');
+  return buildTileStyle(fallbackColor);
+}
+
+function updateColorPickerUI(color) {
+  const dots = document.querySelectorAll('.color-dot-btn');
+  const customColorInput = document.getElementById('edit-custom-color');
+  const hiddenValInput = document.getElementById('edit-color-val');
+  if (hiddenValInput) hiddenValInput.value = color || '';
+
+  const normColor = (color || '').trim().toLowerCase();
+  let matched = false;
+
+  dots.forEach((btn) => {
+    const btnColor = (btn.dataset.color || '').trim().toLowerCase();
+    const isAuto = btnColor === 'auto';
+    const isActive = isAuto ? (!normColor || normColor === 'auto') : (btnColor === normColor);
+    btn.classList.toggle('active', isActive);
+    if (isActive) matched = true;
+  });
+
+  if (customColorInput && normColor && normColor.startsWith('#')) {
+    customColorInput.value = normColor;
+  }
+}
+
 function renderCategories() {
   const categoriesContainer = document.getElementById('categories-container');
   if (!categoriesContainer) return;
@@ -180,8 +392,11 @@ function renderCategories() {
                       name: link.name,
                       title: link.name,
                       url: link.url,
-                      icon: link.icon
+                      icon: link.icon,
+                      color: link.color
                     });
+
+                    const visualTheme = getLinkVisualTheme(link);
 
                     return `
                     <a
@@ -190,7 +405,10 @@ function renderCategories() {
                       class="link-item"
                       data-cat="${catIdx}"
                       data-link="${linkIdx}"
+                      data-name="${escapeHtml(link.name)}"
+                      style="--tile-accent: ${visualTheme.accent}; --tile-bg: ${visualTheme.bg}; --tile-border: ${visualTheme.border}; --tile-glow: ${visualTheme.glow};"
                       draggable="${isEditMode ? 'true' : 'false'}"
+                      title="${escapeHtml(link.name)}"
                     >
                       <div class="link-icon-box">
                         <i class="${link.icon || 'fa-solid fa-link'}"></i>
@@ -463,6 +681,7 @@ function openEditModal(catIdx, linkIdx) {
     if (editUrlInput) editUrlInput.value = data?.url || '';
     if (editIconInput) editIconInput.value = data?.icon || 'fa-solid fa-link';
     updateIconPreview(data?.icon || 'fa-solid fa-link');
+    updateColorPickerUI(data?.color || '');
     if (deleteBtn) deleteBtn.hidden = false;
     if (submitBtn) submitBtn.textContent = 'Enregistrer';
   } else {
@@ -472,6 +691,7 @@ function openEditModal(catIdx, linkIdx) {
     if (editUrlInput) editUrlInput.value = '';
     if (editIconInput) editIconInput.value = 'fa-solid fa-link';
     updateIconPreview('fa-solid fa-link');
+    updateColorPickerUI('');
     if (deleteBtn) deleteBtn.hidden = true;
     if (submitBtn) submitBtn.textContent = 'Ajouter';
   }
@@ -772,6 +992,21 @@ function initBookmarks() {
     });
   });
 
+  // Sélecteur de couleur néon pour le raccourci
+  document.querySelectorAll('.color-dot-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const color = btn.dataset.color || 'auto';
+      updateColorPickerUI(color);
+    });
+  });
+
+  const customColorInput = document.getElementById('edit-custom-color');
+  if (customColorInput) {
+    customColorInput.addEventListener('input', (e) => {
+      updateColorPickerUI(e.target.value);
+    });
+  }
+
   // Formulaire d'édition de raccourci
   if (editForm) {
     editForm.addEventListener('submit', (e) => {
@@ -784,11 +1019,18 @@ function initBookmarks() {
         targetCatIdx = 0;
       }
 
+      const colorValEl = document.getElementById('edit-color-val');
+      const chosenColor = colorValEl ? colorValEl.value.trim() : '';
+
       const newBookmark = {
         name: editNameInput.value.trim(),
         url: editUrlInput.value.trim(),
         icon: editIconInput.value.trim() || 'fa-solid fa-link'
       };
+
+      if (chosenColor && chosenColor !== 'auto') {
+        newBookmark.color = chosenColor;
+      }
 
       const { linkIdx } = currentEditingTarget;
       if (linkIdx === null) {
