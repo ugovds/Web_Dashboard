@@ -42,6 +42,18 @@ function initShortcuts() {
         closeCustomHub();
         return;
       }
+      if (typeof isEditMode !== 'undefined' && isEditMode && typeof setEditMode === 'function') {
+        setEditMode(false);
+        if (typeof showToast === 'function') showToast('Mode Normal activé', 'info');
+        return;
+      }
+    }
+
+    // Toggle Mode Personnalisation via Ctrl+E
+    if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'e')) {
+      e.preventDefault();
+      if (typeof toggleEditMode === 'function') toggleEditMode();
+      return;
     }
 
     // Toggle Palette de Commande via Ctrl+K / Cmd+K

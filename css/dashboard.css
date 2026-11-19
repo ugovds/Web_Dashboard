@@ -3,7 +3,7 @@
    Cyberdeck - Startpage
    ======================================================== */
 
-/* --- CONTENEUR GLOBAL CENTRÉ --- */
+/* --- CONTENEUR GLOBAL CENTRÉ & PLEINE LARGEUR --- */
 .startpage-container {
   width: 100vw;
   height: 100vh;
@@ -13,156 +13,179 @@
   position: relative;
   z-index: 2;
   box-sizing: border-box;
-  padding: 1.15rem 2rem 1.6rem 2rem;
-  max-width: 1720px;
+  padding: 1.1rem 2rem 1.4rem 2rem;
+  max-width: 100%;
+  margin: 0;
+}
+
+/* --- ZONE SUPÉRIEURE : RECHERCHE CENTRÉE SANS BANDEAU SUPERFLU --- */
+.startpage-top-zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 0.95rem;
+  flex-shrink: 0;
+}
+
+.startpage-search-wrap {
+  width: 100%;
+  max-width: 660px;
   margin: 0 auto;
 }
 
-/* --- HEADER HUD FLOTTANT --- */
-.startpage-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
-  padding: 0.65rem 1.4rem;
-  border-radius: 20px;
-  background: rgba(12, 15, 23, 0.72);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.startpage-search-wrap .search-box {
+  padding: 0.55rem 1.15rem;
+  border-radius: 16px;
+  background: rgba(14, 18, 28, 0.72);
+  border: 1px solid var(--border-subtle);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-  flex-shrink: 0;
-  margin-bottom: 1.15rem;
-}
-
-/* --- LOGO / ART AVATAR CYCLER --- */
-.startpage-brand {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-  flex-shrink: 0;
-}
-
-.startpage-brand:hover {
-  transform: translateY(-1px);
-}
-
-.brand-avatar-box {
-  position: relative;
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid var(--border-highlight);
-  background: #000;
-  box-shadow: 0 0 14px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
-}
-
-.brand-avatar-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.brand-status-dot {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  box-shadow: 0 0 6px var(--accent-primary);
-}
-
-.brand-meta {
-  display: flex;
-  flex-direction: column;
-}
-
-.brand-title {
-  font-family: "Orbitron", monospace, sans-serif;
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  color: var(--accent-white, #fff);
-  line-height: 1.1;
-}
-
-.brand-badge {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.68rem;
-  color: var(--accent-primary);
-  letter-spacing: 0.5px;
-}
-
-/* --- OMNIBOX SEARCH CENTRÉE --- */
-.startpage-search-wrap {
-  flex: 1;
-  max-width: 660px;
-}
-
-.startpage-search-wrap .search-box {
-  padding: 0.5rem 1.15rem;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.04);
-  box-shadow: none;
-  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
   transition: all 0.25s ease;
 }
 
 .startpage-search-wrap .search-box:focus-within {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(18, 24, 38, 0.88);
   border-color: var(--border-highlight);
-  box-shadow: 0 0 20px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
   transform: translateY(-1px);
 }
 
-/* --- ACTIONS DU HEADER --- */
-.startpage-actions {
+/* --- BOUTONS D'ANGLE EN HAUT À DROITE (ROUAGE & ÉDITION) --- */
+.top-corner-actions {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  z-index: 100;
+}
+
+.top-corner-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  user-select: none;
+}
+
+.top-corner-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border-highlight);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45), 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+}
+
+.top-corner-btn:active {
+  transform: translateY(1px);
+}
+
+/* État actif du bouton de personnalisation */
+body.customization-mode #toggle-customization-btn {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.22);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  box-shadow: 0 0 18px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.45);
+}
+
+/* --- BARRE FLOTTANTE DU MODE PERSONNALISATION --- */
+.customization-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: 14px;
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.12);
+  border: 1px solid var(--accent-primary);
+  color: var(--accent-white);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  margin-bottom: 0.95rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 20px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.25);
+  animation: fadeInCustomBar 0.22s ease-out;
+  flex-shrink: 0;
+}
+
+.customization-bar[hidden] {
+  display: none !important;
+}
+
+@keyframes fadeInCustomBar {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.customization-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.84rem;
+  color: var(--accent-white);
+}
+
+.customization-bar-info i {
+  color: var(--accent-primary);
+  font-size: 1rem;
+}
+
+.customization-bar-actions {
   display: flex;
   align-items: center;
   gap: 0.65rem;
   flex-shrink: 0;
 }
 
-.startpage-btn {
+.customization-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-subtle);
-  color: var(--text-main);
+  gap: 0.45rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 9px;
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
-  user-select: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.startpage-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--border-highlight);
-  color: #fff;
-  transform: translateY(-1px);
-}
-
-.startpage-btn.primary {
+.customization-btn.primary {
   background: var(--accent-primary);
-  border-color: var(--accent-primary);
   color: #05070a;
   font-weight: 700;
 }
 
-.startpage-btn.primary:hover {
+.customization-btn.primary:hover {
   opacity: 0.92;
-  box-shadow: 0 0 16px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.45);
+  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.45);
+}
+
+.customization-btn.secondary {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-subtle);
+  color: #fff;
+}
+
+.customization-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--border-highlight);
 }
 
 /* --- CANEVAS PRINCIPAL : GRILLE DES RACCOURCIS --- */
@@ -775,24 +798,18 @@
   .startpage-container {
     padding: 0.75rem;
   }
-  .startpage-header {
-    padding: 0.6rem 0.85rem;
-    flex-wrap: wrap;
+  .startpage-top-zone {
+    flex-direction: column;
     gap: 0.65rem;
+    align-items: stretch;
+  }
+  .top-corner-actions {
+    position: static;
+    transform: none;
+    justify-content: flex-end;
   }
   .startpage-search-wrap {
-    order: 3;
     max-width: 100%;
     width: 100%;
-  }
-  .startpage-btn span {
-    display: none;
-  }
-  .startpage-btn {
-    padding: 0.45rem;
-    width: 34px;
-    height: 34px;
-    justify-content: center;
-    border-radius: 50%;
   }
 }

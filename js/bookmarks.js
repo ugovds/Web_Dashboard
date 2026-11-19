@@ -110,21 +110,26 @@ function renderCategories() {
             <i class="${cat.icon || 'fa-solid fa-folder'}"></i>
             <h3>${escapeHtml(cat.title)}</h3>
           </div>
-          <div class="category-tools-group">
-            <button type="button" class="cat-tool-btn cat-tool-add-btn" data-cat="${catIdx}" title="Ajouter un lien dans cette catégorie">
-              <i class="fa-solid fa-plus"></i>
-            </button>
-            <button type="button" class="cat-tool-btn cat-tool-edit-btn" data-cat="${catIdx}" title="Modifier cette catégorie">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            ${
-              categories.length > 1
-                ? `<button type="button" class="cat-tool-btn danger cat-tool-del-btn" data-cat="${catIdx}" title="Supprimer la catégorie">
-                     <i class="fa-solid fa-trash-can"></i>
-                   </button>`
-                : ''
-            }
-          </div>
+          ${
+            isEditMode
+              ? `
+              <div class="category-tools-group">
+                <button type="button" class="cat-tool-btn cat-tool-add-btn" data-cat="${catIdx}" title="Ajouter un lien dans cette catégorie">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button" class="cat-tool-btn cat-tool-edit-btn" data-cat="${catIdx}" title="Modifier cette catégorie">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+                ${
+                  categories.length > 1
+                    ? `<button type="button" class="cat-tool-btn danger cat-tool-del-btn" data-cat="${catIdx}" title="Supprimer la catégorie">
+                         <i class="fa-solid fa-trash-can"></i>
+                       </button>`
+                    : ''
+                }
+              </div>`
+              : ''
+          }
         </div>
 
         <div class="link-list" data-cat="${catIdx}">
@@ -134,9 +139,13 @@ function renderCategories() {
               <div class="empty-cat-placeholder" style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; color: var(--text-muted); padding: 1.5rem; text-align: center;">
                 <i class="fa-regular fa-folder-open" style="font-size: 1.8rem; opacity: 0.6;"></i>
                 <span style="font-size: 0.8rem;">Aucun raccourci pour le moment.</span>
-                <button type="button" class="cat-tool-btn primary link-item-add-quick" data-cat="${catIdx}" style="width: auto; padding: 0.35rem 0.75rem; gap: 0.4rem; font-size: 0.75rem;">
-                  <i class="fa-solid fa-plus"></i> Ajouter un lien
-                </button>
+                ${
+                  isEditMode
+                    ? `<button type="button" class="cat-tool-btn primary link-item-add-quick" data-cat="${catIdx}" style="width: auto; padding: 0.35rem 0.75rem; gap: 0.4rem; font-size: 0.75rem;">
+                         <i class="fa-solid fa-plus"></i> Ajouter un lien
+                       </button>`
+                    : ''
+                }
               </div>
             `
               : cat.links
@@ -150,33 +159,34 @@ function renderCategories() {
                       icon: link.icon
                     });
 
-                    const cleanDomain = getCleanDomain(link.url);
                     return `
                     <a
                       href="${escapeHtml(link.url)}"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      ${isEditMode ? '' : 'target="_blank" rel="noopener noreferrer"'}
                       class="link-item"
                       data-cat="${catIdx}"
                       data-link="${linkIdx}"
-                      draggable="true"
+                      draggable="${isEditMode ? 'true' : 'false'}"
                     >
                       <div class="link-icon-box">
                         <i class="${link.icon || 'fa-solid fa-link'}"></i>
                       </div>
                       <div class="link-details">
                         <span class="link-name-text">${escapeHtml(link.name)}</span>
-                        ${cleanDomain ? `<span class="link-url-text">${escapeHtml(cleanDomain)}</span>` : ''}
                       </div>
-                      <button
-                        type="button"
-                        class="link-delete-badge"
-                        data-del-cat="${catIdx}"
-                        data-del-link="${linkIdx}"
-                        title="Supprimer ce raccourci"
-                      >
-                        <i class="fa-solid fa-xmark"></i>
-                      </button>
+                      ${
+                        isEditMode
+                          ? `<button
+                               type="button"
+                               class="link-delete-badge"
+                               data-del-cat="${catIdx}"
+                               data-del-link="${linkIdx}"
+                               title="Supprimer ce raccourci"
+                             >
+                               <i class="fa-solid fa-xmark"></i>
+                             </button>`
+                          : ''
+                      }
                     </a>
                   `;
                   })
@@ -193,12 +203,29 @@ function renderCategories() {
 }
 
 function setEditMode(active) {
-  isEditMode = active;
+  isEditMode = Boolean(active);
+  document.body.classList.toggle('customization-mode', isEditMode);
+  document.body.classList.toggle('edit-mode-active', isEditMode);
   document.body.classList.toggle('bookmarks-edit-mode', isEditMode);
-  const toolbar = document.getElementById('customize-toolbar');
-  if (toolbar) toolbar.hidden = !isEditMode;
+
+  const customBar = document.getElementById('customization-bar');
+  if (customBar) customBar.hidden = !isEditMode;
+
+  const toggleBtn = document.getElementById('toggle-customization-btn');
+  if (toggleBtn) {
+    toggleBtn.classList.toggle('active', isEditMode);
+    toggleBtn.innerHTML = isEditMode ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-pen"></i>';
+    toggleBtn.title = isEditMode ? 'Quitter le mode personnalisation' : 'Mode Personnalisation (Modifier/Ajouter/Supprimer)';
+  }
+
   renderCategories();
 }
+
+function toggleEditMode() {
+  setEditMode(!isEditMode);
+}
+window.setEditMode = setEditMode;
+window.toggleEditMode = toggleEditMode;
 
 function attachCategoryActionEvents() {
   document.querySelectorAll('.cat-tool-add-btn, .link-item-add-quick').forEach((btn) => {
@@ -616,6 +643,34 @@ function initBookmarks() {
   const editIconInput = document.getElementById('edit-icon');
   const catSelect = document.getElementById('edit-category-select');
   const categoriesContainer = document.getElementById('categories-container');
+
+  // Boutons du mode personnalisation
+  const toggleCustomizationBtn = document.getElementById('toggle-customization-btn');
+  if (toggleCustomizationBtn) {
+    toggleCustomizationBtn.addEventListener('click', () => {
+      toggleEditMode();
+      if (typeof showToast === 'function') {
+        showToast(isEditMode ? 'Mode Personnalisation activé' : 'Mode Normal activé', 'info');
+      }
+    });
+  }
+
+  const customDoneBtn = document.getElementById('customization-done-btn');
+  if (customDoneBtn) {
+    customDoneBtn.addEventListener('click', () => {
+      setEditMode(false);
+      if (typeof showToast === 'function') {
+        showToast('Mode Normal activé', 'info');
+      }
+    });
+  }
+
+  const customAddCatBtn = document.getElementById('customization-add-category-btn');
+  if (customAddCatBtn) {
+    customAddCatBtn.addEventListener('click', () => {
+      openCategoryModal(null);
+    });
+  }
 
   // Boutons d'ajout global
   const topbarAddBtn = document.getElementById('topbar-add-shortcut-btn');

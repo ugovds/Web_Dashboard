@@ -53,21 +53,9 @@
     <!-- Application Startpage -->
     <div class="startpage-container">
       <!-- ==============================================
-           1. HEADER HUD MINIMALISTE & FLOTTANT
+           ZONE SUPÉRIEURE : BARRE DE RECHERCHE + ACTIONS D'ANGLE (ROUAGE & ÉDITION)
            ============================================== -->
-      <header class="startpage-header">
-        <!-- Logo / Thème Avatar -->
-        <div class="startpage-brand" id="brand-theme-cycler" title="Cliquer pour changer de thème (ou touches 1 à 5)">
-          <div class="brand-avatar-box">
-            <img id="main-art" src="images/gif4.gif" alt="Thème" width="38" height="38" fetchpriority="high" />
-            <span class="brand-status-dot"></span>
-          </div>
-          <div class="brand-meta">
-            <span class="brand-title">CYBERDECK</span>
-            <span class="brand-badge" id="art-badge-text">RETRO WAVE</span>
-          </div>
-        </div>
-
+      <div class="startpage-top-zone">
         <!-- Barre de recherche Omnibox centrée -->
         <div class="startpage-search-wrap">
           <div class="search-wrapper">
@@ -100,11 +88,11 @@
               <kbd class="shortcut-hint" title="Appuyez sur / pour cibler">/</kbd>
             </form>
 
-            <!-- Menu déroulant des moteurs de recherche & raccourcis -->
-            <div id="engine-dropdown-menu" class="engine-dropdown-menu liquid-glass-menu" hidden>
+            <!-- Menu déroulant stylisé des moteurs de recherche & raccourcis -->
+            <div id="engine-dropdown-menu" class="engine-dropdown-menu" hidden>
               <div class="engine-dropdown-header">
-                <span><i class="fa-solid fa-layer-group"></i> Moteur de recherche &amp; Raccourcis</span>
-                <span class="engine-dropdown-tip">Choisissez une bulle</span>
+                <span><i class="fa-solid fa-layer-group"></i> Moteur de recherche</span>
+                <span class="engine-dropdown-tip">Choisissez ou tapez !</span>
               </div>
               <div class="engine-dropdown-bubbles-wrap" id="engine-dropdown-grid"></div>
             </div>
@@ -113,18 +101,44 @@
           </div>
         </div>
 
-        <!-- Actions rapides de droite -->
-        <div class="startpage-actions">
-          <button type="button" id="topbar-add-shortcut-btn" class="startpage-btn primary" title="Ajouter un nouveau raccourci">
-            <i class="fa-solid fa-plus"></i>
-            <span>Nouveau Raccourci</span>
+        <!-- Boutons d'angle discrets en haut à droite (Édition + Rouage Paramètres) -->
+        <div class="top-corner-actions">
+          <button
+            type="button"
+            id="toggle-customization-btn"
+            class="top-corner-btn"
+            title="Mode Personnalisation (Modifier/Ajouter/Supprimer des raccourcis)"
+            aria-label="Mode personnalisation"
+          >
+            <i class="fa-solid fa-pen"></i>
           </button>
-          <button type="button" id="open-settings-btn" class="startpage-btn" title="Paramètres &amp; Personnalisation (Alt+2)">
-            <i class="fa-solid fa-sliders"></i>
-            <span>Paramètres</span>
+          <button
+            type="button"
+            id="open-settings-btn"
+            class="top-corner-btn"
+            title="Paramètres &amp; Thèmes (Alt+2)"
+            aria-label="Paramètres"
+          >
+            <i class="fa-solid fa-gear"></i>
           </button>
         </div>
-      </header>
+      </div>
+
+      <!-- Barre flottante du Mode Personnalisation (affichée uniquement quand le mode est activé) -->
+      <div id="customization-bar" class="customization-bar" hidden>
+        <div class="customization-bar-info">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span><strong>Mode Personnalisation actif</strong> — Cliquez sur un raccourci pour changer son lien, nom ou icône. Cliquez sur la croix pour supprimer.</span>
+        </div>
+        <div class="customization-bar-actions">
+          <button type="button" id="customization-add-category-btn" class="customization-btn secondary">
+            <i class="fa-solid fa-folder-plus"></i> + Nouvelle Catégorie
+          </button>
+          <button type="button" id="customization-done-btn" class="customization-btn primary">
+            <i class="fa-solid fa-check"></i> Terminer
+          </button>
+        </div>
+      </div>
 
       <!-- ==============================================
            2. CANEVAS PRINCIPAL : GRILLE CENTRÉE DES RACCOURCIS

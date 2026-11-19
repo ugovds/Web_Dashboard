@@ -171,3 +171,256 @@
   color: var(--accent-primary);
 }
 
+/* ========================================================
+   MENU DÉROULANT DES MOTEURS DE RECHERCHE
+   ======================================================== */
+.engine-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: min(460px, 92vw);
+  background: var(--surface-strong, rgba(14, 18, 28, 0.96));
+  border: 1px solid var(--border-highlight);
+  border-radius: 18px;
+  padding: 0.95rem;
+  backdrop-filter: blur(36px) saturate(200%);
+  -webkit-backdrop-filter: blur(36px) saturate(200%);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  z-index: 150;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: dropdownFadeScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.engine-dropdown-menu[hidden] {
+  display: none !important;
+}
+
+@keyframes dropdownFadeScale {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.engine-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.engine-dropdown-header span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.engine-dropdown-tip {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.engine-dropdown-bubbles-wrap {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  max-height: 290px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.engine-dropdown-bubbles-wrap::-webkit-scrollbar {
+  width: 5px;
+}
+
+.engine-dropdown-bubbles-wrap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.engine-bubble-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  user-select: none;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+.engine-bubble-pill:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--border-highlight);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.engine-bubble-pill.active {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.18);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+}
+
+.engine-bubble-icon {
+  font-size: 0.95rem;
+  width: 18px;
+  text-align: center;
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.engine-bubble-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.engine-bubble-tag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.engine-bubble-tag.default {
+  background: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.15);
+  color: var(--accent-primary);
+  border-color: rgba(var(--accent-primary-rgb, 167, 139, 250), 0.3);
+}
+
+/* ========================================================
+   STYLES SPÉCIFIQUES DES THÈMES POUR LE MENU MOTEURS
+   ======================================================== */
+
+/* Thème 1 : Kanagawa */
+body[data-theme="1"] .engine-dropdown-menu {
+  background: rgba(18, 22, 34, 0.96);
+  border-color: rgba(168, 230, 240, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 24px rgba(168, 230, 240, 0.15);
+}
+body[data-theme="1"] .engine-bubble-pill.active {
+  background: rgba(168, 230, 240, 0.18);
+  border-color: #a8e6f0;
+  color: #a8e6f0;
+}
+
+/* Thème 2 : Sakura */
+body[data-theme="2"] .engine-dropdown-menu {
+  background: rgba(26, 18, 24, 0.96);
+  border-color: rgba(255, 133, 192, 0.35);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75), 0 0 24px rgba(255, 133, 192, 0.15);
+}
+body[data-theme="2"] .engine-bubble-pill.active {
+  background: rgba(255, 133, 192, 0.18);
+  border-color: #ff85c0;
+  color: #ff85c0;
+}
+
+/* Thème 3 : Cyberdeck */
+body[data-theme="3"] .engine-dropdown-menu {
+  background: rgba(13, 16, 26, 0.96);
+  border-color: rgba(49, 225, 247, 0.4);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 28px rgba(49, 225, 247, 0.2);
+}
+body[data-theme="3"] .engine-bubble-pill.active {
+  background: rgba(49, 225, 247, 0.2);
+  border-color: #31e1f7;
+  color: #31e1f7;
+}
+
+/* Thème 4 : Retro Wave */
+body[data-theme="4"] .engine-dropdown-menu {
+  background: rgba(16, 14, 28, 0.96);
+  border-color: rgba(245, 158, 11, 0.38);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 24px rgba(245, 158, 11, 0.15);
+}
+body[data-theme="4"] .engine-bubble-pill.active {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+/* Thème 5 : Liquid Glass (VisionOS Pure Crystal Clear & High Contrast) */
+body[data-theme="5"] .engine-dropdown-menu {
+  background: rgba(16, 20, 32, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(48px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(220%) !important;
+}
+
+body[data-theme="5"] .engine-dropdown-header {
+  border-bottom-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="5"] .engine-dropdown-tip {
+  color: #94a3b8 !important;
+}
+
+body[data-theme="5"] .engine-bubble-pill {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #f8fafc !important;
+}
+
+body[data-theme="5"] .engine-bubble-pill:hover {
+  background: rgba(255, 255, 255, 0.16) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="5"] .engine-bubble-pill.active {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 0 18px rgba(255, 255, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+body[data-theme="5"] .engine-bubble-icon {
+  color: #ffffff !important;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.6));
+}
+
+body[data-theme="5"] .engine-bubble-tag {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+  color: #e2e8f0 !important;
+}
+
+body[data-theme="5"] .engine-bubble-tag.default {
+  background: rgba(255, 255, 255, 0.22) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: #ffffff !important;
+}
+
